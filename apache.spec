@@ -491,11 +491,11 @@ if [ "$1" = "0" ]; then
 fi
 
 %post mod_define
-%{_sbindir}/apxs -e -a -n digest %{_libexecdir}/mod_define.so 1>&2
+%{_sbindir}/apxs -e -a -n define %{_libexecdir}/mod_define.so 1>&2
 
 %preun mod_define
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n digest %{_libexecdir}/mod_define.so 1>&2
+	%{_sbindir}/apxs -e -A -n define %{_libexecdir}/mod_define.so 1>&2
 fi
 
 %post mod_digest
