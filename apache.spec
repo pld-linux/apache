@@ -24,7 +24,7 @@ Summary(ru):	óÁÍÙÊ ÐÏÐÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.0.45
-Release:	0.1
+Release:	0.2
 License:	Apache Group License
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/
@@ -574,6 +574,9 @@ Summary:	The includes and linker libraries for development with APR
 Summary(pl):	Pliki nag³ówkowe, biblioteki dla konsolidatora APR
 Group:		Development/Libraries
 Requires:	apr = %{version}
+Requires:	gdbm-devel >= 1.8.3
+Requires:	db-devel
+Requires:	expat-devel
 
 %description -n apr-devel
 The includes and linker libraries for development with APR.
@@ -586,6 +589,9 @@ Summary:	Static APR libraries
 Summary(pl):	Statyczne biblioteki APR
 Group:		Development/Libraries
 Requires:	apr-devel = %{version}
+Requires:	gdbm-static >= 1.8.3
+Requires:	db-static
+Requires:	expat-static
 
 %description -n apr-static
 Static APR libraries.
