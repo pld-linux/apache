@@ -147,7 +147,7 @@ erhältlich und weit verbreitet ist.
 %description -l es
 El servidor web Apache es el mejor servidor gratuito disponible en el
 mundo UNIX hoy. Usa HTTP (HyperText Transfer Protocol) para permitir
-que browsers web vean documentos y sometan datos remotamente. Puede
+que navegadores vean documentos y sometan datos remotamente. Puede
 ejecutar varias funciones diferentes, incluyendo funciones de proxy y
 caché, y nos ofrece características como monitor de estado, conversión
 dinámica de tipo, y otras más.
