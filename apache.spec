@@ -70,9 +70,9 @@ Requires(post,preun):	/sbin/chkconfig
 Requires(post,postun):	/sbin/ldconfig
 Requires(post):		fileutils
 Requires:	/etc/mime.types
-Provides:	httpd = %{version}
 Requires:	mailcap
 Requires:	psmisc >= 20.1
+Provides:	httpd = %{version}
 Provides:	webserver = %{version}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 Obsoletes:	apache-extra
