@@ -16,6 +16,7 @@ License:	Apache Group License
 Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
+URL:		http://www.apache.org/
 Source0:	ftp://ftp.apache.org/dist/%{name}_%{version}.tar.gz
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
@@ -44,24 +45,24 @@ Patch15:	%{name}-fpic.patch
 Patch16:	%{name}-buff.patch
 Patch17:	%{name}-mkstemp.patch
 Patch18:	%{name}-EAPI-missing_files.patch
+Patch19:	%{name}-mod_include-segv.patch
+BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
+BuildRequires:  db3-devel
+BuildRequires:	mm-devel >= 1.1.3
+%{?mod_rewrite_ldap:BuildRequires: openldap-devel}
 Provides:	httpd
 Provides:	webserver
+Provides:	%{name}(EAPI) = %{version}
 Prereq:		/sbin/chkconfig
 Prereq:		/usr/sbin/useradd
 Prereq:		/usr/bin/getgid
 Prereq:		/bin/id
 Prereq:		sh-utils
-BuildRequires:  db3-devel
-BuildRequires:	mm-devel >= 1.1.3
-%{?mod_rewrite_ldap:BuildRequires: openldap-devel}
 Prereq:		rc-scripts
+Prereq:		mm
+Prereq:		perl
 Requires:	mailcap
 Requires:	/etc/mime.types
-URL:		http://www.apache.org/
-BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
-PreReq:		mm
-Prereq:		perl
-Provides:	%{name}(EAPI) = %{version}
 Obsoletes:	apache-extra
 Obsoletes:	apache6
 Obsoletes:	apache-doc
@@ -167,6 +168,10 @@ Requires:	%{name}(EAPI) = %{version}
 %description mod_auth
 This package contains mod_auth module. It provides for user
 authentication using textual files.
+
+%description -l pl mod_auth
+Ten pakiet zawiera modu³ mod_auth. S³u¿y on do autentykacji przy u¿yciu
+plików tekstowych.
 
 %package mod_auth_anon
 Summary:	Apache module with "anonymous" user access authentication
@@ -487,6 +492,7 @@ Requires:	%{name}(EAPI) = %{version}
 %patch16 -p1
 %patch17 -p1
 %patch18 -p1
+%patch19 -p1
 
 %build
 OPTIM="%{?debug:-O0 -g}%{!?debug:$RPM_OPT_FLAGS}" \
@@ -1089,19 +1095,35 @@ rm -rf $RPM_BUILD_ROOT
 
 %attr(755,root,root) %dir %{_datadir}/html
 %config(noreplace) %{_datadir}/html/index.html
+# note: html extensions are not the same as (g)libc locale names
 %lang(ca) %{_datadir}/html/index.html.ca
-%lang(cz) %{_datadir}/html/index.html.cz
-%lang(de) %{_datadir}/html/index.html.de
-%lang(dk) %{_datadir}/html/index.html.dk
-%lang(ee) %{_datadir}/html/index.html.ee
+%lang(cs) %{_datadir}/html/index.html.cz
+%lang(de_DE) %{_datadir}/html/index.html.de
+%lang(da) %{_datadir}/html/index.html.dk
+%lang(et) %{_datadir}/html/index.html.ee
+%lang(el) %{_datadir}/html/index.html.el
 %lang(en) %{_datadir}/html/index.html.en
 %lang(es) %{_datadir}/html/index.html.es
 %lang(fr) %{_datadir}/html/index.html.fr
+%lang(he) %{_datadir}/html/index.html.he.iso8859-8
 %lang(it) %{_datadir}/html/index.html.it
-%lang(lu) %{_datadir}/html/index.html.lu
+%lang(ja) %{_datadir}/html/index.html.ja.jis
+%lang(ko) %{_datadir}/html/index.html.kr.iso-kr
+%lang(de_LU) %{_datadir}/html/index.html.lu
 %lang(nl) %{_datadir}/html/index.html.nl
-%lang(pt) %{_datadir}/html/index.html.pt
+%lang(no) %{_datadir}/html/index.html.no
+%lang(pl) %{_datadir}/html/index.html.po.iso-pl
+%lang(pt_PT) %{_datadir}/html/index.html.pt
+%lang(pt_BR) %{_datadir}/html/index.html.pt-br
+%lang(ru) %{_datadir}/html/index.html.ru.cp-1251
+%lang(ru) %{_datadir}/html/index.html.ru.cp866
+%lang(ru) %{_datadir}/html/index.html.ru.iso-ru
+%lang(ru) %{_datadir}/html/index.html.ru.koi8-r
+%lang(ru) %{_datadir}/html/index.html.ru.ucs2
+%lang(ru) %{_datadir}/html/index.html.ru.ucs4
+%lang(ru) %{_datadir}/html/index.html.ru.utf8
 %lang(se) %{_datadir}/html/index.html.se
+%lang(zh_TW) %{_datadir}/html/index.html.tw.Big5
 
 %{_datadir}/html/*.gif
 %{_datadir}/errordocs
