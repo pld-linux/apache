@@ -35,7 +35,7 @@ Summary(ru):	óÁÍÙÊ ĞÏĞÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.0.53
-Release:	3.1
+Release:	3.2
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -704,9 +704,7 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 Summary:	Apache2 htpasswd utility
 Group:		Networking/Utilities
 Provides:	htpasswd
-Obsoletes:	htpasswd-apache1
-Obsoletes:	htpasswd-thttpd
-Obsoletes:      htpasswd-mini_httpd
+Obsoletes:	htpasswd
 
 %description -n htpasswd-%{name}
 htpasswd from Apache2
