@@ -27,7 +27,7 @@ Summary(uk):	îÁÊÐÏÐÕÌÑÒÎ¦ÛÉÊ Web-Server
 Summary(zh_CN):	Internet ÉÏÓ¦ÓÃ×î¹ã·ºµÄ Web ·þÎñ³ÌÐò¡£
 Name:		apache
 Version:	1.3.27
-Release:	1
+Release:	2
 License:	Apache Group 
 Group:		Networking/Daemons
 URL:		http://www.apache.org/
@@ -762,9 +762,7 @@ else
 fi
 
 %post
-if [ $1 = 1 ]; then
-	/sbin/chkconfig --add httpd
-fi
+/sbin/chkconfig --add httpd
 %{apxs} -e -a -n access %{_libexecdir}/mod_access.so 1>&2
 %{apxs} -e -a -n alias %{_libexecdir}/mod_alias.so 1>&2
 %{apxs} -e -a -n asis %{_libexecdir}/mod_asis.so 1>&2
