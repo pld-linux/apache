@@ -1,0 +1,2911 @@
+diff -Nur httpd-2.0.48/server/mpm/config.m4 httpd-2.0.48-metuxmpm-r8/server/mpm/config.m4
+--- httpd-2.0.48/server/mpm/config.m4	2003-03-11 00:07:52.000000000 -0700
++++ httpd-2.0.48-metuxmpm-r8/server/mpm/config.m4	2004-03-19 10:03:32.132460289 -0700
+@@ -1,7 +1,7 @@
+ AC_MSG_CHECKING(which MPM to use)
+ AC_ARG_WITH(mpm,
+ APACHE_HELP_STRING(--with-mpm=MPM,Choose the process model for Apache to use.
+-                          MPM={beos|worker|prefork|mpmt_os2|perchild|leader|threadpool}),[
++                          MPM={beos|worker|prefork|mpmt_os2|perchild|leader|threadpool|metuxmpm}),[
+   APACHE_MPM=$withval
+ ],[
+   if test "x$APACHE_MPM" = "x"; then
+@@ -12,7 +12,7 @@
+ 
+ apache_cv_mpm=$APACHE_MPM
+ 	
+-if test "$apache_cv_mpm" = "worker" -o "$apache_cv_mpm" = "perchild" -o "$apache_cv_mpm" = "leader" -o "$apache_cv_mpm" = "threadpool" ; then
++if test "$apache_cv_mpm" = "worker" -o "$apache_cv_mpm" = "perchild" -o "$apache_cv_mpm" = "metuxmpm" -o "$apache_cv_mpm" = "leader" -o "$apache_cv_mpm" = "threadpool" ; then
+   APR_CHECK_APR_DEFINE(APR_HAS_THREADS)
+ 
+   if test "x$ac_cv_define_APR_HAS_THREADS" = "xno"; then
+@@ -26,7 +26,7 @@
+ APACHE_FAST_OUTPUT(server/mpm/Makefile)
+ 
+ MPM_NAME=$apache_cv_mpm
+-if test "$MPM_NAME" = "leader" -o "$MPM_NAME" = "threadpool" -o "$MPM_NAME" = "perchild"; then
++if test "$MPM_NAME" = "leader" -o "$MPM_NAME" = "threadpool" -o "$MPM_NAME" = "perchild" -o "$MPM_NAME" = "metuxmpm"; then
+   AC_MSG_WARN(You have selected an EXPERIMENTAL MPM.  Be warned!)
+   MPM_SUBDIR_NAME=experimental/$MPM_NAME
+ else
+diff -Nur httpd-2.0.48/server/mpm/experimental/metuxmpm/Makefile.in httpd-2.0.48-metuxmpm-r8/server/mpm/experimental/metuxmpm/Makefile.in
+--- httpd-2.0.48/server/mpm/experimental/metuxmpm/Makefile.in	1969-12-31 17:00:00.000000000 -0700
++++ httpd-2.0.48-metuxmpm-r8/server/mpm/experimental/metuxmpm/Makefile.in	2004-03-19 10:03:32.132460289 -0700
+@@ -0,0 +1,5 @@
++
++LTLIBRARY_NAME    = libmetuxmpm.la
++LTLIBRARY_SOURCES = metuxmpm.c
++
++include $(top_srcdir)/build/ltlib.mk
+diff -Nur httpd-2.0.48/server/mpm/experimental/metuxmpm/config5.m4 httpd-2.0.48-metuxmpm-r8/server/mpm/experimental/metuxmpm/config5.m4
+--- httpd-2.0.48/server/mpm/experimental/metuxmpm/config5.m4	1969-12-31 17:00:00.000000000 -0700
++++ httpd-2.0.48-metuxmpm-r8/server/mpm/experimental/metuxmpm/config5.m4	2004-03-19 10:03:32.133460146 -0700
+@@ -0,0 +1,6 @@
++dnl ## XXX - Need a more thorough check of the proper flags to use
++
++if test "$MPM_NAME" = "metuxmpm" ; then
++    AC_CHECK_FUNCS(pthread_kill) 
++    APACHE_FAST_OUTPUT(server/mpm/$MPM_SUBDIR_NAME/Makefile)
++fi
+diff -Nur httpd-2.0.48/server/mpm/experimental/metuxmpm/metuxmpm.c httpd-2.0.48-metuxmpm-r8/server/mpm/experimental/metuxmpm/metuxmpm.c
+--- httpd-2.0.48/server/mpm/experimental/metuxmpm/metuxmpm.c	1969-12-31 17:00:00.000000000 -0700
++++ httpd-2.0.48-metuxmpm-r8/server/mpm/experimental/metuxmpm/metuxmpm.c	2004-03-19 10:57:21.869478056 -0700
+@@ -0,0 +1,2594 @@
++/* ====================================================================
++ * The Apache Software License, Version 1.1
++ *
++ * Copyright (c) 2000-2002 The Apache Software Foundation.  All rights
++ * reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ *
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in
++ *    the documentation and/or other materials provided with the
++ *    distribution.
++ *
++ * 3. The end-user documentation included with the redistribution,
++ *    if any, must include the following acknowledgment:
++ *       "This product includes software developed by the
++ *        Apache Software Foundation (http://www.apache.org/)."
++ *    Alternately, this acknowledgment may appear in the software itself,
++ *    if and wherever such third-party acknowledgments normally appear.
++ *
++ * 4. The names "Apache" and "Apache Software Foundation" must
++ *    not be used to endorse or promote products derived from this
++ *    software without prior written permission. For written
++ *    permission, please contact apache@apache.org.
++ *
++ * 5. Products derived from this software may not be called "Apache",
++ *    nor may "Apache" appear in their name, without prior written
++ *    permission of the Apache Software Foundation.
++ *
++ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
++ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
++ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
++ * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
++ * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
++ * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
++ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
++ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
++ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++ * SUCH DAMAGE.
++ * ====================================================================
++ *
++ * This software consists of voluntary contributions made by many
++ * individuals on behalf of the Apache Software Foundation.  For more
++ * information on the Apache Software Foundation, please see
++ * <http://www.apache.org/>.
++ *
++ * Portions of this software are based upon public domain software
++ * originally written at the National Center for Supercomputing Applications,
++ * University of Illinois, Urbana-Champaign.
++ */
++
++/* TODO:
++    + replace pipe_of_death by an generic command interface 
++    + also use this interface for child->child communications
++    + add support for runtime configuration over this if.
++    + what to do w/ unassigned vhosts ? who should handle them ?
++      perhaps we shoudda add an DefaultProcessor option ?
++    + test, test, test, and test, especially under high load.
++    + what about persistent links w/ changing vhost ?
++      should the client then give it back to the multiplexer ?
++    + add timeouts in multiplexer to prevent local dos attacks
++    + think about possible vulnarabilities. note that the vhost's user
++      could ptrace the processor child and play nice games with it.
++*/
++    
++/* -- build configuration -- manly for debugging -- */
++
++/* #define MPM_METUXMPM_DEBUG */
++
++#define MPM_THREAD_ACCEPT_LOCK
++
++#include "apr_hash.h"
++#include "apr_strings.h"
++#include "apr_pools.h"
++#include "apr_portable.h"
++#include "apr_file_io.h"
++#include "apr_signal.h"
++
++#define APR_WANT_IOVEC
++#include "apr_want.h"
++
++#if APR_HAVE_UNISTD_H
++#include <unistd.h>
++#endif
++#if APR_HAVE_SYS_SOCKET_H
++#include <sys/socket.h>
++#endif
++
++#if !APR_HAS_THREADS
++#error The metuxmpm MPM requires APR threads, but they are unavailable.
++#endif  
++
++#define CORE_PRIVATE 
++ 
++#include "ap_config.h"
++#include "httpd.h" 
++#include "http_main.h" 
++#include "http_log.h" 
++#include "http_config.h"    /* for read_config */ 
++#include "http_core.h"      /* for get_remote_host */ 
++#include "http_protocol.h"
++#include "http_connection.h"
++#include "ap_mpm.h"
++#include "unixd.h"
++#include "mpm_common.h"
++#include "ap_listen.h"
++#include "mpm_default.h"
++#include "mpm.h"
++#include "scoreboard.h"
++#include "util_filter.h"
++#include "apr_poll.h"
++
++#include "util_ebcdic.h"
++
++#ifdef HAVE_POLL_H
++#include <poll.h>
++#endif
++#ifdef HAVE_SYS_POLL_H
++#include <sys/poll.h>
++#endif
++
++/* ### should be APR-ized */
++#include <grp.h>
++#include <pwd.h>
++#include <sys/stat.h>
++#include <sys/un.h>
++#include <setjmp.h>
++#ifdef HAVE_SYS_PROCESSOR_H
++#include <sys/processor.h> /* for bindprocessor() */
++#endif
++
++#ifdef MPM_METUXMPM_DEBUG
++# define _DBG(text,par...) \
++    ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, \
++		 "(metuxmpm: pid=%d uid=%d) %s(): " text, \
++		 getpid(), getuid(), __FUNCTION__, ##par, 0)
++
++# define _TRACE_CALL(text,par...) _DBG("calling " text, ##par)
++# define _TRACE_RET(text,par...) _DBG("returned from " text, ##par)
++#else
++# define _DBG(text,par...)
++# define _TRACE_RET(text,par...)
++# define _TRACE_CALL(text,par...)
++#endif /* MPM_METUXMPM_DEBUG */
++
++/* char of death - for signalling children to die */
++#define AP_metuxmpm_CHAR_OF_DEATH	'!'
++
++#define metuxmpm_SERVER_CONF(cf)	\
++    ((metuxmpm_server_conf *) ap_get_module_config(cf,&mpm_metuxmpm_module))
++
++
++/*
++ * Define some magic numbers that we use for the state of the incomming
++ * request. These must be < 0 so they don't collide with a file descriptor.
++ */
++#define AP_metuxmpm_THISCHILD -1
++#define AP_metuxmpm_OTHERCHILD -2
++
++/* Limit on the threads per process.  Clients will be locked out if more than
++ * this * server_limit are needed.
++ *
++ * We keep this for one reason it keeps the size of the scoreboard file small
++ * enough that we can read the whole thing without worrying too much about
++ * the overhead.
++ */
++#ifndef DEFAULT_THREAD_LIMIT
++#define DEFAULT_THREAD_LIMIT 64 
++#endif
++
++/* Admin can't tune ThreadLimit beyond MAX_THREAD_LIMIT.  We want
++ * some sort of compile-time limit to help catch typos.
++ */
++#ifndef MAX_THREAD_LIMIT
++#define MAX_THREAD_LIMIT 20000
++#endif 
++
++/* Limit on the total --- clients will be locked out if more servers than
++ * this are needed.  It is intended solely to keep the server from crashing
++ * when things get out of hand.
++ *
++ * We keep a hard maximum number of servers, for two reasons --- first off,
++ * in case something goes seriously wrong, we want to stop the fork bomb
++ * short of actually crashing the machine we're running on by filling some
++ * kernel table.  Secondly, it keeps the size of the scoreboard file small
++ * enough that we can read the whole thing without worrying too much about
++ * the overhead.
++ */
++#ifndef DEFAULT_SERVER_LIMIT
++#define DEFAULT_SERVER_LIMIT 256
++#endif
++
++/* Admin can't tune ServerLimit beyond MAX_SERVER_LIMIT.  We want
++ * some sort of compile-time limit to help catch typos.
++ */
++#ifndef MAX_SERVER_LIMIT
++#define MAX_SERVER_LIMIT 20000
++#endif
++
++/*
++ * Actual definitions of config globals
++ */
++
++static int threads_to_start = 0;         /* Worker threads per child */
++static int min_spare_threads = 0;
++static int max_spare_threads = 0;
++static int max_threads = 0;
++static int server_limit = DEFAULT_SERVER_LIMIT;
++static int first_server_limit;
++static int thread_limit = DEFAULT_THREAD_LIMIT;
++static int first_thread_limit;
++static int changed_limit_at_restart;
++static int num_childs = 0;
++static int workers_may_exit = 0;
++static int requests_this_child;
++static int num_listensocks = 0;
++static ap_pod_t *pod;
++static jmp_buf jmpbuffer;
++static int thread_overflow_reported = 0;
++
++/* === configuration stuff === */
++/* the server limit is also the size of the server table */
++static int cf_server_limit = DEFAULT_SERVER_LIMIT;
++
++/* -- server process information -- */
++typedef struct
++{
++    uid_t uid;
++    gid_t gid;
++    int input;       /* The socket descriptor */
++    int output;      /* The socket descriptor */
++    int type;
++    int id;	     /* index in child_info_table */
++    const char *chroot_dir; /* can be null */
++} child_info_t;
++
++#define CHILD_TYPE_MULTIPLEXER	1
++#define CHILD_TYPE_PROCESSOR	2
++
++typedef struct 
++{
++    const char *sockname;       /* The base name for the socket */
++    const char *fullsockname;   /* socket base name + extension */
++    child_info_t* child;	/* The client which processes this server */
++} metuxmpm_server_conf;
++
++typedef struct
++{
++    int sock_fd;
++    int status;
++    jmp_buf jmpbuffer;
++} thread_info_t;
++    
++/* Tables used to determine the user and group each child process should
++ * run as.  The hash table is used to correlate a server name with a child
++ * process.
++ */
++static int            child_info_table_size;
++static child_info_t  *child_info_table;
++static thread_info_t *thread_info_table;
++struct ap_ctable     *ap_child_table;
++
++/*
++ * The max child slot ever assigned, preserved across restarts.  Necessary
++ * to deal with NumServers changes across AP_SIG_GRACEFUL restarts.  We 
++ * use this value to optimize routines that have to scan the entire child 
++ * table.
++ *
++ * XXX - It might not be worth keeping this code in. There aren't very
++ * many child processes in this MPM.
++ */
++int ap_max_daemons_limit = -1;
++int ap_threads_per_child; /* XXX not part of API!  axe it! */
++
++module AP_MODULE_DECLARE_DATA mpm_metuxmpm_module;
++
++/* -- replace the pipe-of-death by an control socket -- */
++static apr_file_t *pipe_of_death_in = NULL;
++static apr_file_t *pipe_of_death_out = NULL;
++static apr_thread_mutex_t *pipe_of_death_mutex;
++
++/* *Non*-shared http_main globals... */
++
++server_rec *ap_server_conf;
++
++/* one_process --- debugging mode variable; can be set from the command line
++ * with the -X flag.  If set, this gets you the child_main loop running
++ * in the process which originally started up (no detach, no make_child),
++ * which is a pretty nice debugging environment.  (You'll get a SIGHUP
++ * early in standalone_main; just continue through.  This is the server
++ * trying to kill off any child processes which it might have lying
++ * around --- Apache doesn't keep track of their pids, it just sends
++ * SIGHUP to the process group, ignoring it in the root process.
++ * Continue through and you'll be fine.).
++ */
++
++static int one_process = 0;
++
++#ifdef DEBUG_SIGSTOP
++int raise_sigstop_flags;
++#endif
++
++static apr_pool_t *pconf;              /* Pool for config stuff */
++static apr_pool_t *pchild;             /* Pool for httpd child stuff */
++static apr_pool_t *thread_pool_parent; /* Parent of per-thread pools */
++static apr_thread_mutex_t *thread_pool_parent_mutex;
++
++static int child_num;
++static unsigned int my_pid; /* Linux getpid() doesn't work except in 
++                      main thread. Use this instead */
++
++/* -- stack w/ free thread slot IDs */
++static int *worker_thread_free_ids;
++static apr_threadattr_t *worker_thread_attr;
++
++/* Keep track of the number of idle worker threads */
++static int idle_thread_count;
++static apr_thread_mutex_t *idle_thread_count_mutex;
++
++/* Locks for accept serialization */
++#ifdef NO_SERIALIZED_ACCEPT
++
++#define ACCEPT_PROC_MUTEX_INIT		APR_SUCCESS
++#define ACCEPT_PROC_MUTEX_LOCK		APR_SUCCESS
++#define ACCEPT_PROC_MUTEX_UNLOCK	APR_SUCCESS
++#define ACCEPT_PROC_MUTEX_CREATE	APR_SUCCESS
++
++#else
++
++static apr_proc_mutex_t *process_accept_mutex;
++
++#define ACCEPT_PROC_MUTEX_LOCK 		(apr_proc_mutex_lock(process_accept_mutex))
++#define ACCEPT_PROC_MUTEX_UNLOCK	(apr_proc_mutex_unlock(process_accept_mutex))
++#define ACCEPT_PROC_MUTEX_CREATE	(apr_proc_mutex_create(&process_accept_mutex,ap_lock_fname, ap_accept_lock_mech,_pconf))
++#define	ACCEPT_PROC_MUTEX_INIT		(apr_proc_mutex_child_init(&process_accept_mutex, ap_lock_fname, pchild));
++
++#endif /* NO_SERIALIZED_ACCEPT */
++
++static apr_thread_mutex_t *thread_accept_mutex;
++
++#ifdef MPM_metuxmpm_THREAD_ACCEPT_LOCK
++
++#define THREAD_ACCEPT_LOCK					\
++	_DBG("locking thread_accept_mutex",0);			\
++	apr_thread_mutex_lock(thread_accept_mutex);		\
++	_DBG("got thread_accept_mutex locked",0);
++				    
++#define THREAD_ACCEPT_UNLOCK	 				\
++	_DBG("unlocking thread_accept_mutex",0);			\
++	apr_thread_mutex_unlock(thread_accept_mutex);		\
++	_DBG("got thread_accept_mutex unlocked",0);
++#else
++
++#define THREAD_ACCEPT_LOCK					\
++	_DBG("omitted locking thread_accept_mutex",0);
++	
++#define THREAD_ACCEPT_UNLOCK					\
++	_DBG("omitted unlocking thread_accept_mutex",0);
++
++#endif
++/* == Keep track of the number of worker threads currently active == */
++static int worker_thread_count = 0;
++static apr_thread_mutex_t *worker_thread_count_mutex;
++
++static inline int worker_thread_count_get ()
++{
++    int x;
++    apr_thread_mutex_lock(worker_thread_count_mutex);
++    x = worker_thread_count;
++    apr_thread_mutex_unlock(worker_thread_count_mutex);
++    _DBG("worker_thread_count=%d", x);
++    return x;
++}
++
++static inline int worker_thread_count_add ( int x )
++{
++    int y;
++    apr_thread_mutex_lock(worker_thread_count_mutex);
++    worker_thread_count += x;
++    y = worker_thread_count;
++    apr_thread_mutex_unlock(worker_thread_count_mutex);
++    _DBG("worker_thread_count=%d (+%d)", y, x);
++    return y;
++}        
++
++/* ------------------------------------------------------------------- */
++
++AP_DECLARE(apr_status_t) ap_mpm_query(int query_code, int *result)
++{
++    switch(query_code){
++        case AP_MPMQ_MAX_DAEMON_USED:
++            *result = ap_max_daemons_limit;
++            return APR_SUCCESS;
++        case AP_MPMQ_IS_THREADED:
++            *result = AP_MPMQ_DYNAMIC;
++            return APR_SUCCESS;
++        case AP_MPMQ_IS_FORKED:
++            *result = AP_MPMQ_STATIC;
++            return APR_SUCCESS;
++        case AP_MPMQ_HARD_LIMIT_DAEMONS:
++            *result = cf_server_limit;
++            return APR_SUCCESS;
++        case AP_MPMQ_HARD_LIMIT_THREADS:
++            *result = thread_limit;
++            return APR_SUCCESS;
++        case AP_MPMQ_MAX_THREADS:
++            *result = max_threads;
++            return APR_SUCCESS;
++        case AP_MPMQ_MIN_SPARE_DAEMONS:
++            *result = 0;
++            return APR_SUCCESS;
++        case AP_MPMQ_MIN_SPARE_THREADS:    
++            *result = min_spare_threads;
++            return APR_SUCCESS;
++        case AP_MPMQ_MAX_SPARE_DAEMONS:
++            *result = 0;
++            return APR_SUCCESS;
++        case AP_MPMQ_MAX_SPARE_THREADS:
++            *result = max_spare_threads;
++            return APR_SUCCESS;
++        case AP_MPMQ_MAX_REQUESTS_DAEMON:
++            *result = ap_max_requests_per_child;
++            return APR_SUCCESS; 
++        case AP_MPMQ_MAX_DAEMONS:
++            *result = num_childs;
++            return APR_SUCCESS;
++    }
++    return APR_ENOTIMPL;
++}
++
++/* a clean exit from a child with proper cleanup */
++static inline int clean_child_exit(int code)
++{
++    if (pchild) apr_pool_destroy(pchild);
++    exit(code);
++}
++
++/* handle all varieties of core dumping signals */
++static void sig_coredump(int sig)
++{
++    chdir(ap_coredump_dir);
++    apr_signal(sig, SIG_DFL);
++    kill(getpid(), sig);
++    /* At this point we've got sig blocked, because we're still inside
++     * the signal handler.  When we leave the signal handler it will
++     * be unblocked, and we'll take the signal... and coredump or whatever
++     * is appropriate for this particular Unix.  In addition the parent
++     * will see the real signal we received -- whereas if we called
++     * abort() here, the parent would only see SIGABRT.
++     */
++}
++
++static void just_die(int sig)
++{
++    clean_child_exit(0);
++}
++
++/*****************************************************************
++ * Connection structures and accounting...
++ */
++
++/* volatile just in case */
++static int volatile shutdown_pending;
++static int volatile restart_pending;
++static int volatile is_graceful;
++static int volatile child_fatal;
++/* we don't currently track ap_my_generation, but mod_status 
++ * references it so it must be defined */
++ap_generation_t volatile ap_my_generation=0;
++
++/*
++ * ap_start_shutdown() and ap_start_restart(), below, are a first stab at
++ * functions to initiate shutdown or restart without relying on signals. 
++ * Previously this was initiated in sig_term() and restart() signal handlers, 
++ * but we want to be able to start a shutdown/restart from other sources --
++ * e.g. on Win32, from the service manager. Now the service manager can
++ * call ap_start_shutdown() or ap_start_restart() as appropiate.  Note that
++ * these functions can also be called by the child processes, since global
++ * variables are no longer used to pass on the required action to the parent.
++ *
++ * These should only be called from the parent process itself, since the
++ * parent process will use the shutdown_pending and restart_pending variables
++ * to determine whether to shutdown or restart. The child process should
++ * call signal_parent() directly to tell the parent to die -- this will
++ * cause neither of those variable to be set, which the parent will
++ * assume means something serious is wrong (which it will be, for the
++ * child to force an exit) and so do an exit anyway.
++ */
++
++static void ap_start_shutdown(void)
++{
++    if (shutdown_pending == 1) 
++    {
++        /* Um, is this _probably_ not an error, if the user has
++         * tried to do a shutdown twice quickly, so we won't
++         * worry about reporting it.
++         */
++        return;
++    }
++    shutdown_pending = 1;
++}
++
++/* do a graceful restart if graceful == 1 */
++static void ap_start_restart(int graceful)
++{
++    if (restart_pending == 1) 
++    {
++        /* Probably not an error - don't bother reporting it */
++        return;
++    }
++    restart_pending = 1;
++    is_graceful = graceful;
++}
++
++static void sig_term(int sig)
++{
++    ap_start_shutdown();
++}
++
++static void restart(int sig)
++{
++    ap_start_restart(sig == AP_SIG_GRACEFUL);
++}
++
++static void set_signals(void)
++{
++#ifndef NO_USE_SIGACTION
++    struct sigaction sa;
++
++    sigemptyset(&sa.sa_mask);
++    sa.sa_flags = 0;
++
++    if (!one_process) {
++        sa.sa_handler = sig_coredump;
++#if defined(SA_ONESHOT)
++        sa.sa_flags = SA_ONESHOT;
++#elif defined(SA_RESETHAND)
++        sa.sa_flags = SA_RESETHAND;
++#endif
++        if (sigaction(SIGSEGV, &sa, NULL) < 0)
++            ap_log_error(APLOG_MARK, APLOG_WARNING, errno, ap_server_conf,
++                         "sigaction(SIGSEGV)");
++#ifdef SIGBUS
++        if (sigaction(SIGBUS, &sa, NULL) < 0)
++            ap_log_error(APLOG_MARK, APLOG_WARNING, errno, ap_server_conf,
++                         "sigaction(SIGBUS)");
++#endif
++#ifdef SIGABORT
++        if (sigaction(SIGABORT, &sa, NULL) < 0)
++            ap_log_error(APLOG_MARK, APLOG_WARNING, errno, ap_server_conf,
++                         "sigaction(SIGABORT)");
++#endif
++#ifdef SIGABRT
++        if (sigaction(SIGABRT, &sa, NULL) < 0)
++            ap_log_error(APLOG_MARK, APLOG_WARNING, errno, ap_server_conf,
++                         "sigaction(SIGABRT)");
++#endif
++#ifdef SIGILL
++        if (sigaction(SIGILL, &sa, NULL) < 0)
++            ap_log_error(APLOG_MARK, APLOG_WARNING, errno, ap_server_conf,
++                         "sigaction(SIGILL)");
++#endif
++        sa.sa_flags = 0;
++    }
++    sa.sa_handler = sig_term;
++    if (sigaction(SIGTERM, &sa, NULL) < 0)
++        ap_log_error(APLOG_MARK, APLOG_WARNING, errno, ap_server_conf,
++                     "sigaction(SIGTERM)");
++#ifdef SIGINT
++    if (sigaction(SIGINT, &sa, NULL) < 0)
++        ap_log_error(APLOG_MARK, APLOG_WARNING, errno, ap_server_conf,
++                     "sigaction(SIGINT)");
++#endif
++#ifdef SIGXCPU
++    sa.sa_handler = SIG_DFL;
++    if (sigaction(SIGXCPU, &sa, NULL) < 0)
++        ap_log_error(APLOG_MARK, APLOG_WARNING, errno, ap_server_conf,
++                     "sigaction(SIGXCPU)");
++#endif
++#ifdef SIGXFSZ
++    sa.sa_handler = SIG_DFL;
++    if (sigaction(SIGXFSZ, &sa, NULL) < 0)
++        ap_log_error(APLOG_MARK, APLOG_WARNING, errno, ap_server_conf,
++                     "sigaction(SIGXFSZ)");
++#endif
++#ifdef SIGPIPE
++    sa.sa_handler = SIG_IGN;
++    if (sigaction(SIGPIPE, &sa, NULL) < 0)
++        ap_log_error(APLOG_MARK, APLOG_WARNING, errno, ap_server_conf,
++                     "sigaction(SIGPIPE)");
++#endif
++
++    /* we want to ignore HUPs and AP_SIG_GRACEFUL while we're busy 
++     * processing one */
++    sigaddset(&sa.sa_mask, SIGHUP);
++    sigaddset(&sa.sa_mask, AP_SIG_GRACEFUL);
++    sa.sa_handler = restart;
++    if (sigaction(SIGHUP, &sa, NULL) < 0)
++        ap_log_error(APLOG_MARK, APLOG_WARNING, errno, ap_server_conf,
++                     "sigaction(SIGHUP)");
++    if (sigaction(AP_SIG_GRACEFUL, &sa, NULL) < 0)
++        ap_log_error(APLOG_MARK, APLOG_WARNING, errno, ap_server_conf,
++                     "sigaction(" AP_SIG_GRACEFUL_STRING ")");
++#else
++    if (!one_process) 
++    {
++        apr_signal(SIGSEGV, sig_coredump);
++#ifdef SIGBUS
++        apr_signal(SIGBUS, sig_coredump);
++#endif /* SIGBUS */
++#ifdef SIGABORT
++        apr_signal(SIGABORT, sig_coredump);
++#endif /* SIGABORT */
++#ifdef SIGABRT
++        apr_signal(SIGABRT, sig_coredump);
++#endif /* SIGABRT */
++#ifdef SIGILL
++        apr_signal(SIGILL, sig_coredump);
++#endif /* SIGILL */
++#ifdef SIGXCPU
++        apr_signal(SIGXCPU, SIG_DFL);
++#endif /* SIGXCPU */
++#ifdef SIGXFSZ
++        apr_signal(SIGXFSZ, SIG_DFL);
++#endif /* SIGXFSZ */
++    }
++
++    apr_signal(SIGTERM, sig_term);
++#ifdef SIGHUP
++    apr_signal(SIGHUP, restart);
++#endif /* SIGHUP */
++#ifdef AP_SIG_GRACEFUL
++    apr_signal(AP_SIG_GRACEFUL, restart);
++#endif /* AP_SIG_GRACEFUL */
++#ifdef SIGPIPE
++    apr_signal(SIGPIPE, SIG_IGN);
++#endif /* SIGPIPE */
++
++#endif
++}
++
++/*****************************************************************
++ * Here follows a long bunch of generic server bookkeeping stuff...
++ */
++
++int ap_graceful_stop_signalled(void)
++{
++    /* XXX - Does this really work? - Manoj */
++    return is_graceful;
++}
++
++/*****************************************************************
++ * Child process main loop.
++ */
++
++static void process_socket(apr_pool_t *p, apr_socket_t *sock, long conn_id,
++                           apr_bucket_alloc_t *bucket_alloc)
++{
++    conn_rec *current_conn;
++    int sock_fd;
++    apr_status_t rv;
++    int thread_num = conn_id % thread_limit;
++    ap_sb_handle_t *sbh;
++
++    if ((rv = apr_os_sock_get(&sock_fd, sock)) != APR_SUCCESS) 
++    {
++        ap_log_error(APLOG_MARK, APLOG_ERR, rv, NULL, "apr_os_sock_get");
++    }
++
++    _DBG("thread_num=%d sock=%ld sock_fd=%d\n", thread_num, sock, sock_fd);
++
++    switch (child_info_table[child_num].type)
++    {
++	case CHILD_TYPE_MULTIPLEXER:
++	    _DBG("type=MULTIPLEXER %d",child_num);
++	    break;
++	case CHILD_TYPE_PROCESSOR:
++	    _DBG("type=PROCESSOR %d",child_num);
++	    break;
++	default:
++	    _DBG("type UNKNOWN! %d",child_num);
++    }
++
++    if (sock_fd >= FD_SETSIZE) 
++    {
++        ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL,
++                     "new file descriptor %d is too large; you probably need "
++                     "to rebuild Apache with a larger FD_SETSIZE "
++                     "(currently %d)", 
++                     sock_fd, FD_SETSIZE);
++        apr_socket_close(sock);
++	_DBG("thread_num=%d: exiting with error", thread_num);
++        return;
++    }
++
++    if (thread_info_table[thread_num].sock_fd < 0) 
++    {
++        ap_sock_disable_nagle(sock);
++    }
++
++    ap_create_sb_handle(&sbh, p, conn_id / thread_limit, thread_num);
++    _TRACE_CALL("ap_run_create_connection() [thread_num=%d]", thread_num);
++    current_conn = ap_run_create_connection(p, ap_server_conf, sock, conn_id, 
++                                            sbh, bucket_alloc);
++    _TRACE_RET("ap_run_create_connection() [thread_num=%d]", thread_num);
++    if (current_conn) 
++    {
++	_TRACE_CALL("ap_process_connection() [thread_num=%d]", thread_num);
++        ap_process_connection(current_conn, sock);
++	_TRACE_RET("ap_process_connection() [thread_num=%d]", thread_num);
++	_TRACE_CALL("ap_lingering_close() [thread_num=%d]", thread_num);
++        ap_lingering_close(current_conn);
++	_TRACE_RET("ap_lingering_close() [thread_num=%d]", thread_num);
++    }
++}
++
++static metuxmpm_process_connection(conn_rec *conn)
++{
++    ap_filter_t *filter;
++    apr_bucket_brigade *bb;
++    core_net_rec *net;
++
++    _DBG("function entered",0);
++
++    /* -- fetch our sockets from the pool -- */
++    apr_pool_userdata_get((void **)&bb, "metuxmpm_SOCKETS", conn->pool);
++    if (bb != NULL) 
++    {
++	/* -- find the 'core' filter and give the socket data to it -- */
++        for (filter = conn->output_filters; filter != NULL; filter = filter->next) 
++	{
++            if (!strcmp(filter->frec->name, "core")) break;
++        }
++        if (filter != NULL) 
++	{
++            net = filter->ctx;
++            net->in_ctx = apr_palloc(conn->pool, sizeof(*net->in_ctx));
++            net->in_ctx->b = bb;
++        }
++    }
++    _DBG("leaving (DECLINED)", 0);
++    return DECLINED;
++}
++    
++
++static void *worker_thread_proc(apr_thread_t *, void *);
++
++/* Starts a thread as long as we're below max_threads */
++static int start_thread(void)
++{
++    apr_thread_t *thread;
++    int rc;
++    int cnt;
++    
++    cnt = worker_thread_count_get ();
++    
++    _DBG("thread count currently: %d", cnt);
++    
++    if (cnt < max_threads - 1) 
++    {
++	_TRACE_CALL("apr_thread_create()",0);
++        rc = apr_thread_create(&thread, worker_thread_attr, worker_thread_proc,
++                 &worker_thread_free_ids[worker_thread_count], pchild);
++	_TRACE_RET("apr_thread_create()",0);
++	if (rc != APR_SUCCESS)
++	{
++            ap_log_error(APLOG_MARK, APLOG_ALERT, rc, ap_server_conf,
++                         "apr_thread_create: unable to create worker thread");
++            /* In case system resources are maxxed out, we don't want
++               Apache running away with the CPU trying to fork over and
++               over and over again if we exit. */
++            sleep(10);
++	    workers_may_exit = 1;
++	    _DBG("WATCH: workers_may_exit=%d", workers_may_exit);
++            return 0;
++        }
++	worker_thread_count_add ( 1 );
++        _DBG("WATCH: workers_may_exit=%d", workers_may_exit);
++	_DBG("ok",0);
++	return 1;
++    }
++
++    /* we already have too many threads running */
++    _DBG("too many running threads. aborting",0);
++    if (!thread_overflow_reported) 
++    {
++	ap_log_error(APLOG_MARK, APLOG_ERR, 0,
++                         ap_server_conf,
++                         "server reached MaxThreadsPerChild setting, "
++                         "consider raising the MaxThreadsPerChild or "
++                         "NumServers settings");
++        thread_overflow_reported = 1;
++    }
++    _DBG("WATCH: workers_may_exit=%d", workers_may_exit);
++    return 0;
++}
++
++/* Sets workers_may_exit if we received a character on the pipe_of_death */
++static apr_status_t check_pipe_of_death
++(
++    void **csd, 
++    ap_listen_rec *lr,
++    apr_pool_t *ptrans
++)
++{
++    int ret;
++    char pipe_read_char;
++    apr_size_t n = 1;
++
++    _DBG("WATCH: workers_may_exit=%d", workers_may_exit);
++
++    if (workers_may_exit) return APR_SUCCESS;
++    
++    apr_thread_mutex_lock(pipe_of_death_mutex);
++    ret = apr_recv(lr->sd, &pipe_read_char, &n);
++    if (APR_STATUS_IS_EAGAIN(ret)) 
++    {
++            /* It lost the lottery. It must continue to suffer
++             * through a life of servitude. */
++    }
++    else 
++    {
++	if (pipe_read_char != AP_metuxmpm_CHAR_OF_DEATH)
++	{
++	    _DBG("got wrong char %c", pipe_read_char);
++	    return APR_SUCCESS;
++	}	
++        /* It won the lottery (or something else is very
++         * wrong). Embrace death with open arms. */
++        workers_may_exit = 1;
++	_DBG("WATCH: workers_may_exit=%d", workers_may_exit);
++    }
++    apr_thread_mutex_unlock(pipe_of_death_mutex);
++    return APR_SUCCESS;
++}
++
++static apr_status_t receive_from_multiplexer 
++(
++    void **trans_sock, 	/* will be filled out w/ the received socket */
++    ap_listen_rec *lr,	/* listener to receive from */
++    apr_pool_t *ptrans	/* transaction wide pool */
++)
++{
++    struct msghdr msg;
++    struct cmsghdr *cmsg;
++    char headers[HUGE_STRING_LEN];
++    char *bodypart;
++    apr_size_t bodypart_len;
++    struct iovec iov[2];
++    int ret, fd_tmp;
++    apr_os_sock_t ctrl_sock_fd;
++    apr_os_sock_t trans_sock_fd;
++
++    /* -- bucket's, brigades and their allocators */
++    apr_bucket_alloc_t *alloc = apr_bucket_alloc_create(ptrans);
++    apr_bucket_brigade *bb    = apr_brigade_create(ptrans, alloc);
++    apr_bucket         *bucket;
++
++    /* prepare the buffers for receiving data from remote side */
++    iov[0].iov_base = &bodypart_len;
++    iov[0].iov_len  = sizeof(bodypart_len);
++    iov[1].iov_base = headers;
++    iov[1].iov_len  = HUGE_STRING_LEN;
++
++    cmsg = apr_palloc(ptrans, sizeof(*cmsg) + sizeof(trans_sock_fd));
++    cmsg->cmsg_len = sizeof(*cmsg) + sizeof(trans_sock_fd);
++
++    msg.msg_name       = NULL;
++    msg.msg_namelen    = 0;
++    msg.msg_iov        = iov;
++    msg.msg_iovlen     = 2;
++    msg.msg_control    = cmsg;
++    msg.msg_controllen = cmsg->cmsg_len;
++
++    /* -- receive data from socket -- */
++    apr_os_sock_get(&ctrl_sock_fd, lr->sd);
++    _DBG("receiving from sock_fd=%d", ctrl_sock_fd);
++    ret = recvmsg(ctrl_sock_fd, &msg, 0);
++    
++    /* -- extract socket from the cmsg -- */
++    memcpy(&trans_sock_fd, CMSG_DATA(cmsg), sizeof(trans_sock_fd));
++    apr_os_sock_put((apr_socket_t **)trans_sock, &trans_sock_fd, ptrans);
++    apr_os_sock_get(&fd_tmp, *trans_sock);
++
++
++    _DBG("trans_sock=%ld fdx=%d sock_fd=%d",
++         *trans_sock, trans_sock_fd, fd_tmp);
++
++    _DBG("headers=\"%s\"", headers);
++
++    /* -- store received data into an brigade and add 
++          it to the current transaction's pool -- */
++    bucket = apr_bucket_eos_create(alloc);
++    APR_BRIGADE_INSERT_HEAD(bb, bucket);
++    bucket = apr_bucket_socket_create(*trans_sock, alloc);
++    APR_BRIGADE_INSERT_HEAD(bb, bucket);
++
++    /* Receive the bodypart (if there is one) and insert it in the brigade */
++    if (bodypart_len) {       
++        _DBG("Receiving the bodypart (bodypart_len=%d)", bodypart_len);
++	bodypart = apr_palloc(ptrans, bodypart_len);
++        ret = recv(ctrl_sock_fd, bodypart, HUGE_STRING_LEN, 0);
++
++        _DBG("bodypart=\"%s\"", bodypart);
++        bucket = apr_bucket_heap_create(bodypart,
++                                        bodypart_len, NULL, alloc);
++        APR_BRIGADE_INSERT_HEAD(bb, bucket);
++    } else {
++        _DBG("There is no bodypart",0);
++    }
++    
++    bucket = apr_bucket_heap_create(headers,
++                                    strlen(headers), NULL, alloc);
++    /* DS: I really don't like that strlen here */
++    
++    APR_BRIGADE_INSERT_HEAD(bb, bucket);
++
++    apr_pool_userdata_set(bb, "metuxmpm_SOCKETS", NULL, ptrans);
++    _DBG("returning 0",0);
++    return 0;
++}
++
++/* idle_thread_count should be incremented before starting a worker_thread */
++
++static void *worker_thread_proc(apr_thread_t *thd, void *arg)
++{
++    apr_socket_t *sock;
++    apr_pool_t *tpool;      /* Pool for this thread           */
++    apr_pool_t *ptrans;     /* Pool for per-transaction stuff */
++    int srv;
++    int thread_num = *((int *) arg);
++    long conn_id = child_num * thread_limit + thread_num;
++    apr_pollfd_t *pollset;
++    apr_status_t rv;
++    ap_listen_rec *lr_walk;
++    int n;
++    int thread_cnt;
++    apr_bucket_alloc_t *bucket_alloc;
++
++    _DBG("function starting",0);
++    
++    /* === allocate thread pools etc === */
++    apr_thread_mutex_lock(thread_pool_parent_mutex);
++    apr_pool_create(&tpool, thread_pool_parent);
++    apr_thread_mutex_unlock(thread_pool_parent_mutex);
++    apr_pool_create(&ptrans, tpool);
++    
++    (void) ap_update_child_status_from_indexes(child_num, thread_num, 
++                                               SERVER_STARTING,
++                                               (request_rec *) NULL);
++
++    bucket_alloc = apr_bucket_alloc_create(apr_thread_pool_get(thd));
++
++    apr_thread_mutex_lock(idle_thread_count_mutex);
++    if (idle_thread_count < max_spare_threads) 
++    {
++        idle_thread_count++;
++	_DBG("idle_thread_count: %d", idle_thread_count);
++        apr_thread_mutex_unlock(idle_thread_count_mutex);
++    }
++    else 
++    {
++	_DBG("too many idle threads: %d (max %d)", idle_thread_count, max_spare_threads );
++        apr_thread_mutex_unlock(idle_thread_count_mutex);
++	goto worker_out;
++    }
++
++    while (!workers_may_exit)
++    {
++        apr_int16_t event;
++
++	_DBG("loop. conn_id=%d req_max=%d req_remain=%d", 
++	    conn_id, ap_max_requests_per_child, requests_this_child);
++	
++        ((ap_max_requests_per_child != 0) && 
++	 (requests_this_child < 1) && (workers_may_exit=1));
++
++	_DBG("WATCH: workers_may_exit=%d", workers_may_exit);
++	if (workers_may_exit) goto worker_out;
++
++        (void) ap_update_child_status_from_indexes(child_num, thread_num, 
++                                                   SERVER_READY,
++                                                   (request_rec *) NULL);
++
++	THREAD_ACCEPT_LOCK;
++
++        /* -- setup pollset -- */
++        /* NOTE: we do _not_ do this upwards anylonger */
++        apr_poll_setup(&pollset, num_listensocks, tpool);
++        apr_poll_setup(&pollset, num_listensocks, ptrans);
++        for(lr_walk = ap_listeners; lr_walk != NULL; lr_walk = lr_walk->next) 
++        {
++	    int fd;
++    	    apr_poll_socket_add(pollset, lr_walk->sd, APR_POLLIN);
++    	    apr_os_sock_get(&fd, lr_walk->sd);
++	    _DBG("adding fd %d to pollset", fd);
++        }
++
++	if (workers_may_exit) goto worker_out;
++        _TRACE_CALL("apr_poll()",0);
++        srv = apr_poll(pollset, num_listensocks, &n, -1);
++        _TRACE_RET("apr_poll()",0);
++
++	if (srv != APR_SUCCESS) 
++	{
++    	    if (APR_STATUS_IS_EINTR(srv)) 
++	    {
++		_DBG("apr_poll() has been interrupted", 0);
++		THREAD_ACCEPT_UNLOCK;
++                continue;
++            }
++
++            /* apr_poll() will only return errors in catastrophic
++             * circumstances. Let's try exiting gracefully, for now. */
++            ap_log_error(APLOG_MARK, APLOG_ERR, srv, (const server_rec *)
++                             ap_server_conf, "apr_poll: (listen)");
++            workers_may_exit = 1;
++	    _DBG("poll error!",0);
++	    _DBG("WATCH: workers_may_exit=%d", workers_may_exit);
++	    THREAD_ACCEPT_UNLOCK;
++	    goto worker_out;
++        }
++	    
++        /* find a listener */
++        _DBG("looking for an listener",0);
++	for (lr_walk=ap_listeners; lr_walk!=NULL; lr_walk = lr_walk->next)
++	{
++	    int fd_tmp;
++    	    apr_os_sock_get(&fd_tmp, lr_walk->sd);
++	    _DBG(" ... trying w/ fd=%d", fd_tmp);
++    	    apr_poll_revents_get(&event, lr_walk->sd, pollset);
++            if (event & (APR_POLLIN)) 
++	    {
++		THREAD_ACCEPT_UNLOCK;
++                goto got_fd;
++            }
++	    if (event & (APR_POLLERR)) 
++	    {
++		ap_log_error(APLOG_MARK, APLOG_EMERG, rv, ap_server_conf,
++                             "got POLLERR in line 870");
++	    }
++        }
++
++	THREAD_ACCEPT_UNLOCK;
++	_DBG("WARN: did not find the right listener",0);
++	sleep ( 1 );
++	continue;
++
++    got_fd:
++	_DBG("input available ... resetting socket.",0);
++	sock = NULL;	/* important! */
++	
++	_TRACE_CALL("accept_func()",0);
++        rv = lr_walk->accept_func((void*)&sock, lr_walk, ptrans);
++	_TRACE_RET("accept_func()",0);
++	
++        if (rv == APR_EGENERAL) 
++	{
++            /* E[NM]FILE, ENOMEM, etc */
++	    _DBG("there was some error." ,0);
++            workers_may_exit = 1;
++	    _DBG("WATCH: workers_may_exit=%d", workers_may_exit);
++	    break;
++        }
++
++        apr_thread_mutex_lock(idle_thread_count_mutex);
++        if (idle_thread_count > min_spare_threads) 
++	{
++            idle_thread_count--;
++        }
++        else 
++	{
++            if (!start_thread()) 
++	    {
++                idle_thread_count--;
++            }
++        }
++        apr_thread_mutex_unlock(idle_thread_count_mutex);
++
++        if (!setjmp(thread_info_table[thread_num].jmpbuffer)) 
++	{
++	    _DBG("marked jmpbufffer",0);
++	    _TRACE_CALL("process_socket()",0);
++    	    process_socket(ptrans, sock, conn_id, bucket_alloc);
++	    _TRACE_RET("process_socket()",0);
++        }
++        else 
++	{
++	    _DBG("landed from longjmp",0);
++            thread_info_table[thread_num].sock_fd = AP_metuxmpm_THISCHILD;
++        }  
++        requests_this_child--;
++	apr_pool_clear(ptrans);
++    }
++
++    _DBG("thread loop finished",0);
++worker_out:
++    _DBG("this thread's work is done ... workers_may_exit=%d",workers_may_exit);
++
++    /* == think about it == */
++    apr_thread_mutex_lock(idle_thread_count_mutex);
++    idle_thread_count--;
++    apr_thread_mutex_unlock(idle_thread_count_mutex);
++
++    /* == */
++    apr_thread_mutex_lock(thread_pool_parent_mutex);
++    ap_update_child_status_from_indexes(child_num, thread_num, SERVER_DEAD,
++                                        (request_rec *) NULL);
++    apr_pool_destroy(tpool);
++    apr_thread_mutex_unlock(thread_pool_parent_mutex);
++    
++    thread_cnt = worker_thread_count_add ( -1 );
++    worker_thread_free_ids[thread_cnt] = thread_num;
++    if (!thread_cnt) 
++    {
++        /* All the threads have exited, now finish the shutdown process
++         * by signalling the sigwait thread */
++	_DBG("all workers have quit. killing myself (%d) with SIGTERM", my_pid);
++        kill(my_pid, SIGTERM);
++    }
++    else 
++    {
++	_DBG("this is not the time to die - %d threads are still alive", thread_cnt);
++	_DBG("WATCH: workers_may_exit=%d", workers_may_exit);
++    }
++
++    apr_bucket_alloc_destroy(bucket_alloc);
++    _DBG("leaving. good bye",0);
++    return NULL;
++}
++
++
++
++/* Set group privileges.
++ *
++ * Note that we use the username as set in the config files, rather than
++ * the lookup of to uid --- the same uid may have multiple passwd entries,
++ * with different sets of groups for each.
++ */
++
++static int set_group_privs(uid_t uid, gid_t gid)
++{
++    if (!geteuid()) 
++    {
++        const char *name;
++
++        /* Get username if passed as a uid */
++
++        struct passwd *ent;
++
++        if ((ent = getpwuid(uid)) == NULL) 
++	{
++            ap_log_error(APLOG_MARK, APLOG_ALERT, errno, NULL,
++                         "getpwuid: couldn't determine user name from uid %u, "
++                         "you probably need to modify the User directive",
++                         (unsigned)uid);
++            return -1;
++        }
++
++        name = ent->pw_name;
++
++        /*
++         * Set the GID before initgroups(), since on some platforms
++         * setgid() is known to zap the group list.
++         */
++        if (setgid(gid) == -1) 
++	{
++            ap_log_error(APLOG_MARK, APLOG_ALERT, errno, NULL,
++                         "setgid: unable to set group id to Group %u",
++                         (unsigned)gid);
++            return -1;
++        }
++
++        /* Reset `groups' attributes. */
++
++        if (initgroups(name, gid) == -1) 
++	{
++	            ap_log_error(APLOG_MARK, APLOG_ALERT, errno, NULL,
++                         "initgroups: unable to set groups for User %s "
++                         "and Group %u", name, (unsigned)gid);
++            return -1;
++        }
++    }
++    return 0;
++}
++
++
++static int metuxmpm_setup_child(int childnum)
++{
++    child_info_t *ug = &child_info_table[childnum];
++
++    if (ug->uid == -1 && ug->gid == -1) {
++        return unixd_setup_child();
++    }
++    if (set_group_privs(ug->uid, ug->gid)) {
++        return -1;
++    }
++    /* Only try to switch if we're running as root */
++    if (!geteuid()
++        && (
++#ifdef _OSD_POSIX
++            os_init_job_environment(server_conf, unixd_config.user_name,
++                                    one_process) != 0 ||
++#endif
++            setuid(ug->uid) == -1)) {
++        ap_log_error(APLOG_MARK, APLOG_ALERT, errno, NULL,
++                     "setuid: unable to change to uid: %ld",
++                     (long) ug->uid);
++        return -1;
++    }
++    return 0;
++}
++
++static int check_signal(int signum)
++{
++    _DBG("signum=%d", signum);
++    switch (signum) {
++    case SIGTERM:
++    case SIGINT:
++        just_die(signum);
++        return 1;
++    }
++    return 0;
++}                                                                               
++
++typedef struct metuxmpm_header 
++{
++    char *headers;
++    apr_pool_t *p;
++} metuxmpm_header;
++
++/* Send a single HTTP header field to the client.  Note that this function
++ * is used in calls to table_do(), so their interfaces are co-dependent.
++ * In other words, don't change this one without checking table_do in alloc.c.
++ * It returns true unless there was a write error of some kind.
++ */
++static int metuxmpm_header_field(metuxmpm_header *h,
++                             const char *fieldname, const char *fieldval)
++{
++    apr_pstrcat(h->p, h->headers, fieldname, ": ", fieldval, CRLF, NULL); 
++    return 1;
++}
++
++static inline ap_listen_rec* listen_add ( apr_pool_t* pool, apr_socket_t *sock, void* accept_func )
++{
++    ap_listen_rec *lr_walk, *lr_new;
++    
++    _DBG("function started",0);
++    /* -- create an new listener for this child -- */
++    lr_new = apr_palloc(pool, sizeof(*lr_new));
++    lr_new->sd          = sock;
++    lr_new->active      = 1;
++    lr_new->accept_func = accept_func;
++    lr_new->next        = NULL;
++
++    /* -- add the new listener_rec into the list -- */
++    /* FIXME: should we somehow lock this list ? */
++    if (lr_walk = ap_listeners) 
++    {
++	while (lr_walk->next) lr_walk = lr_walk->next;
++	lr_walk->next = lr_new;
++    }
++    else
++    {
++	ap_listeners = lr_walk = lr_new; 
++    }
++    num_listensocks++;
++    return lr_new;
++}
++
++static inline void listen_clear ()
++{
++    ap_listen_rec *lr_walk;
++    
++    _DBG("function started",0);
++
++    /* FIXME: should we somehow lock this list ? */
++    while (ap_listeners)
++    {
++	lr_walk = ap_listeners->next;
++	apr_socket_close(ap_listeners->sd);
++	ap_listeners = lr_walk;
++    }
++    num_listensocks=0;
++}
++
++/* -- main routine of an child process -- */
++static void child_main(int child_num_arg)
++{
++    int i;
++    apr_status_t rv;
++    apr_socket_t *sock = NULL;
++    
++    my_pid    = getpid();
++    child_num = child_num_arg;
++
++    _DBG("sock_fd_in=%d sock_fd_out=%d", child_info_table[child_num].input, child_info_table[child_num].output );
++    
++    /* -- allocate an new pool for us -- */
++    apr_pool_create(&pchild, pconf);
++    if (child_info_table[child_num].chroot_dir){
++      _DBG("chroot to %s",child_info_table[child_num].chroot_dir);
++      if (chroot(child_info_table[child_num].chroot_dir)){
++        _DBG("chroot failure %s",child_info_table[child_num].chroot_dir);
++        return;
++      }
++    }
++
++    switch (child_info_table[child_num].type)
++    {
++	case CHILD_TYPE_MULTIPLEXER:
++	    _DBG("MULTIPLEXER %d", child_num);
++	    break;
++	    
++	case CHILD_TYPE_PROCESSOR:
++	    _DBG("PROCESSOR %d", child_num);
++
++	    /* -- create new listener to receive from multiplexer -- */
++	    apr_os_sock_put(&sock, &child_info_table[child_num].input, pconf);
++	    listen_clear ();
++	    listen_add ( pconf, sock, receive_from_multiplexer );
++	    break;
++	
++	default:
++	    _DBG("unspecified child type for %d sleeping a while ...", child_num);
++	    sleep ( 5 );
++	    return;
++    }
++    /*stuff to do before we switch id's, so we have permissions.*/
++
++    /* -- init child process (uid switching etc) -- */
++    (metuxmpm_setup_child(child_num) && clean_child_exit(APEXIT_CHILDFATAL));
++    ap_run_child_init(pchild, ap_server_conf);
++
++    /*done with init critical section */
++
++    apr_setup_signal_thread();
++
++    requests_this_child = ap_max_requests_per_child;
++    
++    /* Setup worker threads */
++
++    _DBG("setting up worker threads ... " ,0);
++    ((threads_to_start > max_threads) && (threads_to_start = max_threads));
++    idle_thread_count = threads_to_start;
++    workers_may_exit    = 0;
++    worker_thread_count = 0;
++    worker_thread_free_ids = (int *)apr_pcalloc(pchild, thread_limit * sizeof(int));
++    for (i = 0; i < max_threads; i++) 
++    {
++        worker_thread_free_ids[i] = i;
++    }
++    apr_pool_create(&thread_pool_parent, pchild);
++    apr_thread_mutex_create(&thread_pool_parent_mutex, 
++                    APR_THREAD_MUTEX_DEFAULT, pchild);
++    apr_thread_mutex_create(&idle_thread_count_mutex, 
++                    APR_THREAD_MUTEX_DEFAULT, pchild);
++    apr_thread_mutex_create(&worker_thread_count_mutex,
++                    APR_THREAD_MUTEX_DEFAULT, pchild);
++    apr_thread_mutex_create(&pipe_of_death_mutex,
++                    APR_THREAD_MUTEX_DEFAULT, pchild);
++    apr_thread_mutex_create(&thread_accept_mutex,
++                    APR_THREAD_MUTEX_DEFAULT, pchild);
++
++    apr_threadattr_create(&worker_thread_attr, pchild);
++    apr_threadattr_detach_set(worker_thread_attr, 1);                                     
++
++    /* We are creating worker threads right now */
++    for (i=0; i < threads_to_start; i++) 
++    {
++        /* start_thread shouldn't fail here */
++	_TRACE_CALL("start_thread()",0);
++        if (!start_thread()) break;
++	_TRACE_RET("start_thread()",0);
++    }
++
++    _TRACE_CALL("apr_signal_thread()",0);
++    apr_signal_thread(check_signal);
++    _TRACE_RET("apr_signal_thread",0);
++}
++
++static int make_child(server_rec *s, int slot)
++{
++    int pid;
++
++    switch (child_info_table[slot].type)
++    {
++	case CHILD_TYPE_MULTIPLEXER:		break;
++	case CHILD_TYPE_PROCESSOR:		break;
++	default:
++	    _DBG("no valid client in slot %d", slot);
++	    sleep(1);
++	    return 0;
++    }
++
++    if (slot + 1 > ap_max_daemons_limit) 
++    {
++        ap_max_daemons_limit = slot + 1;
++    }
++
++    (void) ap_update_child_status_from_indexes(slot, 0, SERVER_STARTING,
++                                               (request_rec *) NULL);
++
++    if ((pid = fork()) == -1) 
++    {
++        ap_log_error(APLOG_MARK, APLOG_ERR, errno, s,
++                     "fork: Unable to fork new process");
++        /* In case system resources are maxxed out, we don't want
++         * Apache running away with the CPU trying to fork over and
++         * over and over again. */
++        sleep(10);
++
++        return -1;
++    }
++
++    if (!pid) 
++    {
++#ifdef HAVE_BINDPROCESSOR
++        /* By default, AIX binds to a single processor.  This bit unbinds
++         * children which will then bind to another CPU.
++         */
++        int status = bindprocessor(BINDPROCESS, (int)getpid(),
++                                   PROCESSOR_CLASS_ANY);
++        if (status != OK) {
++            ap_log_error(APLOG_MARK, APLOG_WARNING, errno, 
++                         ap_server_conf, "processor unbind failed %d", status);
++        }
++#endif
++
++        RAISE_SIGSTOP(MAKE_CHILD);
++
++        /* XXX - For an unthreaded server, a signal handler will be necessary
++         * apr_signal(SIGTERM, just_die);
++         */
++        child_main(slot);
++        clean_child_exit(0);
++    }
++    /* else */
++    ap_scoreboard_image->parent[slot].pid = pid;
++
++    ap_child_table[slot].pid    = pid;
++    ap_child_table[slot].status = SERVER_ALIVE;
++
++    return 0;
++}
++
++/* start up a bunch of children */
++static int startup_children(int number_to_start)
++{
++    int i;
++
++    for (i = 0; number_to_start && i < num_childs; ++i) 
++    {
++        if (ap_child_table[i].pid)  continue;
++        if (make_child(ap_server_conf, i) < 0) break;
++        --number_to_start;
++    }
++    return number_to_start;
++}
++
++
++/*
++ * spawn_rate is the number of children that will be spawned on the
++ * next maintenance cycle if there aren't enough servers.  It is
++ * doubled up to MAX_SPAWN_RATE, and reset only when a cycle goes by
++ * without the need to spawn.
++ */
++static int spawn_rate = 1;
++#ifndef MAX_SPAWN_RATE
++#define MAX_SPAWN_RATE  (32)
++#endif
++static int hold_off_on_exponential_spawning;
++
++static void perform_child_maintenance(void)
++{
++    int i;
++    int free_length;
++    int free_slots[MAX_SPAWN_RATE];
++    int last_non_dead = -1;
++
++    /* initialize the free_list */
++    free_length = 0;
++    
++    for (i = 0; i < num_childs; ++i) 
++    {
++        if (ap_child_table[i].pid == 0) 
++	{
++            if (free_length < spawn_rate) 
++	    {
++                free_slots[free_length] = i;
++                ++free_length;
++            }
++        }
++        else 
++	{
++            last_non_dead = i;
++        }
++
++        if (i >= ap_max_daemons_limit && free_length >= spawn_rate) 
++	{
++            break;
++        }
++    }
++    ap_max_daemons_limit = last_non_dead + 1;
++
++    if (free_length > 0) 
++    {
++        for (i = 0; i < free_length; ++i) 
++	{
++	    _TRACE_CALL("make_child()",0);
++            make_child(ap_server_conf, free_slots[i]);
++	    _TRACE_RET("make_child()",0);
++        }
++        /* the next time around we want to spawn twice as many if this
++         * wasn't good enough, but not if we've just done a graceful
++         */
++        if (hold_off_on_exponential_spawning) 
++	{
++            --hold_off_on_exponential_spawning;
++        }
++        else if (spawn_rate < MAX_SPAWN_RATE) 
++	{
++            spawn_rate *= 2;
++        }
++    }
++    else 
++    {
++        spawn_rate = 1;
++    }
++}
++
++static void server_main_loop(int remaining_children_to_start)
++{
++    apr_exit_why_e exitwhy;
++    apr_proc_t pid;
++    int child_slot;
++    int status;
++    int i;
++    static int l=0;
++    
++    while (!restart_pending && !shutdown_pending) 
++    {
++        ap_wait_or_timeout(&exitwhy, &status, &pid, pconf);
++        
++        if (pid.pid != -1) 
++	{
++            if (ap_process_child_status(&pid, exitwhy, status)==APEXIT_CHILDFATAL) 
++	    {
++		_DBG("shutdown pending ...",0);
++                shutdown_pending = 1;
++                child_fatal = 1;
++                return;
++            }
++            /* non-fatal death... note that it's gone in the child table and
++             * clean out the status table. */
++	    _DBG("child has #%d died ...", child_slot);
++            child_slot = -1;
++            for (i = 0; i < ap_max_daemons_limit; ++i) 
++	    {
++                if (ap_child_table[i].pid == pid.pid) 
++		{
++                    child_slot = i;
++                    break;
++                }
++            }
++            if (child_slot >= 0) 
++	    {
++                ap_child_table[child_slot].pid = 0;
++                ap_update_child_status_from_indexes(child_slot, i, SERVER_DEAD,
++                                                    (request_rec *) NULL);
++
++                
++                if (remaining_children_to_start && (child_slot < num_childs))
++		{
++                    /* we're still doing a 1-for-1 replacement of dead
++                     * children with new children
++                     */
++		    _DBG("replacing by new child ...",0);
++                    make_child(ap_server_conf, child_slot);
++                    --remaining_children_to_start;
++                }
++#if APR_HAS_OTHER_CHILD
++            }
++            else if (apr_proc_other_child_read(&pid, status) == 0) 
++	    {
++            /* handled */
++#endif
++            }
++            else if (is_graceful) 
++	    {
++                /* Great, we've probably just lost a slot in the
++                * child table.  Somehow we don't know about this
++                * child.
++                */
++                ap_log_error(APLOG_MARK, APLOG_WARNING, 0, 
++                             ap_server_conf,
++                             "long lost child came home! (pid %ld)", 
++                             (long)pid.pid);
++            }
++            /* Don't perform idle maintenance when a child dies,
++             * only do it when there's a timeout.  Remember only a
++             * finite number of children can die, and it's pretty
++             * pathological for a lot to die suddenly.
++             */
++            continue;
++        }
++        else if (remaining_children_to_start) 
++	{
++            /* we hit a 1 second timeout in which none of the previous
++             * generation of children needed to be reaped... so assume
++             * they're all done, and pick up the slack if any is left.
++             */
++	    _TRACE_CALL("startup_children()",0);
++            remaining_children_to_start = startup_children(remaining_children_to_start);
++	    _TRACE_RET("startup_children()",0);
++            /* In any event we really shouldn't do the code below because
++             * few of the servers we just started are in the IDLE state
++             * yet, so we'd mistakenly create an extra server.
++             */
++            continue;
++        }
++	
++        perform_child_maintenance();
++    }
++}
++
++int ap_mpm_run(apr_pool_t *_pconf, apr_pool_t *plog, server_rec *s)
++{
++    int remaining_children_to_start;
++    int i;
++    int fd;
++    apr_status_t rv;
++    apr_size_t one = 1;
++    apr_socket_t *sock = NULL;
++
++    ap_log_pid(pconf, ap_pid_fname);
++
++    first_server_limit = server_limit;
++    first_thread_limit = thread_limit;
++    if (changed_limit_at_restart) 
++    {
++        ap_log_error(APLOG_MARK, APLOG_WARNING, 0, s,
++                     "WARNING: Attempt to change ServerLimit or ThreadLimit "
++                     "ignored during restart");
++        changed_limit_at_restart = 0;
++    }
++
++    ap_server_conf = s;
++
++    /* Initialize cross-process accept lock */
++    ap_lock_fname = apr_psprintf(_pconf, "%s.%u",
++                                 ap_server_root_relative(_pconf, ap_lock_fname),
++                                 my_pid);
++    rv = ACCEPT_PROC_MUTEX_CREATE;
++    if (rv != APR_SUCCESS) 
++    {
++        ap_log_error(APLOG_MARK, APLOG_EMERG, rv, s,
++                     "Couldn't create cross-process lock");
++        return 1;
++    }
++
++    if (!is_graceful) 
++    {
++        if (ap_run_pre_mpm(s->process->pool, SB_SHARED) != OK) 
++	{
++            return 1;
++        }
++    }
++    /* Initialize the child table */
++    if (!is_graceful) 
++    {
++        for (i = 0; i < server_limit; i++) 
++	{
++            ap_child_table[i].pid = 0;
++        }
++    }
++
++    /* We need to put the new listeners at the end of the ap_listeners
++     * list.  If we don't, then the pool will be cleared before the
++     * open_logs phase is called for the second time, and ap_listeners
++     * will have only invalid data.  If that happens, then the sockets
++     * that we opened using make_sock() will be lost, and the server
++     * won't start.
++     */
++    apr_os_file_get(&fd, pipe_of_death_in);
++    apr_os_sock_put(&sock, &fd, pconf);
++
++    listen_add ( pconf, sock, check_pipe_of_death );
++    set_signals();
++
++    /* If we're doing a graceful_restart then we're going to see a lot
++     * of children exiting immediately when we get into the main loop
++     * below (because we just sent them AP_SIG_GRACEFUL).  This happens 
++     * pretty rapidly... and for each one that exits we'll start a new one 
++     * until we reach at least daemons_min_free.  But we may be permitted to
++     * start more than that, so we'll just keep track of how many we're
++     * supposed to start up without the 1 second penalty between each fork.
++     */
++    remaining_children_to_start = num_childs;
++    if (!is_graceful) {
++        remaining_children_to_start = \
++            startup_children(remaining_children_to_start);
++    }
++    else {
++        /* give the system some time to recover before kicking into
++         * exponential mode */
++        hold_off_on_exponential_spawning = 10;
++    }
++
++    ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, ap_server_conf,
++                 "%s configured -- resuming normal operations",
++                 ap_get_server_version());
++    ap_log_error(APLOG_MARK, APLOG_INFO, 0, ap_server_conf,
++                 "Server built: %s", ap_get_server_built());
++#ifdef AP_MPM_WANT_SET_ACCEPT_LOCK_MECH
++#ifdef NO_SERIALIZED_ACCEPT
++    _DBG("AcceptMutex: n/a (compiled w/ NO_SERIALIZED_ACCEPT)", 0 );
++    ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, ap_server_conf,
++		"AcceptMutex: n/a (compiled w/ NO_SERIALIZED_ACCEPT)" );
++#else
++    ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, ap_server_conf,
++		"AcceptMutex: %s (default: %s)",
++		apr_proc_mutex_name(process_accept_mutex),
++		apr_proc_mutex_defname());
++#endif
++#endif
++    restart_pending = shutdown_pending = 0;
++
++    server_main_loop(remaining_children_to_start);
++
++    if (shutdown_pending) 
++    {
++        /* Time to gracefully shut down:
++         * Kill child processes, tell them to call child_exit, etc...
++         */
++        if (unixd_killpg(getpgrp(), SIGTERM) < 0) 
++	{
++            ap_log_error(APLOG_MARK, APLOG_WARNING, errno, ap_server_conf,
++                         "killpg SIGTERM");
++        }
++        ap_reclaim_child_processes(1);      /* Start with SIGTERM */
++
++        if (!child_fatal) 
++	{
++            /* cleanup pid file on normal shutdown */
++            const char *pidfile = NULL;
++            pidfile = ap_server_root_relative (pconf, ap_pid_fname);
++            if (pidfile != NULL && unlink(pidfile) == 0) {
++                ap_log_error(APLOG_MARK, APLOG_INFO, 0,
++                             ap_server_conf,
++                             "removed PID file %s (pid=%ld)",
++                             pidfile, (long)getpid());
++            }
++    
++            ap_log_error(APLOG_MARK, APLOG_NOTICE, 0,
++                         ap_server_conf, "caught SIGTERM, shutting down");
++        }
++        return 1;
++    }
++
++    /* we've been told to restart */
++    apr_signal(SIGHUP, SIG_IGN);
++
++    if (one_process) return 1;	    /* not worth thinking about */
++
++    if (is_graceful) 
++    {
++        char char_of_death = AP_metuxmpm_CHAR_OF_DEATH;
++
++        ap_log_error(APLOG_MARK, APLOG_NOTICE, 0,
++                     ap_server_conf, AP_SIG_GRACEFUL_STRING " received.  "
++                     "Doing graceful restart");
++
++        /* This is mostly for debugging... so that we know what is still
++         * gracefully dealing with existing request.
++         */
++    
++        for (i = 0; i < num_childs; ++i) 
++	{
++            ((ap_child_table[i].pid) && (ap_child_table[i].status = SERVER_DYING));
++        }
++	
++        /* give the children the signal to die */
++        for (i = 0; i < num_childs;) 
++	{
++            if ((rv = apr_file_write(pipe_of_death_out, &char_of_death,&one)) != APR_SUCCESS) 
++	    {
++                if (APR_STATUS_IS_EINTR(rv)) continue;
++                ap_log_error(APLOG_MARK, APLOG_WARNING, rv, ap_server_conf,
++                             "write pipe_of_death");
++            }
++            i++;
++        }
++    }
++    else 
++    {
++        /* Kill 'em all.  Since the child acts the same on the parents SIGTERM 
++         * and a SIGHUP, we may as well use the same signal, because some user
++         * pthreads are stealing signals from us left and right.
++         */
++        if (unixd_killpg(getpgrp(), SIGTERM) < 0) 
++	{
++            ap_log_error(APLOG_MARK, APLOG_WARNING, errno, ap_server_conf,
++                         "killpg SIGTERM");
++        }
++        ap_reclaim_child_processes(1);      /* Start with SIGTERM */
++        ap_log_error(APLOG_MARK, APLOG_NOTICE, 0,
++                     ap_server_conf, "SIGHUP received.  Attempting to restart");
++    }
++    return 0;
++}
++
++/* This really should be a post_config hook, but the error log is already
++ * redirected by that point, so we need to do this in the open_logs phase.
++ */
++static int metuxmpm_open_logs(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, server_rec *s)
++{
++    apr_status_t rv;
++
++    pconf = p;
++    ap_server_conf = s;
++
++    _DBG("port=%d", ap_server_conf->port);
++    
++    if ((num_listensocks = ap_setup_listeners(ap_server_conf)) < 1) {
++        ap_log_error(APLOG_MARK, APLOG_ALERT|APLOG_STARTUP, 0,
++                     NULL, "metuxmpm_open_logs(): no listening sockets available, shutting down");
++        return DONE;
++    }
++
++    ap_log_pid(pconf, ap_pid_fname);
++
++    if ((rv = ap_mpm_pod_open(pconf, &pod))) {
++        ap_log_error(APLOG_MARK, APLOG_CRIT|APLOG_STARTUP, rv, NULL,
++                "Could not open pipe-of-death.");
++        return DONE;
++    }
++
++    if ((rv = apr_file_pipe_create(&pipe_of_death_in, &pipe_of_death_out,
++                                   pconf)) != APR_SUCCESS) {
++        ap_log_error(APLOG_MARK, APLOG_ERR, rv,
++                     (const server_rec*) ap_server_conf,
++                     "apr_file_pipe_create (apipe_of_death)");
++        exit(1);
++    }
++    if ((rv = apr_file_pipe_timeout_set(pipe_of_death_in, 0)) != APR_SUCCESS) {
++        ap_log_error(APLOG_MARK, APLOG_ERR, rv,
++                     (const server_rec*) ap_server_conf,
++                     "apr_file_pipe_timeout_set (pipe_of_death)");
++        exit(1);
++    }
++
++    return OK;
++}
++
++static int metuxmpm_pre_config(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp)
++{
++    static int restart_num = 0;
++    int no_detach, debug, foreground;
++    ap_directive_t *pdir;
++    int i;
++    int tmp_server_limit = DEFAULT_SERVER_LIMIT;
++    int tmp_thread_limit = DEFAULT_THREAD_LIMIT;
++    apr_status_t rv;
++
++    debug = ap_exists_config_define("DEBUG");
++
++    if (debug) {
++        foreground = one_process = 1;
++        no_detach = 0;
++    }
++    else {
++        one_process = ap_exists_config_define("ONE_PROCESS");
++        no_detach = ap_exists_config_define("NO_DETACH");
++        foreground = ap_exists_config_define("FOREGROUND");
++    }
++
++    /* FIXME */
++/*    no_detach = 0;
++    foreground = 0; */
++    
++    /* sigh, want this only the second time around */
++    if (restart_num++ == 1) 
++    {
++        is_graceful = 0;
++
++        if (!one_process && !foreground) 
++	{
++            rv = apr_proc_detach(no_detach ? APR_PROC_DETACH_FOREGROUND
++                                           : APR_PROC_DETACH_DAEMONIZE);
++            if (rv != APR_SUCCESS) {
++                ap_log_error(APLOG_MARK, APLOG_CRIT, rv, NULL,
++                             "apr_proc_detach failed");
++                return HTTP_INTERNAL_SERVER_ERROR;
++            }                  
++        }
++
++        my_pid = getpid();
++    }
++
++    unixd_pre_config(ptemp);
++    ap_listen_pre_config();
++//    num_childs = DEFAULT_NUM_DAEMON;
++    num_childs = 0;
++    threads_to_start = DEFAULT_START_THREAD;
++    min_spare_threads = DEFAULT_MIN_SPARE_THREAD;
++    max_spare_threads = DEFAULT_MAX_SPARE_THREAD;
++    max_threads = thread_limit;
++    ap_pid_fname = DEFAULT_PIDLOG;
++    ap_lock_fname = DEFAULT_LOCKFILE;
++    ap_max_requests_per_child = DEFAULT_MAX_REQUESTS_PER_CHILD;
++
++    apr_cpystrn(ap_coredump_dir, ap_server_root, sizeof(ap_coredump_dir));
++
++    /* we need to know ServerLimit and ThreadLimit before we start processing
++     * the tree because we need to already have allocated child_info_table
++     */
++    for (pdir = ap_conftree; pdir != NULL; pdir = pdir->next) 
++    {
++        if (!strcasecmp(pdir->directive, "ServerLimit")) 
++	{
++            if (atoi(pdir->args) > tmp_server_limit) 
++	    {
++                tmp_server_limit = atoi(pdir->args);
++                if (tmp_server_limit > MAX_SERVER_LIMIT) 
++		{
++                    tmp_server_limit = MAX_SERVER_LIMIT;
++                }
++            }
++        }
++        else if (!strcasecmp(pdir->directive, "ThreadLimit")) 
++	{
++            if (atoi(pdir->args) > tmp_thread_limit) 
++	    {
++                tmp_thread_limit = atoi(pdir->args);
++                if (tmp_thread_limit > MAX_THREAD_LIMIT) 
++		{
++                    tmp_thread_limit = MAX_THREAD_LIMIT;
++                }
++            }
++        }
++    }
++
++    /* -- now setup the child information table -- */
++    child_info_table = (child_info_t *)apr_pcalloc(p, tmp_server_limit * sizeof(child_info_t));
++    child_info_table_size = tmp_server_limit; /* FIXME: remove tmp_server_limit */
++    for (i = 0; i < tmp_server_limit; i++) 
++    {
++        child_info_table[i].uid    = -1;
++        child_info_table[i].gid    = -1;
++        child_info_table[i].input  = -1;
++        child_info_table[i].output = -1;
++	child_info_table[i].type   = -1;
++	child_info_table[i].id     = i;
++    }
++
++    return OK;
++}
++
++#undef NO_BODY
++
++static int pass_request(request_rec *r)
++{
++    int rv;
++    struct msghdr msg;
++    struct cmsghdr *cmsg;
++    int sock_fd;
++    char *bodypart = NULL;
++    struct iovec iov[2];
++    conn_rec *c = r->connection;
++    apr_bucket_brigade *bb = apr_brigade_create(r->pool, c->bucket_alloc);
++    apr_bucket_brigade *bodypart_bb = NULL;
++    apr_size_t len = 0;
++    apr_size_t bodypart_len = 0;
++    metuxmpm_header h;
++    apr_bucket *bucket;
++    const apr_array_header_t *headers_in_array;
++    const apr_table_entry_t *headers_in;
++    int counter;
++
++    apr_socket_t *thesock = ap_get_module_config(r->connection->conn_config, &core_module);
++    metuxmpm_server_conf *sconf = metuxmpm_SERVER_CONF(r->server->module_config);
++
++    if ((!r->the_request) || (!strlen(r->the_request)))
++    {
++	_DBG("empty request. dropping it (%ld)", r->the_request);
++	return -1;
++    }
++
++    if (!sconf->child)
++    {
++	_DBG("server %s in child %d has no child_info assiocated",
++		r->hostname, child_num);
++	return -1;
++    }	
++
++    _DBG("passing request to another child.  Vhost: %s, child %d %d",
++                apr_table_get(r->headers_in, "Host"), child_num, sconf->child->output);
++    _DBG("r->the_request=\"%s\" len=%d", r->the_request, strlen(r->the_request));
++
++    ap_get_brigade(r->connection->input_filters, bb, AP_MODE_EXHAUSTIVE, APR_NONBLOCK_READ, len);
++
++    /* Scan the brigade looking for heap-buckets */
++    
++    _DBG("Scanning the brigade",0);
++    bucket = APR_BRIGADE_FIRST(bb);
++    while (bucket != APR_BRIGADE_SENTINEL(bb) &&
++           APR_BUCKET_IS_HEAP(bucket)) {
++       _DBG("HEAP BUCKET is found, length=%d", bucket->length);
++        bucket = APR_BUCKET_NEXT(bucket);
++	if (!APR_BUCKET_IS_HEAP(bucket)) {
++  	    _DBG("NON-HEAP BUCKET is found, extracting the part of brigade before it",0);
++	    bodypart_bb = bb;
++	    bb = apr_brigade_split(bodypart_bb, bucket);
++	    /* Do we need to apr_destroy_brigade(bb) here? 
++	     * Yeah, I know we do apr_pool_destroy(r->pool) before return, but
++	     * ap_get_brigade is in non-blocking mode (however len is zero).
++	     */
++            if (apr_brigade_pflatten(bodypart_bb, &bodypart, &bodypart_len, r->pool) != APR_SUCCESS) {
++                ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, ap_server_conf,
++                     "Unable to flatten brigade, declining request");
++		apr_pool_destroy(r->pool);
++                return DECLINED;
++            }
++  	    _DBG("Brigade is flattened as bodypart (bodypart_len=%d)", bodypart_len);    
++	}
++    }
++    _DBG("Scanning is finished",0);
++
++    apr_os_sock_get(&sock_fd, thesock);
++
++    h.p = r->pool;
++
++    headers_in_array = apr_table_elts(r->headers_in);
++    headers_in = (const apr_table_entry_t *) headers_in_array->elts;
++    
++    h.headers = apr_pstrcat(h.p, r->the_request, CRLF, NULL);
++    for (counter = 0; counter < headers_in_array->nelts; counter++) {
++        if (headers_in[counter].key == NULL
++         || headers_in[counter].val == NULL) {
++             continue;
++         }
++         h.headers = apr_pstrcat(h.p, h.headers, headers_in[counter].key, ": ",
++                                 headers_in[counter].val, CRLF, NULL);
++			 
++    }
++    h.headers = apr_pstrcat(h.p, h.headers, CRLF, NULL);
++    ap_xlate_proto_to_ascii(h.headers, strlen(h.headers));
++
++    iov[0].iov_base = &bodypart_len;
++    iov[0].iov_len  = sizeof(bodypart_len);
++    iov[1].iov_base = h.headers;
++    iov[1].iov_len  = strlen(h.headers) + 1;
++    
++    msg.msg_name    = NULL;
++    msg.msg_namelen = 0;
++    msg.msg_iov     = iov;
++    msg.msg_iovlen  = 2;
++
++    cmsg = apr_palloc(r->pool, sizeof(*cmsg) + sizeof(sock_fd));
++    cmsg->cmsg_len   = sizeof(*cmsg) + sizeof(sock_fd);
++    cmsg->cmsg_level = SOL_SOCKET;
++    cmsg->cmsg_type  = SCM_RIGHTS;
++
++    memcpy(CMSG_DATA(cmsg), &sock_fd, sizeof(sock_fd));
++
++    msg.msg_control    = cmsg;
++    msg.msg_controllen = cmsg->cmsg_len;
++
++    _DBG("Writing message to %d, passing sock_fd:  %d", sconf->child->output, sock_fd);
++    _DBG("headers=\"%s\"", h.headers);
++    ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, ap_server_conf, 
++                 "Writing message to %d, passing sd:  %d", sconf->child->output, sock_fd);
++
++    if ((rv = sendmsg(sconf->child->output, &msg, 0)) == -1) 
++    {
++        apr_pool_destroy(r->pool);
++        ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, ap_server_conf, 
++                     "Writing message failed %d %d", rv, errno);
++        return -1;
++    }
++
++    _DBG("Writing message succeeded %d", rv);
++    ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, ap_server_conf, 
++                 "Writing message succeeded %d", rv);
++
++    if (bodypart_len) {
++        _DBG("Passing bodypart (bodypart_len=%d) \"%s\"", bodypart_len, bodypart);
++         if ((rv = send(sconf->child->output, bodypart, bodypart_len, 0)) == -1) {
++             apr_pool_destroy(r->pool);
++	     ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, ap_server_conf,
++			  "Writing message failed %d %d", rv, errno);
++	     return -1;
++         }
++        _DBG("Writing message succeeded %d", rv);
++        ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, ap_server_conf, 
++                     "Writing message succeeded %d", rv);
++    } else {
++        _DBG("No bodypart",0);
++    }
++
++    /* -- close the socket at our site -- */
++    apr_socket_close(thesock);
++    /* DS: What is the purpose of this?
++     *     apr_socket_close(sconf->child->output) seems more reasonable 
++     */
++    _DBG("closing socket %d at our side", sock_fd);
++    apr_pool_destroy(r->pool);
++    return 1;
++}
++
++static int metuxmpm_post_config(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, server_rec *server_list)
++{
++    int i;
++    server_rec *sr_walk;
++    metuxmpm_server_conf *sconf;
++
++    for (sr_walk = server_list; sr_walk; sr_walk = sr_walk->next) 
++    {
++        sconf = metuxmpm_SERVER_CONF(sr_walk->module_config);
++	if (sconf->child)
++	{
++	    _DBG("server \"%s\" child=%d fd_in=%d fd_out=%d", 
++		    sr_walk->server_hostname,
++		    sconf->child->id, 
++		    sconf->child->input, 
++		    sconf->child->output );
++	}
++	else
++	{
++	    _DBG("server \"%s\" has no child assiocated.",
++		    sr_walk->server_hostname);
++	}
++    }
++
++    thread_info_table = (thread_info_t *)apr_pcalloc(p, thread_limit * sizeof(thread_info_t));
++    for (i = 0; i < thread_limit; i++) 
++    {
++        thread_info_table[i].sock_fd = AP_metuxmpm_THISCHILD;
++	thread_info_table[i].status  = 0;
++    }
++    ap_child_table = (ap_ctable *)apr_pcalloc(p, server_limit * sizeof(ap_ctable));
++
++    return OK;
++}
++
++static int metuxmpm_post_read(request_rec *r)
++{
++    int thread_num = r->connection->id % thread_limit;
++    metuxmpm_server_conf *sconf = metuxmpm_SERVER_CONF(r->server->module_config);
++
++    if (!strlen(r->the_request)) 
++    {
++	_DBG("corrupt request. aborting",0);
++	return DECLINED;
++    }
++
++    if (thread_info_table[thread_num].sock_fd != AP_metuxmpm_THISCHILD) 
++    {
++        apr_socket_t *sock = NULL;
++
++        apr_os_sock_put(&sock, &thread_info_table[thread_num].sock_fd, 
++                        r->connection->pool);
++        ap_sock_disable_nagle(sock);
++        ap_set_module_config(r->connection->conn_config, &core_module, sock);
++	_DBG("not the right socket? ",0);
++        return OK;
++    }
++
++    switch (child_info_table[child_num].type)
++    {
++	case CHILD_TYPE_MULTIPLEXER:
++	{
++	    _DBG("MULTIPLEXER => Determining if request should be passed. "
++        	 "Child Num: %d, dest-child: %d, hostname from server: %s r->hostname=%s r->the_request=\"%s\"", 
++	    	child_num, sconf->child->id, r->server->server_hostname, r->hostname, r->the_request);
++
++	    if (sconf->child->id != child_num)
++	    {
++    		_DBG("Passing request.",0);
++    		if (pass_request(r) == -1) 
++	        {
++        	    ap_log_error(APLOG_MARK, APLOG_ERR, 0,
++                             ap_server_conf, "Could not pass request to proper "
++                             "child, request will not be honoured.");
++		    return DECLINED;
++	        }
++		_DBG("doing longjmp",0);
++		longjmp(thread_info_table[thread_num].jmpbuffer, 1); 
++		_DBG("request declined at our site",0);
++		return DECLINED;
++		_DBG("OUH! we should never reach this point",0);
++	    }
++	    _DBG("eeeh?! the server is assigned to the multiplexer! ... dropping request",0);
++	    return DECLINED;
++	}
++	case CHILD_TYPE_PROCESSOR:
++	{
++	    _DBG("PROCESSOR %d", child_num );
++	    if (sconf->child->id != child_num) 
++	    {
++		_DBG("hmmpf! this server is not assigned to us! what did the mux have smoked ?!",0);
++	    }
++	    _DBG("request for %s / (server %s) seems to be for us", r->hostname, r->server->server_hostname );
++	    return OK;
++	}
++	default:
++	{
++	    _DBG("unspecified child type %d in %d, dropping request", child_info_table[child_num].type, child_num );
++	    return OK;
++	}
++    }    
++    _DBG("THIS POINT SHOULD NOT BE REACHED!",0);
++    return OK;
++}
++
++static void metuxmpm_hooks(apr_pool_t *p)
++{
++    /* The metuxmpm open_logs phase must run before the core's, or stderr
++     * will be redirected to a file, and the messages won't print to the
++     * console.
++     */
++    static const char *const aszSucc[] = {"core.c", NULL};
++    one_process = 0;
++
++    ap_hook_open_logs(metuxmpm_open_logs, NULL, aszSucc, APR_HOOK_MIDDLE);
++    ap_hook_pre_config(metuxmpm_pre_config, NULL, NULL, APR_HOOK_MIDDLE); 
++    ap_hook_post_config(metuxmpm_post_config, NULL, NULL, APR_HOOK_MIDDLE); 
++
++    /* Both of these must be run absolutely first.  If this request isn't for 
++     * this server then we need to forward it to the proper child.  No sense
++     * tying up this server running more post_read request hooks if it is
++     * just going to be forwarded along.  The process_connection hook allows
++     * metuxmpm to receive the passed request correctly, by automatically
++     * filling in the core_input_filter's ctx pointer.
++     */
++    ap_hook_post_read_request(metuxmpm_post_read, NULL, NULL,
++                              APR_HOOK_REALLY_FIRST);
++    ap_hook_process_connection(metuxmpm_process_connection, NULL, NULL, 
++                               APR_HOOK_REALLY_FIRST);
++}
++
++//static const char *cf_NumServers(cmd_parms *cmd, void *dummy,
++//                                   const char *arg) 
++//{
++//    const char *err = ap_check_cmd_context(cmd, GLOBAL_ONLY);
++//    if (err != NULL) return err;
++//
++//    num_childs = atoi(arg);
++//    if (num_childs > server_limit) {
++//       ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL, 
++//                    "WARNING: NumServers of %d exceeds ServerLimit value "
++//                    "of %d servers,", num_childs, server_limit);
++//       ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL, 
++//                    " lowering NumServers to %d.  To increase, please "
++//                    "see the", server_limit);
++//       ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL, 
++//                    " ServerLimit directive.");
++//       num_childs = server_limit;
++//    } 
++//    else if (num_childs < 1) 
++//    {
++//        ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL, 
++//                     "WARNING: Require NumServers > 0, setting to 1");
++//        num_childs = 1;
++//    }
++//    return NULL;
++//}
++
++static const char *cf_StartThreads(cmd_parms *cmd, void *dummy,
++                                        const char *arg) 
++{
++    const char *err = ap_check_cmd_context(cmd, GLOBAL_ONLY);
++    if (err != NULL) return err;
++
++    threads_to_start = atoi(arg);
++    if (threads_to_start > thread_limit) {
++        ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL, 
++                     "WARNING: StartThreads of %d exceeds ThreadLimit value"
++                     " of %d threads,", threads_to_start,
++                     thread_limit);
++        ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL, 
++                     " lowering StartThreads to %d. To increase, please"
++                     " see the", thread_limit);
++        ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL, 
++                     " ThreadLimit directive.");
++    }
++    else if (threads_to_start < 1) {
++        ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL, 
++                     "WARNING: Require StartThreads > 0, setting to 1");
++        threads_to_start = 1;
++    }
++    return NULL;
++}
++
++static const char *cf_MinSpareThreads(cmd_parms *cmd, void *dummy,
++                                         const char *arg)
++{
++    const char *err = ap_check_cmd_context(cmd, GLOBAL_ONLY);
++    if (err != NULL) return err;
++
++    min_spare_threads = atoi(arg);
++    if (min_spare_threads <= 0) 
++    {
++       ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL, 
++                    "WARNING: detected MinSpareThreads set to non-positive.");
++       ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL, 
++                    "Resetting to 1 to avoid almost certain Apache failure.");
++       ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL, 
++                    "Please read the documentation.");
++       min_spare_threads = 1;
++    }
++       
++    return NULL;
++}
++
++static const char *cf_MaxSpareThreads(cmd_parms *cmd, void *dummy,
++                                         const char *arg)
++{
++    const char *err = ap_check_cmd_context(cmd, GLOBAL_ONLY);
++    if (err != NULL) return err;
++
++    max_spare_threads = atoi(arg);
++    if (max_spare_threads >= thread_limit) 
++    {
++       ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL, 
++                    "WARNING: detected MinSpareThreads set higher than");
++       ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL, 
++                    "ThreadLimit. Resetting to %d", thread_limit);
++       max_spare_threads = thread_limit;
++    }
++    return NULL;
++}
++
++static const char *cf_MaxThreadsPerChild(cmd_parms *cmd, void *dummy, const char *arg)
++{
++    const char *err = ap_check_cmd_context(cmd, GLOBAL_ONLY);
++    if (err != NULL) return err;
++
++    max_threads = atoi(arg);
++    if (max_threads > thread_limit) 
++    {
++       ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL, 
++                    "WARNING: detected MaxThreadsPerChild set higher than");
++       ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL, 
++                    "ThreadLimit. Resetting to %d", thread_limit);
++       max_threads = thread_limit;
++    }
++    return NULL;
++}
++
++static const char* child_add ( int type, const char* user_name, const char* group_name ,const char* chroot_dir )
++{
++    _DBG("%d: %s.%s %s", num_childs, user_name, group_name, chroot_dir);
++    if (num_childs<server_limit)
++    {
++	int socks[2];
++        int l;
++
++        child_info_table[num_childs].uid  = ap_uname2id(user_name);
++        child_info_table[num_childs].gid  = ap_gname2id(group_name); 
++	child_info_table[num_childs].type = type;
++        socketpair(PF_UNIX, SOCK_STREAM, 0, socks);
++	child_info_table[num_childs].input  = socks[0];
++	child_info_table[num_childs].output = socks[1];
++	child_info_table[num_childs].chroot_dir = 0;
++        if (chroot_dir){
++          l = strlen(chroot_dir);
++          if (l > 0){
++            child_info_table[num_childs].chroot_dir = chroot_dir;
++            /* should copy the contents */
++            /* do we need to check its existence? */
++          }
++        }
++
++	_DBG("[%d] uid=%d gid=%d type=%d fd_in=%d fd_out=%d,chroot_dir=%s", 
++	    num_childs, 
++	    child_info_table[num_childs].uid, 
++	    child_info_table[num_childs].gid,
++	    child_info_table[num_childs].type,
++	    child_info_table[num_childs].input,
++	    child_info_table[num_childs].output,
++	    child_info_table[num_childs].chroot_dir
++	);
++	
++        if (child_info_table[num_childs].uid == 0 || 
++	    child_info_table[num_childs].gid == 0) 
++	{
++	    _DBG("Assigning root user/group to a child.",0);
++        }
++	num_childs++;
++	return NULL;
++    }
++
++    return "Trying to use more child ID's than NumServers.  "
++	   "Increase NumServers in your config file.";
++}
++    
++/* we define an Processor w/ specific uid/gid */
++static const char *cf_Processor(
++    cmd_parms *cmd, void *dummy, const char *user_name, const char *group_name, const char *chroot_dir)
++{
++    _DBG("%d: %s.%s %s", num_childs, user_name, group_name, chroot_dir);
++    return child_add ( CHILD_TYPE_PROCESSOR, user_name, group_name, chroot_dir );
++}
++
++/* we define an Multiplexer child w/ specific uid/gid */
++static const char *cf_Multiplexer(
++    cmd_parms *cmd, void *dummy, const char *user_name, const char *group_name, const char *chroot_dir)
++{
++    _DBG("%d: %s.%s %s", num_childs, user_name, group_name, chroot_dir);
++    return child_add ( CHILD_TYPE_MULTIPLEXER, user_name, group_name, chroot_dir );
++}
++
++/* process the config file option AssignUserId */
++/* -- FIXME: perhaps we could add childs from here automatically -- */
++static const char * cf_AssignUserId
++(
++    cmd_parms *cmd, 
++    void *dummy, 
++    const char *user_name,
++    const char *group_name
++)
++{
++    int i;
++    int matching = 0;
++    int uid = ap_uname2id(user_name);
++    int gid = ap_gname2id(group_name);
++    const char *errstr;
++
++    metuxmpm_server_conf *sconf 
++	= metuxmpm_SERVER_CONF(cmd->server->module_config);
++
++    sconf->fullsockname = 
++	apr_pstrcat(cmd->pool, sconf->sockname, ".", user_name,":", group_name, NULL);
++
++    _DBG("user=\"%s\" (%d) group=\"%s\" (%d) numchilds=%d", user_name, uid, group_name, gid, num_childs );
++
++    for (i = 0; i < num_childs; i++)
++    {
++	_DBG("trying %d: %d.%d / %d", i, 
++	    child_info_table[i].uid, child_info_table[i].gid, child_info_table[i].type );
++    
++        if ((uid == child_info_table[i].uid) && 
++	    (gid == child_info_table[i].gid) &&
++	    (child_info_table[i].type == CHILD_TYPE_PROCESSOR))
++	{
++	    /* create an socket for this child, if it has no one */
++	    /* FIXME: we should do it anywhere else, for _all_ childs */
++	    sconf->child  = &child_info_table[i];
++	    _DBG("assigning server to child %d; "
++		 "UID: %d, GID: %d, input=%d, output=%d", 
++		 i, uid, gid, sconf->child->input, sconf->child->output);
++	    return NULL;
++        }
++    }
++
++    _DBG("assigning server to child FAILED %d; UID: %d, GID: %d ", i, uid, gid);
++    return "Unable to find process with matching uid/gid.";
++}
++
++static const char *cf_ServerLimit (cmd_parms *cmd, void *dummy, const char *arg) 
++{
++    int tmp_server_limit;
++    
++    const char *err = ap_check_cmd_context(cmd, GLOBAL_ONLY);
++    if (err != NULL) return err;
++
++    tmp_server_limit = atoi(arg);
++    /* you cannot change ServerLimit across a restart; ignore
++     * any such attempts
++     */
++    if (first_server_limit && tmp_server_limit != server_limit) 
++    {
++        /* how do we log a message?  the error log is a bit bucket at this
++         * point; we'll just have to set a flag so that ap_mpm_run()
++         * logs a warning later
++         */
++        changed_limit_at_restart = 1;
++        return NULL;
++    }
++    server_limit = tmp_server_limit;
++    
++    if (server_limit > MAX_SERVER_LIMIT) 
++    {
++       ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL, 
++                    "WARNING: ServerLimit of %d exceeds compile time limit "
++                    "of %d servers,", server_limit, MAX_SERVER_LIMIT);
++       ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL, 
++                    " lowering ServerLimit to %d.", MAX_SERVER_LIMIT);
++       server_limit = MAX_SERVER_LIMIT;
++    } 
++    else if (server_limit < 1) 
++    {
++	ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL, 
++                     "WARNING: Require ServerLimit > 0, setting to 1");
++	server_limit = 1;
++    }
++    return NULL;
++}
++
++static const char *cf_ThreadLimit (cmd_parms *cmd, void *dummy, const char *arg) 
++{
++    int tmp_thread_limit;
++    
++    const char *err = ap_check_cmd_context(cmd, GLOBAL_ONLY);
++    if (err != NULL) return err;
++
++    tmp_thread_limit = atoi(arg);
++    /* you cannot change ThreadLimit across a restart; ignore
++     * any such attempts
++     */
++    if (first_thread_limit && tmp_thread_limit != thread_limit) 
++    {
++        /* how do we log a message?  the error log is a bit bucket at this
++         * point; we'll just have to set a flag so that ap_mpm_run()
++         * logs a warning later
++         */
++        changed_limit_at_restart = 1;
++        return NULL;
++    }
++    thread_limit = tmp_thread_limit;
++    
++    if (thread_limit > MAX_THREAD_LIMIT) 
++    {
++       ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL, 
++                    "WARNING: ThreadLimit of %d exceeds compile time limit "
++                    "of %d servers,", thread_limit, MAX_THREAD_LIMIT);
++       ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL, 
++                    " lowering ThreadLimit to %d.", MAX_THREAD_LIMIT);
++       thread_limit = MAX_THREAD_LIMIT;
++    } 
++    else if (thread_limit < 1) 
++    {
++	ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL, 
++                     "WARNING: Require ThreadLimit > 0, setting to 1");
++	thread_limit = 1;
++    }
++    return NULL;
++}
++
++static const command_rec metuxmpm_cmds[] = {
++UNIX_DAEMON_COMMANDS,
++LISTEN_COMMANDS,
++AP_INIT_TAKE1("StartThreads", cf_StartThreads, NULL, RSRC_CONF,
++              "Number of threads each child creates"),
++AP_INIT_TAKE1("MinSpareThreads", cf_MinSpareThreads, NULL, RSRC_CONF,
++              "Minimum number of idle threads per child, to handle "
++              "request spikes"),
++AP_INIT_TAKE1("MaxSpareThreads", cf_MaxSpareThreads, NULL, RSRC_CONF,
++              "Maximum number of idle threads per child"),
++AP_INIT_TAKE1("MaxThreadsPerChild", cf_MaxThreadsPerChild, NULL, RSRC_CONF,
++              "Maximum number of threads per child"),
++AP_INIT_TAKE23("Multiplexer", cf_Multiplexer, NULL, RSRC_CONF,
++              "Specify an Multiplexer Child configuration."),
++AP_INIT_TAKE23("Processor", cf_Processor, NULL, RSRC_CONF,
++              "Specify a User and Group for a specific child process."),
++AP_INIT_TAKE2("AssignUserID", cf_AssignUserId, NULL, RSRC_CONF,
++              "Tie a virtual host to a specific child process."),
++AP_INIT_TAKE1("ServerLimit", cf_ServerLimit, NULL, RSRC_CONF,
++              "Maximum value of NumServers for this run of Apache"),
++AP_INIT_TAKE1("ThreadLimit", cf_ThreadLimit, NULL, RSRC_CONF,
++              "Maximum worker threads in a server for this run of Apache"),
++{ NULL }
++};
++
++/* == allocate an private server config structure == */
++static void *metuxmpm_create_config(apr_pool_t *p, server_rec *s)
++{
++    metuxmpm_server_conf *c = (metuxmpm_server_conf *)
++                                  apr_pcalloc(p, sizeof(metuxmpm_server_conf));
++    c->child  = NULL;
++    return c;
++}
++
++module AP_MODULE_DECLARE_DATA mpm_metuxmpm_module = 
++{
++    MPM20_MODULE_STUFF,
++    ap_mpm_rewrite_args,        /* hook to run before apache parses args */
++    NULL,                       /* create per-directory config structure */
++    NULL,                       /* merge per-directory config structures */
++    metuxmpm_create_config,     /* create per-server config structure */
++    NULL,                       /* merge per-server config structures */
++    metuxmpm_cmds,              /* command apr_table_t */
++    metuxmpm_hooks              /* register_hooks */
++};
++
+diff -Nur httpd-2.0.48/server/mpm/experimental/metuxmpm/mpm.h httpd-2.0.48-metuxmpm-r8/server/mpm/experimental/metuxmpm/mpm.h
+--- httpd-2.0.48/server/mpm/experimental/metuxmpm/mpm.h	1969-12-31 17:00:00.000000000 -0700
++++ httpd-2.0.48-metuxmpm-r8/server/mpm/experimental/metuxmpm/mpm.h	2004-03-19 10:03:32.137459576 -0700
+@@ -0,0 +1,100 @@
++/* ====================================================================
++ * The Apache Software License, Version 1.1
++ *
++ * Copyright (c) 2000-2002 The Apache Software Foundation.  All rights
++ * reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ *
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in
++ *    the documentation and/or other materials provided with the
++ *    distribution.
++ *
++ * 3. The end-user documentation included with the redistribution,
++ *    if any, must include the following acknowledgment:
++ *       "This product includes software developed by the
++ *        Apache Software Foundation (http://www.apache.org/)."
++ *    Alternately, this acknowledgment may appear in the software itself,
++ *    if and wherever such third-party acknowledgments normally appear.
++ *
++ * 4. The names "Apache" and "Apache Software Foundation" must
++ *    not be used to endorse or promote products derived from this
++ *    software without prior written permission. For written
++ *    permission, please contact apache@apache.org.
++ *
++ * 5. Products derived from this software may not be called "Apache",
++ *    nor may "Apache" appear in their name, without prior written
++ *    permission of the Apache Software Foundation.
++ *
++ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
++ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
++ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
++ * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
++ * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
++ * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
++ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
++ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
++ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++ * SUCH DAMAGE.
++ * ====================================================================
++ *
++ * This software consists of voluntary contributions made by many
++ * individuals on behalf of the Apache Software Foundation.  For more
++ * information on the Apache Software Foundation, please see
++ * <http://www.apache.org/>.
++ *
++ * Portions of this software are based upon public domain software
++ * originally written at the National Center for Supercomputing Applications,
++ * University of Illinois, Urbana-Champaign.
++ */
++
++#include "httpd.h"
++#include "mpm_default.h"
++#include "unixd.h"
++
++#ifndef APACHE_MPM_METUXMPM_H
++#define APACHE_MPM_METUXMPM_H
++
++#define METUXMPM_MPM
++
++#define MPM_NAME "metuxmpm"
++
++#define AP_MPM_WANT_RECLAIM_CHILD_PROCESSES
++#define AP_MPM_WANT_WAIT_OR_TIMEOUT
++#define AP_MPM_WANT_PROCESS_CHILD_STATUS
++#define AP_MPM_WANT_SET_PIDFILE
++#define AP_MPM_WANT_SET_SCOREBOARD
++#define AP_MPM_WANT_SET_LOCKFILE
++#define AP_MPM_WANT_SET_MAX_REQUESTS
++#define AP_MPM_WANT_SET_COREDUMPDIR
++#define AP_MPM_WANT_SET_ACCEPT_LOCK_MECH
++#define AP_MPM_WANT_SIGNAL_SERVER
++#define AP_MPM_USES_POD
++
++#define MPM_CHILD_PID(i) (ap_scoreboard_image->parent[i].pid)
++#define MPM_NOTE_CHILD_KILLED(i) (MPM_CHILD_PID(i) = 0)
++#define MPM_ACCEPT_FUNC unixd_accept
++
++/* Table of child status */
++#define SERVER_DEAD 0
++#define SERVER_DYING 1
++#define SERVER_ALIVE 2
++
++typedef struct ap_ctable{
++    pid_t pid;
++    unsigned char status;
++} ap_ctable;
++
++extern int ap_threads_per_child;
++extern int ap_max_daemons_limit;
++extern server_rec *ap_server_conf;
++
++#endif /* APACHE_MPM_METUXMPM_H */
+diff -Nur httpd-2.0.48/server/mpm/experimental/metuxmpm/mpm_default.h httpd-2.0.48-metuxmpm-r8/server/mpm/experimental/metuxmpm/mpm_default.h
+--- httpd-2.0.48/server/mpm/experimental/metuxmpm/mpm_default.h	1969-12-31 17:00:00.000000000 -0700
++++ httpd-2.0.48-metuxmpm-r8/server/mpm/experimental/metuxmpm/mpm_default.h	2004-03-19 10:03:32.138459433 -0700
+@@ -0,0 +1,115 @@
++/* ====================================================================
++ * The Apache Software License, Version 1.1
++ *
++ * Copyright (c) 2000-2002 The Apache Software Foundation.  All rights
++ * reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ *
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in
++ *    the documentation and/or other materials provided with the
++ *    distribution.
++ *
++ * 3. The end-user documentation included with the redistribution,
++ *    if any, must include the following acknowledgment:
++ *       "This product includes software developed by the
++ *        Apache Software Foundation (http://www.apache.org/)."
++ *    Alternately, this acknowledgment may appear in the software itself,
++ *    if and wherever such third-party acknowledgments normally appear.
++ *
++ * 4. The names "Apache" and "Apache Software Foundation" must
++ *    not be used to endorse or promote products derived from this
++ *    software without prior written permission. For written
++ *    permission, please contact apache@apache.org.
++ *
++ * 5. Products derived from this software may not be called "Apache",
++ *    nor may "Apache" appear in their name, without prior written
++ *    permission of the Apache Software Foundation.
++ *
++ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
++ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
++ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
++ * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
++ * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
++ * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
++ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
++ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
++ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++ * SUCH DAMAGE.
++ * ====================================================================
++ *
++ * This software consists of voluntary contributions made by many
++ * individuals on behalf of the Apache Software Foundation.  For more
++ * information on the Apache Software Foundation, please see
++ * <http://www.apache.org/>.
++ *
++ * Portions of this software are based upon public domain software
++ * originally written at the National Center for Supercomputing Applications,
++ * University of Illinois, Urbana-Champaign.
++ */
++
++#ifndef APACHE_MPM_DEFAULT_H
++#define APACHE_MPM_DEFAULT_H
++
++#define NO_SERIALIZED_ACCEPT
++
++/* Number of threads to spawn off by default --- also, if fewer than
++ * this free when the caretaker checks, it will spawn more.
++ */
++#ifndef DEFAULT_START_THREAD
++#define DEFAULT_START_THREAD 5
++#endif
++
++/* Maximum number of *free* server threads --- more than this, and
++ * they will die off.
++ */
++
++#ifndef DEFAULT_MAX_SPARE_THREAD
++#define DEFAULT_MAX_SPARE_THREAD 10
++#endif
++
++/* Minimum --- fewer than this, and more will be created */
++
++#ifndef DEFAULT_MIN_SPARE_THREAD
++#define DEFAULT_MIN_SPARE_THREAD 5
++#endif
++
++/* Number of servers to spawn off by default
++ */
++#ifndef DEFAULT_NUM_DAEMON
++#define DEFAULT_NUM_DAEMON 2
++#endif
++
++/* File used for accept locking, when we use a file */
++#ifndef DEFAULT_LOCKFILE
++#define DEFAULT_LOCKFILE DEFAULT_REL_RUNTIMEDIR "/accept.lock"
++#endif
++
++/* Where the main/parent process's pid is logged */
++#ifndef DEFAULT_PIDLOG
++#define DEFAULT_PIDLOG DEFAULT_REL_RUNTIMEDIR "/httpd.pid"
++#endif
++
++/*
++ * Interval, in microseconds, between scoreboard maintenance.
++ */
++#ifndef SCOREBOARD_MAINTENANCE_INTERVAL
++#define SCOREBOARD_MAINTENANCE_INTERVAL 1000000
++#endif
++
++/* Number of requests to try to handle in a single process.  If <= 0,
++ * the children don't die off.
++ */
++#ifndef DEFAULT_MAX_REQUESTS_PER_CHILD
++#define DEFAULT_MAX_REQUESTS_PER_CHILD 10000
++#endif
++
++#endif /* AP_MPM_DEFAULT_H */
+diff -Nur httpd-2.0.48/srclib/apr/network_io/unix/sockets.c httpd-2.0.48-metuxmpm-r8/srclib/apr/network_io/unix/sockets.c
+--- httpd-2.0.48/srclib/apr/network_io/unix/sockets.c	2003-07-08 06:53:11.000000000 -0600
++++ httpd-2.0.48-metuxmpm-r8/srclib/apr/network_io/unix/sockets.c	2004-03-19 10:03:32.138459433 -0700
+@@ -411,7 +411,36 @@
+         set_socket_vars(*sock, APR_INET, SOCK_STREAM, 0);
+         (*sock)->timeout = -1;
+     }
+-    (*sock)->local_port_unknown = (*sock)->local_interface_unknown = 1;
++//    (*sock)->local_port_unknown = (*sock)->local_interface_unknown = 1;
++     if (1)
++     {
++       /* fixup socket's peer information.
++          we need it for the muxmpm.           enrico weigelt, metux ITS
++                                               <weigelt@metux.de>
++       */
++       /* XXX next line looks bogus w.r.t. AF_INET6 support */
++
++       /* adjust remote address */
++       (*sock)->remote_addr->salen = sizeof((*sock)->remote_addr->sa);
++         getpeername(
++           *thesock,
++           (struct sockaddr*)&((*sock)->remote_addr->sa),
++           &((*sock)->remote_addr->salen)
++       );
++         (*sock)->remote_addr->port = ntohs((*sock)->remote_addr->sa.sin.sin_port);
++
++         /* XXX assumes sin_port and sin6_port at same offset */
++
++       /* adjust local address */
++         getsockname(
++           *thesock,
++           (struct sockaddr*)&((*sock)->local_addr->sa),
++           &((*sock)->local_addr->salen)
++       );
++         (*sock)->local_addr->port = ntohs((*sock)->local_addr->sa.sin.sin_port);
++       (*sock)->local_port_unknown = (*sock)->local_interface_unknown = 0;
++     }
++
+     (*sock)->remote_addr_unknown = 1;
+     (*sock)->socketdes = *thesock;
+     return APR_SUCCESS;
