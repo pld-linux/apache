@@ -6,3 +6,7 @@ SERVICE_RUN_NICE_LEVEL="+5"
 # Cmdline options 
 HTTPD_OPTS=""
 
+# choose MPM
+# prefork, worker, perchild (experimental), metuxmpm (experimental)
+# (note that some may be not available)
+HTTPD_MPM="prefork"

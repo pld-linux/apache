@@ -32,34 +32,36 @@ else
 	exit 0
 fi
 
+[ -z "$HTTPD_MPM" ] && HTTPD_MPM="prefork"
+
 RETVAL=0
 # See how we were called.
 case "$1" in
   start)
 	# Check if the service is already running?
 	if [ ! -f /var/lock/subsys/httpd ]; then
-		msg_starting httpd
-		daemon httpd $HTTPD_OPTS
+		msg_starting httpd.${HTTPD_MPM}
+		daemon httpd.${HTTPD_MPM} $HTTPD_OPTS
 		RETVAL=$?
 		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/httpd
 	else
-		msg_already_running httpd
+		msg_already_running httpd.${HTTPD_MPM}
 	fi
 	;;
   stop)
 	# Stop daemons.
 	if [ -f /var/lock/subsys/httpd ]; then
-		msg_stopping httpd
-		daemon httpd -k stop
+		msg_stopping httpd.${HTTPD_MPM}
+		daemon httpd.${HTTPD_MPM} -k stop
 		rm -f /var/lock/subsys/httpd /var/run/httpd.pid /var/run/httpd.loc* >/dev/null 2>&1
 	else
-		msg_not_running httpd
+		msg_not_running httpd.${HTTPD_MPM}
 	fi
 	;;
   status)
-	status httpd
+	status httpd.${HTTPD_MPM}
 	RETVAL=$?
-	/usr/sbin/httpd -S
+	/usr/sbin/httpd.${HTTPD_MPM} -S
 	;;
   restart)
   	$0 stop
@@ -67,11 +69,11 @@ case "$1" in
 	;;
   reload|force-reload|graceful)
 	if [ -f /var/lock/subsys/httpd ]; then
-		msg_reloading httpd
-		daemon httpd -k graceful
+		msg_reloading httpd.${HTTPD_MPM}
+		daemon httpd.${HTTPD_MPM} -k graceful
 		RETVAL=$?
 	else
-		msg_not_running httpd >&2
+		msg_not_running httpd.${HTTPD_MPM} >&2
 		RETVAL=7
 	fi
 	;;
