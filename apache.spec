@@ -1720,7 +1720,7 @@ fi
 %{_includedir}
 %{_libexecdir}/*.exp
 %attr(750,root,root) %dir %{_sysconfdir}/build
-%attr(644,root,root) %{_libexecdir}/build/[lprs]*.mk
+%{_libexecdir}/build/[lprs]*.mk
 %attr(755,root,root) %{_libexecdir}/build/*.sh
 %attr(755,root,root) %{_libexecdir}/build/libtool
 
