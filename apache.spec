@@ -1,3 +1,7 @@
+#
+# Conditional build:
+# mod_rewrite_ldap - enable ldap map supoort for mod_rewrite (alpha)
+#
 %include	/usr/lib/rpm/macros.perl
 Summary:	The most widely used Web server on the Internet
 Summary(de):	Leading World Wide Web-Server
@@ -6,7 +10,7 @@ Summary(pl):	Serwer WWW (World Wide Web)
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	1.3.12
-Release:	26
+Release:	27
 License:	BSD-like
 Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
@@ -31,6 +35,7 @@ Patch7:		%{name}-mm_conf.patch
 Patch8:		%{name}-modules_symbols.patch
 Patch9:		%{name}-apxs_force_rm_cp.patch
 Patch10:	%{name}-db3.patch
+Patch11:	%{name}-lookup_map_ldap.patch
 Provides:	httpd
 Provides:	webserver
 Prereq:		/sbin/chkconfig
@@ -40,6 +45,7 @@ Prereq:		/bin/id
 Prereq:		sh-utils
 BuildRequires:	db2-devel
 BuildRequires:	mm-devel >= 1.1.3
+%{?mod_rewrite_ldap:BuildRequires: openldap-devel}
 Requires:	rc-scripts
 Requires:	mailcap
 Requires:	/etc/mime.types
@@ -444,6 +450,7 @@ Requires:	%{name}(EAPI) = %{version}
 %patch8 -p1
 %patch9 -p1
 %patch10 -p1
+%{?mod_rewrite_ldap:%patch11 -p1}
 
 %build
 OPTIM="%{!?debug:$RPM_OPT_FLAGS}%{?debug:-O -g}" \
@@ -476,6 +483,9 @@ OPTIM="%{!?debug:$RPM_OPT_FLAGS}%{?debug:-O -g}" \
 
 rm -f src/modules/standard/mod_auth_db.so
 %{__make} -C src/modules/standard mod_auth_db.so LIBS_SHLIB="-ldb"
+
+rm -f src/modules/standard/mod_rewrite.so
+%{__make} -C src/modules/standard mod_rewrite.so LIBS_SHLIB="-lndbm %{?mod_rewrite_ldap:-lldap -llber}"
 
 %install
 rm -rf $RPM_BUILD_ROOT
