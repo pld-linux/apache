@@ -5,21 +5,18 @@ Summary(pl):	Serwer WWW (World Wide Web) ze wsparciem dla IPv6
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	1.3.9
-Release:	0.1
+Release:	1
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Source0:	ftp://ftp.apache.org/apache/dist/%{name}_%{version}.tar.gz
 Source1:	apache.init
 Source2:	apache.logrotate
 Source3:	apache-extra1.tar.bz2
-#Source6:	apache_1.3.6.tar.gz.asc
-#Source7:	apache_1.3.6.tar.gz.md5
 Source8:	apache.sysconfig
 Patch0:		apache-suexec.patch
-#Patch1:		apache-136-v6-19990616-PLD.diff
-Patch1:		apache-139-v6-19990820-PLD.diff
+Patch1:		apache-1.3.9-ipv6-23081999.patch.gz
 Patch2:		apache-htdocs.patch
-#Patch3:		apache-release.patch
+Patch3:		apache-release.patch
 Patch4:		apache-pld.patch
 Copyright:	BSD-like
 Provides:	httpd
@@ -105,7 +102,7 @@ Dokumentacja do Apache w formacie HTML.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
-#%patch3 -p1
+%patch3 -p1
 %patch4 -p1
 
 %build
@@ -138,20 +135,16 @@ rm -rf $RPM_BUILD_ROOT
 
 make install-quiet root="$RPM_BUILD_ROOT"
 
-mv $RPM_BUILD_ROOT%{_datadir}/htdocs $RPM_BUILD_ROOT%{_datadir}/html
+#mv $RPM_BUILD_ROOT%{_datadir}/htdocs $RPM_BUILD_ROOT%{_datadir}/html
 
-install -d $RPM_BUILD_ROOT/etc/{httpd,logrotate.d,rc.d/init.d,sysconfig}
-install -d $RPM_BUILD_ROOT%{_datadir}/{html/manual,icons,cgi-bin}
-install -d $RPM_BUILD_ROOT/{usr/{lib/apache,sbin,share,man/man{1,8}},var/log/httpd}
+install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig} \
+	$RPM_BUILD_ROOT/var/log/httpd
 
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/apache
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
 install %{SOURCE8} $RPM_BUILD_ROOT/etc/sysconfig/apache
 
-install -d $RPM_BUILD_ROOT%{_includedir}
-
 rm -f $RPM_BUILD_ROOT%{_sysconfdir}/*
-rm -f $RPM_BUILD_ROOT%{_datadir}/html/manual/expand.pl
 
 touch $RPM_BUILD_ROOT/var/log/httpd/{access,error,agent,referer}_log
 
@@ -160,9 +153,7 @@ cp -a apache-extra/icons/*	$RPM_BUILD_ROOT%{_datadir}/icons
 cp -a apache-extra/*.conf	$RPM_BUILD_ROOT%{_sysconfdir}
 cp -a apache-extra/m*		$RPM_BUILD_ROOT%{_sysconfdir}
 
-mv $RPM_BUILD_ROOT/usr/man $RPM_BUILD_ROOT%{_mandir}
-
-strip $RPM_BUILD_ROOT%{_libexecdir}/*
+strip $RPM_BUILD_ROOT%{_libexecdir}/* || :
 
 gzip -9nf $RPM_BUILD_ROOT%{_mandir}/man*/* \
 	ABOUT_APACHE src/CHANGES KEYS README README.v6
