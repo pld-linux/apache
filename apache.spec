@@ -18,13 +18,15 @@ Source6:	apache-httpd.conf
 Source7:	apache-srm.conf
 Source8:	apache-virtual-host.conf
 Patch0:		apache-suexec.patch
-Patch1:		apache-1.3.9-ipv6-23081999.patch.gz
-Patch2:		apache-htdocs.patch
-Patch3:		apache-release.patch
-Patch4:		apache-pld.patch
-Patch5:		apache-EAPI.patch
-Patch6:		apache-errordocs.patch
-Patch7:		apache-apxs.patch
+Patch1:		ftp://ftp.kame.net/pub/kame/misc/apache-139-v6-19991013a.diff.gz
+Patch2:		ftp://ftp.nemoto.ecei.tohoku.ac.jp/pub/Net/IPv6/Patches/apache-139-v6-19991013a.new4.patch.gz
+Patch3:		ftp://ftp.nemoto.ecei.tohoku.ac.jp/pub/Net/IPv6/Patches/apache-139-v6-19991013a.new4_to_4.1.patch
+Patch4:		apache-htdocs.patch
+Patch5:		apache-release.patch
+Patch6:		apache-pld.patch
+Patch7:		apache-EAPI.patch
+Patch8:		apache-errordocs.patch
+Patch9:		apache-apxs.patch
 Copyright:	BSD-like
 Provides:	httpd
 Provides:	webserver
@@ -144,6 +146,8 @@ Dokumentacja do Apache w formacie HTML.
 %patch5 -p1
 %patch6 -p1
 %patch7 -p1
+%patch8 -p1
+%patch9 -p1
 
 %build
 
@@ -270,9 +274,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(754,root,root) /etc/rc.d/init.d/*
 
 %attr(751,root,root) %dir %{_sysconfdir}
-%attr(640,root,root) %config %verify(not size mtime md5) %{_sysconfdir}/*
-%attr(640,root,root) %config %verify(not size mtime md5) /etc/sysconfig/*
-%attr(640,root,root) %config /etc/logrotate.d/*
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/*
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/sysconfig/*
+%attr(640,root,root) %config(noreplace) /etc/logrotate.d/*
 
 %attr(755,root,root) %dir %{_datadir}/html
 %config(noreplace) %{_datadir}/html/index.html
