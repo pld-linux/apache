@@ -1,3 +1,4 @@
+%include	/usr/lib/rpm/macros.perl
 Summary:	The most widely used Web server on the Internet
 Summary(de):	Leading World Wide Web-Server
 Summary(fr):	Le serveur web le plus utilise sur Internet
@@ -22,11 +23,10 @@ Patch1:		ftp://ftp.kame.net/pub/kame/misc/apache-139-v6-19991013a.diff.gz
 Patch2:		ftp://ftp.nemoto.ecei.tohoku.ac.jp/pub/Net/IPv6/Patches/apache-139-v6-19991013a.new4.patch.gz
 Patch3:		ftp://ftp.nemoto.ecei.tohoku.ac.jp/pub/Net/IPv6/Patches/apache-139-v6-19991013a.new4_to_4.1.patch
 Patch4:		apache-htdocs.patch
-Patch5:		apache-release.patch
-Patch6:		apache-pld.patch
-Patch7:		apache-EAPI.patch
-Patch8:		apache-errordocs.patch
-Patch9:		apache-apxs.patch
+Patch5:		apache-pld.patch
+Patch6:		apache-EAPI.patch
+Patch7:		apache-errordocs.patch
+Patch8:		apache-apxs.patch
 Copyright:	BSD-like
 Provides:	httpd
 Provides:	webserver
@@ -39,8 +39,6 @@ BuildRequires:	mm-devel
 Requires:	rc-scripts
 Requires:	mailcap
 Requires:	/etc/mime.types
-Requires:	file
-Requires:	/usr/share/misc/magic
 URL:		http://www.apache.org/
 BuildRoot:	/tmp/%{name}-%{version}-root
 Obsoletes:	apache-extra
@@ -57,9 +55,7 @@ server. Apache is also the most popular Web server on the Internet.
 
 This special version also includes many optimizations, Extended Application
 Programming Interface (EAPI), Shared memory module, Hotwired XSSI module,
-hooks for SSL module and several cosmetic improvements. Also included is the
-FrontPage 2000 patch, however you need to install the frontpage package to
-enable it.
+hooks for SSL module and several cosmetic improvements.
 
 %description -l de
 Apache ist ein voll funktionsfähiger Web-Server, der kostenlos
@@ -72,9 +68,7 @@ aussi le serveur Web le plus populaire sur Internet.
 Cette version speciale inclut egalement plusieurs optimisations, l'Interface
 de Programmation d'Applications Etendu (EAPI), le module de memoire
 partagee, un module XSSI de Hotwired , des attaches pour le module SSL ainsi
-que plusieurs ameliorations cosmetiques. La patch FrontPage 2000 est
-egalement incluse, toutefois vous devrez installer le package additionnel
-frontpage pour utiliser ces fonctions.
+que plusieurs ameliorations cosmetiques.
 
 %description -l pl
 Apache jest serwerem WWW (World Wide Web). Instaluj±c ten pakiet bêdziesz 
@@ -147,7 +141,6 @@ Dokumentacja do Apache w formacie HTML.
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1
-%patch9 -p1
 
 %build
 
@@ -303,7 +296,6 @@ rm -rf $RPM_BUILD_ROOT
 %dir %attr(750,http,http) /var/cache/www/apache
 
 %dir %attr(750,http,http) /var/state/apache
-%dir %attr(750,http,http) /var/state/apache/mm
 
 %{_mandir}/man[18]/*
 
