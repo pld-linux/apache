@@ -457,7 +457,7 @@ Requires:	%{name}(EAPI) = %{version}
 %patch12 -p1
 
 %build
-OPTIM="%{!?debug:$RPM_OPT_FLAGS}%{?debug:-O -g}" \
+OPTIM="%{?debug:-O -g}%{!?debug:$RPM_OPT_FLAGS}" \
 ./configure \
 	--prefix=%{_prefix} \
 	--sysconfdir=%{_sysconfdir} \
