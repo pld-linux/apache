@@ -191,19 +191,19 @@ diff -Nru apache_1.3.20/configure.v6 apache_1.3.20.new/configure.v6
 +
 +./configure --enable-rule=INET6 --enable-module=proxy $*
 diff -Nru apache_1.3.20/src/Configuration.tmpl apache_1.3.20.new/src/Configuration.tmpl
---- apache_1.3.20/src/Configuration.tmpl	Mon May 21 11:02:04 2001
-+++ apache_1.3.20.new/src/Configuration.tmpl	Mon May 21 10:54:52 2001
-@@ -184,6 +184,9 @@
- #  directory is present. This rule will always be interpreted as "no"
- #  if the directory is not present.
- #
+--- apache_1.3.22/src/Configuration.tmpl	Fri Oct  5 10:19:15 2001
++++ apache_1.3.22.new/src/Configuration.tmpl	Fri Nov 16 05:27:07 2001
+@@ -191,6 +191,9 @@
+ #  Rule EXPAT=default   : If Expat can be found at the system or
+ #                         in lib/expat-lite, use it; otherwise
+ #                         skip it
 +# INET6:
 +#  IPv6 support.
 +#
  
  Rule SOCKS4=no
  Rule SOCKS5=no
-@@ -191,6 +194,7 @@
+@@ -198,6 +201,7 @@
  Rule IRIXN32=yes
  Rule PARANOID=no
  Rule EXPAT=default
@@ -4139,9 +4139,9 @@ diff -Nru apache_1.3.20/src/modules/proxy/mod_proxy.h apache_1.3.20.new/src/modu
  /* This function is called by ap_table_do() for all header lines */
  int ap_proxy_send_hdr_line(void *p, const char *key, const char *value);
 diff -Nru apache_1.3.20/src/modules/proxy/proxy_connect.c apache_1.3.20.new/src/modules/proxy/proxy_connect.c
---- apache_1.3.20/src/modules/proxy/proxy_connect.c	Mon Jan 15 18:05:29 2001
-+++ apache_1.3.20.new/src/modules/proxy/proxy_connect.c	Mon May 21 10:54:52 2001
-@@ -116,14 +116,15 @@
+--- apache_1.3.22/src/modules/proxy/proxy_connect.c.orig	Fri Oct  5 10:19:15 2001
++++ apache_1.3.20/src/modules/proxy/proxy_connect.c	Fri Nov 16 05:27:07 2001
+@@ -114,14 +114,15 @@
  			  const char *proxyhost, int proxyport)
  {
      struct sockaddr_in server;
@@ -4161,7 +4161,7 @@ diff -Nru apache_1.3.20/src/modules/proxy/proxy_connect.c apache_1.3.20.new/src/
  
      void *sconf = r->server->module_config;
      proxy_server_conf *conf =
-@@ -131,26 +132,59 @@
+@@ -129,26 +130,59 @@
      struct noproxy_entry *npent = (struct noproxy_entry *) conf->noproxies->elts;
  
      memset(&server, '\0', sizeof(server));
@@ -4230,7 +4230,7 @@ diff -Nru apache_1.3.20/src/modules/proxy/proxy_connect.c apache_1.3.20.new/src/
      }
  
      /* Check if it is an allowed port */
-@@ -161,59 +195,64 @@
+@@ -159,59 +193,64 @@
  	    case DEFAULT_SNEWS_PORT:
  		break;
  	    default:
@@ -4257,11 +4257,11 @@ diff -Nru apache_1.3.20/src/modules/proxy/proxy_connect.c apache_1.3.20.new/src/
 +	if (error)
 +	    return HTTP_INTERNAL_SERVER_ERROR;	/* XXX */
 +
- 	Explain2("CONNECT to remote proxy %s on port %d", proxyhost, proxyport);
+ 	ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "CONNECT to remote proxy %s on port %d", proxyhost, proxyport);
      }
      else {
--	Explain2("CONNECT to %s on port %d", host, port);
-+	Explain2("CONNECT to %s on port %d", hoststr, port);
+-	ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "CONNECT to %s on port %d", host, port);
++	ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "CONNECT to %s on port %d", hoststr, port);
      }
  
 -    server.sin_port = (proxyport ? htons(proxyport) : htons(port));
@@ -4286,7 +4286,7 @@ diff -Nru apache_1.3.20/src/modules/proxy/proxy_connect.c apache_1.3.20.new/src/
  
  #ifdef CHECK_FD_SETSIZE
 -    if (sock >= FD_SETSIZE) {
--	ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_WARNING, NULL,
+-	ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_WARNING, r->server,
 -	    "proxy_connect_handler: filedescriptor (%u) "
 -	    "larger than FD_SETSIZE (%u) "
 -	    "found, you probably need to rebuild Apache with a "
@@ -4330,8 +4330,8 @@ diff -Nru apache_1.3.20/src/modules/proxy/proxy_connect.c apache_1.3.20.new/src/
  
      /* If we are connecting through a remote proxy, we need to pass
 diff -Nru apache_1.3.20/src/modules/proxy/proxy_ftp.c apache_1.3.20.new/src/modules/proxy/proxy_ftp.c
---- apache_1.3.20/src/modules/proxy/proxy_ftp.c	Fri Mar  9 11:10:31 2001
-+++ apache_1.3.20.new/src/modules/proxy/proxy_ftp.c	Mon May 21 10:54:52 2001
+--- apache_1.3.22/src/modules/proxy/proxy_ftp.c.orig	Fri Oct  5 10:19:15 2001
++++ apache_1.3.22/src/modules/proxy/proxy_ftp.c	Fri Nov 16 05:34:23 2001
 @@ -62,6 +62,7 @@
  #include "http_main.h"
  #include "http_log.h"
@@ -4340,7 +4340,7 @@ diff -Nru apache_1.3.20/src/modules/proxy/proxy_ftp.c apache_1.3.20.new/src/modu
  
  #define AUTODETECT_PWD
  
-@@ -453,8 +454,10 @@
+@@ -451,8 +452,10 @@
      const char *err;
      int port, i, j, len, sock, dsock, rc, nocache = 0;
      int csd = 0;
@@ -4353,7 +4353,7 @@ diff -Nru apache_1.3.20/src/modules/proxy/proxy_ftp.c apache_1.3.20.new/src/modu
      struct in_addr destaddr;
      table *resp_hdrs;
      BUFF *f;
-@@ -475,11 +478,18 @@
+@@ -473,11 +476,18 @@
      unsigned int presult, h0, h1, h2, h3, p0, p1;
      unsigned int paddr;
      unsigned short pport;
@@ -4373,7 +4373,7 @@ diff -Nru apache_1.3.20/src/modules/proxy/proxy_ftp.c apache_1.3.20.new/src/modu
  /* stuff for responses */
      char resp[MAX_STRING_LEN];
      char *size = NULL;
-@@ -549,62 +559,52 @@
+@@ -547,62 +557,52 @@
      if (parms != NULL)
  	*(parms++) = '\0';
  
@@ -4473,7 +4473,7 @@ diff -Nru apache_1.3.20/src/modules/proxy/proxy_ftp.c apache_1.3.20.new/src/modu
      if (i == -1) {
  	ap_pclosesocket(p, sock);
  	return ap_proxyerror(r, HTTP_BAD_GATEWAY, ap_pstrcat(r->pool,
-@@ -808,7 +808,7 @@
+@@ -806,7 +806,7 @@
      }
  
  /* try to set up PASV data connection first */
@@ -4482,7 +4482,7 @@ diff -Nru apache_1.3.20/src/modules/proxy/proxy_ftp.c apache_1.3.20.new/src/modu
      if (dsock == -1) {
  	ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
  		     "proxy: error creating PASV socket");
-@@ -827,11 +827,21 @@
+@@ -825,11 +825,22 @@
      }
  #endif
  
@@ -4497,16 +4497,17 @@ diff -Nru apache_1.3.20/src/modules/proxy/proxy_ftp.c apache_1.3.20.new/src/modu
 +    ap_bputs(cmd, f);
 +    ap_bputs(CRLF, f);
      ap_bflush(f);
--    Explain0("FTP: PASV command issued");
 +    Explain0("FTP: passive command issued");
- /* possible results: 227, 421, 500, 501, 502, 530 */
+     ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: PASV command issued");
+-    /* possible results: 227, 421, 500, 501, 502, 530 */
++    /* possible results: 227, 228, 229, 421, 500, 501, 502, 530 */
      /* 227 Entering Passive Mode (h1,h2,h3,h4,p1,p2). */
 +    /* 228 Entering Long Passive Mode (...). */
 +    /* 229 Entering Extended Passive Mode (...). */
      /* 421 Service not available, closing control connection. */
      /* 500 Syntax error, command unrecognized. */
      /* 501 Syntax error in parameters or arguments. */
-@@ -840,7 +850,7 @@
+@@ -838,7 +849,7 @@
      i = ap_bgets(pasv, sizeof(pasv), f);
      if (i == -1) {
  	ap_log_rerror(APLOG_MARK, APLOG_ERR|APLOG_NOERRNO, r,
@@ -4515,9 +4516,9 @@ diff -Nru apache_1.3.20/src/modules/proxy/proxy_ftp.c apache_1.3.20.new/src/modu
  	ap_pclosesocket(p, dsock);
  	ap_bclose(f);
  	ap_kill_timeout(r);
-@@ -872,10 +882,14 @@
+@@ -870,10 +881,14 @@
  	    pport = (p1 << 8) + p0;
- 	    Explain5("FTP: contacting host %d.%d.%d.%d:%d",
+ 	    ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: contacting host %d.%d.%d.%d:%d",
  		     h3, h2, h1, h0, pport);
 -	    data_addr.sin_family = AF_INET;
 -	    data_addr.sin_addr.s_addr = htonl(paddr);
@@ -4534,7 +4535,7 @@ diff -Nru apache_1.3.20/src/modules/proxy/proxy_ftp.c apache_1.3.20.new/src/modu
  
  	    if (i == -1) {
  		ap_kill_timeout(r);
-@@ -883,17 +897,76 @@
+@@ -881,17 +896,76 @@
  				     ap_pstrcat(r->pool,
  						"Could not connect to remote machine: ",
  						strerror(errno), NULL));
@@ -4613,7 +4614,7 @@ diff -Nru apache_1.3.20/src/modules/proxy/proxy_ftp.c apache_1.3.20.new/src/modu
  	if (getsockname(sock, (struct sockaddr *) &server, &clen) < 0) {
  	    ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
  			 "proxy: error getting socket address");
-@@ -902,7 +975,7 @@
+@@ -900,7 +974,7 @@
  	    return HTTP_INTERNAL_SERVER_ERROR;
  	}
  
@@ -4622,7 +4623,7 @@ diff -Nru apache_1.3.20/src/modules/proxy/proxy_ftp.c apache_1.3.20.new/src/modu
  	if (dsock == -1) {
  	    ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
  			 "proxy: error creating socket");
-@@ -923,13 +996,26 @@
+@@ -921,13 +995,26 @@
  #endif /*_OSD_POSIX*/
  	}
  
@@ -4654,7 +4655,7 @@ diff -Nru apache_1.3.20/src/modules/proxy/proxy_ftp.c apache_1.3.20.new/src/modu
  	    ap_bclose(f);
  	    ap_pclosesocket(p, dsock);
  	    return HTTP_INTERNAL_SERVER_ERROR;
-@@ -1188,7 +1274,7 @@
+@@ -1186,7 +1273,7 @@
  
      if (!pasvmode) {		/* wait for connection */
  	ap_hard_timeout("proxy ftp data connect", r);
@@ -5418,20 +5419,16 @@ diff -Nru apache_1.3.20/src/modules/standard/mod_access.c apache_1.3.20.new/src/
  	case T_HOST:
  	    if (!gothost) {
 diff -Nru apache_1.3.20/src/modules/standard/mod_unique_id.c apache_1.3.20.new/src/modules/standard/mod_unique_id.c
---- apache_1.3.20/src/modules/standard/mod_unique_id.c	Mon Jan 15 18:05:51 2001
-+++ apache_1.3.20.new/src/modules/standard/mod_unique_id.c	Mon May 21 10:54:52 2001
-@@ -67,14 +67,26 @@
+--- apache_1.3.22/src/modules/standard/mod_unique_id.c.orig	Tue Oct  2 18:11:13 2001
++++ apache_1.3.22/src/modules/standard/mod_unique_id.c	Fri Nov 16 05:41:26 2001
+@@ -67,10 +67,22 @@
  #include "http_config.h"
  #include "http_log.h"
  #include "multithread.h"
 +#include "sa_len.h"
- 
- #ifdef MULTITHREAD
- #error sorry this module does not support multithreaded servers yet
- #endif
- 
-+/*#define SHORT_UNIQUE_ID*/
 +
++/*#define SHORT_UNIQUE_ID*/
+ 
  typedef struct {
      unsigned int stamp;
 -    unsigned int in_addr;
@@ -5446,18 +5443,18 @@ diff -Nru apache_1.3.20/src/modules/standard/mod_unique_id.c apache_1.3.20.new/s
 +#endif
 +    } addr;
      unsigned int pid;
-     unsigned short counter;
- } unique_id_rec;
-@@ -144,7 +156,7 @@
+ #ifdef MULTITHREAD
+     unsigned int tid;
+@@ -142,7 +154,7 @@
   * this shouldn't be a problem till year 2106.
   */
  
 -static unsigned global_in_addr;
 +static struct sockaddr_storage global_addr;
  
- static APACHE_TLS unique_id_rec cur_unique_id;
+ #ifdef WIN32
  
-@@ -164,7 +176,8 @@
+@@ -221,7 +233,8 @@
  #define MAXHOSTNAMELEN 256
  #endif
      char str[MAXHOSTNAMELEN + 1];
@@ -5467,18 +5464,18 @@ diff -Nru apache_1.3.20/src/modules/standard/mod_unique_id.c apache_1.3.20.new/s
  #ifndef NO_GETTIMEOFDAY
      struct timeval tv;
  #endif
-@@ -174,8 +187,8 @@
+@@ -232,8 +245,8 @@
       */
      unique_id_rec_offset[0] = XtOffsetOf(unique_id_rec, stamp);
-     unique_id_rec_size[0] = sizeof(cur_unique_id.stamp);
+     unique_id_rec_size[0] = sizeof(cur_unique_id->stamp);
 -    unique_id_rec_offset[1] = XtOffsetOf(unique_id_rec, in_addr);
--    unique_id_rec_size[1] = sizeof(cur_unique_id.in_addr);
+-    unique_id_rec_size[1] = sizeof(cur_unique_id->in_addr);
 +    unique_id_rec_offset[1] = XtOffsetOf(unique_id_rec, addr);
 +    unique_id_rec_size[1] = sizeof(cur_unique_id.addr);
      unique_id_rec_offset[2] = XtOffsetOf(unique_id_rec, pid);
-     unique_id_rec_size[2] = sizeof(cur_unique_id.pid);
-     unique_id_rec_offset[3] = XtOffsetOf(unique_id_rec, counter);
-@@ -201,17 +214,44 @@
+     unique_id_rec_size[2] = sizeof(cur_unique_id->pid);
+ #ifdef MULTITHREAD
+@@ -269,17 +282,44 @@
      }
      str[sizeof(str) - 1] = '\0';
  
@@ -5528,11 +5525,11 @@ diff -Nru apache_1.3.20/src/modules/standard/mod_unique_id.c apache_1.3.20.new/s
  
      /*
       * If the server is pummelled with restart requests we could possibly end
-@@ -270,7 +310,23 @@
+@@ -336,7 +376,23 @@
  		     "oh no! pids are greater than 32-bits!  I'm broken!");
      }
  
--    cur_unique_id.in_addr = global_in_addr;
+-    cur_unique_id->in_addr = global_in_addr;
 +    memset(&cur_unique_id.addr, 0, sizeof(cur_unique_id.addr));
 +    switch (global_addr.ss_family) {
 +    case AF_INET:
