@@ -117,6 +117,70 @@ Documentation for apache in HTML format.
 %description -l pl doc
 Dokumentacja do Apache w formacie HTML.
 
+%package mod_actions
+Summary:	Apache module for run CGI whenever a file of a certain type is requested
+Group:		Networking/Daemons
+Group(pl):	Sieciowe/Serwery
+Prereq:		/usr/sbin/apxs
+Requires:	%{name} = %{version}
+
+%description mod_actions
+This package contains mod_actions module. This module lets you run CGI
+scripts whenever a file of a certain type is requested. This makes it much
+easier to execute scripts that process files.
+
+%package mod_auth_anon
+Summary:	Apache module with "anonymous" user access authentication
+Group:		Networking/Daemons
+Group(pl):	Sieciowe/Serwery
+Prereq:		/usr/sbin/apxs
+Requires:	%{name} = %{version}
+
+%description mod_auth_anon
+This package contains mod_auth_anon module. It allows "anonymous" user
+access to authenticated areas. It does access control in a manner similar to
+anonymous-ftp sites; i.e. have a 'magic' user id 'anonymous' and the email
+address as a password. These email addresses can be logged. Combined with
+other (database) access control methods, this allows for effective user
+tracking and customization according to a user profile while still keeping
+the site open for 'unregistered' users. One advantage of using Auth-based
+user tracking is that, unlike magic-cookies and funny URL pre/postfixes, it
+is completely browser independent and it allows users to share URLs.
+
+%package mod_digest
+Summary:	Apache user authentication module using MD5 Digest Authentication 
+Group:		Networking/Daemons
+Group(pl):	Sieciowe/Serwery
+Prereq:		/usr/sbin/apxs
+Requires:	%{name} = %{version}
+
+%description mod_digest
+This package contains mod_dir module. It provides user authentication using
+MD5 Digest Authentication.
+
+%package mod_dir
+Summary:	Apache module for trailing slash" redirects and serving directory index files
+Group:		Networking/Daemons
+Group(pl):	Sieciowe/Serwery
+Prereq:		/usr/sbin/apxs
+Requires:	%{name} = %{version}
+
+%description mod_dir
+This package contains mod_dir which provides "trailing slash" redirects and
+serving directory index files.
+
+%package mod_headers
+Summary:	Apache module allows for the customization of HTTP response headers
+Group:		Networking/Daemons
+Group(pl):	Sieciowe/Serwery
+Prereq:		/usr/sbin/apxs
+Requires:	%{name} = %{version}
+
+%description mod_headers
+This package contains mod_headers module. The module allows for the
+customization of HTTP response headers. Headers can be merged, replaced or
+removed.
+
 %package mod_mmap_static
 Summary:	Apache module for mmap()ing statically configured list files
 Group:		Networking/Daemons
@@ -127,6 +191,30 @@ Requires:	%{name} = %{version}
 %description mod_mmap_static
 This package contains mod_mmap_static module. It provides mmap()ing of a
 statically configured list of frequently requested but not changed files.
+
+%package mod_imap
+Summary:	Apache module with imap-file handler
+Group:		Networking/Daemons
+Group(pl):	Sieciowe/Serwery
+Prereq:		/usr/sbin/apxs
+Requires:	%{name} = %{version}
+
+%description mod_imap
+This package contains mod_imap module. It provides for .map files, replacing
+the functionality of the imagemap CGI program. Any directory or document
+type configured to use the handler imap-file.
+
+%package mod_info
+Summary:	Apache module with comprehensive overview of the server configuration
+Group:		Networking/Daemons
+Group(pl):	Sieciowe/Serwery
+Prereq:		/usr/sbin/apxs
+Requires:	%{name} = %{version}
+
+%description mod_info
+This package contains mod_mmap_static module. It provides a comprehensive
+overview of the server configuration including all installed modules and
+directives in the configuration files.
 
 %package mod_proxy
 Summary:	Apache module with Web proxy
@@ -140,6 +228,30 @@ This package contains module with implementation a proxy/cache for Apache.
 It implements proxying capability for FTP, CONNECT (for SSL), HTTP/0.9, and
 HTTP/1.0. The module can be configured to connect to other proxy modules for
 these and other protocols.
+
+%package mod_rewrite
+Summary:	Apache module with rule-based engine for rewrite requested URLs on the fly
+Group:		Networking/Daemons
+Group(pl):	Sieciowe/Serwery
+Prereq:		/usr/sbin/apxs
+Requires:	%{name} = %{version}
+
+%description mod_rewrite
+This package contains It provides a rule-based rewriting engine to rewrite
+requested URLs on the fly.
+
+%package mod_status
+Summary:	Server status report module for apache
+Group:		Networking/Daemons
+Group(pl):	Sieciowe/Serwery
+Prereq:		/usr/sbin/apxs
+Requires:	%{name} = %{version}
+
+%description mod_status
+The Status module allows a server administrator to find out how well their
+server is performing. A HTML page is presented that gives the current server
+statistics in an easily readable form. If required this page can be made to
+automatically refresh (given a compatible browser).
 
 %package mod_usertrack
 Summary:	Apache module for user tracking using cookies
@@ -162,6 +274,22 @@ Requires:	%{name} = %{version}
 %description mod_vhost_alias
 This package contains the mod_vhost_alias. It provides support for
 dynamically configured mass virtual hosting.
+
+%package mod_unique_id
+Summary:	Apache module which provides a magic token for each request
+Group:		Networking/Daemons
+Group(pl):	Sieciowe/Serwery
+Prereq:		/usr/sbin/apxs
+Requires:	%{name} = %{version}
+
+%description mod_unique_id
+This package contains the mod_unique_id. This module provides a magic token
+for each request which is guaranteed to be unique across "all" requests
+under very specific conditions. The unique identifier is even unique across
+multiple machines in a properly configured cluster of machines. The
+environment variable UNIQUE_ID is set to the identifier for each request.
+Unique identifiers are useful for various reasons which are beyond the scope
+of this document.
 
 %prep 
 %setup -q -n apache_%{version} -a3
@@ -190,7 +318,7 @@ OPTIM="$RPM_OPT_FLAGS" \
 	--without-confadjust \
 	--enable-module=all \
 	--enable-shared=max \
-	--proxycachedir=/var/cache/www/apache \
+	--proxycachedir=/var/cache/apache \
 	--with-perl=%{_bindir}/perl \
 	--enable-suexec \
 	--suexec-caller=http \
@@ -201,14 +329,13 @@ make
 
 %install
 rm -rf $RPM_BUILD_ROOT
-
-make install-quiet root="$RPM_BUILD_ROOT"
-
-#mv $RPM_BUILD_ROOT%{_datadir}/htdocs $RPM_BUILD_ROOT%{_datadir}/html
-
 install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig} \
 	$RPM_BUILD_ROOT%{_datadir}/errordocs \
 	$RPM_BUILD_ROOT/var/{log/{httpd,archiv/httpd},state/apache/mm}
+
+make install-quiet root="$RPM_BUILD_ROOT"
+
+mv $RPM_BUILD_ROOT%{_datadir}/html/manual $RPM_BUILD_ROOT%{_datadir}
 
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/apache
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
@@ -265,67 +392,49 @@ else
 	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
 fi
 /usr/sbin/apxs -e -a -n mod_access %{_libexecdir}/mod_access.so 1>&2
-/usr/sbin/apxs -e -a -n mod_actions %{_libexecdir}/mod_actions.so 1>&2
 /usr/sbin/apxs -e -a -n mod_alias %{_libexecdir}/mod_alias.so 1>&2
 /usr/sbin/apxs -e -a -n mod_asis %{_libexecdir}/mod_asis.so 1>&2
 /usr/sbin/apxs -e -a -n mod_auth %{_libexecdir}/mod_auth.so 1>&2
-/usr/sbin/apxs -e -a -n mod_auth_anon %{_libexecdir}/mod_auth_anon.so 1>&2
 /usr/sbin/apxs -e -a -n mod_auth_db %{_libexecdir}/mod_auth_db.so 1>&2
 /usr/sbin/apxs -e -a -n mod_auth_dbm %{_libexecdir}/mod_auth_dbm.so 1>&2
 /usr/sbin/apxs -e -a -n mod_autoindex %{_libexecdir}/mod_autoindex.so 1>&2
 /usr/sbin/apxs -e -a -n mod_cern_meta %{_libexecdir}/mod_cern_meta.so 1>&2
 /usr/sbin/apxs -e -a -n mod_cgi %{_libexecdir}/mod_cgi.so 1>&2
-/usr/sbin/apxs -e -a -n mod_digest %{_libexecdir}/mod_digest.so 1>&2
-/usr/sbin/apxs -e -a -n mod_dir %{_libexecdir}/mod_dir.so 1>&2
 /usr/sbin/apxs -e -a -n mod_env %{_libexecdir}/mod_env.so 1>&2
 /usr/sbin/apxs -e -a -n mod_expires %{_libexecdir}/mod_expires.so 1>&2
-/usr/sbin/apxs -e -a -n mod_headers %{_libexecdir}/mod_headers.so 1>&2
-/usr/sbin/apxs -e -a -n mod_imap %{_libexecdir}/mod_imap.so 1>&2
 /usr/sbin/apxs -e -a -n mod_include %{_libexecdir}/mod_include.so 1>&2
-/usr/sbin/apxs -e -a -n mod_info %{_libexecdir}/mod_info.so 1>&2
 /usr/sbin/apxs -e -a -n mod_log_agent %{_libexecdir}/mod_log_agent.so 1>&2
 /usr/sbin/apxs -e -a -n mod_log_config %{_libexecdir}/mod_log_config.so 1>&2
 /usr/sbin/apxs -e -a -n mod_log_referer %{_libexecdir}/mod_log_referer.so 1>&2
 /usr/sbin/apxs -e -a -n mod_mime %{_libexecdir}/mod_mime.so 1>&2
 /usr/sbin/apxs -e -a -n mod_mime_magic %{_libexecdir}/mod_mime_magic.so 1>&2
 /usr/sbin/apxs -e -a -n mod_negotiation %{_libexecdir}/mod_negotiation.so 1>&2
-/usr/sbin/apxs -e -a -n mod_rewrite %{_libexecdir}/mod_rewrite.so 1>&2
 /usr/sbin/apxs -e -a -n mod_setenvif %{_libexecdir}/mod_setenvif.so 1>&2
 /usr/sbin/apxs -e -a -n mod_speling %{_libexecdir}/mod_speling.so 1>&2
-/usr/sbin/apxs -e -a -n mod_unique_id %{_libexecdir}/mod_unique_id.so 1>&2
 /usr/sbin/apxs -e -a -n mod_userdir %{_libexecdir}/mod_userdir.so 1>&2
 
 %preun
 if [ "$1" = "0" ]; then
 	/usr/sbin/apxs -e -A -n mod_access %{_libexecdir}/mod_access.so 1>&2
-	/usr/sbin/apxs -e -A -n mod_actions %{_libexecdir}/mod_actions.so 1>&2
 	/usr/sbin/apxs -e -A -n mod_alias %{_libexecdir}/mod_alias.so 1>&2
 	/usr/sbin/apxs -e -A -n mod_asis %{_libexecdir}/mod_asis.so 1>&2
 	/usr/sbin/apxs -e -A -n mod_auth %{_libexecdir}/mod_auth.so 1>&2
-	/usr/sbin/apxs -e -A -n mod_auth_anon %{_libexecdir}/mod_auth_anon.so 1>&2
 	/usr/sbin/apxs -e -A -n mod_auth_db %{_libexecdir}/mod_auth_db.so 1>&2
 	/usr/sbin/apxs -e -A -n mod_auth_dbm %{_libexecdir}/mod_auth_dbm.so 1>&2
 	/usr/sbin/apxs -e -A -n mod_autoindex %{_libexecdir}/mod_autoindex.so 1>&2
 	/usr/sbin/apxs -e -A -n mod_cern_meta %{_libexecdir}/mod_cern_meta.so 1>&2
 	/usr/sbin/apxs -e -A -n mod_cgi %{_libexecdir}/mod_cgi.so 1>&2
-	/usr/sbin/apxs -e -A -n mod_digest %{_libexecdir}/mod_digest.so 1>&2
-	/usr/sbin/apxs -e -A -n mod_dir %{_libexecdir}/mod_dir.so 1>&2
 	/usr/sbin/apxs -e -A -n mod_env %{_libexecdir}/mod_env.so 1>&2
 	/usr/sbin/apxs -e -A -n mod_expires %{_libexecdir}/mod_expires.so 1>&2
-	/usr/sbin/apxs -e -A -n mod_headers %{_libexecdir}/mod_headers.so 1>&2
-	/usr/sbin/apxs -e -A -n mod_imap %{_libexecdir}/mod_imap.so 1>&2
 	/usr/sbin/apxs -e -A -n mod_include %{_libexecdir}/mod_include.so 1>&2
-	/usr/sbin/apxs -e -A -n mod_info %{_libexecdir}/mod_info.so 1>&2
 	/usr/sbin/apxs -e -A -n mod_log_agent %{_libexecdir}/mod_log_agent.so 1>&2
 	/usr/sbin/apxs -e -A -n mod_log_config %{_libexecdir}/mod_log_config.so 1>&2
 	/usr/sbin/apxs -e -A -n mod_log_referer %{_libexecdir}/mod_log_referer.so 1>&2
 	/usr/sbin/apxs -e -A -n mod_mime %{_libexecdir}/mod_mime.so 1>&2
 	/usr/sbin/apxs -e -A -n mod_mime_magic %{_libexecdir}/mod_mime_magic.so 1>&2
 	/usr/sbin/apxs -e -A -n mod_negotiation %{_libexecdir}/mod_negotiation.so 1>&2
-	/usr/sbin/apxs -e -A -n mod_rewrite %{_libexecdir}/mod_rewrite.so 1>&2
 	/usr/sbin/apxs -e -A -n mod_setenvif %{_libexecdir}/mod_setenvif.so 1>&2
 	/usr/sbin/apxs -e -A -n mod_speling %{_libexecdir}/mod_speling.so 1>&2
-	/usr/sbin/apxs -e -A -n mod_unique_id %{_libexecdir}/mod_unique_id.so 1>&2
 	/usr/sbin/apxs -e -A -n mod_userdir %{_libexecdir}/mod_userdir.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd stop 1>&2
@@ -345,6 +454,46 @@ if [ "$1" = "0" ]; then
 	fi
 fi
 
+%post mod_actions
+/usr/sbin/apxs -e -a -n mod_actions %{_libexecdir}/mod_actions.so 1>&2
+
+%preun mod_actions
+if [ "$1" = "0" ]; then
+	/usr/sbin/apxs -e -A -n mod_actions %{_libexecdir}/mod_actions.so 1>&2
+fi
+
+%post mod_auth_anon
+/usr/sbin/apxs -e -a -n mod_auth_anon %{_libexecdir}/mod_auth_anon.so 1>&2
+
+%preun mod_auth_anon
+if [ "$1" = "0" ]; then
+	/usr/sbin/apxs -e -A -n mod_auth_anon %{_libexecdir}/mod_auth_anon.so 1>&2
+fi
+
+%post mod_digest
+/usr/sbin/apxs -e -a -n mod_digest %{_libexecdir}/mod_digest.so 1>&2
+
+%preun mod_digest
+if [ "$1" = "0" ]; then
+	/usr/sbin/apxs -e -A -n mod_digest %{_libexecdir}/mod_digest.so 1>&2
+fi
+
+%post mod_dir
+/usr/sbin/apxs -e -a -n mod_dir %{_libexecdir}/mod_dir.so 1>&2
+
+%preun mod_dir
+if [ "$1" = "0" ]; then
+	/usr/sbin/apxs -e -A -n mod_dir %{_libexecdir}/mod_dir.so 1>&2
+fi
+
+%post mod_headers
+/usr/sbin/apxs -e -a -n mod_headers %{_libexecdir}/mod_headers.so 1>&2
+
+%preun mod_headers
+if [ "$1" = "0" ]; then
+	/usr/sbin/apxs -e -A -n mod_headers %{_libexecdir}/mod_headers.so 1>&2
+fi
+
 %post mod_mmap_static
 /usr/sbin/apxs -e -a -n mod_mmap_static %{_libexecdir}/mod_mmap_static.so 1>&2
 
@@ -353,12 +502,36 @@ if [ "$1" = "0" ]; then
 	/usr/sbin/apxs -e -A -n mod_mmap_static %{_libexecdir}/mod_mmap_static.so 1>&2
 fi
 
+%post mod_imap
+/usr/sbin/apxs -e -a -n mod_imap %{_libexecdir}/mod_imap.so 1>&2
+
+%preun mod_imap
+if [ "$1" = "0" ]; then
+	/usr/sbin/apxs -e -A -n mod_imap %{_libexecdir}/mod_imap.so 1>&2
+fi
+
+%post mod_info
+/usr/sbin/apxs -e -a -n mod_info %{_libexecdir}/mod_info.so 1>&2
+
+%preun mod_info
+if [ "$1" = "0" ]; then
+	/usr/sbin/apxs -e -A -n mod_info %{_libexecdir}/mod_info.so 1>&2
+fi
+
 %post mod_proxy
 /usr/sbin/apxs -e -a -n libproxy %{_libexecdir}/libproxy.so 1>&2
 
 %preun mod_proxy
 if [ "$1" = "0" ]; then
 	/usr/sbin/apxs -e -A -n libproxy %{_libexecdir}/libproxy.so 1>&2
+fi
+
+%post mod_rewrite
+/usr/sbin/apxs -e -a -n mod_rewrite %{_libexecdir}/mod_rewrite.so 1>&2
+
+%preun mod_rewrite
+if [ "$1" = "0" ]; then
+	/usr/sbin/apxs -e -A -n mod_rewrite %{_libexecdir}/mod_rewrite.so 1>&2
 fi
 
 %post mod_status
@@ -375,6 +548,14 @@ fi
 %preun mod_usertrack
 if [ "$1" = "0" ]; then
 	/usr/sbin/apxs -e -A -n mod_usertrack %{_libexecdir}/mod_usertrack.so 1>&2
+fi
+
+%post mod_unique_id
+/usr/sbin/apxs -e -a -n mod_unique_id %{_libexecdir}/mod_unique_id.so 1>&2
+
+%preun mod_unique_id
+if [ "$1" = "0" ]; then
+	/usr/sbin/apxs -e -A -n mod_unique_id %{_libexecdir}/mod_unique_id.so 1>&2
 fi
 
 %post mod_vhost_alias
@@ -399,7 +580,6 @@ rm -rf $RPM_BUILD_ROOT
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/access.conf
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/srm.conf
-%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/virtual-host.conf
 %attr(640,root,root) %{_sysconfdir}/magic
 
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/sysconfig/*
@@ -431,34 +611,25 @@ rm -rf $RPM_BUILD_ROOT
 
 %dir %{_libexecdir}
 %attr(755,root,root) %{_libexecdir}/mod_access.so
-%attr(755,root,root) %{_libexecdir}/mod_actions.so
 %attr(755,root,root) %{_libexecdir}/mod_alias.so
 %attr(755,root,root) %{_libexecdir}/mod_asis.so
 %attr(755,root,root) %{_libexecdir}/mod_auth.so
-%attr(755,root,root) %{_libexecdir}/mod_auth_anon.so
 %attr(755,root,root) %{_libexecdir}/mod_auth_db.so
 %attr(755,root,root) %{_libexecdir}/mod_auth_dbm.so
 %attr(755,root,root) %{_libexecdir}/mod_autoindex.so
 %attr(755,root,root) %{_libexecdir}/mod_cern_meta.so
 %attr(755,root,root) %{_libexecdir}/mod_cgi.so
-%attr(755,root,root) %{_libexecdir}/mod_digest.so
-%attr(755,root,root) %{_libexecdir}/mod_dir.so
 %attr(755,root,root) %{_libexecdir}/mod_env.so
 %attr(755,root,root) %{_libexecdir}/mod_expires.so
-%attr(755,root,root) %{_libexecdir}/mod_headers.so
-%attr(755,root,root) %{_libexecdir}/mod_imap.so
 %attr(755,root,root) %{_libexecdir}/mod_include.so
-%attr(755,root,root) %{_libexecdir}/mod_info.so
 %attr(755,root,root) %{_libexecdir}/mod_log_agent.so
 %attr(755,root,root) %{_libexecdir}/mod_log_config.so
 %attr(755,root,root) %{_libexecdir}/mod_log_referer.so
 %attr(755,root,root) %{_libexecdir}/mod_mime.so
 %attr(755,root,root) %{_libexecdir}/mod_mime_magic.so
 %attr(755,root,root) %{_libexecdir}/mod_negotiation.so
-%attr(755,root,root) %{_libexecdir}/mod_rewrite.so
 %attr(755,root,root) %{_libexecdir}/mod_setenvif.so
 %attr(755,root,root) %{_libexecdir}/mod_speling.so
-%attr(755,root,root) %{_libexecdir}/mod_unique_id.so
 %attr(755,root,root) %{_libexecdir}/mod_userdir.so
 
 %attr(755,root,root) %{_bindir}/dbmmanage 
@@ -490,69 +661,96 @@ rm -rf $RPM_BUILD_ROOT
 
 %files doc
 %defattr(644,root,root,755)
-%dir %{_datadir}/html/manual/
-%{_datadir}/html/manual/images
-%{_datadir}/html/manual/misc
-%dir %{_datadir}/html/manual/serach
-%attr(755,root,root) %{_datadir}/html/manual/serach/manual-index.cgi
-%{_datadir}/html/manual/vhosts
-%{_datadir}/html/manual/LICENSE
-%{_datadir}/html/manual/*.html
-%{_datadir}/html/manual/mod/core.html
-%{_datadir}/html/manual/mod/directive-dict.html
-%{_datadir}/html/manual/mod/directives.html
-%{_datadir}/html/manual/mod/footer.html
-%{_datadir}/html/manual/mod/header.html
-%{_datadir}/html/manual/mod/index.html
-%{_datadir}/html/manual/mod/mod_access.html
-%{_datadir}/html/manual/mod/mod_actions.html
-%{_datadir}/html/manual/mod/mod_alias.html
-%{_datadir}/html/manual/mod/mod_asis.html
-%{_datadir}/html/manual/mod/mod_auth.html
-%{_datadir}/html/manual/mod/mod_auth_anon.html
-%{_datadir}/html/manual/mod/mod_auth_db.html
-%{_datadir}/html/manual/mod/mod_auth_dbm.html
-%{_datadir}/html/manual/mod/mod_autoindex.html
-%{_datadir}/html/manual/mod/mod_cgi.html
-%{_datadir}/html/manual/mod/mod_cookies.html
-%{_datadir}/html/manual/mod/mod_digest.html
-%{_datadir}/html/manual/mod/mod_dir.html
-%{_datadir}/html/manual/mod/mod_env.html
-%{_datadir}/html/manual/mod/mod_expires.html
-%{_datadir}/html/manual/mod/mod_headers.html
-%{_datadir}/html/manual/mod/mod_imap.html
-%{_datadir}/html/manual/mod/mod_include.html
-%{_datadir}/html/manual/mod/mod_info.html
-%{_datadir}/html/manual/mod/mod_log_agent.html
-%{_datadir}/html/manual/mod/mod_log_config.html
-%{_datadir}/html/manual/mod/mod_log_referer.html
-%{_datadir}/html/manual/mod/mod_mime.html
-%{_datadir}/html/manual/mod/mod_mime_magic.html
-%{_datadir}/html/manual/mod/mod_negotiation.html
-%{_datadir}/html/manual/mod/mod_rewrite.html
-%{_datadir}/html/manual/mod/mod_setenvif.html
-%{_datadir}/html/manual/mod/mod_so.html
-%{_datadir}/html/manual/mod/mod_speling.html
-%{_datadir}/html/manual/mod/mod_unique_id.html
-%{_datadir}/html/manual/mod/mod_userdir.html
+%dir %{_datadir}/manual/
+%{_datadir}/manual/images
+%{_datadir}/manual/misc
+%dir %{_datadir}/manual/search
+%attr(755,root,root) %{_datadir}/manual/search/manual-index.cgi
+%{_datadir}/manual/vhosts
+%{_datadir}/manual/LICENSE
+%{_datadir}/manual/*.html
+%{_datadir}/manual/mod/core.html
+%{_datadir}/manual/mod/directive-dict.html
+%{_datadir}/manual/mod/directives.html
+%{_datadir}/manual/mod/footer.html
+%{_datadir}/manual/mod/header.html
+%{_datadir}/manual/mod/index.html
+%{_datadir}/manual/mod/mod_access.html
+%{_datadir}/manual/mod/mod_alias.html
+%{_datadir}/manual/mod/mod_asis.html
+%{_datadir}/manual/mod/mod_auth.html
+%{_datadir}/manual/mod/mod_auth_db.html
+%{_datadir}/manual/mod/mod_auth_dbm.html
+%{_datadir}/manual/mod/mod_autoindex.html
+%{_datadir}/manual/mod/mod_cgi.html
+%{_datadir}/manual/mod/mod_cookies.html
+%{_datadir}/manual/mod/mod_env.html
+%{_datadir}/manual/mod/mod_expires.html
+%{_datadir}/manual/mod/mod_include.html
+%{_datadir}/manual/mod/mod_log_agent.html
+%{_datadir}/manual/mod/mod_log_config.html
+%{_datadir}/manual/mod/mod_log_referer.html
+%{_datadir}/manual/mod/mod_mime.html
+%{_datadir}/manual/mod/mod_mime_magic.html
+%{_datadir}/manual/mod/mod_negotiation.html
+%{_datadir}/manual/mod/mod_setenvif.html
+%{_datadir}/manual/mod/mod_speling.html
+%{_datadir}/manual/mod/mod_userdir.html
+
+%files mod_actions
+%attr(755,root,root) %{_libexecdir}/mod_actions.so
+%attr(644,root,root) %{_datadir}/manual/mod/mod_actions.html
+
+%files mod_auth_anon
+%attr(755,root,root) %{_libexecdir}/mod_auth_anon.so
+%attr(644,root,root) %{_datadir}/manual/mod/mod_auth_anon.html
+
+%files mod_digest
+%attr(755,root,root) %{_libexecdir}/mod_digest.so
+%attr(644,root,root) %{_datadir}/manual/mod/mod_digest.html
+
+%files mod_dir
+%attr(755,root,root) %{_libexecdir}/mod_dir.so
+%attr(644,root,root) %{_datadir}/manual/mod/mod_dir.html
+
+%files mod_headers
+%attr(755,root,root) %{_libexecdir}/mod_headers.so
+%attr(644,root,root) %{_datadir}/manual/mod/mod_headers.html
 
 %files mod_mmap_static
 %attr(755,root,root) %{_libexecdir}/mod_mmap_static.so
-%attr(644,root,root) %{_datadir}/html/manual/mod/mod_mmap_static.html
+%attr(644,root,root) %{_datadir}/manual/mod/mod_mmap_static.html
+
+%files mod_imap
+%attr(755,root,root) %{_libexecdir}/mod_imap.so
+%attr(644,root,root) %{_datadir}/manual/mod/mod_imap.html
+
+%files mod_info
+%attr(755,root,root) %{_libexecdir}/mod_info.so
+%attr(644,root,root) %{_datadir}/manual/mod/mod_info.html
 
 %files mod_proxy
 %attr(755,root,root) %{_libexecdir}/libproxy.so
-%attr(644,root,root) %{_datadir}/html/manual/mod/mod_proxy.html
-%dir %attr(750,http,http) /var/cache/www/apache
+%attr(644,root,root) %{_datadir}/manual/mod/mod_proxy.html
+%dir %attr(750,http,http) /var/cache/apache
+
+%files mod_rewrite
+%attr(755,root,root) %{_libexecdir}/mod_rewrite.so
+%attr(644,root,root) %{_datadir}/manual/mod/mod_rewrite.html
 
 %files mod_status
 %attr(755,root,root) %{_libexecdir}/mod_status.so
-%attr(644,root,root) %{_datadir}/html/manual/mod/mod_status.html
+%attr(644,root,root) %{_datadir}/manual/mod/mod_status.html
 
 %files mod_usertrack
 %attr(755,root,root) %{_libexecdir}/mod_usertrack.so
-%attr(644,root,root) %{_datadir}/html/manual/mod/mod_usertrack.html
+%attr(644,root,root) %{_datadir}/manual/mod/mod_usertrack.html
+
+%files mod_unique_id
+%attr(755,root,root) %{_libexecdir}/mod_unique_id.so
+%attr(644,root,root) %{_datadir}/manual/mod/mod_unique_id.html
 
 %files mod_vhost_alias
 %attr(755,root,root) %{_libexecdir}/mod_vhost_alias.so
-%attr(644,root,root) %{_datadir}/html/manual/mod/mod_vhost_alias.html
+%attr(644,root,root) %{_datadir}/manual/mod/mod_vhost_alias.html
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/virtual-host.conf
