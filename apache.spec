@@ -455,7 +455,7 @@ ModuЁ mod_ssl udostЙpnia wsparcie do silnej kryptografii dla serwera
 Apache poprzez protokoЁy SSL/TSL (Secure Sockets Layer/Transport Layer
 Security).
 
-%description mos_ssl -l ru
+%description mod_ssl -l ru
 Модуль mod_ssl обеспечивает поддержку в веб-сервере Apache надежного
 шифрования средствами Secure Sockets Layer (SSL) и Transport Layer
 
