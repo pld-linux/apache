@@ -1,0 +1,23 @@
+===================================================================
+RCS file: /home/cvspublic/httpd-2.0/modules/ssl/ssl_engine_io.c,v
+retrieving revision 1.125
+retrieving revision 1.126
+diff -u -r1.125 -r1.126
+--- httpd-2.0/modules/ssl/ssl_engine_io.c	2004/08/11 13:19:24	1.125
++++ httpd-2.0/modules/ssl/ssl_engine_io.c	2004/08/17 16:31:23	1.126
+@@ -564,8 +564,12 @@
+         *len = bytes;
+         if (inctx->mode == AP_MODE_SPECULATIVE) {
+             /* We want to rollback this read. */
+-            inctx->cbuf.value -= bytes;
+-            inctx->cbuf.length += bytes;
++            if (inctx->cbuf.length > 0) {
++                inctx->cbuf.value -= bytes;
++                inctx->cbuf.length += bytes;
++            } else {
++                char_buffer_write(&inctx->cbuf, buf, (int)bytes);
++            }
+             return APR_SUCCESS;
+         }
+         /* This could probably be *len == wanted, but be safe from stray
+
