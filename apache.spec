@@ -529,9 +529,6 @@ if [ -n "`getgid http`" ]; then
 	fi
 else
 	/usr/sbin/groupadd -g 51 -r -f http
-	if [ -f /var/db/group.db ]; then
-		/usr/bin/update-db 1>&2
-	fi
 fi
 if [ -n "`id -u http 2>/dev/null`" ]; then
 	if [ "`id -u http`" != "51" ]; then
@@ -540,9 +537,6 @@ if [ -n "`id -u http 2>/dev/null`" ]; then
 	fi
 else
 	/usr/sbin/useradd -u 51 -r -d /home/httpd -s /bin/false -c "HTTP User" -g http http 1>&2
-	if [ -f /var/db/passwd.db ]; then
-		/usr/bin/update-db 1>&2
-	fi
 fi
 
 %post
@@ -600,13 +594,7 @@ fi
 %postun
 if [ "$1" = "0" ]; then
 	/usr/sbin/userdel http
-	if [ -f /var/db/passwd.db ]; then
-		/usr/bin/update-db
-	fi
 	/usr/sbin/groupdel http
-	if [ -f /var/db/group.db ]; then
-		/usr/bin/update-db
-	fi
 fi
 
 %post mod_actions
