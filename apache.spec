@@ -1112,7 +1112,7 @@ fi
 %attr(755,root,root) %{_sbindir}/logresolve
 %attr(755,root,root) %{_sbindir}/rotatelogs
 
-%attr(755,root,root) %{_libdir}/lib*.so.*
+%attr(755,root,root) %{_libdir}/libaprutil.so.*
 
 %dir %attr(770,root,http) /var/run/apache
 
