@@ -723,7 +723,7 @@ install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
 	--with-program-name=httpd.${mpm} \
 	--with-mpm=${mpm} \
 %ifarch %{ix86}
-%ifnarch i386 i485
+%ifnarch i386 i486
 	$( [ "${mpm}" = "leader" ] && echo "--enable-nonportable-atomics=yes" ) \
 %endif
 %endif
