@@ -1,11 +1,10 @@
 diff -urN apache_1.3.14.orig/config.layout apache_1.3.14/config.layout
 --- apache_1.3.14.orig/config.layout	Tue Sep 26 01:44:55 2000
 +++ apache_1.3.14/config.layout	Sat Nov 11 20:41:04 2000
-@@ -249,3 +249,23 @@
-     logfiledir:    $prefix/logs
-     proxycachedir: $prefix/proxy
+@@ -249,3 +249,22 @@
+     proxycachedir: $localstatedir/cache/apache
  </Layout>
-+
+ 
 +# PLD layout...
 +<Layout PLD>
 +    prefix:        /usr
