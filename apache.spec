@@ -1,7 +1,7 @@
 #
 # Conditional build:
-# mod_rewrite_ldap - enable ldap map supoort for mod_rewrite (alpha)
-# _without_apache_ipv6 - disable IPv6 support
+# mod_rewrite_ldap	- enable ldap map supoort for mod_rewrite (alpha)
+# _without_ipv6		- disable IPv6 support
 #
 %include	/usr/lib/rpm/macros.perl
 Summary:	The most widely used Web server on the Internet
@@ -26,8 +26,8 @@ Summary(tr):	Lider WWW tarayýcý
 Summary(uk):	îÁÊÐÏÐÕÌÑÒÎ¦ÛÉÊ Web-Server
 Summary(zh_CN):	Internet ÉÏÓ¦ÓÃ×î¹ã·ºµÄ Web ·þÎñ³ÌÐò¡£
 Name:		apache
-Version:	1.3.23
-Release:	6
+Version:	1.3.26
+Release:	0.1
 License:	Apache Group License
 Group:		Networking/Daemons
 URL:		http://www.apache.org/
@@ -250,7 +250,7 @@ Summary(uk):	úÁÓÏÂÉ ÓÔ×ÏÒÅÎÎÑ ÍÏÄÕÌ¦× ÄÌÑ web server'Õ Apache
 Summary(zh_CN):	ÓÃÓÚ Apache Web ·þÎñ³ÌÐòµÄ¿ª·¢¹¤¾ß¡£
 Group:		Networking/Utilities
 Requires:	%{name}(EAPI) = %{version}
-Provides:	%{name}(EAPI)-devel
+Provides:	%{name}(EAPI)-devel = %{version}
 
 %description devel
 The apache-devel package contains header files for Apache.
@@ -655,7 +655,7 @@ wa¿no¶ci mo¿e byæ ustalana w zale¿no¶ci od czasu modyfikacji plików
 %patch6 -p0
 %patch7 -p1
 %patch8 -p1
-%{!?_without_apache_ipv6:%patch9 -p1}
+%{!?_without_ipv6:%patch9 -p1}
 %patch10 -p1
 %patch11 -p1
 %patch12 -p1
@@ -665,7 +665,7 @@ wa¿no¶ci mo¿e byæ ustalana w zale¿no¶ci od czasu modyfikacji plików
 %patch16 -p1
 %patch17 -p1
 %patch18 -p1
-%{?_without_apache_ipv6:%patch19 -p1}
+%{?_without_ipv6:%patch19 -p1}
 %patch20 -p1
 %patch21 -p1
 
@@ -696,7 +696,7 @@ OPTIM="%{rpmcflags}" \
 	--suexec-docroot=%{_datadir} \
 	--disable-rule=WANTHSREGEX \
 	--enable-rule=EAPI \
-	%{!?_without_apache_ipv6:--enable-rule=INET6}
+	%{!?_without_ipv6:--enable-rule=INET6}
 
 %{__make} LIBS1="-lm -lcrypt -lmm -ldl"
 
@@ -732,8 +732,6 @@ install %{SOURCE9}  $RPM_BUILD_ROOT%{_sysconfdir}/mod_status.conf
 install %{SOURCE10} $RPM_BUILD_ROOT%{_sysconfdir}/mod_proxy.conf
 
 ln -sf index.html.en $RPM_BUILD_ROOT%{_datadir}/html/index.html
-
-gzip -9nf ABOUT_APACHE src/CHANGES README
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -1145,7 +1143,7 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc ABOUT_APACHE.gz src/CHANGES.gz README.gz
+%doc ABOUT_APACHE src/CHANGES README
 %doc conf/mime.types
 
 %attr(754,root,root) /etc/rc.d/init.d/httpd
