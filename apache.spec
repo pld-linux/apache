@@ -5,7 +5,7 @@ Summary(pl):	Serwer WWW (World Wide Web)
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	1.3.4
-Release:	4d
+Release:	5d
 Group:		Networking/Daemons
 Group(pl):	Sieci/Demony
 Source0:	ftp://ftp.apache.org/apache/dist/%{name}_%{version}.tar.gz
@@ -156,7 +156,7 @@ rm -rf $RPM_BUILD_ROOT
 %preun
 if [ $1 = 0 ]; then
    if [ -f /var/lock/subsys/httpd ]; then
-       /etc/rc.d/init.d/httpd stop
+       /etc/rc.d/init.d/httpd stop >&2
    fi
    /sbin/chkconfig --del httpd
 fi
@@ -217,6 +217,10 @@ fi
 /home/httpd/html/manual
 
 %changelog
+* Tue Jan 26 1999 Wojtek ¦lusarczyk <wojtek@shadow.eu.org>
+  [1.3.4-5d]
+- rebuild against new kernel-2.2.0 ;)  
+
 * Mon Jan 25 1999 Wojtek ¦lusarczyk <wojtek@shadow.eu.org>
   [1.3.4-4d]
 - added errordocs.  
