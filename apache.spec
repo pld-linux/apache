@@ -950,7 +950,6 @@ rm -rf $RPM_BUILD_ROOT
 %attr(644,root,root) %{_datadir}/manual/mod/mod_rewrite.html
 
 %files mod_status
-%config(noreplace) %{_sysconfdir}/mod_status.conf
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/mod_status.conf
 %attr(755,root,root) %{_libexecdir}/mod_status.so
 %attr(644,root,root) %{_datadir}/manual/mod/mod_status.html
