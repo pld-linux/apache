@@ -15,6 +15,7 @@
 # - change _prefix to /etc/httpd, _exec_prefix to /usr, fix configs to Load modules/xyz.so
 #   + provide /etc/httpd/modules symlink to /usr/lib{,64}/apache (see for example fedora apache.spec}
 #   This will fix path problems with AMD64.
+# - check if all modules (*.so) are exactly the same for different MPMs
 #
 # Conditional build:
 %bcond_without	ssl	# don't build with SSL support
@@ -669,6 +670,7 @@ fi
 %{__perl} -pi -e "s:\@exp_installbuilddir\@:%{_libdir}/apache/build:g" \
 	support/apxs.in
 install /usr/share/automake/config.* build/
+CPPFLAGS="-DMAX_SERVER_LIMIT=200000"
 for mpm in %{?with_metuxmpm:metuxmpm} perchild prefork worker; do
 install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
 ../%configure \
@@ -717,7 +719,13 @@ install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
 	--enable-speling \
 	--enable-rewrite \
 	--enable-so \
+	--with-program-name=httpd.${mpm} \
 	--with-mpm=${mpm} \
+%ifarch %{ix86}
+%ifnarch i386 i485
+	$( [ "${mpm}" = "leader" ] && echo "--enable-nonportable-atomics=yes" ) \
+%endif
+%endif
 	--with-suexec-bin=%{_sbindir}/suexec \
 	--with-suexec-caller=http \
 	--with-suexec-docroot=%{_datadir} \
@@ -728,7 +736,7 @@ install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
 	--with-apr=%{_bindir} \
 	--with-apr-util=%{_bindir}
 %{__make}
-./httpd -l | grep -v "${mpm}" > modules-inside
+./httpd.${mpm} -l | grep -v "${mpm}" > modules-inside
 cd ..
 done
 
@@ -760,11 +768,11 @@ install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig} \
 	logdir=%{_var}/log/httpd \
 	proxycachedir=%{_var}/cache/httpd
 
-ln -s httpd $RPM_BUILD_ROOT%{_sbindir}/httpd.prefork
-
 for mpm in %{?with_metuxmpm:metuxmpm} perchild worker; do
-	install buildmpm-${mpm}/httpd $RPM_BUILD_ROOT%{_sbindir}/httpd.${mpm}
+	install buildmpm-${mpm}/httpd.${mpm} $RPM_BUILD_ROOT%{_sbindir}/httpd.${mpm}
 done
+
+ln -s httpd.prefork $RPM_BUILD_ROOT%{_sbindir}/httpd
 
 rm -f $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
