@@ -217,7 +217,7 @@ wysy³anych do przegl±darki.
 
 %package mod_mmap_static
 Summary:	Apache module for mmap()ing statically configured list files
-Sumary(pl):	Modu³ s³u¿±cy do mmap()owania plików.
+Summary(pl):	Modu³ s³u¿±cy do mmap()owania plików.
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
