@@ -184,7 +184,7 @@ make install-quiet root="$RPM_BUILD_ROOT"
 
 install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig} \
 	$RPM_BUILD_ROOT%{_datadir}/errordocs \
-	$RPM_BUILD_ROOT/var/log/httpd
+	$RPM_BUILD_ROOT/var/{log/httpd,state/apache/mm}
 
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/apache
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
@@ -297,6 +297,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_sbindir}/rotatelogs
 
 %dir %attr(750,http,http) /var/cache/www/apache
+
+%dir %attr(750,http,http) /var/state/apache
+%dir %attr(750,http,http) /var/state/apache/mm
 
 %{_mandir}/man[18]/*
 
