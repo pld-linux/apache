@@ -26,12 +26,12 @@ Summary(tr):	Lider WWW tarayýcý
 Summary(uk):	îÁÊÐÏÐÕÌÑÒÎ¦ÛÉÊ Web-Server
 Summary(zh_CN):	Internet ÉÏÓ¦ÓÃ×î¹ã·ºµÄ Web ·þÎñ³ÌÐò¡£
 Name:		apache
-Version:	1.3.29
-Release:	3
+Version:	1.3.31
+Release:	1
 License:	Apache Group
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/%{name}_%{version}.tar.gz
-# Source0-md5:	e97fe9bf51dc2c9c233d53f63b1347e3
+# Source0-md5:	bd548a06ac48dda496b4e613572bb020
 Source1:	%{name}1.init
 Source2:	%{name}.logrotate
 Source3:	%{name}-icons.tar.gz
@@ -44,30 +44,27 @@ Source9:	%{name}-mod_status.conf
 Source10:	%{name}-mod_proxy.conf
 Patch0:		%{name}-PLD.patch
 Patch1:		%{name}-suexec.patch
-Patch2:		%{name}-htdocs.patch
-Patch3:		%{name}-errordocs.patch
-Patch4:		%{name}-apxs.patch
-Patch5:		%{name}-mod_ssl-addon.patch
-Patch6:		%{name}-mod_ssl-eapi.patch
+Patch2:		%{name}-errordocs.patch
+Patch3:		%{name}-apxs.patch
+Patch4:		%{name}-mod_ssl-addon.patch
+Patch5:		%{name}-mod_ssl-eapi.patch
 # http://allafrica.com/tools/apache/mod_proxy/
-Patch7:		http://allafrica.com/tools/apache/mod_proxy/mod_proxy-khk_1.3.26-patch.diff
-Patch8:		%{name}-EAPI_MM_CORE_PATH-correction.patch
-Patch9:		%{name}-EAPI_MM=SYSTEM.patch
-Patch10:	%{name}-ipv6-PLD.patch
-Patch11:	%{name}-modules_symbols.patch
-Patch12:	%{name}-apxs_force_rm_cp.patch
-Patch13:	%{name}-db3.patch
-Patch14:	%{name}-lookup_map_ldap.patch
-Patch15:	%{name}-man.patch
-Patch16:	%{name}-fpic.patch
-Patch17:	%{name}-buff.patch
-Patch18:	%{name}-mkstemp.patch
-Patch19:	%{name}-EAPI-missing_files.patch
-Patch20:	%{name}-PLD-nov6.patch
-Patch21:	%{name}-configdir_skip_backups.patch
-Patch22:	%{name}-apxs-quiet.patch
-Patch23:	%{name}-CAN-2003-0020.patch
-
+Patch6:		http://allafrica.com/tools/apache/mod_proxy/mod_proxy-khk_1.3.26-patch.diff
+Patch7:		%{name}-EAPI_MM_CORE_PATH-correction.patch
+Patch8:		%{name}-EAPI_MM=SYSTEM.patch
+Patch9:		%{name}-ipv6-PLD.patch
+Patch10:	%{name}-modules_symbols.patch
+Patch11:	%{name}-apxs_force_rm_cp.patch
+Patch12:	%{name}-db3.patch
+Patch13:	%{name}-lookup_map_ldap.patch
+Patch14:	%{name}-man.patch
+Patch15:	%{name}-fpic.patch
+Patch16:	%{name}-buff.patch
+Patch17:	%{name}-mkstemp.patch
+Patch18:	%{name}-EAPI-missing_files.patch
+Patch19:	%{name}-PLD-nov6.patch
+Patch20:	%{name}-configdir_skip_backups.patch
+Patch21:	%{name}-apxs-quiet.patch
 URL:		http://www.apache.org/
 BuildRequires:	db3-devel
 BuildRequires:	mm-devel >= 1.1.3
@@ -654,32 +651,46 @@ Modu³ kontroluje ustawianie nag³ówka HTTP Expires. Data wyga¶niêcia
 wa¿no¶ci mo¿e byæ ustalana w zale¿no¶ci od czasu modyfikacji plików
 ¼ród³owych lub odwo³ania klienta.
 
+%package mod_log_forensic
+Summary:	Apache module for forensic logging of the requests
+Summary:	Modu³ Apache'a do logowania ¿±dañ w celu pó¼niejszej analizy
+Group:		Networking/Daemons
+Prereq:		%{_sbindir}/apxs
+Prereq:		perl
+Requires:	%{name}(EAPI) = %{version}
+
+%description mod_log_forensic
+This module provides for forensic logging of client requests. Logging
+is done before and after processing a request.
+
+%description mod_log_forensic -l pl
+Ten modu³ pozwala na logowanie ¿±dañ w celu pó¼niejszej analizy.
+Logowanie jest wykonywane przed i po przetworzeniu ¿±dania.
+
 %prep
 %setup -q -n apache_%{version} -a3
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
-%patch4 -p1
+%patch4 -p0
 %patch5 -p0
-%patch6 -p0
+%patch6 -p1
 %patch7 -p1
 %patch8 -p1
-%patch9 -p1
-%{!?_without_ipv6:%patch10 -p1}
+%{!?_without_ipv6:%patch9 -p1}
+%patch10 -p1
 %patch11 -p1
 %patch12 -p1
-%patch13 -p1
-%{?_with_rewrite_ldap:%patch14 -p1}
+%{?_with_rewrite_ldap:%patch13 -p1}
+%patch14 -p1
 %patch15 -p1
 %patch16 -p1
 %patch17 -p1
 %patch18 -p1
-%patch19 -p1
-%{?_without_ipv6:%patch20 -p1}
+%{?_without_ipv6:%patch19 -p1}
+%patch20 -p1
 %patch21 -p1
-%patch22 -p1
-%patch23 -p0
 
 %build
 OPTIM="%{rpmcflags} -DHARD_SERVER_LIMIT=2048 -DBIG_SECURITY_HOLE=1" \
@@ -1041,6 +1052,22 @@ if [ "$1" = "0" ]; then
 	fi
 fi
 
+%post mod_log_forensic
+%{apxs} -e -a -n log_forensic %{_libexecdir}/mod_log_forensic.so 1>&2
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+fi
+
+%preun mod_log_forensic
+if [ "$1" = "0" ]; then
+	%{apxs} -e -A -n log_forensic %{_libexecdir}/mod_log_forensic.so 1>&2
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2
+	fi
+fi
+
 %post mod_proxy
 %{apxs} -e -a -n proxy %{_libexecdir}/libproxy.so 1>&2
 if [ -f /etc/httpd/httpd.conf ] && ! grep -q "^Include.*mod_proxy.conf" /etc/httpd/httpd.conf; then
@@ -1220,8 +1247,6 @@ fi
 %{_datadir}/manual/images/pixel.gif
 %{_datadir}/manual/images/sub.gif
 %{_datadir}/manual/misc
-%dir %{_datadir}/manual/search
-%attr(755,root,root) %{_datadir}/manual/search/manual-index.cgi
 %{_datadir}/manual/LICENSE
 %{_datadir}/manual/bind.html.html
 %{_datadir}/manual/bind.html.en
@@ -1269,7 +1294,9 @@ fi
 %{_datadir}/manual/keepalive.html.html
 %{_datadir}/manual/keepalive.html.en
 %lang(ja) %{_datadir}/manual/keepalive.html.ja.jis
-%{_datadir}/manual/location.html
+%{_datadir}/manual/location.html.html
+%{_datadir}/manual/location.html.en
+%lang(ja) %{_datadir}/manual/location.html.ja.jis
 %{_datadir}/manual/logs.html
 %{_datadir}/manual/multilogs.html
 %{_datadir}/manual/new_features_1_3.html.html
@@ -1335,7 +1362,9 @@ fi
 %{_datadir}/manual/mod/mod_asis.html.html
 %{_datadir}/manual/mod/mod_asis.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_asis.html.ja.jis
-%{_datadir}/manual/mod/mod_autoindex.html
+%{_datadir}/manual/mod/mod_autoindex.html.html
+%{_datadir}/manual/mod/mod_autoindex.html.en
+%lang(ja) %{_datadir}/manual/mod/mod_autoindex.html.ja.jis
 %{_datadir}/manual/mod/mod_cern_meta.html
 %{_datadir}/manual/mod/mod_cgi.html.html
 %{_datadir}/manual/mod/mod_cgi.html.en
@@ -1535,6 +1564,12 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_mmap_static.so
 %{_datadir}/manual/mod/mod_mmap_static.html
+
+%files mod_log_forensic
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libexecdir}/mod_log_forensic.so
+%{_datadir}/manual/mod/mod_log_forensic.html.html
+%{_datadir}/manual/mod/mod_log_forensic.html.en
 
 %files mod_imap
 %defattr(644,root,root,755)
