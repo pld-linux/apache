@@ -53,7 +53,7 @@ case "$1" in
 	if [ -f /var/lock/subsys/apache ]; then
 		msg_stopping apache
 		killproc apache
-		rm -f /var/lock/subsys/apache /var/run/.pid /var/run/apache.loc* >/dev/null 2>&1
+		rm -f /var/lock/subsys/apache /var/run/apache.pid /var/run/apache.loc* >/dev/null 2>&1
 	else
 		msg_not_running apache
 	fi
