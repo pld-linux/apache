@@ -122,6 +122,21 @@ Requires:	%{name}-apxs = %{version}-%{release}
 Requires:	mailcap
 Requires:	psmisc >= 20.1
 Provides:	apache(modules-api) = %{_apache_modules_api}
+Provides:	apache(mod_access)
+Provides:	apache(mod_alias)
+Provides:	apache(mod_asis)
+Provides:	apache(mod_autoindex)
+Provides:	apache(mod_cern_meta)
+Provides:	apache(mod_cgi)
+Provides:	apache(mod_env)
+Provides:	apache(mod_include)
+Provides:	apache(mod_log_config)
+Provides:	apache(mod_mime)
+Provides:	apache(mod_mime_magic)
+Provides:	apache(mod_negotiation)
+Provides:	apache(mod_setenvif)
+Provides:	apache(mod_speling)
+Provides:	apache(mod_userdir)
 Provides:	group(http)
 Provides:	httpd = %{version}
 Provides:	user(http)
