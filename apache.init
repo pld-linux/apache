@@ -53,7 +53,10 @@ case "$1" in
 	if [ -f /var/lock/subsys/httpd ]; then
 		msg_stopping httpd.${HTTPD_MPM}
 		if [ -f /var/run/httpd.pid ]; then
-			PID=`cat /var/run/httpd.pid`
+			PID=$(filter_chroot `cat /var/run/httpd.pid`)
+			if [ ! $PID ]; then
+				PID=0
+			fi
 		else
 			PID=0
 		fi
