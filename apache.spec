@@ -1318,6 +1318,7 @@ fi
 %attr(755,root,root) %{_sbindir}/rotatelogs
 
 %dir %attr(770,root,http) /var/run/apache
+%dir %attr(770,root,http) /var/cache/apache
 
 %{_mandir}/man1/htdigest.1*
 %{_mandir}/man8/ab.8*
@@ -1868,7 +1869,6 @@ fi
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_proxy.conf
 %attr(755,root,root) %{_libexecdir}/mod_proxy*.so
-%attr(770,root,http) /var/cache/apache
 
 %files mod_rewrite
 %defattr(644,root,root,755)
