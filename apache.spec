@@ -11,14 +11,15 @@
 # - add %%post/%%postun to suexec
 # - --with-suexec-gidmin=500 or =100 ?
 # - --with-suexec-uidmin=500 or =1000 ?
-# - multiple MPM support in subpackages like apache-mpm-worker, apache-mpm-prefork
-#   and so on. See SuSE 9 apache rpm for idea how to do this.
-# - switch from worker to perchild when it will be working in apache (but better multiple MPM support)
+# - subpackages for MPMs
+# - change _prefix to /etc/httpd, _exec_prefix to /usr, fix configs to Load modules/xyz.so
+#   + provide /etc/httpd/modules symlink to /usr/lib{,64}/apache (see for example fedora apache.spec}
+#   This will fix path problems with AMD64.
 #
 # Conditional build:
 %bcond_without	ssl	# don't build with SSL support
 %bcond_without	ldap	# don't build with LDAP support
-%bcond_with	metuxmpm	# use METUX MPM
+%bcond_without	metuxmpm	# use METUX MPM
 #
 %include	/usr/lib/rpm/macros.perl
 # this is internal macro, don't change to %%apache_modules_api
@@ -51,7 +52,7 @@ Source11:	%{name}-mod_info.conf
 Source12:	%{name}-mod_ssl.conf
 Source13:	%{name}-mod_dav.conf
 Source14:	%{name}-mod_dir.conf
-Source15:	%{name}-suexec.conf
+Source15:	%{name}-mod_suexec.conf
 Source20:	%{name}-server.crt
 Source21:	%{name}-server.key
 Patch0:		%{name}-configdir_skip_backups.patch
@@ -668,7 +669,9 @@ fi
 %{__perl} -pi -e "s:\@exp_installbuilddir\@:%{_libdir}/apache/build:g" \
 	support/apxs.in
 install /usr/share/automake/config.* build/
-%configure \
+for mpm in %{?with_metuxmpm:metuxmpm} perchild prefork worker; do
+install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
+../%configure \
 	--prefix=%{_libexecdir} \
 	--enable-layout=PLD \
 	--enable-modules=all \
@@ -714,11 +717,7 @@ install /usr/share/automake/config.* build/
 	--enable-speling \
 	--enable-rewrite \
 	--enable-so \
-%if %{with metuxmpm}
-	--with-mpm=metuxmpm \
-%else
-	--with-mpm=worker \
-%endif
+	--with-mpm=${mpm} \
 	--with-suexec-bin=%{_sbindir}/suexec \
 	--with-suexec-caller=http \
 	--with-suexec-docroot=%{_datadir} \
@@ -728,15 +727,26 @@ install /usr/share/automake/config.* build/
 	--with-suexec-umask=077 \
 	--with-apr=%{_bindir} \
 	--with-apr-util=%{_bindir}
-
 %{__make}
+./httpd -l | grep -v "${mpm}" > modules-inside
+cd ..
+done
+
+for mpm in %{?with_metuxmpm:metuxmpm} perchild worker; do
+	if ! cmp -s buildmpm-prefork/modules-inside buildmpm-${mpm}/modules-inside; then
+		echo "List of compiled modules is different between prefork-MPM and ${mpm}-MPM!"
+		echo "Build failed."
+		exit 1
+	fi
+done
 
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig} \
 	$RPM_BUILD_ROOT%{_var}/{log/{httpd,archiv/httpd},{run,cache}/apache}
 
-%{__make} install \
+# prefork is default one
+%{__make} -C buildmpm-prefork install \
 	DESTDIR=$RPM_BUILD_ROOT \
 	installbuilddir=%{_sysconfdir}/build \
 	prefix=%{_sysconfdir}/httpd \
@@ -749,6 +759,12 @@ install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig} \
 	runtimedir=%{_var}/run \
 	logdir=%{_var}/log/httpd \
 	proxycachedir=%{_var}/cache/httpd
+
+ln -s httpd $RPM_BUILD_ROOT%{_sbindir}/httpd.prefork
+
+for mpm in %{?with_metuxmpm:metuxmpm} perchild worker; do
+	install buildmpm-${mpm}/httpd $RPM_BUILD_ROOT%{_sbindir}/httpd.${mpm}
+done
 
 rm -f $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
@@ -1227,6 +1243,7 @@ fi
 %attr(755,root,root) %{_sbindir}/apxs
 %attr(755,root,root) %{_sbindir}/checkgid
 %attr(755,root,root) %{_sbindir}/httpd
+%attr(755,root,root) %{_sbindir}/httpd.*
 %attr(755,root,root) %{_sbindir}/logresolve
 %attr(755,root,root) %{_sbindir}/rotatelogs
 %attr(755,root,root) %{_sbindir}/envvars*
