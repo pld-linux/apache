@@ -420,8 +420,8 @@ fi
 %{_sbindir}/apxs -e -a -n log_agent %{_libexecdir}/mod_log_agent.so 1>&2
 %{_sbindir}/apxs -e -a -n log_config %{_libexecdir}/mod_log_config.so 1>&2
 %{_sbindir}/apxs -e -a -n log_referer %{_libexecdir}/mod_log_referer.so 1>&2
-%{_sbindir}/apxs -e -a -n mime %{_libexecdir}/mod_mime.so 1>&2
 %{_sbindir}/apxs -e -a -n mime_magic %{_libexecdir}/mod_mime_magic.so 1>&2
+%{_sbindir}/apxs -e -a -n mime %{_libexecdir}/mod_mime.so 1>&2
 %{_sbindir}/apxs -e -a -n negotiation %{_libexecdir}/mod_negotiation.so 1>&2
 %{_sbindir}/apxs -e -a -n setenvif %{_libexecdir}/mod_setenvif.so 1>&2
 %{_sbindir}/apxs -e -a -n speling %{_libexecdir}/mod_speling.so 1>&2
