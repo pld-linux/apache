@@ -31,7 +31,7 @@ Release:	1
 License:	Apache Group 
 Group:		Networking/Daemons
 URL:		http://www.apache.org/
-Source0:	ftp://ftp.apache.org/dist/httpd/%{name}_%{version}.tar.gz
+Source0:	http://www.apache.org/dist/httpd/%{name}_%{version}.tar.gz
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}-icons.tar.gz
