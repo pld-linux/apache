@@ -1,0 +1,4 @@
+- BR libtool 1.5 (to fix relinking issue)
+- provide information about modules API version
+- use ./buildconf to rebuild libtool/autoconf files
+- release 0.2
