@@ -670,6 +670,8 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 %patch20 -p1
 %patch21 -p1
 
+%{__perl} -pi -e "s@/usr/local/bin/perl@%{__perl}@" $(grep -rl "/usr/local/bin/perl" *)
+
 %build
 # sanity check
 MODULES_API=`awk '/#define MODULE_MAGIC_NUMBER_MAJOR/ {print $3}' include/ap_mmn.h`
