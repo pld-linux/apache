@@ -4,7 +4,6 @@
 # - mod_optional_fn_{export,import}
 # - mod_optional_hook_{export,import}
 # - config examples for mod_*
-# - move configuration to directory (/etc/httpd/httpd.conf/)
 %include	/usr/lib/rpm/macros.perl
 Summary:	The most widely used Web server on the Internet
 Summary(de):	Leading World Wide Web-Server
@@ -32,6 +31,7 @@ Source11:	%{name}-mod_info.conf
 Source12:	%{name}-mod_ssl.conf
 Source13:	%{name}-mod_dav.conf
 Patch0:		%{name}-apxs.patch
+Patch1:		%{name}-configdir_skip_backups.patch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 BuildRequires:	automake
 BuildRequires:	openssl-devel
@@ -568,6 +568,7 @@ Modu³ cacheuj±cy statyczn± listê plików w pamiêci.
 %prep
 %setup -q -n httpd-%{version}
 %patch0 -p1
+%patch1 -p1
 
 %build
 cp -f %{_prefix}/share/automake/config.* srclib/pcre/
@@ -652,8 +653,15 @@ install -d $RPM_BUILD_ROOT%{_var}/{run,cache}/apache
 	logdir=$RPM_BUILD_ROOT%{_var}/log/httpd \
 	proxycachedir=$RPM_BUILD_ROOT%{_var}/cache/httpd
 
+rm -f $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
+install -d $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
+
+mv -f $RPM_BUILD_ROOT%{_sysconfdir}/10_httpd.conf \
+	$RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
+
 mv -f $RPM_BUILD_ROOT%{_sysconfdir}/build \
 	$RPM_BUILD_ROOT%{_libexecdir}/build
+
 ln -s %{_libexecdir}/build $RPM_BUILD_ROOT%{_sysconfdir}/build
 
 perl -pi -e "s#$RPM_BUILD_ROOT##g" $RPM_BUILD_ROOT%{_libexecdir}/build/config_vars.mk
@@ -665,13 +673,13 @@ install %{SOURCE4} $RPM_BUILD_ROOT/etc/sysconfig/apache
 
 touch $RPM_BUILD_ROOT/var/log/httpd/{access,error,agent,referer}_log
 
-install %{SOURCE6}  $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
-install %{SOURCE8}  $RPM_BUILD_ROOT%{_sysconfdir}/mod_vhost_alias.conf
-install %{SOURCE9}  $RPM_BUILD_ROOT%{_sysconfdir}/mod_status.conf
-install %{SOURCE10} $RPM_BUILD_ROOT%{_sysconfdir}/mod_proxy.conf
-install %{SOURCE11} $RPM_BUILD_ROOT%{_sysconfdir}/mod_info.conf
-install %{SOURCE12} $RPM_BUILD_ROOT%{_sysconfdir}/mod_ssl.conf
-install %{SOURCE13} $RPM_BUILD_ROOT%{_sysconfdir}/mod_dav.conf
+install %{SOURCE6}  $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf/10_httpd.conf
+install %{SOURCE8}  $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf/20_mod_vhost_alias.conf
+install %{SOURCE9}  $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf/25_mod_status.conf
+install %{SOURCE10} $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf/30_mod_proxy.conf
+install %{SOURCE11} $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf/35_mod_info.conf
+install %{SOURCE12} $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf/40_mod_ssl.conf
+install %{SOURCE13} $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf/45_mod_dav.conf
 
 ln -sf index.html.en $RPM_BUILD_ROOT%{_datadir}/html/index.html
 
@@ -873,9 +881,6 @@ fi
 %post mod_dav
 %{_sbindir}/apxs -e -a -n dav %{_libexecdir}/mod_dav.so 1>&2
 %{_sbindir}/apxs -e -a -n dav_fs %{_libexecdir}/mod_dav_fs.so 1>&2
-if [ -f /etc/httpd/httpd.conf ] && ! grep -q "^Include.*mod_dav.conf" /etc/httpd/httpd.conf; then
-	echo "Include /etc/httpd/mod_dav.conf" >> /etc/httpd/httpd.conf
-fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -886,9 +891,6 @@ fi
 if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n dav %{_libexecdir}/mod_dav_fs.so 1>&2
 	%{_sbindir}/apxs -e -A -n dav %{_libexecdir}/mod_dav.so 1>&2
-	grep -v "^Include.*mod_dav.conf" /etc/httpd/httpd.conf > \
-		/etc/httpd/httpd.conf.tmp
-	mv -f /etc/httpd/httpd.conf.tmp /etc/httpd/httpd.conf
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
@@ -1008,9 +1010,6 @@ fi
 
 %post mod_info
 %{_sbindir}/apxs -e -a -n info %{_libexecdir}/mod_info.so 1>&2
-if [ -f /etc/httpd/httpd.conf ] && ! grep -q "^Include.*mod_info.conf" /etc/httpd/httpd.conf; then
-	echo "Include /etc/httpd/mod_info.conf" >> /etc/httpd/httpd.conf
-fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -1019,9 +1018,6 @@ fi
 
 %preun mod_info
 if [ "$1" = "0" ]; then
-	grep -v "^Include.*mod_info.conf" /etc/httpd/httpd.conf > \
-		/etc/httpd/httpd.conf.tmp
-	mv -f /etc/httpd/httpd.conf.tmp /etc/httpd/httpd.conf
 	%{_sbindir}/apxs -e -A -n info %{_libexecdir}/mod_info.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
@@ -1033,9 +1029,6 @@ fi
 %{_sbindir}/apxs -e -a -n proxy_connect %{_libexecdir}/mod_proxy_connect.so 1>&2
 %{_sbindir}/apxs -e -a -n proxy_ftp %{_libexecdir}/mod_proxy_ftp.so 1>&2
 %{_sbindir}/apxs -e -a -n proxy_http %{_libexecdir}/mod_proxy_http.so 1>&2
-if [ -f /etc/httpd/httpd.conf ] && ! grep -q "^Include.*mod_proxy.conf" /etc/httpd/httpd.conf; then
-	echo "Include /etc/httpd/mod_proxy.conf" >> /etc/httpd/httpd.conf
-fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -1048,9 +1041,6 @@ if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n proxy_ftp %{_libexecdir}/mod_proxy_ftp.so 1>&2
 	%{_sbindir}/apxs -e -A -n proxy_connect %{_libexecdir}/mod_proxy_connect.so 1>&2
 	%{_sbindir}/apxs -e -A -n proxy %{_libexecdir}/mod_proxy.so 1>&2
-	grep -v "^Include.*mod_proxy.conf" /etc/httpd/httpd.conf > \
-		/etc/httpd/httpd.conf.tmp
-	mv -f /etc/httpd/httpd.conf.tmp /etc/httpd/httpd.conf
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
@@ -1074,9 +1064,6 @@ fi
 
 %post mod_ssl
 %{_sbindir}/apxs -e -a -n ssl %{_libexecdir}/mod_ssl.so 1>&2
-if [ -f /etc/httpd/httpd.conf ] && ! grep -q "^Include.*mod_ssl.conf" /etc/httpd/httpd.conf; then
-	echo "Include /etc/httpd/mod_ssl.conf" >> /etc/httpd/httpd.conf
-fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -1086,9 +1073,6 @@ fi
 %preun mod_ssl
 if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n ssl %{_libexecdir}/mod_ssl.so 1>&2
-	grep -v "^Include.*mod_ssl.conf" /etc/httpd/httpd.conf > \
-		/etc/httpd/httpd.conf.tmp
-	mv -f /etc/httpd/httpd.conf.tmp /etc/httpd/httpd.conf
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
@@ -1096,9 +1080,6 @@ fi
 
 %post mod_status
 %{_sbindir}/apxs -e -a -n status %{_libexecdir}/mod_status.so 1>&2
-if [ -f /etc/httpd/httpd.conf ] && ! grep -q "^Include.*mod_status.conf" /etc/httpd/httpd.conf; then
-	echo "Include /etc/httpd/mod_status.conf" >> /etc/httpd/httpd.conf
-fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -1108,9 +1089,6 @@ fi
 %preun mod_status
 if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n status %{_libexecdir}/mod_status.so 1>&2
-	grep -v "^Include.*mod_status.conf" /etc/httpd/httpd.conf > \
-		/etc/httpd/httpd.conf.tmp
-	mv -f /etc/httpd/httpd.conf.tmp /etc/httpd/httpd.conf
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
@@ -1150,9 +1128,6 @@ fi
 
 %post mod_vhost_alias
 %{_sbindir}/apxs -e -a -n vhost_alias %{_libexecdir}/mod_vhost_alias.so 1>&2
-if [ -f /etc/httpd/httpd.conf ] && ! grep -q "^Include.*mod_vhost_alias.conf" /etc/httpd/httpd.conf; then
-	echo "Include /etc/httpd/mod_vhost_alias.conf" >> /etc/httpd/httpd.conf
-fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -1162,9 +1137,6 @@ fi
 %preun mod_vhost_alias
 if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n vhost_alias %{_libexecdir}/mod_vhost_alias.so 1>&2
-	grep -v "^Include.*mod_vhost_alias.conf" /etc/httpd/httpd.conf > \
-		/etc/httpd/httpd.conf.tmp
-	mv -f /etc/httpd/httpd.conf.tmp /etc/httpd/httpd.conf
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
@@ -1178,7 +1150,8 @@ fi
 %attr(754,root,root) /etc/rc.d/init.d/httpd
 
 %attr(750,root,root) %dir %{_sysconfdir}
-%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf
+%attr(750,root,root) %dir %{_sysconfdir}/httpd.conf
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_httpd.conf
 %attr(640,root,root) %{_sysconfdir}/magic
 %attr(755,root,root) %dir %{_sysconfdir}/build
 %attr(755,root,root) %dir %{_libexecdir}/build
@@ -1347,7 +1320,7 @@ fi
 
 %files mod_dav
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/mod_dav.conf
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_dav.conf
 %attr(755,root,root) %{_libexecdir}/mod_dav*.so
 %{_datadir}/manual/mod/mod_dav*.html
 
@@ -1383,13 +1356,13 @@ fi
 
 %files mod_info
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/mod_info.conf
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_info.conf
 %attr(755,root,root) %{_libexecdir}/mod_info.so
 %{_datadir}/manual/mod/mod_info.html
 
 %files mod_proxy
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/mod_proxy.conf
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_proxy.conf
 %attr(755,root,root) %{_libexecdir}/mod_proxy*.so
 %doc %{_datadir}/manual/mod/mod_proxy*.html
 %attr(770,root,http) /var/cache/apache
@@ -1402,14 +1375,14 @@ fi
 
 %files mod_ssl
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/mod_ssl.conf
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_ssl.conf
 %attr(755,root,root) %{_libexecdir}/mod_ssl.so
 %{_datadir}/manual/ssl
 %{_datadir}/manual/mod/mod_ssl.html
 
 %files mod_status
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/mod_status.conf
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_status.conf
 %attr(755,root,root) %{_libexecdir}/mod_status.so
 %{_datadir}/manual/mod/mod_status.html
 
@@ -1428,4 +1401,4 @@ fi
 %attr(755,root,root) %{_libexecdir}/mod_vhost_alias.so
 %{_datadir}/manual/mod/mod_vhost_alias.html
 %{_datadir}/manual/vhosts
-%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/mod_vhost_alias.conf
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_vhost_alias.conf
