@@ -33,8 +33,8 @@ Patch4:		%{name}-apxs.patch
 Patch5:		%{name}-mod_ssl-addon.patch
 Patch6:		%{name}-mod_ssl-eapi.patch
 Patch7:		%{name}-EAPI_MM_CORE_PATH-correction.patch
-Patch8:		%{name}-v6-PLD-5.patch.gz
-Patch9:		%{name}-mm_conf.patch
+Patch8:		%{name}-EAPI_MM=SYSTEM.patch
+Patch9:		%{name}-v6-PLD-5.patch.gz
 Patch10:	%{name}-modules_symbols.patch
 Patch11:	%{name}-apxs_force_rm_cp.patch
 Patch12:	%{name}-db3.patch
@@ -474,8 +474,8 @@ Requires:	%{name}(EAPI) = %{version}
 %patch5 -p0
 %patch6 -p0
 %patch7 -p1
-%{!?bcond_off_apache_ipv6:%patch8 -p1}
-%patch9 -p1
+%patch8 -p1
+%{!?bcond_off_apache_ipv6:%patch9 -p1}
 %patch10 -p1
 %patch11 -p1
 %patch12 -p1
