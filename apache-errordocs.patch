@@ -50,7 +50,7 @@ diff -Nru apache_1.3.9/errordocs/401.shtml apache_1.3.9.new/errordocs/401.shtml
 +</TD><TD>
 +Zapytanie nie przesz³o pomy¶lnie procesu uwierzytelnienia.
 +Serwer nie mo¿e zweryfikowaæ czy posiadasz autoryzacjê dostêpu do dokumentu,
-+który ¿±dasz. Prawdopodobnie wprowadzi³es nieprawid³owe dane jak np. has³o lub 
++który ¿±dasz. Prawdopodobnie wprowadzono nieprawid³owe dane jak np. has³o lub 
 +twoja przegl±darka nie potrafi dostarczyæ w³a¶ciwych danych do autoryzacji.
 +</TD></TR>
 +</TABLE>
