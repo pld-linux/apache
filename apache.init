@@ -22,40 +22,51 @@
 [ -f /etc/sysconfig/apache ] && . /etc/sysconfig/apache
 
 # Check that networking is up.
-if [ "${NETWORKING}" = "no" ]; then
-	echo "WARNING: Networking is down. Apache can't be runed."
-	exit 1
+if is_no "${NETWORKING}"; then
+        # nls "ERROR: Networking is down. %s can't be run." <service>
+        msg_Network_Down httpd
+        exit 1
 fi
+			
 
 # See how we were called.
 case "$1" in
   start)
 	# Check if the service is already running?
-	if [ ! -f /var/lock/subsys/httpd ]; then
-		show Starting httpd
+        if [ ! -f /var/lock/subsys/httpd ]; then
+		msg_starting httpd
 		daemon httpd
-		touch /var/lock/subsys/httpd
+	        RETVAL=$?
+    		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/httpd
 	else
-		echo "httpd already is running"
+        	msg_Already_Running httpd
+	        exit 1
 	fi
 	;;
   stop)
-	show Shutting down httpd
-	killproc httpd  
-	rm -f /var/lock/subsys/httpd /var/run/httpd.pid /var/run/httpd.loc*
+        # Stop daemons.
+	if [ -f /var/lock/subsys/httpd ]; then
+                msg_stopping httpd
+                killproc httpd
+                rm -f /var/lock/subsys/httpd /var/run/httpd.pid /var/run/httpd.loc* >/dev/null 2>&1
+        else
+		msg_Not_Running httpd
+	        exit 1
+	fi
 	;;
   status)
 	status httpd
 	/usr/sbin/httpd -S
+	exit $?
 	;;
   restart|reload)
 	$0 stop
 	$0 start
 	;;
   *)
-	echo "Usage: $0 {start|stop|restart|status}"
+	msg_Usage "$0 {start|stop|restart|status}"
 	exit 1
 	;;
 esac
 
-exit 0
+exit $RETVAL
