@@ -5,7 +5,7 @@ Summary(pl):	Serwer WWW (World Wide Web) ze wsparciem dla IPv6
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	1.3.6
-Release:	2.0
+Release:	2.1
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Source0:	ftp://ftp.apache.org/apache/dist/%{name}_%{version}.tar.gz
@@ -21,14 +21,14 @@ Patch2:		%{name}-htdocs.patch
 Patch3:		%{name}-release.patch
 Patch4:		apache-ndbm.patch
 Copyright:	BSD-like
-Obsoletes:	apache-extra
-Obsoletes:	apache6
 Provides:	httpd
 Provides:	webserver
 Prereq:		/sbin/chkconfig
+Prereq:		/usr/sbin/useradd
 URL:		http://www.apache.org/
-
 BuildRoot:	/tmp/%{name}-%{version}-root
+Obsoletes:	apache-extra
+Obsoletes:	apache6
 
 %define		_sysconfdir	/etc/httpd
 %define		_includedir	%{_prefix}/include/apache
@@ -165,6 +165,9 @@ strip $RPM_BUILD_ROOT%{_libexecdir}/*
 gzip -9nf $RPM_BUILD_ROOT%{_mandir}/man*/* \
 	ABOUT_APACHE src/CHANGES KEYS README README.v6
 
+%pre
+/usr/sbin/useradd -u 51 -r -f httpd
+
 %post
 /sbin/chkconfig --add httpd
 umask 137
@@ -179,6 +182,7 @@ if [ "$1" = "0" ]; then
 		/etc/rc.d/init.d/httpd stop 1>&2
 	fi
 	/sbin/chkconfig --del httpd
+	groupdel http
 fi
 
 %clean
