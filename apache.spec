@@ -30,17 +30,19 @@ Patch1:		%{name}-suexec.patch
 Patch2:		%{name}-htdocs.patch
 Patch3:		%{name}-errordocs.patch
 Patch4:		%{name}-apxs.patch
-Patch5:		%{name}-EAPI.patch
-Patch6:		%{name}-v6-PLD-5.patch.gz
-Patch7:		%{name}-mm_conf.patch
-Patch8:		%{name}-modules_symbols.patch
-Patch9:		%{name}-apxs_force_rm_cp.patch
-Patch10:	%{name}-db3.patch
-Patch11:	%{name}-lookup_map_ldap.patch
-Patch12:	%{name}-man.patch
-Patch13:	%{name}-fpic.patch
-Patch14:	%{name}-buff.patch
-Patch15:	%{name}-mkstemp.patch
+Patch5:		%{name}-mod_ssl-addon.patch
+Patch6:		%{name}-mod_ssl-eapi.patch
+Patch7:		%{name}-EAPI_MM_CORE_PATH-correction.patch
+Patch8:		%{name}-v6-PLD-5.patch.gz
+Patch9:		%{name}-mm_conf.patch
+Patch10:	%{name}-modules_symbols.patch
+Patch11:	%{name}-apxs_force_rm_cp.patch
+Patch12:	%{name}-db3.patch
+Patch13:	%{name}-lookup_map_ldap.patch
+Patch14:	%{name}-man.patch
+Patch15:	%{name}-fpic.patch
+Patch16:	%{name}-buff.patch
+Patch17:	%{name}-mkstemp.patch
 Provides:	httpd
 Provides:	webserver
 Prereq:		/sbin/chkconfig
@@ -469,17 +471,19 @@ Requires:	%{name}(EAPI) = %{version}
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
-%patch5 -p1
-%{!?bcond_off_apache_ipv6:%patch6 -p1}
+%patch5 -p0
+%patch6 -p0
 %patch7 -p1
-%patch8 -p1
+%{!?bcond_off_apache_ipv6:%patch8 -p1}
 %patch9 -p1
 %patch10 -p1
-%{?mod_rewrite_ldap:%patch11 -p1}
+%patch11 -p1
 %patch12 -p1
-%patch13 -p1
+%{?mod_rewrite_ldap:%patch13 -p1}
 %patch14 -p1
 %patch15 -p1
+%patch16 -p1
+%patch17 -p1
 
 %build
 OPTIM="%{?debug:-O0 -g}%{!?debug:$RPM_OPT_FLAGS}" \
