@@ -1030,74 +1030,119 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/manual/LICENSE
 %{_datadir}/manual/bind.html
 %{_datadir}/manual/cgi_path.html
+%lang(en) /home/httpd/manual/configuring.html.html
 %lang(en) %{_datadir}/manual/configuring.html.en
+%lang(fr) %{_datadir}/manual/configuring.html.fr
 %lang(ja) %{_datadir}/manual/configuring.html.ja.jis
 %{_datadir}/manual/content-negotiation.html
 %lang(en) %{_datadir}/manual/custom-error.html.en
+%lang(en) %{_datadir}/manual/custom-error.html.html
 %lang(ja) %{_datadir}/manual/custom-error.html.ja.jis
 %{_datadir}/manual/dns-caveats.html
 %{_datadir}/manual/dso.html
 %{_datadir}/manual/env.html
 %{_datadir}/manual/footer.html
 %lang(en) %{_datadir}/manual/handler.html.en
+%lang(en) %{_datadir}/manual/handler.html.html
 %lang(ja) %{_datadir}/manual/handler.html.ja.jis
 %{_datadir}/manual/header.html
 %lang(en) %{_datadir}/manual/index.html.en
+%lang(fr) %{_datadir}/manual/index.html.fr
+%lang(en) %{_datadir}/manual/index.html.html
 %lang(ja) %{_datadir}/manual/index.html.ja.jis
 %lang(en) %{_datadir}/manual/install.html.en
+%lang(es) %{_datadir}/manual/install.html.es
+%lang(fr) %{_datadir}/manual/install.html.fr
+%lang(en) %{_datadir}/manual/install.html.html
 %lang(ja) %{_datadir}/manual/install.html.ja.jis
-%{_datadir}/manual/invoking.html
+%lang(en) %{_datadir}/manual/invoking.html
+%lang(fr) %{_datadir}/manual/invoking.html.fr
+%lang(en) %{_datadir}/manual/invoking.html.html
 %{_datadir}/manual/keepalive.html
 %{_datadir}/manual/location.html
 %{_datadir}/manual/multilogs.html
 %lang(en) %{_datadir}/manual/new_features_1_3.html.en
+%lang(en) %{_datadir}/manual/new_features_1_3.html.html
 %lang(ja) %{_datadir}/manual/new_features_1_3.html.ja.jis
 %{_datadir}/manual/process-model.html
 %{_datadir}/manual/sections.html
 %lang(en) %{_datadir}/manual/server-wide.html.en
+%lang(fr) %{_datadir}/manual/server-wide.html.fr
+%lang(en) %{_datadir}/manual/server-wide.html.html
 %lang(ja) %{_datadir}/manual/server-wide.html.ja.jis
 %{_datadir}/manual/sourcereorg.html
-%{_datadir}/manual/stopping.html
-%{_datadir}/manual/suexec.html
+%lang(en) %{_datadir}/manual/stopping.html
+%lang(fr) %{_datadir}/manual/stopping.html.fr
+%lang(en) %{_datadir}/manual/stopping.html.html
+%lang(en) %{_datadir}/manual/suexec.html.en
+%lang(en) %{_datadir}/manual/suexec.html.html
+%lang(j1) %{_datadir}/manual/suexec.html.ja.jis
 %{_datadir}/manual/upgrading_to_1_3.html
 %dir %{_datadir}/manual/howto
 %lang(en) %{_datadir}/manual/howto/cgi.html.en
+%lang(en) %{_datadir}/manual/howto/cgi.html.html
 %lang(ja) %{_datadir}/manual/howto/cgi.html.ja.jis
 %{_datadir}/manual/howto/footer.html
 %{_datadir}/manual/howto/header.html
 %lang(en) %{_datadir}/manual/howto/ssi.html.en
+%lang(en) %{_datadir}/manual/howto/ssi.html.html
 %lang(ja) %{_datadir}/manual/howto/ssi.html.ja.jis
 %dir %{_datadir}/manual/mod
 %{_datadir}/manual/mod/core.html
 %lang(en) %{_datadir}/manual/mod/directive-dict.html.en
+%lang(en) %{_datadir}/manual/mod/directive-dict.html.html
 %lang(ja) %{_datadir}/manual/mod/directive-dict.html.ja.jis
 %{_datadir}/manual/mod/directives.html
 %{_datadir}/manual/mod/footer.html
 %{_datadir}/manual/mod/header.html
-%{_datadir}/manual/mod/index-bytype.html
-%{_datadir}/manual/mod/index.html
+%lang(en) %{_datadir}/manual/mod/index-bytype.html
+%lang(fr) %{_datadir}/manual/mod/index-bytype.html.fr
+%lang(en) %{_datadir}/manual/mod/index.html
+%lang(en) %{_datadir}/manual/mod/index.html.fr
 %{_datadir}/manual/mod/mod_access.html
 %{_datadir}/manual/mod/mod_alias.html
 %{_datadir}/manual/mod/mod_asis.html
 %{_datadir}/manual/mod/mod_autoindex.html
-%{_datadir}/manual/mod/mod_cern_meta.html
 %{_datadir}/manual/mod/mod_cgi.html
-%{_datadir}/manual/mod/mod_cookies.html
-%{_datadir}/manual/mod/mod_env.html
+%lang(en) %{_datadir}/manual/mod/mod_env.html.en
+%lang(en) %{_datadir}/manual/mod/mod_env.html.html
+%lang(en) %{_datadir}/manual/mod/mod_env.html.ja.jis
 %{_datadir}/manual/mod/mod_include.html
 %{_datadir}/manual/mod/mod_log_agent.html
 %{_datadir}/manual/mod/mod_log_config.html
 %{_datadir}/manual/mod/mod_log_referer.html
-%{_datadir}/manual/mod/mod_mime.html
+%lang(en) %{_datadir}/manual/mod/mod_mime.html.en
+%lang(en) %{_datadir}/manual/mod/mod_mime.html.html
+%lang(ja) %{_datadir}/manual/mod/mod_mime.html.ja.jis
 %{_datadir}/manual/mod/mod_mime_magic.html
 %lang(en) %{_datadir}/manual/mod/mod_negotiation.html.en
+%lang(en) %{_datadir}/manual/mod/mod_negotiation.html.html
 %lang(ja) %{_datadir}/manual/mod/mod_negotiation.html.ja.jis
-%{_datadir}/manual/mod/mod_setenvif.html
+%lang(en) %{_datadir}/manual/mod/mod_setenvif.html.en
+%lang(en) %{_datadir}/manual/mod/mod_setenvif.html.html
+%lang(ja) %{_datadir}/manual/mod/mod_setenvif.html.ja.jis
 %{_datadir}/manual/mod/mod_speling.html
 %{_datadir}/manual/mod/mod_userdir.html
 %lang(en) %{_datadir}/manual/mod/module-dict.html.en
+%lang(en) %{_datadir}/manual/mod/module-dict.html.html
 %lang(ja) %{_datadir}/manual/mod/module-dict.html.ja.jis
-%{_datadir}/manual/programs
+%dir %{_datadir}/manual/programs
+%{_datadir}/manual/programs/ab.html
+%{_datadir}/manual/programs/apachectl.html
+%{_datadir}/manual/programs/apxs.html
+%{_datadir}/manual/programs/dbmmanage.html
+%{_datadir}/manual/programs/footer.html
+%{_datadir}/manual/programs/header.html
+%{_datadir}/manual/programs/htdigest.html
+%{_datadir}/manual/programs/htpasswd.html
+%{_datadir}/manual/programs/httpd.html
+%lang(en) %{_datadir}/manual/programs/index.html.en
+%lang(en) %{_datadir}/manual/programs/index.html.html
+%lang(ja) %{_datadir}/manual/programs/index.html.ja.jis
+%{_datadir}/manual/programs/logresolve.html
+%{_datadir}/manual/programs/other.html
+%{_datadir}/manual/programs/rotatelogs.html
+%{_datadir}/manual/programs/suexec.html
 %dir %{_datadir}/manual/vhosts
 %{_datadir}/manual/vhosts/details.html
 %{_datadir}/manual/vhosts/examples.html
@@ -1106,6 +1151,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/manual/vhosts/header.html
 %{_datadir}/manual/vhosts/host.html
 %lang(en) %{_datadir}/manual/vhosts/index.html.en
+%lang(en) %{_datadir}/manual/vhosts/index.html.html
 %lang(ja) %{_datadir}/manual/vhosts/index.html.ja.jis
 %{_datadir}/manual/vhosts/ip-based.html
 %{_datadir}/manual/vhosts/mass.html
@@ -1118,7 +1164,7 @@ rm -rf $RPM_BUILD_ROOT
 # note: html extensions are not the same as (g)libc locale names
 %lang(ca) %{_datadir}/html/index.html.ca
 %lang(cs) %{_datadir}/html/index.html.cz
-%lang(de_DE) %{_datadir}/html/index.html.de
+%lang(de) %{_datadir}/html/index.html.de
 %lang(da) %{_datadir}/html/index.html.dk
 %lang(et) %{_datadir}/html/index.html.ee
 %lang(el) %{_datadir}/html/index.html.el
@@ -1143,7 +1189,7 @@ rm -rf $RPM_BUILD_ROOT
 %lang(ru) %{_datadir}/html/index.html.ru.ucs4
 %lang(ru) %{_datadir}/html/index.html.ru.utf8
 %lang(se) %{_datadir}/html/index.html.se
-%lang(zh_TW) %{_datadir}/html/index.html.tw.Big5
+%lang(zh_TW) %{_datadir}/html/index.html.zh.Big5
 
 %{_datadir}/html/*.gif
 %{_datadir}/errordocs
@@ -1180,10 +1226,8 @@ rm -rf $RPM_BUILD_ROOT
 %files mod_auth_db
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_auth_db.so
-%attr(755,root,root) %{_libexecdir}/mod_auth_dbm.so
 %attr(755,root,root) %{_bindir}/dbmmanage 
 %{_datadir}/manual/mod/mod_auth_db.html
-%{_datadir}/manual/mod/mod_auth_dbm.html
 %{_mandir}/man1/dbmmanage.1*
 %{_mandir}/man1/htpasswd.1*
 
@@ -1249,6 +1293,7 @@ rm -rf $RPM_BUILD_ROOT
 %files mod_usertrack
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_usertrack.so
+%{_datadir}/manual/mod/mod_cookies.html
 %{_datadir}/manual/mod/mod_usertrack.html
 
 %files mod_unique_id
