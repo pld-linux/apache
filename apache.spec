@@ -9,13 +9,13 @@ Summary(fr):	Le serveur web le plus utilise sur Internet
 Summary(pl):	Serwer WWW (World Wide Web)
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
-Version:	1.3.12
-Release:	28
+Version:	1.3.14
+Release:	1
 License:	BSD-like
 Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
-Source0:	ftp://ftp.apache.org/dist/%{name}_%{version}.tar.gz
+Source0:	ftp://ftp.apache.org/dist/%{name}_%{version}.tar.bz2
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}-icons.tar.gz
@@ -30,14 +30,13 @@ Patch2:		%{name}-htdocs.patch
 Patch3:		%{name}-errordocs.patch
 Patch4:		%{name}-apxs.patch
 Patch5:		%{name}-EAPI.patch
-Patch6:		%{name}-v6-PLD-3.patch.gz
+Patch6:		%{name}-v6-PLD-4.patch.gz
 Patch7:		%{name}-mm_conf.patch
 Patch8:		%{name}-modules_symbols.patch
 Patch9:		%{name}-apxs_force_rm_cp.patch
 Patch10:	%{name}-db3.patch
 Patch11:	%{name}-lookup_map_ldap.patch
-Patch12:	%{name}-rewrite.patch
-Patch13:	%{name}-man.patch
+Patch12:	%{name}-man.patch
 Provides:	httpd
 Provides:	webserver
 Prereq:		/sbin/chkconfig
@@ -455,7 +454,6 @@ Requires:	%{name}(EAPI) = %{version}
 %patch10 -p1
 %{?mod_rewrite_ldap:%patch11 -p1}
 %patch12 -p1
-%patch13 -p1
 
 %build
 OPTIM="%{!?debug:$RPM_OPT_FLAGS}%{?debug:-O -g}" \
@@ -472,7 +470,6 @@ OPTIM="%{!?debug:$RPM_OPT_FLAGS}%{?debug:-O -g}" \
 	--with-layout=PLD \
 	--without-confadjust \
 	--enable-module=all \
-	--disable-module=auth_dbm \
 	--enable-shared=max \
 	--proxycachedir=/var/cache/apache \
 	--with-perl=%{_bindir}/perl \
@@ -488,6 +485,9 @@ OPTIM="%{!?debug:$RPM_OPT_FLAGS}%{?debug:-O -g}" \
 
 rm -f src/modules/standard/mod_auth_db.so
 %{__make} -C src/modules/standard mod_auth_db.so LIBS_SHLIB="-ldb"
+
+rm -f src/modules/standard/mod_auth_dbm.so
+%{__make} -C src/modules/standard mod_auth_dbm.so LIBS_SHLIB="-lndbm"
 
 rm -f src/modules/standard/mod_rewrite.so
 %{__make} -C src/modules/standard mod_rewrite.so LIBS_SHLIB="-lndbm %{?mod_rewrite_ldap:-lldap -llber}"
@@ -658,6 +658,7 @@ fi
 
 %post mod_auth_db
 %{_sbindir}/apxs -e -a -n auth_db %{_libexecdir}/mod_auth_db.so 1>&2
+%{_sbindir}/apxs -e -a -n auth_dbm %{_libexecdir}/mod_auth_dbm.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -667,6 +668,7 @@ fi
 %preun mod_auth_db
 if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n auth_db %{_libexecdir}/mod_auth_db.so 1>&2
+	%{_sbindir}/apxs -e -A -n auth_dbm %{_libexecdir}/mod_auth_dbm.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
@@ -1075,9 +1077,11 @@ rm -rf $RPM_BUILD_ROOT
 %files mod_auth_db
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_auth_db.so
+%attr(755,root,root) %{_libexecdir}/mod_auth_dbm.so
 %attr(755,root,root) %{_bindir}/dbmmanage 
 %attr(755,root,root) %{_bindir}/htpasswd
 %{_datadir}/manual/mod/mod_auth_db.html
+%{_datadir}/manual/mod/mod_auth_dbm.html
 %{_mandir}/man1/dbmmanage.1*
 %{_mandir}/man1/htpasswd.1*
 
