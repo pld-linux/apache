@@ -110,7 +110,6 @@ OPTIM=$RPM_OPT_FLAGS LDFLAGS=-s\
 	--without-confadjust \
 	--enable-module=all \
 	--enable-shared=max \
-	--disable-module=auth_db \
 	--proxycachedir=/var/cache/www/apache \
 	--with-perl=%{_bindir}/perl \
 	--enable-suexec \
