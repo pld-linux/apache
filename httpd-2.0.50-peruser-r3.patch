@@ -262,7 +262,7 @@ diff -Nur httpd-2.0.50/server/mpm/experimental/peruser/mpm.h httpd-2.0.50-new/se
 diff -Nur httpd-2.0.50/server/mpm/experimental/peruser/peruser.c httpd-2.0.50-new/server/mpm/experimental/peruser/peruser.c
 --- httpd-2.0.50/server/mpm/experimental/peruser/peruser.c	1969-12-31 17:00:00.000000000 -0700
 +++ httpd-2.0.50-new/server/mpm/experimental/peruser/peruser.c	2004-08-01 21:07:09.480526896 -0600
-@@ -0,0 +1,2628 @@
+@@ -0,0 +1,2629 @@
 +/* ====================================================================
 + * The Apache Software License, Version 1.1
 + *
@@ -354,6 +354,7 @@ diff -Nur httpd-2.0.50/server/mpm/experimental/peruser/peruser.c httpd-2.0.50-ne
 +#include "http_config.h"
 +#include "http_core.h"		/* for get_remote_host */
 +#include "http_connection.h"
++#include "http_protocol.h"  /* for ap_hook_post_read_request */
 +#include "scoreboard.h"
 +#include "ap_mpm.h"
 +#include "unixd.h"
@@ -1086,7 +1087,7 @@ diff -Nur httpd-2.0.50/server/mpm/experimental/peruser/peruser.c httpd-2.0.50-ne
 +    }
 +}
 +
-+static peruser_process_connection(conn_rec *conn)
++static int peruser_process_connection(conn_rec *conn)
 +{
 +    ap_filter_t *filter;
 +    apr_bucket_brigade *bb;
@@ -1582,7 +1583,7 @@ diff -Nur httpd-2.0.50/server/mpm/experimental/peruser/peruser.c httpd-2.0.50-ne
 +
 +    /* -- add the new listener_rec into the list -- */
 +    /* FIXME: should we somehow lock this list ? */
-+    if (lr_walk = ap_listeners)
++    if ((lr_walk = ap_listeners))
 +    {
 +        while (lr_walk->next) lr_walk = lr_walk->next;
 +        lr_walk->next = lr_new;
@@ -2644,7 +2645,7 @@ diff -Nur httpd-2.0.50/server/mpm/experimental/peruser/peruser.c httpd-2.0.50-ne
 +            _DBG("request for %s / (server %s) seems to be for us", r->hostname, r->server->server_hostname);
 +
 +            /* TODO: add configuration for max processors per server */
-+            if (total_processors(sconf) > ap_max_processors) return;
++            if (total_processors(sconf) > ap_max_processors) return DECLINED;
 +            if (idle_processors(sconf) < ap_daemons_min_free) child_clone();
 +
 +            return OK;
