@@ -6,7 +6,7 @@ Summary(pl):	Serwer WWW (World Wide Web)
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	1.3.12
-Release:	10
+Release:	11
 License:	BSD-like
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
@@ -25,7 +25,7 @@ Patch2:		%{name}-htdocs.patch
 Patch3:		%{name}-errordocs.patch
 Patch4:		%{name}-apxs.patch
 Patch5:		%{name}-EAPI.patch
-Patch6:		%{name}-v6-PLD-2.patch.gz
+Patch6:		%{name}-v6-PLD-3.patch.gz
 Patch7:		%{name}-mm_conf.patch
 Patch8:		%{name}-modules_symbols.patch
 Patch9:		%{name}-apxs_force_rm_cp.patch
