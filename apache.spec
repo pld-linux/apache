@@ -32,12 +32,12 @@ Summary(pt_BR):	Servidor HTTPD para prover serviços WWW
 Summary(ru):	óÁÍÙÊ ÐÏÐÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
-Version:	2.0.52
-Release:	10
+Version:	2.0.53
+Release:	0.1
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
-# Source0-md5:	eba528fa8613dc5bfb0615a69c11f053
+# Source0-md5:	b089bdc7065c3be166bcc516b0d92416
 # Source0-size:	6918995
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
@@ -682,7 +682,7 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 %patch5 -p1
 %patch7 -p1
 %patch8 -p1
-%patch9 -p1
+#%patch9 -p1
 %patch10 -p1
 %patch11 -p1
 %patch13 -p1
@@ -695,9 +695,9 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 %patch20 -p1
 %patch21 -p1
 %patch22 -p1
-%patch23 -p1
+#%patch23 -p1
 %patch24 -p1
-%patch25 -p1
+#%patch25 -p1
 %{?with_external_pcre:%patch26 -p2}
 
 %{__perl} -pi -e "s@/usr/local/bin/perl@%{__perl}@" $(grep -rl "/usr/local/bin/perl" *)
