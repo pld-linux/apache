@@ -6,7 +6,7 @@ Summary(pl):	Serwer WWW (World Wide Web)
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	1.3.12
-Release:	8
+Release:	9
 License:	BSD-like
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
