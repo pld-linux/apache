@@ -40,6 +40,7 @@ Requires:	mailcap
 Requires:	/etc/mime.types
 URL:		http://www.apache.org/
 BuildRoot:	/tmp/%{name}-%{version}-root
+Provides:	apache(EAPI)
 Obsoletes:	apache-extra
 Obsoletes:	apache6
 Obsoletes:	apache-doc
@@ -73,7 +74,7 @@ Summary:	Apache suexec wrapper
 Summary(pl):	Suexec wrapper do serwera www Apache
 Group:		Networking/Development
 Group(pl):	Sieciowe/Programowanie
-Requires:	%{name} = %{version}
+Requires:	%{name}(EAPI) = %{version}
 
 %description suexec
 The suEXEC feature provides Apache users the ability to run CGI and SSI
@@ -92,7 +93,8 @@ Summary(fr):	Les outils de developpement de modules pour le serveur web Apache
 Summary(pl):	Pliki nag³ówkowe do tworzenai modu³ów rozszerzeñ do serwera www Apache
 Group:		Networking/Development
 Group(pl):	Sieciowe/Programowanie
-Requires:	%{name} = %{version}
+Requires:	%{name}(EAPI) = %{version}
+Provides:	%{name}(EAPI)-devel
 
 %description devel
 The apache-devel package contains the source code for the Apache Web server
@@ -112,7 +114,7 @@ Summary:	Apache module for run CGI whenever a file of a certain type is requeste
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
-Requires:	%{name} = %{version}
+Requires:	%{name}(EAPI) = %{version}
 
 %description mod_actions
 This package contains mod_actions module. This module lets you run CGI
@@ -124,7 +126,7 @@ Summary:	Apache module with "anonymous" user access authentication
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
-Requires:	%{name} = %{version}
+Requires:	%{name}(EAPI) = %{version}
 
 %description mod_auth_anon
 This package contains mod_auth_anon module. It allows "anonymous" user
@@ -142,7 +144,7 @@ Summary:	Apache user authentication module using MD5 Digest Authentication
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
-Requires:	%{name} = %{version}
+Requires:	%{name}(EAPI) = %{version}
 
 %description mod_digest
 This package contains mod_dir module. It provides user authentication using
@@ -153,7 +155,7 @@ Summary:	Apache module for trailing slash" redirects and serving directory index
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
-Requires:	%{name} = %{version}
+Requires:	%{name}(EAPI) = %{version}
 
 %description mod_dir
 This package contains mod_dir which provides "trailing slash" redirects and
@@ -164,7 +166,7 @@ Summary:	Apache module allows for the customization of HTTP response headers
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
-Requires:	%{name} = %{version}
+Requires:	%{name}(EAPI) = %{version}
 
 %description mod_headers
 This package contains mod_headers module. The module allows for the
@@ -176,7 +178,7 @@ Summary:	Apache module for mmap()ing statically configured list files
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
-Requires:	%{name} = %{version}
+Requires:	%{name}(EAPI) = %{version}
 
 %description mod_mmap_static
 This package contains mod_mmap_static module. It provides mmap()ing of a
@@ -187,7 +189,7 @@ Summary:	Apache module with imap-file handler
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
-Requires:	%{name} = %{version}
+Requires:	%{name}(EAPI) = %{version}
 
 %description mod_imap
 This package contains mod_imap module. It provides for .map files, replacing
@@ -199,7 +201,7 @@ Summary:	Apache module with comprehensive overview of the server configuration
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
-Requires:	%{name} = %{version}
+Requires:	%{name}(EAPI) = %{version}
 
 %description mod_info
 This package contains mod_mmap_static module. It provides a comprehensive
@@ -211,7 +213,7 @@ Summary:	Apache module with Web proxy
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
-Requires:	%{name} = %{version}
+Requires:	%{name}(EAPI) = %{version}
 
 %description mod_proxy
 This package contains module with implementation a proxy/cache for Apache.
@@ -224,7 +226,7 @@ Summary:	Apache module with rule-based engine for rewrite requested URLs on the 
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
-Requires:	%{name} = %{version}
+Requires:	%{name}(EAPI) = %{version}
 
 %description mod_rewrite
 This package contains It provides a rule-based rewriting engine to rewrite
@@ -235,7 +237,7 @@ Summary:	Server status report module for apache
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
-Requires:	%{name} = %{version}
+Requires:	%{name}(EAPI) = %{version}
 
 %description mod_status
 The Status module allows a server administrator to find out how well their
@@ -248,7 +250,7 @@ Summary:	Apache module for user tracking using cookies
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
-Requires:	%{name} = %{version}
+Requires:	%{name}(EAPI) = %{version}
 
 %description mod_usertrack
 This package contains the user tracking module which did its own logging
@@ -259,7 +261,7 @@ Summary:	Apache module for dynamically configured mass virtual hosting
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
-Requires:	%{name} = %{version}
+Requires:	%{name}(EAPI) = %{version}
 
 %description mod_vhost_alias
 This package contains the mod_vhost_alias. It provides support for
@@ -270,7 +272,7 @@ Summary:	Apache module which provides a magic token for each request
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
-Requires:	%{name} = %{version}
+Requires:	%{name}(EAPI) = %{version}
 
 %description mod_unique_id
 This package contains the mod_unique_id. This module provides a magic token
@@ -280,6 +282,15 @@ multiple machines in a properly configured cluster of machines. The
 environment variable UNIQUE_ID is set to the identifier for each request.
 Unique identifiers are useful for various reasons which are beyond the scope
 of this document.
+
+%package mod_expires
+Summary:	Apache module which provides .... 
+Group:		Networking/Daemons
+Group(pl):	Sieciowe/Serwery
+Prereq:		%{_sbindir}/apxs
+Requires:	%{name}(EAPI) = %{version}
+
+%description mod_expires
 
 %prep 
 %setup -q -n apache_%{version} -a3
