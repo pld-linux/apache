@@ -1,4 +1,3 @@
-%define ver	2_0_31
 %include	/usr/lib/rpm/macros.perl
 Summary:	The most widely used Web server on the Internet
 Summary(de):	Leading World Wide Web-Server
@@ -7,15 +6,15 @@ Summary(fr):	Le serveur web le plus utilise sur Internet
 Summary(pl):	Serwer WWW (World Wide Web)
 Summary(pt_BR):	Servidor HTTPD para prover serviços WWW
 Summary(tr):	Lider WWW tarayýcý
-Name:		apache2
-Version:	%(echo %{ver} | sed -e "s#_#\.#")
-Release:	1
+Name:		apache
+Version:	2.0.32
+Release:	0.1
 License:	Apache Group License
 Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
 URL:		http://httpd.apache.org/
-Source0:	http://www.apache.org/dist/httpd/httpd-%{ver}-alpha.tar.gz
+Source0:	http://www.apache.org/dist/httpd/httpd-%{version}-beta.tar.gz
 #Source1:	%{name}.init
 #Source2:	%{name}.logrotate
 #Source3:	%{name}-icons.tar.gz
@@ -30,9 +29,8 @@ BuildRequires:	gdbm-devel
 BuildRequires:	expat-devel
 BuildRequires:	expat-static
 BuildRequires:	perl-devel >= 5.004
-
-Provides:	httpd
-Provides:	webserver
+Provides:	httpd = %{version}
+Provides:	webserver = %{version}
 Provides:	%{name}(EAPI) = %{version}
 Prereq:		/sbin/chkconfig
 Prereq:		/usr/sbin/useradd
@@ -51,10 +49,10 @@ Obsoletes:	apache-doc
 Obsoletes:	indexhtml
 
 %define		_bindir		%{_sbindir}
-%define		_sysconfdir	/etc/httpd2
-%define		_includedir	%{_prefix}/include/apache2
+%define		_sysconfdir	/etc/httpd
+%define		_includedir	%{_prefix}/include/apache
 %define		_datadir	/home/httpd
-%define		_libexecdir	%{_libdir}/apache2
+%define		_libexecdir	%{_libdir}/apache
 
 %description
 Apache is a powerful, full-featured, efficient and freely-available
@@ -502,7 +500,7 @@ wa¿no¶ci mo¿e byæ ustalana w zale¿no¶ci od czasu modyfikacji plików
 ¼ród³owych lub odwo³ania klienta.
 
 %prep 
-%setup -q -n httpd-%{ver}
+%setup -q -n httpd-%{version}
 
 %build
 %configure2_13 \
@@ -547,7 +545,7 @@ wa¿no¶ci mo¿e byæ ustalana w zale¿no¶ci od czasu modyfikacji plików
 	--enable-speling \
 	--enable-rewrite \
 	--enable-so \
-	--with-mpm=threaded \	
+	--with-mpm=prefork \
 	--with-suexec-bin=%{_sbindir} \
 	--with-suexec-caller=http \
 	--with-suexec-docroot=%{_datadir} \
@@ -561,7 +559,7 @@ wa¿no¶ci mo¿e byæ ustalana w zale¿no¶ci od czasu modyfikacji plików
 rm -rf $RPM_BUILD_ROOT
 
 %{makeinstall} \
-	prefix=%{_sysconfdir}/httpd2 \
+	prefix=%{_sysconfdir}/httpd \
 	bindir=$RPM_BUILD_ROOT%{_sbindir} \
 	sbindir=$RPM_BUILD_ROOT%{_sbindir} \
 	installbuilddir=$RPM_BUILD_ROOT%{_sysconfdir}/build \
@@ -577,8 +575,8 @@ rm -rf $RPM_BUILD_ROOT
 	includedir=$RPM_BUILD_ROOT%{_includedir} \
 	localstatedir=$RPM_BUILD_ROOT%{_localstatedir} \
 	runtimedir=$RPM_BUILD_ROOT{_var}/run \
-	logdir=$RPM_BUILD_ROOT%{_var}/log/httpd2 \
-	proxycachedir=$RPM_BUILD_ROOT%{_var}/cache/httpd2   
+	logdir=$RPM_BUILD_ROOT%{_var}/log/httpd \
+	proxycachedir=$RPM_BUILD_ROOT%{_var}/cache/httpd
 
 mv -f $RPM_BUILD_ROOT%{_datadir}/html/manual $RPM_BUILD_ROOT%{_datadir}
 
