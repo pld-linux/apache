@@ -126,7 +126,7 @@ sunucusudur.
 
 %package suexec
 Summary:	Apache suexec wrapper
-Summary(pl):	Suexec wrapper do serwera WWW Apache
+Summary(pl):	Wrapper suexec do serwera WWW Apache
 Group:		Development/Tools
 Requires:	%{name} = %{version}
 
@@ -167,8 +167,8 @@ Apache et le binaire APXS dont vous aurez besoin pour construire des
 Objets Dynamiques Partages (DSOs) pour Apache.
 
 %description devel -l pl
-Pliki nag³ówkowe i inne zasoby niezbdne przy budowaniu modu³ow DSO
-(Dynamic Shared Objects) dla apache.
+Pliki nag³ówkowe i inne zasoby niezbêdne przy budowaniu modu³ów DSO
+(Dynamic Shared Objects) dla Apache.
 
 %description devel -l ru
 óÒÅÄÓÔ×Á ÒÁÚÒÁÂÏÔËÉ ÍÏÄÕÌÅÊ ÄÌÑ ×ÅÂ-ÓÅÒ×ÅÒÁ Apache.
@@ -189,7 +189,7 @@ Requires:	%{name}-devel = %{version}
 The apache-static package contains static libraries for Apache.
 
 %description static -l pl
-Styatyczne biblioteki serwera Apache.
+Statyczne biblioteki serwera Apache.
 
 %package mod_actions
 Summary:	Apache module for run CGI whenever a file of a certain type is requested
@@ -390,7 +390,7 @@ replacing the functionality of the imagemap CGI program. Any directory
 or document type configured to use the handler imap-file.
 
 %description mod_imap -l pl
-Modu³ umozliwiaj±cy obs³ugê plików .map (imap-file handler)
+Modu³ umo¿liwiaj±cy obs³ugê plików .map (imap-file handler).
 
 %package mod_info
 Summary:	Apache module with comprehensive overview of the server configuration
@@ -414,7 +414,6 @@ Group:		Networking/Daemons
 Requires:	%{name} = %{version}
 
 %description mod_proxy
-
 This package contains module with implementation a proxy/cache for
 Apache. It implements proxying capability for FTP, CONNECT (for SSL),
 HTTP/0.9, HTTP/1.0 and HTTP/1.1. The module can be configured to
@@ -422,7 +421,7 @@ connect to other proxy modules for these and other protocols.
 
 %description mod_proxy -l pl
 Modu³ zawiera implementacjê serwera proxy/cache dla Apache.
-Iplementacja zawiera obs³ugê FTP, CONNECT (dla SSL), HTTP/0.9,
+Implementacja zawiera obs³ugê FTP, CONNECT (dla SSL), HTTP/0.9,
 HTTP/1.0 i HTTP/1.1.
 
 %package mod_rewrite
@@ -440,7 +439,7 @@ Modu³ oferuj±cy mo¿liwo¶æ "przepisywania" adresów URL w locie.
 
 %package mod_ssl
 Summary:	SSL/TLS module for the Apache HTTP server
-Summary(pl):	Modu³ SSL/TSL dla serwera serwera Apache
+Summary(pl):	Modu³ SSL/TSL dla serwera Apache
 Summary(ru):	íÏÄÕÌØ SSL/TLS ÄÌÑ ×ÅÂ-ÓÅÒ×ÅÒÁ Apache
 Group:		Networking/Daemons
 Epoch:		1
