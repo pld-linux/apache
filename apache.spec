@@ -509,7 +509,7 @@ wa¿no¶ci mo¿e byæ ustalana w zale¿no¶ci od czasu modyfikacji plików
 %patch19 -p1
 
 %build
-OPTIM="%{?debug:-O0 -g}%{!?debug:$RPM_OPT_FLAGS}" \
+OPTIM="-lpthread %{?debug:-O0 -g}%{!?debug:$RPM_OPT_FLAGS}" \
 ./configure \
 	--prefix=%{_prefix} \
 	--sysconfdir=%{_sysconfdir} \
