@@ -27,6 +27,7 @@ Patch3:		apache-errordocs.patch
 Patch4:		apache-apxs.patch
 Patch5:		apache-EAPI.patch
 Patch6:		apache-v6-PLD-1.patch.gz
+Patch7:		apache-mm_conf.patch
 Copyright:	BSD-like
 Provides:	httpd
 Provides:	webserver
@@ -313,6 +314,7 @@ Requires:	%{name}(EAPI) = %{version}
 %patch4 -p1
 %patch5 -p1
 #%patch6 -p1
+%patch7 -p1
 
 %build
 
