@@ -33,7 +33,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.0.48
-Release:	0.6
+Release:	0.7
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -1287,9 +1287,9 @@ fi
 %attr(755,root,root) %{_datadir}/cgi-bin
 
 %{_datadir}/error
+%dir %{_datadir}/manual
 
 %files doc
-%dir %{_datadir}/manual
 %{_datadir}/manual/LICENSE
 %{_datadir}/manual/*.xml
 %{_datadir}/manual/*.html.en
