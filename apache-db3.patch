@@ -1,0 +1,16 @@
+--- apache_1.3.12/src/modules/standard/mod_auth_dbm.c~	Mon Sep 25 20:50:01 2000
++++ apache_1.3.12/src/modules/standard/mod_auth_dbm.c	Mon Sep 25 21:05:00 2000
+@@ -75,8 +75,12 @@
+ #include "http_log.h"
+ #include "http_protocol.h"
+ #if defined(__GLIBC__) && defined(__GLIBC_MINOR__) \
+-    && __GLIBC__ >= 2 && __GLIBC_MINOR__ >= 1
++    && __GLIBC__ >= 2 && __GLIBC_MINOR__ == 1
+ #include <db1/ndbm.h>
++#elif defined(__GLIBC__) && defined(__GLIBC_MINOR__) \
++    && __GLIBC__ >= 2 && __GLIBC_MINOR__ == 2
++#define DB_DBM_HSEARCH 1
++#include <db.h>
+ #else
+ #include <ndbm.h>
+ #endif
