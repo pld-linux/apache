@@ -152,7 +152,7 @@ cp -a apache-extra/m*		$RPM_BUILD_ROOT/etc/httpd/conf
 mv $RPM_BUILD_ROOT/usr/man $RPM_BUILD_ROOT%{_mandir}
 
 gzip -9nf $RPM_BUILD_ROOT%{_mandir}/{man1/*,man8/*}
-gzip -9nf ABOUT_APACHE src/CHANGES KEYS README
+gzip -9nf ABOUT_APACHE src/CHANGES KEYS README README.v6
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -171,7 +171,7 @@ fi
 %files
 %defattr(644,root,root,755)
 %doc ABOUT_APACHE.gz src/CHANGES.gz KEYS.gz README.gz
-%doc conf/mime.types
+%doc conf/mime.types README.v6
 
 %attr(750,root,root) %dir /etc/httpd
 %attr(750,root,root) %dir /etc/httpd/conf
