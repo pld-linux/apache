@@ -1,6 +1,6 @@
-diff -Nru apache_1.3.17/src/include/ap_ctx.h apache_1.3.17.new/src/include/ap_ctx.h
---- apache_1.3.17/src/include/ap_ctx.h	Thu Jan  1 01:00:00 1970
-+++ apache_1.3.17.new/src/include/ap_ctx.h	Thu Dec 30 22:02:59 1999
+diff -Nru apache_1.3.20/src/include/ap_ctx.h apache_1.3.20.new/src/include/ap_ctx.h
+--- apache_1.3.20/src/include/ap_ctx.h	Thu Jan  1 01:00:00 1970
++++ apache_1.3.20.new/src/include/ap_ctx.h	Mon Mar 12 21:00:54 2001
 @@ -0,0 +1,110 @@
 +/* ====================================================================
 + * Copyright (c) 1998-2000 The Apache Group.  All rights reserved.
@@ -97,8 +97,8 @@ diff -Nru apache_1.3.17/src/include/ap_ctx.h apache_1.3.17.new/src/include/ap_ct
 + * treating numbers as pointers but keeping track of the NULL return code of
 + * ap_ctx_get.
 + */
-+#define AP_CTX_NUM2PTR(n) (void *)((unsigned int)(n)+1)
-+#define AP_CTX_PTR2NUM(p) (unsigned int)(((char *)(p))-1)
++#define AP_CTX_NUM2PTR(n) (void *)(((unsigned long)(n))+1)
++#define AP_CTX_PTR2NUM(p) (unsigned long)(((char *)(p))-1)
 +
 +/*
 + * Prototypes for Context Handling Functions
@@ -112,9 +112,9 @@ diff -Nru apache_1.3.17/src/include/ap_ctx.h apache_1.3.17.new/src/include/ap_ct
 +#endif /* AP_CTX_H */
 +
 +#endif /* EAPI */
-diff -Nru apache_1.3.17/src/include/ap_hook.h apache_1.3.17.new/src/include/ap_hook.h
---- apache_1.3.17/src/include/ap_hook.h	Thu Jan  1 01:00:00 1970
-+++ apache_1.3.17.new/src/include/ap_hook.h	Thu Dec 30 22:02:59 1999
+diff -Nru apache_1.3.20/src/include/ap_hook.h apache_1.3.20.new/src/include/ap_hook.h
+--- apache_1.3.20/src/include/ap_hook.h	Thu Jan  1 01:00:00 1970
++++ apache_1.3.20.new/src/include/ap_hook.h	Thu Dec 30 22:02:59 1999
 @@ -0,0 +1,710 @@
 +#if 0
 +=cut
@@ -826,9 +826,9 @@ diff -Nru apache_1.3.17/src/include/ap_hook.h apache_1.3.17.new/src/include/ap_h
 +
 +=cut
 +*/
-diff -Nru apache_1.3.17/src/include/ap_mm.h apache_1.3.17.new/src/include/ap_mm.h
---- apache_1.3.17/src/include/ap_mm.h	Thu Jan  1 01:00:00 1970
-+++ apache_1.3.17.new/src/include/ap_mm.h	Thu Dec 30 22:02:59 1999
+diff -Nru apache_1.3.20/src/include/ap_mm.h apache_1.3.20.new/src/include/ap_mm.h
+--- apache_1.3.20/src/include/ap_mm.h	Thu Jan  1 01:00:00 1970
++++ apache_1.3.20.new/src/include/ap_mm.h	Thu Dec 30 22:02:59 1999
 @@ -0,0 +1,130 @@
 +/* ====================================================================
 + * Copyright (c) 1999-2000 The Apache Group.  All rights reserved.
@@ -960,9 +960,9 @@ diff -Nru apache_1.3.17/src/include/ap_mm.h apache_1.3.17.new/src/include/ap_mm.
 +
 +#endif /* EAPI */
 +
-diff -Nru apache_1.3.17/htdocs/manual/mod/mod_define.html apache_1.3.17.new/htdocs/manual/mod/mod_define.html
---- apache_1.3.17/htdocs/manual/mod/mod_define.html	Thu Jan  1 01:00:00 1970
-+++ apache_1.3.17.new/htdocs/manual/mod/mod_define.html	Fri Aug 27 11:23:39 1999
+diff -Nru apache_1.3.20/htdocs/manual/mod/mod_define.html apache_1.3.20.new/htdocs/manual/mod/mod_define.html
+--- apache_1.3.20/htdocs/manual/mod/mod_define.html	Thu Jan  1 01:00:00 1970
++++ apache_1.3.20.new/htdocs/manual/mod/mod_define.html	Fri Aug 27 11:23:39 1999
 @@ -0,0 +1,135 @@
 +<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 +<!--%hypertext -->
@@ -1099,9 +1099,9 @@ diff -Nru apache_1.3.17/htdocs/manual/mod/mod_define.html apache_1.3.17.new/htdo
 +</BODY>
 +</HTML>
 +<!--/%hypertext -->
-diff -Nru apache_1.3.17/src/ap/ap_ctx.c apache_1.3.17.new/src/ap/ap_ctx.c
---- apache_1.3.17/src/ap/ap_ctx.c	Thu Jan  1 01:00:00 1970
-+++ apache_1.3.17.new/src/ap/ap_ctx.c	Thu Dec 30 22:02:56 1999
+diff -Nru apache_1.3.20/src/ap/ap_ctx.c apache_1.3.20.new/src/ap/ap_ctx.c
+--- apache_1.3.20/src/ap/ap_ctx.c	Thu Jan  1 01:00:00 1970
++++ apache_1.3.20.new/src/ap/ap_ctx.c	Thu Dec 30 22:02:56 1999
 @@ -0,0 +1,155 @@
 +/* ====================================================================
 + * Copyright (c) 1998-2000 The Apache Group.  All rights reserved.
@@ -1258,9 +1258,9 @@ diff -Nru apache_1.3.17/src/ap/ap_ctx.c apache_1.3.17.new/src/ap/ap_ctx.c
 +}
 +
 +#endif /* EAPI */
-diff -Nru apache_1.3.17/src/ap/ap_hook.c apache_1.3.17.new/src/ap/ap_hook.c
---- apache_1.3.17/src/ap/ap_hook.c	Thu Jan  1 01:00:00 1970
-+++ apache_1.3.17.new/src/ap/ap_hook.c	Thu Dec 30 22:02:56 1999
+diff -Nru apache_1.3.20/src/ap/ap_hook.c apache_1.3.20.new/src/ap/ap_hook.c
+--- apache_1.3.20/src/ap/ap_hook.c	Thu Jan  1 01:00:00 1970
++++ apache_1.3.20.new/src/ap/ap_hook.c	Thu Dec 30 22:02:56 1999
 @@ -0,0 +1,930 @@
 +#if 0
 +=pod
@@ -2192,9 +2192,9 @@ diff -Nru apache_1.3.17/src/ap/ap_hook.c apache_1.3.17.new/src/ap/ap_hook.c
 +
 +=pod
 +*/
-diff -Nru apache_1.3.17/src/ap/ap_mm.c apache_1.3.17.new/src/ap/ap_mm.c
---- apache_1.3.17/src/ap/ap_mm.c	Thu Jan  1 01:00:00 1970
-+++ apache_1.3.17.new/src/ap/ap_mm.c	Thu Dec 30 22:02:56 1999
+diff -Nru apache_1.3.20/src/ap/ap_mm.c apache_1.3.20.new/src/ap/ap_mm.c
+--- apache_1.3.20/src/ap/ap_mm.c	Thu Jan  1 01:00:00 1970
++++ apache_1.3.20.new/src/ap/ap_mm.c	Thu Dec 30 22:02:56 1999
 @@ -0,0 +1,178 @@
 +/* ====================================================================
 + * Copyright (c) 1999-2000 The Apache Group.  All rights reserved.
@@ -2374,9 +2374,9 @@ diff -Nru apache_1.3.17/src/ap/ap_mm.c apache_1.3.17.new/src/ap/ap_mm.c
 +    STUB(mm_lib_version(), 0)
 +
 +#endif /* EAPI */
-diff -Nru apache_1.3.17/src/modules/extra/mod_define.c apache_1.3.17.new/src/modules/extra/mod_define.c
---- apache_1.3.17/src/modules/extra/mod_define.c	Thu Jan  1 01:00:00 1970
-+++ apache_1.3.17.new/src/modules/extra/mod_define.c	Thu Dec 30 22:00:58 1999
+diff -Nru apache_1.3.20/src/modules/extra/mod_define.c apache_1.3.20.new/src/modules/extra/mod_define.c
+--- apache_1.3.20/src/modules/extra/mod_define.c	Thu Jan  1 01:00:00 1970
++++ apache_1.3.20.new/src/modules/extra/mod_define.c	Thu Dec 30 22:00:58 1999
 @@ -0,0 +1,416 @@
 +/*
 +**  mod_define.c - Apache module for configuration defines ($xxx)
