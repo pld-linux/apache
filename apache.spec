@@ -170,7 +170,10 @@ if [ -n "`getgid http`" ]; then
 		exit 1
 	fi
 else
-	/usr/sbin/groupadd -g 51 -r -f httpd
+	/usr/sbin/groupadd -g 51 -r -f http
+	if [ -f /var/db/group.db ]; then
+		/usr/bin/update-db
+	fi
 fi
 if [ -n "`id -u http`" ]; then
 	if [ "`id -u http`" != "51" ]; then
@@ -178,7 +181,10 @@ if [ -n "`id -u http`" ]; then
 		exit 1
 	fi
 else
-	/usr/sbin/useradd -u 51 -r -f -d /home/httpd -s /bin/false -c "HTTP User" -M httpd
+	/usr/sbin/useradd -u 51 -r -f -d /home/httpd -s /bin/false -c "HTTP User" -g http -M http
+	if [ -f /var/db/passwd.db ]; then
+		/usr/bin/update-db
+	fi
 fi
 
 
@@ -196,6 +202,18 @@ if [ "$1" = "0" ]; then
 		/etc/rc.d/init.d/httpd stop 1>&2
 	fi
 	/sbin/chkconfig --del httpd
+fi
+
+%postun
+if [ "$1" = "0" ]; then
+	/usr/sbin/userdel http
+	if [ -f /var/db/passwd.db ]; then
+		/usr/bin/update-db
+	fi
+	/usr/sbin/groupdel http
+	if [ -f /var/db/group.db ]; then
+		/usr/bin/update-db
+	fi
 fi
 
 %clean
