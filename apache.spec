@@ -11,7 +11,7 @@ Summary(pl):	Serwer WWW (World Wide Web)
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	1.3.20
-Release:	2
+Release:	16
 License:	Apache Group License
 Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
@@ -545,11 +545,8 @@ OPTIM="%{rpmcflags}" \
 rm -f src/modules/standard/mod_auth_db.so
 %{__make} -C src/modules/standard mod_auth_db.so LIBS_SHLIB="-ldb"
 
-rm -f src/modules/standard/mod_auth_dbm.so
-%{__make} -C src/modules/standard mod_auth_dbm.so LIBS_SHLIB="-lndbm"
-
 rm -f src/modules/standard/mod_rewrite.so
-%{__make} -C src/modules/standard mod_rewrite.so LIBS_SHLIB="-lndbm %{?mod_rewrite_ldap:-lldap -llber}"
+%{__make} -C src/modules/standard mod_rewrite.so LIBS_SHLIB="-ldb %{?mod_rewrite_ldap:-lldap -llber}"
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -705,7 +702,6 @@ fi
 
 %post mod_auth_db
 %{_sbindir}/apxs -e -a -n auth_db %{_libexecdir}/mod_auth_db.so 1>&2
-%{_sbindir}/apxs -e -a -n auth_dbm %{_libexecdir}/mod_auth_dbm.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -715,11 +711,13 @@ fi
 %preun mod_auth_db
 if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n auth_db %{_libexecdir}/mod_auth_db.so 1>&2
-	%{_sbindir}/apxs -e -A -n auth_dbm %{_libexecdir}/mod_auth_dbm.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
 fi
+
+%triggetpostun mod_auth_db --  apache-mod_auth_db <= 1.3.20-2 
+%{_sbindir}/apxs -e -A -n auth_dbm %{_libexecdir}/mod_auth_dbm.so 1>&2
 
 %post mod_define
 %{_sbindir}/apxs -e -a -n define %{_libexecdir}/mod_define.so 1>&2
