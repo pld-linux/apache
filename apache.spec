@@ -27,7 +27,6 @@ Version:	2.0.46
 Release:	0.2
 License:	Apache Group License
 Group:		Networking/Daemons
-URL:		http://httpd.apache.org/
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 # Source0-md5:	ff682f82f0808eb01df60824d959ebe8 
 Source1:	%{name}.init
@@ -49,6 +48,7 @@ Patch0:		%{name}-configdir_skip_backups.patch
 Patch1:		%{name}-layout.patch
 Patch2:		%{name}-suexec.patch
 Patch3:		%{name}-nolibs.patch
+URL:		http://httpd.apache.org/
 BuildRequires:	db-devel
 BuildRequires:	expat-devel
 BuildRequires:	gdbm-devel >= 1.8.3
@@ -60,8 +60,8 @@ BuildRequires:	zlib-devel
 BuildRequires:	libtool
 PreReq:		perl
 PreReq:		rc-scripts
-Requires(pre): /usr/bin/getgid
 Requires(pre): /bin/id
+Requires(pre): /usr/bin/getgid
 Requires(pre): /usr/sbin/groupadd
 Requires(pre): /usr/sbin/useradd
 Requires(postun):      /usr/sbin/userdel
@@ -69,16 +69,16 @@ Requires(postun):      /usr/sbin/groupdel
 Requires(post,preun):	/sbin/chkconfig
 Requires(post,postun):	/sbin/ldconfig
 Requires(post):		fileutils
-Requires:	mailcap
 Requires:	/etc/mime.types
-Requires:	psmisc >= 20.1
 Provides:	httpd = %{version}
+Requires:	mailcap
+Requires:	psmisc >= 20.1
 Provides:	webserver = %{version}
-Obsoletes:	apache-extra
-Obsoletes:	apache6
-Obsoletes:	apache-doc
-Obsoletes:	indexhtml
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
+Obsoletes:	apache-extra
+Obsoletes:	apache-doc
+Obsoletes:	apache6
+Obsoletes:	indexhtml
 
 %define		_sysconfdir	/etc/httpd
 %define		_includedir	%{_prefix}/include/apache
@@ -668,11 +668,11 @@ cd ../..
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig}
-install -d $RPM_BUILD_ROOT%{_var}/log/{httpd,archiv/httpd}
-install -d $RPM_BUILD_ROOT%{_var}/{run,cache}/apache
+install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig} \
+	$RPM_BUILD_ROOT%{_var}/{log/{httpd,archiv/httpd},{run,cache}/apache}
 
-%{__make} install DESTDIR=$RPM_BUILD_ROOT \
+%{__make} install \
+	DESTDIR=$RPM_BUILD_ROOT \
 	installbuilddir=%{_sysconfdir}/build \
 	prefix=%{_sysconfdir}/httpd \
 	libexecdir=%{_libdir}/%{name} \
