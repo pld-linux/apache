@@ -1,3 +1,4 @@
+# _without_ssl	- don't build with SSL support
 # TODO:
 # - mod_case_filter
 # - mod_case_filter_in
@@ -22,7 +23,7 @@ Summary(pt_BR):	Servidor HTTPD para prover serviços WWW
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.0.43
-Release:	0.1
+Release:	0.2
 License:	Apache Group License
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/
@@ -46,8 +47,8 @@ Patch1:		%{name}-configdir_skip_backups.patch
 Patch2:		%{name}-layout.patch
 Patch3:		%{name}-suexec.patch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
-BuildRequires:	openssl-devel >= 0.9.6f
-BuildRequires:	openssl-tools
+%{!?_without_ssl:BuildRequires:	openssl-devel >= 0.9.6f}
+%{!?_without_ssl:BuildRequires:	openssl-tools}
 BuildRequires:	db4-devel
 BuildRequires:	zlib-devel
 BuildRequires:	expat-devel
@@ -605,7 +606,7 @@ Statyczne biblioteki APR.
 	--enable-proxy-connect \
 	--enable-proxy-ftp \
 	--enable-proxy-http \
-	--enable-ssl \
+	%{!?_without_ssl:--enable-ssl} \
 	--enable-optional-hook-export \
 	--enable-optional-hook-import \
 	--enable-optional-fn-import \
@@ -672,9 +673,11 @@ install %{SOURCE4} $RPM_BUILD_ROOT/etc/sysconfig/apache
 
 touch $RPM_BUILD_ROOT/var/log/httpd/{access,error,agent,referer,suexec}_log
 
+%if %{?_without_ssl:1}%{!?_without_ssl:0}
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/ssl
 install %{SOURCE20} $RPM_BUILD_ROOT%{_sysconfdir}/ssl/server.crt
 install %{SOURCE21} $RPM_BUILD_ROOT%{_sysconfdir}/ssl/server.key
+%endif
 
 CFG="$RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf/"
 
@@ -1340,6 +1343,7 @@ fi
 %{_datadir}/manual/mod/mod_rewrite.html.en
 %{_datadir}/manual/images/mod_rewrite*
 
+%if %{!?_without_ssl:1}%{?_without_ssl:0}
 %files mod_ssl
 %defattr(644,root,root,755)
 %attr(750,root,root) %dir %{_sysconfdir}/ssl
@@ -1348,6 +1352,7 @@ fi
 %attr(755,root,root) %{_libexecdir}/mod_ssl.so
 %{_datadir}/manual/ssl
 %{_datadir}/manual/mod/mod_ssl.html.en
+%endif
 
 %files mod_status
 %defattr(644,root,root,755)
