@@ -6,7 +6,7 @@ Summary(pl):	Serwer WWW (World Wide Web)
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	1.3.12
-Release:	1
+Release:	3
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Source0:	ftp://ftp.apache.org/dist/%{name}_%{version}.tar.gz
@@ -28,6 +28,7 @@ Patch4:		apache-apxs.patch
 Patch5:		apache-EAPI.patch
 Patch6:		apache-v6-PLD-1.patch.gz
 Patch7:		apache-mm_conf.patch
+Patch8:		apache-modules_symbols.patch
 Copyright:	BSD-like
 Provides:	httpd
 Provides:	webserver
@@ -315,6 +316,7 @@ Requires:	%{name}(EAPI) = %{version}
 %patch5 -p1
 #%patch6 -p1
 %patch7 -p1
+%patch8 -p1
 
 %build
 
@@ -408,16 +410,16 @@ fi
 %{_sbindir}/apxs -e -a -n alias %{_libexecdir}/mod_alias.so 1>&2
 %{_sbindir}/apxs -e -a -n asis %{_libexecdir}/mod_asis.so 1>&2
 %{_sbindir}/apxs -e -a -n auth %{_libexecdir}/mod_auth.so 1>&2
-%{_sbindir}/apxs -e -a -n db_auth %{_libexecdir}/mod_auth_db.so 1>&2
-%{_sbindir}/apxs -e -a -n dbm_auth %{_libexecdir}/mod_auth_dbm.so 1>&2
+%{_sbindir}/apxs -e -a -n auth_db %{_libexecdir}/mod_auth_db.so 1>&2
+%{_sbindir}/apxs -e -a -n auth_dbm %{_libexecdir}/mod_auth_dbm.so 1>&2
 %{_sbindir}/apxs -e -a -n autoindex %{_libexecdir}/mod_autoindex.so 1>&2
 %{_sbindir}/apxs -e -a -n cern_meta %{_libexecdir}/mod_cern_meta.so 1>&2
 %{_sbindir}/apxs -e -a -n cgi %{_libexecdir}/mod_cgi.so 1>&2
 %{_sbindir}/apxs -e -a -n env %{_libexecdir}/mod_env.so 1>&2
-%{_sbindir}/apxs -e -a -n includes %{_libexecdir}/mod_include.so 1>&2
-%{_sbindir}/apxs -e -a -n agent_log %{_libexecdir}/mod_log_agent.so 1>&2
-%{_sbindir}/apxs -e -a -n config_log %{_libexecdir}/mod_log_config.so 1>&2
-%{_sbindir}/apxs -e -a -n referer_log %{_libexecdir}/mod_log_referer.so 1>&2
+%{_sbindir}/apxs -e -a -n include %{_libexecdir}/mod_include.so 1>&2
+%{_sbindir}/apxs -e -a -n log_agent %{_libexecdir}/mod_log_agent.so 1>&2
+%{_sbindir}/apxs -e -a -n log_config %{_libexecdir}/mod_log_config.so 1>&2
+%{_sbindir}/apxs -e -a -n log_referer %{_libexecdir}/mod_log_referer.so 1>&2
 %{_sbindir}/apxs -e -a -n mime %{_libexecdir}/mod_mime.so 1>&2
 %{_sbindir}/apxs -e -a -n mime_magic %{_libexecdir}/mod_mime_magic.so 1>&2
 %{_sbindir}/apxs -e -a -n negotiation %{_libexecdir}/mod_negotiation.so 1>&2
@@ -438,16 +440,16 @@ if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n alias %{_libexecdir}/mod_alias.so 1>&2
 	%{_sbindir}/apxs -e -A -n asis %{_libexecdir}/mod_asis.so 1>&2
 	%{_sbindir}/apxs -e -A -n auth %{_libexecdir}/mod_auth.so 1>&2
-	%{_sbindir}/apxs -e -A -n db_auth %{_libexecdir}/mod_auth_db.so 1>&2
-	%{_sbindir}/apxs -e -A -n dbm_auth %{_libexecdir}/mod_auth_dbm.so 1>&2
+	%{_sbindir}/apxs -e -A -n auth_db %{_libexecdir}/mod_auth_db.so 1>&2
+	%{_sbindir}/apxs -e -A -n auth_dbm %{_libexecdir}/mod_auth_dbm.so 1>&2
 	%{_sbindir}/apxs -e -A -n autoindex %{_libexecdir}/mod_autoindex.so 1>&2
 	%{_sbindir}/apxs -e -A -n cern_meta %{_libexecdir}/mod_cern_meta.so 1>&2
 	%{_sbindir}/apxs -e -A -n cgi %{_libexecdir}/mod_cgi.so 1>&2
 	%{_sbindir}/apxs -e -A -n env %{_libexecdir}/mod_env.so 1>&2
-	%{_sbindir}/apxs -e -A -n includes %{_libexecdir}/mod_include.so 1>&2
-	%{_sbindir}/apxs -e -A -n agent_log %{_libexecdir}/mod_log_agent.so 1>&2
-	%{_sbindir}/apxs -e -A -n config_log %{_libexecdir}/mod_log_config.so 1>&2
-	%{_sbindir}/apxs -e -A -n referer_log %{_libexecdir}/mod_log_referer.so 1>&2
+	%{_sbindir}/apxs -e -A -n include %{_libexecdir}/mod_include.so 1>&2
+	%{_sbindir}/apxs -e -A -n log_agent %{_libexecdir}/mod_log_agent.so 1>&2
+	%{_sbindir}/apxs -e -A -n log_config %{_libexecdir}/mod_log_config.so 1>&2
+	%{_sbindir}/apxs -e -A -n log_referer %{_libexecdir}/mod_log_referer.so 1>&2
 	%{_sbindir}/apxs -e -A -n mime %{_libexecdir}/mod_mime.so 1>&2
 	%{_sbindir}/apxs -e -A -n mime_magic %{_libexecdir}/mod_mime_magic.so 1>&2
 	%{_sbindir}/apxs -e -A -n negotiation %{_libexecdir}/mod_negotiation.so 1>&2
@@ -481,11 +483,11 @@ if [ "$1" = "0" ]; then
 fi
 
 %post mod_auth_anon
-%{_sbindir}/apxs -e -a -n anon_auth %{_libexecdir}/mod_auth_anon.so 1>&2
+%{_sbindir}/apxs -e -a -n auth_anon %{_libexecdir}/mod_auth_anon.so 1>&2
 
 %preun mod_auth_anon
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n anon_auth %{_libexecdir}/mod_auth_anon.so 1>&2
+	%{_sbindir}/apxs -e -A -n auth_anon %{_libexecdir}/mod_auth_anon.so 1>&2
 fi
 
 %post mod_define
