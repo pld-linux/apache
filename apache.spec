@@ -31,7 +31,7 @@ Summary(ru):	óÁÍÙÊ ĞÏĞÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.0.50
-Release:	6.9
+Release:	7
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -361,7 +361,6 @@ Summary:	Apache module - display index of files
 Summary(pl):	Modu³ apache do wy¶wietlania indeksu plików
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}-%{release}
-Obsoletes:	Apache-Gallery
 
 %description mod_autoindex
 This package contains mod_autoindex module. It provides
