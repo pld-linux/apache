@@ -11,7 +11,7 @@ Summary(pl):	Serwer WWW (World Wide Web)
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	1.3.14
-Release:	3
+Release:	4
 License:	BSD-like
 Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
@@ -54,6 +54,7 @@ Requires:	/etc/mime.types
 URL:		http://www.apache.org/
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 PreReq:		mm
+Prereq:		perl
 Provides:	%{name}(EAPI) = %{version}
 Obsoletes:	apache-extra
 Obsoletes:	apache6
@@ -135,6 +136,7 @@ Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
+Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
 
 %description mod_actions
@@ -152,6 +154,7 @@ Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
+Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
 
 %description mod_auth
@@ -165,6 +168,7 @@ Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
+Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
 
 %description mod_auth_anon
@@ -191,6 +195,7 @@ Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
+Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
 
 %description mod_auth_db
@@ -210,6 +215,7 @@ Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
+Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
 
 %description mod_define
@@ -226,6 +232,7 @@ Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
+Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
 
 %description mod_digest
@@ -243,6 +250,7 @@ Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
+Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
 
 %description mod_dir
@@ -259,6 +267,7 @@ Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
+Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
 
 %description mod_headers
@@ -277,6 +286,7 @@ Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
+Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
 
 %description mod_mmap_static
@@ -295,6 +305,7 @@ Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
+Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
 
 %description mod_imap
@@ -312,6 +323,7 @@ Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
+Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
 
 %description mod_info
@@ -330,6 +342,7 @@ Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
+Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
 
 %description mod_proxy
@@ -350,6 +363,7 @@ Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
+Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
 
 %description mod_rewrite
@@ -366,6 +380,7 @@ Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
+Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
 
 %description mod_status
@@ -386,6 +401,7 @@ Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
+Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
 
 %description mod_usertrack
@@ -403,6 +419,7 @@ Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
+Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
 
 %description mod_vhost_alias
@@ -419,6 +436,7 @@ Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
+Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
 
 %description mod_unique_id
@@ -436,6 +454,7 @@ Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
+Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
 
 %description mod_expires
