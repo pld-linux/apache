@@ -6,7 +6,6 @@
 # - mod_ext_filter
 # - mod_echo
 # - config examples for mod_*
-# - switch from worker to perchild when it will be working in apache
 # - check if all modules are (de)registered in %%post/%%postun
 # - find smart way to deregister module if its moved from main package to subpackage (maybe test -f ?)
 # - add %%post/%%postun to suexec
@@ -14,6 +13,7 @@
 # - --with-suexec-uidmin=500 or =1000 ?
 # - multiple MPM support in subpackages like apache-mpm-worker, apache-mpm-prefork
 #   and so on. See SuSE 9 apache rpm for idea how to do this.
+# - switch from worker to perchild when it will be working in apache (but better multiple MPM support)
 #
 # Conditional build:
 %bcond_without	ssl	# don't build with SSL support
@@ -32,12 +32,12 @@ Summary(pt_BR):	Servidor HTTPD para prover serviços WWW
 Summary(ru):	óÁÍÙÊ ÐÏÐÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
-Version:	2.0.48
-Release:	1
+Version:	2.0.49
+Release:	0.1
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
-# Source0-md5:	466c63bb71b710d20a5c353df8c1a19c
+# Source0-md5:	275d3d37eed1b070f333d3618f7d1954
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}-icons.tar.gz
@@ -61,42 +61,22 @@ Patch4:		%{name}-apr.patch
 # project homepage http://www.metux.de/mpm/en/?patpage=index
 # http://www.sannes.org/metuxmpm/
 Patch5:		httpd-2.0.47-metuxmpm-r7.diff
-Patch6:		%{name}-posix_syntax
-Patch7:		httpd-2.0.40-xfsz.patch
-Patch8:		httpd-2.0.45-davetag.patch
-Patch9:		httpd-2.0.45-davfs.patch
-Patch10:	httpd-2.0.45-encode.patch
-Patch11:	httpd-2.0.45-export.patch
-Patch12:	httpd-2.0.45-proxy.patch
-Patch13:	httpd-2.0.46-dav401dest.patch
-Patch14:	httpd-2.0.46-davbadfrag.patch
-Patch15:	httpd-2.0.46-execfail.patch
-Patch16:	httpd-2.0.46-graceful.patch
-Patch17:	httpd-2.0.46-logtimez.patch
-Patch18:	httpd-2.0.46-md5dig.patch
-Patch19:	httpd-2.0.46-metharray.patch
-Patch20:	httpd-2.0.46-rolog.patch
-Patch21:	httpd-2.0.46-shmcb.patch
-Patch22:	httpd-2.0.46-sslerr.patch
-Patch23:	httpd-2.0.46-sslio.patch
-Patch24:	httpd-2.0.46-sslmutex.patch
-Patch25:	httpd-2.0.47-ldapshm.patch
-Patch26:	httpd-2.0.47-sslcleanup.patch
-Patch27:	httpd-2.0.48-abench.patch
-Patch28:	httpd-2.0.48-autoindex.patch
-Patch29:	httpd-2.0.48-CAN-2003-0020.patch
-Patch30:	httpd-2.0.48-corelimit.patch
-Patch31:	httpd-2.0.48-debuglog.patch
-Patch32:	httpd-2.0.48-dynlimit.patch
-Patch33:	httpd-2.0.48-fdsetsize.patch
-Patch34:	httpd-2.0.48-include.patch
-Patch35:	httpd-2.0.48-proxy11.patch
-Patch36:	httpd-2.0.48-sslpphrase.patch
-Patch37:	httpd-2.0.48-sslvars.patch
-Patch38:	httpd-2.0.48-status.patch
-Patch39:	httpd-2.0.48-usertrack.patch
-Patch40:	httpd-2.0.48-worker.patch
-Patch41:	%{name}-v6only-ENOPROTOOPT.patch
+Patch6:		httpd-2.0.40-xfsz.patch
+Patch7:		httpd-2.0.45-davetag.patch
+Patch8:		httpd-2.0.45-encode.patch
+Patch9:		httpd-2.0.45-export.patch
+Patch10:	httpd-2.0.46-dav401dest.patch
+Patch11:	httpd-2.0.46-md5dig.patch
+Patch12:	httpd-2.0.46-rolog.patch
+Patch13:	httpd-2.0.46-shmcb.patch
+Patch14:	httpd-2.0.46-sslmutex.patch
+Patch15:	httpd-2.0.47-sslcleanup.patch
+Patch16:	httpd-2.0.48-corelimit.patch
+Patch17:	httpd-2.0.48-debuglog.patch
+Patch18:	httpd-2.0.48-dynlimit.patch
+Patch19:	httpd-2.0.48-fdsetsize.patch
+Patch20:	httpd-2.0.48-sslpphrase.patch
+Patch21:	%{name}-v6only-ENOPROTOOPT.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	automake
 BuildRequires:	apr-devel >= 1:0.9.4-1
@@ -658,7 +638,6 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
-%patch6 -p1
 %{?with_metuxmpm:%patch5 -p1}
 %patch7 -p1
 %patch8 -p1
@@ -675,26 +654,6 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 %patch19 -p1
 %patch20 -p1
 %patch21 -p1
-%patch22 -p1
-%patch23 -p1
-%patch24 -p1
-%patch25 -p1
-%patch26 -p1
-%patch27 -p1
-%patch28 -p1
-%patch29 -p1
-%patch30 -p1
-%patch31 -p1
-%patch32 -p1
-%patch33 -p1
-%patch34 -p1
-%patch35 -p1
-%patch36 -p1
-%patch37 -p1
-%patch38 -p1
-%patch39 -p1
-%patch40 -p1
-%patch41 -p1
 
 %build
 # sanity check
@@ -708,7 +667,6 @@ fi
 %{__perl} -pi -e "s:\@exp_installbuilddir\@:%{_libdir}/apache/build:g" \
 	support/apxs.in
 install /usr/share/automake/config.* build/
-CPPFLAGS="-DBIG_SECURITY_HOLE=1"
 %configure \
 	--prefix=%{_libexecdir} \
 	--enable-layout=PLD \
@@ -1330,8 +1288,6 @@ fi
 %{_datadir}/manual/mod/mod_userdir.html.en
 %{_datadir}/manual/platform
 %{_datadir}/manual/programs
-%dir %{_datadir}/manual/search
-%doc %attr(755,root,root) %{_datadir}/manual/search/manual-index.cgi
 %{_datadir}/manual/style
 
 %files suexec
