@@ -27,7 +27,7 @@ Summary(uk):	îÁÊÐÏÐÕÌÑÒÎ¦ÛÉÊ Web-Server
 Summary(zh_CN):	Internet ÉÏÓ¦ÓÃ×î¹ã·ºµÄ Web ·þÎñ³ÌÐò¡£
 Name:		apache
 Version:	1.3.33
-Release:	1
+Release:	2
 License:	Apache Group
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/%{name}_%{version}.tar.gz
@@ -43,7 +43,6 @@ Source7:	%{name}.monitrc
 Source8:	%{name}-mod_vhost_alias.conf
 Source9:	%{name}-mod_status.conf
 Source10:	%{name}-mod_proxy.conf
-Source11:	%{name}-mod_autoindex.conf
 Patch0:		%{name}-PLD.patch
 Patch1:		%{name}-suexec.patch
 Patch2:		%{name}-errordocs.patch
@@ -80,7 +79,6 @@ Requires(pre):	/usr/sbin/useradd
 Requires(post,preun):	/sbin/chkconfig
 Requires(postun):	/usr/sbin/groupdel
 Requires(postun):	/usr/sbin/userdel
-Requires:	apache-mod_autoindex
 Requires:	/etc/mime.types
 Requires:	mailcap
 Requires:	psmisc >= 20.1
@@ -404,20 +402,6 @@ authentication using MD5 Digest Authentication.
 %description mod_auth_digest -l pl
 Modu³ ten dostarcza metodê autoryzacji bazuj±c± na MD5 Digest
 Authentication.
-
-%package mod_autoindex
-Summary:	Apache module - display index of files
-Summary(pl):	Modu³ apache do wy¶wietlania indeksu plików
-Group:		Networking/Daemons
-Requires(post,preun):	%{apxs}
-Requires:	%{name}(EAPI) = %{version}-%{release}
-
-%description mod_autoindex
-This package contains mod_autoindex module. It provides
-generation index of files.
-
-%description mod_autoindex -l pl
-Ten pakiet dostarcza modu³ autoindex, który generuje indeks plików.
 
 %package mod_define
 Summary:	Apache module - authentication variables for arbitrary directives
@@ -772,7 +756,6 @@ install %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
 install %{SOURCE8} $RPM_BUILD_ROOT%{_sysconfdir}/mod_vhost_alias.conf
 install %{SOURCE9} $RPM_BUILD_ROOT%{_sysconfdir}/mod_status.conf
 install %{SOURCE10} $RPM_BUILD_ROOT%{_sysconfdir}/mod_proxy.conf
-install %{SOURCE11} $RPM_BUILD_ROOT%{_sysconfdir}/mod_autoindex.conf
 install %{SOURCE7} $RPM_BUILD_ROOT/etc/monit
 
 ln -sf index.html.en $RPM_BUILD_ROOT%{_datadir}/html/index.html
@@ -805,6 +788,7 @@ fi
 %{apxs} -e -a -n access %{_libexecdir}/mod_access.so 1>&2
 %{apxs} -e -a -n alias %{_libexecdir}/mod_alias.so 1>&2
 %{apxs} -e -a -n asis %{_libexecdir}/mod_asis.so 1>&2
+%{apxs} -e -a -n autoindex %{_libexecdir}/mod_autoindex.so 1>&2
 %{apxs} -e -a -n cern_meta %{_libexecdir}/mod_cern_meta.so 1>&2
 %{apxs} -e -a -n cgi %{_libexecdir}/mod_cgi.so 1>&2
 %{apxs} -e -a -n env %{_libexecdir}/mod_env.so 1>&2
@@ -831,6 +815,7 @@ if [ "$1" = "0" ]; then
 	%{apxs} -e -A -n access %{_libexecdir}/mod_access.so 1>&2
 	%{apxs} -e -A -n alias %{_libexecdir}/mod_alias.so 1>&2
 	%{apxs} -e -A -n asis %{_libexecdir}/mod_asis.so 1>&2
+	%{apxs} -e -A -n autoindex %{_libexecdir}/mod_autoindex.so 1>&2
 	%{apxs} -e -A -n cern_meta %{_libexecdir}/mod_cern_meta.so 1>&2
 	%{apxs} -e -A -n cgi %{_libexecdir}/mod_cgi.so 1>&2
 	%{apxs} -e -A -n env %{_libexecdir}/mod_env.so 1>&2
@@ -941,37 +926,12 @@ fi
 %triggerpostun mod_auth_db -- apache-mod_auth_db <= 1.3.20-2
 %{apxs} -e -A -n auth_dbm %{_libexecdir}/mod_auth_dbm.so 1>&2
 
-%post mod_autoindex
-if [ "$1" = "0" ]; then
-	if [ -f /etc/httpd/httpd.conf ] && ! grep -q "^Include.*mod_autoindex.conf" /etc/httpd/httpd.conf; then
-		echo "Include /etc/httpd/mod_autoindex.conf" >> /etc/httpd/httpd.conf
-	fi
-	%{apxs} -e -a -n autoindex %{_libexecdir}/mod_autoindex.so 1>&2
-	if [ -f /var/lock/subsys/httpd ]; then
-		/etc/rc.d/init.d/httpd restart 1>&2
-	fi
-fi
-
-%preun mod_autoindex
-if [ "$1" = "0" ]; then
-        umask 027
-        %{apxs} -e -A -n autoindex %{_libexecdir}/mod_autoindex.so 1>&2
-        grep -v "^Include.*mod_autoindex.conf" /etc/httpd/httpd.conf > \
-                /etc/httpd/httpd.conf.tmp
-        mv -f /etc/httpd/httpd.conf.tmp /etc/httpd/httpd.conf
-        if [ -f /var/lock/subsys/httpd ]; then
-                /etc/rc.d/init.d/httpd restart 1>&2
-        fi
-fi
-
 %post mod_define
-if [ "$1" = "0" ]; then
-	%{apxs} -e -a -n define %{_libexecdir}/mod_define.so 1>&2
-	if [ -f /var/lock/subsys/httpd ]; then
-		/etc/rc.d/init.d/httpd restart 1>&2
-	else
-		echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
-	fi
+%{apxs} -e -a -n define %{_libexecdir}/mod_define.so 1>&2
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
 fi
 
 %preun mod_define
@@ -1243,6 +1203,7 @@ fi
 %attr(755,root,root) %{_libexecdir}/mod_access.so
 %attr(755,root,root) %{_libexecdir}/mod_alias.so
 %attr(755,root,root) %{_libexecdir}/mod_asis.so
+%attr(755,root,root) %{_libexecdir}/mod_autoindex.so
 %attr(755,root,root) %{_libexecdir}/mod_cern_meta.so
 %attr(755,root,root) %{_libexecdir}/mod_cgi.so
 %attr(755,root,root) %{_libexecdir}/mod_env.so
@@ -1573,11 +1534,6 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_auth_digest.so
 %{_datadir}/manual/mod/mod_auth_digest.html
-
-%files mod_autoindex
-%defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/mod_autoindex.conf
-%attr(755,root,root) %{_libexecdir}/mod_autoindex.so
 
 %files mod_define
 %defattr(644,root,root,755)
