@@ -26,8 +26,8 @@ Summary(tr):	Lider WWW tarayýcý
 Summary(uk):	îÁÊÐÏÐÕÌÑÒÎ¦ÛÉÊ Web-Server
 Summary(zh_CN):	Internet ÉÏÓ¦ÓÃ×î¹ã·ºµÄ Web ·þÎñ³ÌÐò¡£
 Name:		apache
-Version:	1.3.26
-Release:	5
+Version:	1.3.27
+Release:	1
 License:	Apache Group 
 Group:		Networking/Daemons
 URL:		http://www.apache.org/
@@ -1289,6 +1289,7 @@ fi
 %lang(ja) %{_datadir}/manual/howto/cgi.html.ja.jis
 %{_datadir}/manual/howto/footer.html
 %{_datadir}/manual/howto/header.html
+%{_datadir}/manual/howto/htaccess.html
 %{_datadir}/manual/howto/ssi.html.html
 %{_datadir}/manual/howto/ssi.html.en
 %lang(ja) %{_datadir}/manual/howto/ssi.html.ja.jis
@@ -1318,7 +1319,8 @@ fi
 %{_datadir}/manual/mod/mod_access.html.html
 %{_datadir}/manual/mod/mod_access.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_access.html.ja.jis
-%{_datadir}/manual/mod/mod_alias.html
+%{_datadir}/manual/mod/mod_alias.html.en
+%lang(ja) %{_datadir}/manual/mod/mod_alias.html.ja.jis
 %{_datadir}/manual/mod/mod_asis.html.html
 %{_datadir}/manual/mod/mod_asis.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_asis.html.ja.jis
@@ -1467,7 +1469,8 @@ fi
 %attr(755,root,root) %{_libexecdir}/mod_auth.so
 %attr(755,root,root) %{_bindir}/htpasswd
 %{_datadir}/manual/howto/auth.html
-%{_datadir}/manual/mod/mod_auth.html
+%{_datadir}/manual/mod/mod_auth.html.en
+%lang(ja) %{_datadir}/manual/mod/mod_auth.html.ja.jis
 
 %files mod_auth_anon
 %defattr(644,root,root,755)
