@@ -23,6 +23,18 @@ diff -urN httpd-2.0.47.org/modules/arch/netware/mod_netware.c httpd-2.0.47/modul
  
      /* If there isn't an extension then give it an empty string */
      if (!ext) {
+diff -urN httpd-2.0.47.org/modules/arch/win32/mod_isapi.c httpd-2.0.47/modules/arch/win32/mod_isapi.c
+--- httpd-2.0.47.org/modules/arch/win32/mod_isapi.c	2003-09-13 14:18:35.000000000 +0200
++++ httpd-2.0.47/modules/arch/win32/mod_isapi.c	2003-09-15 20:34:54.000000000 +0200
+@@ -1646,7 +1646,7 @@
+ {
+     apr_status_t rv;
+ 
+-    apr_pool_sub_make(&loaded.pool, pconf, NULL);
++    apr_pool_create_ex(&loaded.pool, pconf, NULL);
+     if (!loaded.pool) {
+ 	ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, NULL,
+ 	             "ISAPI: could not create the isapi cache pool");
 diff -urN httpd-2.0.47.org/modules/arch/win32/mod_win32.c httpd-2.0.47/modules/arch/win32/mod_win32.c
 --- httpd-2.0.47.org/modules/arch/win32/mod_win32.c	2003-09-13 14:18:35.000000000 +0200
 +++ httpd-2.0.47/modules/arch/win32/mod_win32.c	2003-09-13 22:41:53.000000000 +0200
@@ -434,6 +446,27 @@ diff -urN httpd-2.0.47.org/modules/ssl/ssl_engine_init.c httpd-2.0.47/modules/ss
          {
              ap_log_error(APLOG_MARK, APLOG_WARNING, 0, s,
                           "%s server certificate wildcard CommonName (CN) `%s' "
+diff -urN httpd-2.0.47.org/modules/ssl/ssl_scache_dbm.c httpd-2.0.47/modules/ssl/ssl_scache_dbm.c
+--- httpd-2.0.47.org/modules/ssl/ssl_scache_dbm.c	2003-09-13 14:18:35.000000000 +0200
++++ httpd-2.0.47/modules/ssl/ssl_scache_dbm.c	2003-09-15 20:34:39.000000000 +0200
+@@ -118,7 +118,7 @@
+     SSLModConfigRec *mc = myModConfig(s);
+     apr_pool_t *p;
+ 
+-    apr_pool_sub_make(&p, mc->pPool, NULL);
++    apr_pool_create_ex(&p, mc->pPool, NULL);
+     if (p != NULL) {
+         /* the correct way */
+         unlink(apr_pstrcat(p, mc->szSessionCacheDataFile, SSL_DBM_FILE_SUFFIX_DIR, NULL));
+@@ -350,7 +350,7 @@
+     ssl_mutex_on(s);
+     for (;;) {
+         /* allocate the key array in a memory sub pool */
+-        apr_pool_sub_make(&p, mc->pPool, NULL);
++        apr_pool_create_ex(&p, mc->pPool, NULL);
+         if (p == NULL)
+             break;
+         if ((keylist = apr_palloc(p, sizeof(dbmkey)*KEYMAX)) == NULL) {
 diff -urN httpd-2.0.47.org/os/beos/beosd.c httpd-2.0.47/os/beos/beosd.c
 --- httpd-2.0.47.org/os/beos/beosd.c	2003-09-13 14:18:32.000000000 +0200
 +++ httpd-2.0.47/os/beos/beosd.c	2003-09-13 22:41:54.000000000 +0200
@@ -772,7 +805,16 @@ diff -urN httpd-2.0.47.org/server/mpm/netware/mpm_netware.c httpd-2.0.47/server/
              }
 diff -urN httpd-2.0.47.org/server/mpm/winnt/mpm_winnt.c httpd-2.0.47/server/mpm/winnt/mpm_winnt.c
 --- httpd-2.0.47.org/server/mpm/winnt/mpm_winnt.c	2003-09-13 14:18:35.000000000 +0200
-+++ httpd-2.0.47/server/mpm/winnt/mpm_winnt.c	2003-09-13 22:41:52.000000000 +0200
++++ httpd-2.0.47/server/mpm/winnt/mpm_winnt.c	2003-09-15 20:35:15.000000000 +0200
+@@ -650,7 +650,7 @@
+     char *cmd;
+     char *cwd;
+ 
+-    apr_pool_sub_make(&ptemp, p, NULL);
++    apr_pool_create_ex(&ptemp, p, NULL);
+ 
+     /* Build the command line. Should look something like this:
+      * C:/apache/bin/apache.exe -f ap_server_confname 
 @@ -1168,10 +1168,10 @@
      /* WARNING: There is an implict assumption here that the
       * executable resides in ServerRoot or ServerRoot\bin
@@ -786,6 +828,18 @@ diff -urN httpd-2.0.47.org/server/mpm/winnt/mpm_winnt.c httpd-2.0.47/server/mpm/
          if (!strcasecmp(def_server_root, "bin"))
              *(def_server_root - 1) = '\0';
      }
+diff -urN httpd-2.0.47.org/server/mpm/winnt/nt_eventlog.c httpd-2.0.47/server/mpm/winnt/nt_eventlog.c
+--- httpd-2.0.47.org/server/mpm/winnt/nt_eventlog.c	2003-09-13 14:18:35.000000000 +0200
++++ httpd-2.0.47/server/mpm/winnt/nt_eventlog.c	2003-09-15 20:35:04.000000000 +0200
+@@ -81,7 +81,7 @@
+     apr_status_t rv;
+     apr_pool_t *p;
+     
+-    apr_pool_sub_make(&p, NULL, NULL);
++    apr_pool_create_ex(&p, NULL, NULL);
+ 
+     errarg[0] = "The Apache service named";
+     errarg[1] = display_name;
 diff -urN httpd-2.0.47.org/server/mpm/worker/pod.c httpd-2.0.47/server/mpm/worker/pod.c
 --- httpd-2.0.47.org/server/mpm/worker/pod.c	2003-09-13 14:18:35.000000000 +0200
 +++ httpd-2.0.47/server/mpm/worker/pod.c	2003-09-13 22:50:47.000000000 +0200
