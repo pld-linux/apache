@@ -31,12 +31,12 @@ Summary(pt_BR):	Servidor HTTPD para prover serviços WWW
 Summary(ru):	óÁÍÙÊ ÐÏÐÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
-Version:	2.0.49
-Release:	5
+Version:	2.0.50
+Release:	0.1
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
-# Source0-md5:	275d3d37eed1b070f333d3618f7d1954
+# Source0-md5:	8b251767212aebf41a13128bb70c0b41
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}-icons.tar.gz
@@ -79,7 +79,6 @@ Patch19:	httpd-2.0.48-fdsetsize.patch
 Patch20:	httpd-2.0.48-sslpphrase.patch
 Patch21:	%{name}-v6only-ENOPROTOOPT.patch
 Patch22:	%{name}-conffile-path.patch
-Patch23:	http://www.apache.org/dist/httpd/patches/apply_to_2.0.49/CAN-2004-0493.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	automake
 BuildRequires:	apr-devel >= 1:0.9.5-6
@@ -646,18 +645,17 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 %patch9 -p1
 %patch10 -p1
 %patch11 -p1
-%patch12 -p1
+#%patch12 -p1
 %patch13 -p1
 %patch14 -p1
 %patch15 -p1
 %patch16 -p1
 %patch17 -p1
 %patch18 -p1
-%patch19 -p1
+#%patch19 -p1
 %patch20 -p1
 %patch21 -p1
 %patch22 -p1
-%patch23 -p0
 
 %build
 # sanity check
