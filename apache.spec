@@ -31,7 +31,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.0.52
-Release:	2
+Release:	3
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -698,6 +698,8 @@ fi
 # Before configure; fix location of build dir in generated apxs
 %{__perl} -pi -e "s:\@exp_installbuilddir\@:%{_libdir}/apache/build:g" \
 	support/apxs.in
+%{__perl} -pi -e "s:apr-config:apr-1-config:g" support/apxs.in
+%{__perl} -pi -e "s:apu-config:apu-1-config:g" support/apxs.in
 install /usr/share/automake/config.* build/
 CPPFLAGS="-DMAX_SERVER_LIMIT=200000 -DBIG_SECURITY_HOLE=1"
 for mpm in metuxmpm peruser perchild prefork worker; do
