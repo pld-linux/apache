@@ -17,7 +17,6 @@
 # Conditional build:
 %bcond_without	ssl		# build without SSL support
 %bcond_without	ldap		# build without LDAP support
-%bcond_with	apr1		# use apr*-1 instead of 0.9.5
 #
 %include	/usr/lib/rpm/macros.perl
 # this is internal macro, don't change to %%apache_modules_api
@@ -84,15 +83,8 @@ Patch22:	httpd-2.0.50-peruser-r3.patch
 Patch23:	%{name}-apr1.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	automake
-%if %{with apr1}
 BuildRequires:	apr-devel >= 1:1.0.0
 BuildRequires:	apr-util-devel >= 1:1.0.0
-%else
-BuildRequires:	apr-devel >= 1:0.9.5-6
-BuildRequires:	apr-devel < 1:1.0.0
-BuildRequires:	apr-util-devel >= 1:0.9.5-5
-BuildRequires:	apr-util-devel < 1:1.0.0
-%endif
 BuildRequires:	db-devel
 BuildRequires:	expat-devel
 BuildRequires:	gdbm-devel >= 1.8.3
@@ -117,9 +109,6 @@ Requires(post,postun):	/sbin/ldconfig
 Requires(post):	fileutils
 Requires:	/etc/mime.types
 Requires:	%{name}-apxs = %{version}-%{release}
-%if !%{with apr1}
-Requires:	apr-util >= 1:0.9.5-5
-%endif
 Requires:	mailcap
 Requires:	psmisc >= 20.1
 Provides:	apache(modules-api) = %{_apache_modules_api}
@@ -239,11 +228,7 @@ Summary(pt_BR):	Arquivos de inclusão do Apache para desenvolvimento de módulos
 Summary(ru):	óÒÅÄÓÔ×Á ÒÁÚÒÁÂÏÔËÉ ÍÏÄÕÌÅÊ ÄÌÑ ×ÅÂ-ÓÅÒ×ÅÒÁ Apache
 Group:		Networking/Utilities
 Requires:	%{name}-apxs = %{version}-%{release}
-%if %{with apr1}
 Requires:	apr-util-devel >= 1:1.0.0
-%else
-Requires:	apr-util-devel >= 1:0.9.5-5
-%endif
 Requires:	libtool
 Obsoletes:	apache-static
 
@@ -698,7 +683,7 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 %patch20 -p1
 %patch21 -p1
 %patch22 -p1
-%{?with_apr1:%patch23 -p1}
+%patch23 -p1
 
 %{__perl} -pi -e "s@/usr/local/bin/perl@%{__perl}@" $(grep -rl "/usr/local/bin/perl" *)
 
@@ -779,8 +764,8 @@ install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
 	--with-suexec-uidmin=500 \
 	--with-suexec-gidmin=500 \
 	--with-suexec-umask=077 \
-	--with-apr=%{_bindir}/apr%{?with_apr1:-1}-config \
-	--with-apr-util=%{_bindir}/apu%{?with_apr1:-1}-config
+	--with-apr=%{_bindir}/apr-1-config \
+	--with-apr-util=%{_bindir}/apu-1-config
 %{__make}
 ./httpd.${mpm} -l | grep -v "${mpm}" > modules-inside
 
