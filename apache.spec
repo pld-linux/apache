@@ -4,6 +4,7 @@
 # - mod_optional_fn_{export,import}
 # - mod_optional_hook_{export,import}
 # - config examples for mod_*
+# - move configuration to directory (/etc/httpd/httpd.conf/)
 %include	/usr/lib/rpm/macros.perl
 Summary:	The most widely used Web server on the Internet
 Summary(de):	Leading World Wide Web-Server
@@ -14,7 +15,7 @@ Summary(pt_BR):	Servidor HTTPD para prover serviços WWW
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.0.35
-Release:	0.3
+Release:	0.4
 License:	Apache Group License
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/
@@ -447,6 +448,7 @@ Summary(pl):	Modu³ apache: Silna kryptografia z u¿yciem SSL
 Group:		Networking/Daemons
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
+Epoch:		1
 Requires:	%{name}(EAPI) = %{version}
 
 %description mod_ssl
@@ -655,8 +657,7 @@ mv -f $RPM_BUILD_ROOT%{_sysconfdir}/build \
 ln -s %{_libexecdir}/build $RPM_BUILD_ROOT%{_sysconfdir}/build
 
 perl -pi -e "s#$RPM_BUILD_ROOT##g" $RPM_BUILD_ROOT%{_libexecdir}/build/config_vars.mk
-perl -pi -e "s#dlname=''#dlname='libapr.so.0'#g" $RPM_BUILD_ROOT%{_libdir}/libapr.la
-perl -pi -e "s#dlname=''#dlname='libaprutil.so.0'#g" $RPM_BUILD_ROOT%{_libdir}/libaprutil.la
+perl -pi -e "s#-pthread#-lpthread#g" $RPM_BUILD_ROOT%{_libdir}/lib*.la
 
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/apache
