@@ -1,0 +1,23 @@
+/var/log/httpd/access_log {
+    postrotate
+	/usr/bin/killall -HUP httpd
+    endscript
+}
+
+/var/log/httpd/agent_log {
+    postrotate
+	/usr/bin/killall -HUP httpd
+    endscript
+}
+
+/var/log/httpd/error_log {
+    postrotate
+	/usr/bin/killall -HUP httpd
+    endscript
+}
+
+/var/log/httpd/referer_log {
+    postrotate
+	/usr/bin/killall -HUP httpd
+    endscript
+}
