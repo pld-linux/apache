@@ -4,24 +4,21 @@ Summary(fr): Serveur Web leader du marché
 Summary(pl): Serwer WWW (World Wide Web)
 Summary(tr): Lider WWW tarayýcý
 Name:        apache
-Version:     1.3.1
-Release:     2
+Version:     1.3.2
+Release:     1
 Group:       Networking/Daemons
 Source0:     ftp://ftp.apache.org/apache/dist/%{name}_%{version}.tar.gz
-Source1:     index.html
-Source2:     poweredby.gif
-Source3:     httpd.init
-Source4:     apache.log
-Patch0:      apache-1.3b8-htdocs.patch
-Patch1:      apache-1.3b8-suexec.patch
+Source1:     httpd.init
+Source2:     apache.log
+Patch0:      apache-1.3.2-htdocs.patch
+Patch1:      apache-1.3.2-suexec.patch
 Patch2:      apache-1.3b7-perlpath.patch
 Patch3:      apache-1.3b8-config.patch
 Patch4:      apache-1.3b8-mimetypes.patch
-Patch5:      apache-1.3-headerdos.patch
 Copyright:   BSD-like
-Obsoletes:   apache-suexec apache-extra apache-doc
-Requires:    /etc/mime.types
-Requires:    initscripts >= 3.25
+Obsoletes:   apache-suexec apache-extra
+Provides:    httpd
+Requires:    /etc/mime.types, initscripts >= 3.25
 Prereq:      /sbin/chkconfig
 URL:         http://www.apache.org/
 BuildRoot:   /tmp/%{name}-%{version}-root
@@ -48,7 +45,7 @@ Apache serbest daðýtýlan ve çok kullanýlan yetenekli bir web sunucusudur.
 
 %package devel
 Summary:     Apache include files
-Summary(pl): Pliki nag³owkowe do serwera www Apache
+Summary(pl): Pliki nag³ówkowe do serwera www Apache
 Group:       Networking/Development
 Requires:    %{name} = %{version}
 
@@ -65,13 +62,13 @@ Pliki nag³owkowe do serwera www Apache.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
-#%patch4 -p1
-%patch5 -p1
+%patch4 -p1
 
 %build
 OPTIM="$RPM_OPT_FLAGS" ./configure --prefix=/usr --sysconfdir=/etc/httpd/conf \
 	--datadir=/home/httpd --libexecdir=/usr/libexec/apache \
-	--localstatedir=/var --runtimedir=/var/run --logfiledir=/var/log/httpd \
+	--localstatedir=/var --runtimedir=/var/run \
+	--logfiledir=/var/log/httpd \
 	--without-confadjust \
 	--enable-module=auth_anon --enable-shared=auth_anon \
 	--enable-module=auth_db --enable-shared=auth_db \
@@ -99,10 +96,6 @@ make install-quiet root="$RPM_BUILD_ROOT"
 install -d $RPM_BUILD_ROOT/etc/{httpd/conf,logrotate.d,rc.d/{init,rc{0,1,2,3,4,5,6}}.d}
 install -d $RPM_BUILD_ROOT/home/httpd/{html/manual,icons,cgi-bin}
 install -d $RPM_BUILD_ROOT/{usr/{lib/apache,sbin,man/man{1,8}},var/log/httpd}
-
-mv $RPM_BUILD_ROOT/home/httpd/html/{index,index_apache}.html
-install $RPM_SOURCE_DIR/{index.html,poweredby.gif} \
-	$RPM_BUILD_ROOT/home/httpd/html
 
 install $RPM_SOURCE_DIR/apache.log $RPM_BUILD_ROOT/etc/logrotate.d/apache
 install $RPM_SOURCE_DIR/httpd.init $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
@@ -146,11 +139,11 @@ fi
 %config(noreplace) %verify(not size mtime md5) /etc/httpd/conf/*.conf
 /etc/httpd/conf/*.conf.default
 %config(missingok) /etc/rc.d/rc*.d/*
-/home/httpd/html/poweredby.gif
 %attr(600, root, root) %config /etc/logrotate.d/*
 %attr(755, root, root) %dir /home/httpd
 %attr(755, root, root) %dir /home/httpd/html
 %config(noreplace) /home/httpd/html/index.html
+/home/httpd/html/apache_pb.gif
 %attr(755, root, root) /etc/rc.d/init.d/httpd
 %attr(755, root, root, 755) /home/httpd/cgi-bin
 %attr(755, root, root, 755) /usr/libexec/apache
@@ -172,6 +165,13 @@ fi
 %attr(644, root, root, 755) /usr/include/apache
 
 %changelog
+* Fri Sep 25 1998 Konrad Stêpieñ <konrad@interdata.com.pl>
+  [1.3.2-1]
+- reconfig to use /etc/mime.types (again),
+  orginal mime.types can be found in documentation directory
+- restore orginal start page,
+- added "Provides: httpd".
+
 * Thu Sep  3 1998 Tomasz K³oczko <kloczek@rudy.mif.pg.gda.pl>
   [1.3.1-2]
 - removed /home/httpd/icons/README
@@ -184,9 +184,9 @@ fi
 - added /etc/rc.d/rc*.d/* symlinks as a %config(missingok),
 - changed permidssion on logrotate config file to 600,
 - changed permidssion on /var/log/httpd to 700,
-- added %ghost /var/log/httpd/*,
-- added striping modules,
-- added patch to defeat header dos attack.
+- added %ghost /var/log/httpd/*
+- added striping modules.
+- added patch to defeat header dos attack
 
 * Sat Jul 18 1998 Manoj Kasichainula <manojk@io.com>
   [1.3.1-1]
