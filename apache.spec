@@ -745,6 +745,7 @@ if [ -n "`getgid http`" ]; then
 		exit 1
 	fi
 else
+	echo "Adding group http GID=51"
 	/usr/sbin/groupadd -g 51 -r -f http
 fi
 if [ -n "`id -u http 2>/dev/null`" ]; then
@@ -753,6 +754,7 @@ if [ -n "`id -u http 2>/dev/null`" ]; then
 		exit 1
 	fi
 else
+	echo "Adding user http UID=51"
 	/usr/sbin/useradd -u 51 -r -d /home/httpd -s /bin/false -c "HTTP User" -g http http 1>&2
 fi
 
@@ -810,7 +812,9 @@ fi
 
 %postun
 if [ "$1" = "0" ]; then
+	echo "Removing user http UID=51"
 	/usr/sbin/userdel http
+	echo "Removing group http GID=51"
 	/usr/sbin/groupdel http
 fi
 
