@@ -381,7 +381,7 @@ Ten pakiet zawiera modu³ mod_auth_db. Modu³ ten s³u¿y do autentykacji
 ale jako plików danych u¿ywa Berkeley DB.
 
 %package mod_auth_digest
-Summary:	Apache user authentication module using MD5 Digest Authentication 
+Summary:	Apache user authentication module using MD5 Digest Authentication
 Summary(pl):	Modu³ apache do autoryzacji MD5
 Group:		Networking/Daemons
 Prereq:		%{_sbindir}/apxs
@@ -413,7 +413,7 @@ variables which can be expanded on any(!) directive line.
 Modu³ ten umo¿liwia definicjê zmiennych i dyrektyw.
 
 %package mod_digest
-Summary:	Older version of apache user authentication module using MD5 Digest Authentication 
+Summary:	Older version of apache user authentication module using MD5 Digest Authentication
 Summary(pl):	Starsza wersja modu³u apache do autoryzacji MD5
 Group:		Networking/Daemons
 Prereq:		%{_sbindir}/apxs
@@ -423,9 +423,10 @@ Requires:	%{name}(EAPI) = %{version}
 %description mod_digest
 This package contains mod_digest module. It provides user
 authentication using MD5 Digest Authentication. It implements an older
-version of the MD5 Digest Authentication specification which will probably
-not work with modern browsers. Please take a look at mod_auth_digest
-which implements the most recent version of the standard.
+version of the MD5 Digest Authentication specification which will
+probably not work with modern browsers. Please take a look at
+mod_auth_digest which implements the most recent version of the
+standard.
 
 %description mod_digest -l pl
 Modu³ ten dostarcza metodê autoryzacji bazuj±c± na MD5 Digest
@@ -893,7 +894,7 @@ if [ "$1" = "0" ]; then
 	fi
 fi
 
-%triggerpostun mod_auth_db -- apache-mod_auth_db <= 1.3.20-2 
+%triggerpostun mod_auth_db -- apache-mod_auth_db <= 1.3.20-2
 %{_sbindir}/apxs -e -A -n auth_dbm %{_libexecdir}/mod_auth_dbm.so 1>&2
 
 %post mod_define
