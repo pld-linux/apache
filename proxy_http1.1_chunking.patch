@@ -1,0 +1,3739 @@
+* Updated * (the first version I added here was incomplete, sorry)
+
+This patch works around a couple of problems in the stock 1.3.24 apache
+mod_proxy. The 1.3.24 version would fail to de-chunk a chunked http/1.1
+response for an http/1.0-client, resulting in mysterious hex digits
+spread all over the returned document. Especially in a chain of proxies,
+that would lead to serious problems in the interaction between upstream
+proxies and apache, and the connections would often hang.
+
+The patch is a snapshot of the current development version 1.3.25-dev
+(as of 18-Apr-2002), and contains a lot of whitespace reformatting.
+Sorry for that, but the layout was standardized using indent, so as
+to ease future maintenance.
+
+It has been tested in an intranet environment, both using direct
+connections and ProxyRemote connections, and with both http and
+https.
+
+The patch should apply cleanly against version apache-1.3.24
+
+If you have questions, please contact martin at apache dot org, who
+supplied this patch file. Thank you.
+
+   Martin
+
+
+How-to-apply:
+
+$ gzip -dc apache_1.3.24.tar.gz  | tar xvf - 
+$ cd apache_1.3.24/src
+$ patch -p0 </tmp/proxy_http1.1_chunking.patch
+
+
+Index: main/http_protocol.c
+===================================================================
+RCS file: /home/cvs/apache-1.3/src/main/http_protocol.c,v
+retrieving revision 1.312
+retrieving revision 1.314
+diff -u -b -u -r1.312 -r1.314
+--- main/http_protocol.c	21 Mar 2002 14:49:46 -0000	1.312
++++ main/http_protocol.c	6 Apr 2002 14:31:05 -0000	1.314
+@@ -857,13 +857,13 @@
+  *       then the actual input line exceeded the buffer length,
+  *       and it would be a good idea for the caller to puke 400 or 414.
+  */
+-static int getline(char *s, int n, BUFF *in, int fold)
++API_EXPORT(int) ap_getline(char *s, int n, BUFF *in, int fold)
+ {
+     char *pos, next;
+     int retval;
+     int total = 0;
+ #ifdef CHARSET_EBCDIC
+-    /* When getline() is called, the HTTP protocol is in a state
++    /* When ap_getline() is called, the HTTP protocol is in a state
+      * where we MUST be reading "plain text" protocol stuff,
+      * (Request line, MIME headers, Chunk sizes) regardless of
+      * the MIME type and conversion setting of the document itself.
+@@ -978,7 +978,7 @@
+ 
+ static int read_request_line(request_rec *r)
+ {
+-    char l[DEFAULT_LIMIT_REQUEST_LINE + 2]; /* getline's two extra for \n\0 */
++    char l[DEFAULT_LIMIT_REQUEST_LINE + 2]; /* ap_getline's two extra for \n\0 */
+     const char *ll = l;
+     const char *uri;
+     conn_rec *conn = r->connection;
+@@ -1000,7 +1000,7 @@
+      * have to block during a read.
+      */
+     ap_bsetflag(conn->client, B_SAFEREAD, 1);
+-    while ((len = getline(l, sizeof(l), conn->client, 0)) <= 0) {
++    while ((len = ap_getline(l, sizeof(l), conn->client, 0)) <= 0) {
+         if ((len < 0) || ap_bgetflag(conn->client, B_EOF)) {
+             ap_bsetflag(conn->client, B_SAFEREAD, 0);
+ 	    /* this is a hack to make sure that request time is set,
+@@ -1031,7 +1031,7 @@
+ 
+     ap_parse_uri(r, uri);
+ 
+-    /* getline returns (size of max buffer - 1) if it fills up the
++    /* ap_getline returns (size of max buffer - 1) if it fills up the
+      * buffer before finding the end-of-line.  This is only going to
+      * happen if it exceeds the configured limit for a request-line.
+      */
+@@ -1056,7 +1056,7 @@
+ 
+ static void get_mime_headers(request_rec *r)
+ {
+-    char field[DEFAULT_LIMIT_REQUEST_FIELDSIZE + 2]; /* getline's two extra */
++    char field[DEFAULT_LIMIT_REQUEST_FIELDSIZE + 2]; /* ap_getline's two extra */
+     conn_rec *c = r->connection;
+     char *value;
+     char *copy;
+@@ -1071,7 +1071,7 @@
+      * Read header lines until we get the empty separator line, a read error,
+      * the connection closes (EOF), reach the server limit, or we timeout.
+      */
+-    while ((len = getline(field, sizeof(field), c->client, 1)) > 0) {
++    while ((len = ap_getline(field, sizeof(field), c->client, 1)) > 0) {
+ 
+         if (r->server->limit_req_fields &&
+             (++fields_read > r->server->limit_req_fields)) {
+@@ -1081,7 +1081,7 @@
+                           "this server's limit.<P>\n");
+             return;
+         }
+-        /* getline returns (size of max buffer - 1) if it fills up the
++        /* ap_getline returns (size of max buffer - 1) if it fills up the
+          * buffer before finding the end-of-line.  This is only going to
+          * happen if it exceeds the configured limit for a field size.
+          */
+@@ -1513,7 +1513,6 @@
+ API_EXPORT(void) ap_basic_http_header(request_rec *r)
+ {
+     char *protocol;
+-    const char *server;
+ 
+     if (r->assbackwards)
+         return;
+@@ -1542,11 +1541,14 @@
+     /* output the date header */
+     ap_send_header_field(r, "Date", ap_gm_timestr_822(r->pool, r->request_time));
+ 
+-    /* keep a previously set server header (possible from proxy), otherwise
++    /* keep the set-by-proxy server header, otherwise
+      * generate a new server header */
+-    if (server = ap_table_get(r->headers_out, "Server")) {
++    if (r->proxyreq) {
++        const char *server = ap_table_get(r->headers_out, "Server");
++        if (server) {
+         ap_send_header_field(r, "Server", server);
+     }
++    }
+     else {
+         ap_send_header_field(r, "Server", ap_get_server_version());
+     }
+@@ -2016,7 +2018,7 @@
+     return 1;
+ }
+ 
+-static long get_chunk_size(char *b)
++API_EXPORT(long) ap_get_chunk_size(char *b)
+ {
+     long chunksize = 0;
+ 
+@@ -2098,14 +2100,14 @@
+ 
+     if (r->remaining == 0) {    /* Start of new chunk */
+ 
+-        chunk_start = getline(buffer, bufsiz, r->connection->client, 0);
++        chunk_start = ap_getline(buffer, bufsiz, r->connection->client, 0);
+         if ((chunk_start <= 0) || (chunk_start >= (bufsiz - 1))
+             || !ap_isxdigit(*buffer)) {
+             r->connection->keepalive = -1;
+             return -1;
+         }
+ 
+-        len_to_read = get_chunk_size(buffer);
++        len_to_read = ap_get_chunk_size(buffer);
+ 
+         if (len_to_read == 0) { /* Last chunk indicated, get footers */
+             if (r->read_body == REQUEST_CHUNKED_DECHUNK) {
+@@ -2139,7 +2141,7 @@
+         len_read = chunk_start;
+ 
+         while ((bufsiz > 1) && ((len_read =
+-                  getline(buffer, bufsiz, r->connection->client, 1)) > 0)) {
++                  ap_getline(buffer, bufsiz, r->connection->client, 1)) > 0)) {
+ 
+             if (len_read != (bufsiz - 1)) {
+                 buffer[len_read++] = CR;        /* Restore footer line end  */
+Index: modules/proxy/mod_proxy.c
+===================================================================
+RCS file: /home/cvs/apache-1.3/src/modules/proxy/mod_proxy.c,v
+retrieving revision 1.80
+retrieving revision 1.81
+diff -u -b -u -r1.80 -r1.81
+--- modules/proxy/mod_proxy.c	13 Mar 2002 21:05:32 -0000	1.80
++++ modules/proxy/mod_proxy.c	25 Mar 2002 09:21:58 -0000	1.81
+@@ -99,8 +99,9 @@
+ 
+     while (aliasp < end_fakename) {
+         if (*aliasp == '/') {
+-            /* any number of '/' in the alias matches any number in
+-             * the supplied URI, but there must be at least one...
++            /*
++             * any number of '/' in the alias matches any number in the
++             * supplied URI, but there must be at least one...
+              */
+             if (*urip != '/')
+                 return 0;
+@@ -122,9 +123,9 @@
+     if (aliasp[-1] != '/' && *urip != '\0' && *urip != '/')
+         return 0;
+ 
+-    /* Return number of characters from URI which matched (may be
+-     * greater than length of alias, since we may have matched
+-     * doubled slashes)
++    /*
++     * Return number of characters from URI which matched (may be greater
++     * than length of alias, since we may have matched doubled slashes)
+      */
+ 
+     return urip - uri;
+@@ -146,7 +147,7 @@
+     void *sconf = r->server->module_config;
+     proxy_server_conf *conf;
+ 
+-    conf = (proxy_server_conf *) ap_get_module_config(sconf, &proxy_module);
++    conf = (proxy_server_conf *)ap_get_module_config(sconf, &proxy_module);
+ 
+     if (conf->req && r->parsed_uri.scheme) {
+         /* but it might be something vhosted */
+@@ -176,20 +177,22 @@
+ {
+     void *sconf = r->server->module_config;
+     proxy_server_conf *conf =
+-    (proxy_server_conf *) ap_get_module_config(sconf, &proxy_module);
++    (proxy_server_conf *)ap_get_module_config(sconf, &proxy_module);
+     int i, len;
+-    struct proxy_alias *ent = (struct proxy_alias *) conf->aliases->elts;
++    struct proxy_alias *ent = (struct proxy_alias *)conf->aliases->elts;
+ 
+     if (r->proxyreq != NOT_PROXY) {
+-        /* someone has already set up the proxy, it was possibly ourselves
+-         * in proxy_detect
++        /*
++         * someone has already set up the proxy, it was possibly ourselves in
++         * proxy_detect
+          */
+         return OK;
+     }
+ 
+-    /* XXX: since r->uri has been manipulated already we're not really
+-     * compliant with RFC1945 at this point.  But this probably isn't
+-     * an issue because this is a hybrid proxy/origin server.
++    /*
++     * XXX: since r->uri has been manipulated already we're not really
++     * compliant with RFC1945 at this point.  But this probably isn't an
++     * issue because this is a hybrid proxy/origin server.
+      */
+ 
+     for (i = 0; i < conf->aliases->nelts; i++) {
+@@ -272,7 +275,7 @@
+                                   UNP_REVEALPASSWORD);
+ 
+     ap_table_set(r->headers_out, "Location", nuri);
+-    ap_log_rerror(APLOG_MARK, APLOG_INFO|APLOG_NOERRNO, r,
++    ap_log_rerror(APLOG_MARK, APLOG_INFO | APLOG_NOERRNO, r,
+                 "Domain missing: %s sent to %s%s%s", r->uri,
+                 ap_unparse_uri_components(r->pool, &r->parsed_uri,
+                       UNP_OMITUSERINFO),
+@@ -289,7 +292,7 @@
+     char *url, *scheme, *p;
+     void *sconf = r->server->module_config;
+     proxy_server_conf *conf =
+-    (proxy_server_conf *) ap_get_module_config(sconf, &proxy_module);
++    (proxy_server_conf *)ap_get_module_config(sconf, &proxy_module);
+     array_header *proxies = conf->proxies;
+     struct proxy_remote *ents = (struct proxy_remote *) proxies->elts;
+     int i, rc;
+@@ -313,7 +316,7 @@
+             return OK;
+         }
+         ap_table_setn(r->headers_in, "Max-Forwards", 
+-                      ap_psprintf(r->pool, "%ld", (maxfwd > 0) ? maxfwd-1 : 0));
++                ap_psprintf(r->pool, "%ld", (maxfwd > 0) ? maxfwd - 1 : 0));
+     }
+ 
+     if ((rc = ap_setup_client_block(r, REQUEST_CHUNKED_ERROR)))
+@@ -343,16 +346,16 @@
+     /* Check URI's destination host against NoProxy hosts */
+     /* Bypass ProxyRemote server lookup if configured as NoProxy */
+     /* we only know how to handle communication to a proxy via http */
+-    /*if (strcasecmp(scheme, "http") == 0) */
++    /* if (strcasecmp(scheme, "http") == 0) */
+     {
+         int ii;
+-        struct dirconn_entry *list = (struct dirconn_entry *) conf->dirconn->elts;
++        struct dirconn_entry *list = (struct dirconn_entry *)conf->dirconn->elts;
+ 
+         for (direct_connect = ii = 0; ii < conf->dirconn->nelts && !direct_connect; ii++) {
+             direct_connect = list[ii].matcher(&list[ii], r);
+         }
+ #if DEBUGGING
+-        ap_log_rerror(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r,
++        ap_log_rerror(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r,
+                      (direct_connect) ? "NoProxy for %s" : "UseProxy for %s",
+                      r->uri);
+ #endif
+@@ -367,8 +370,9 @@
+                 (p == NULL && strcasecmp(scheme, ents[i].scheme) == 0) ||
+                 (p != NULL &&
+                strncasecmp(url, ents[i].scheme, strlen(ents[i].scheme)) == 0)) {
+-                /* CONNECT is a special method that bypasses the normal
+-                 * proxy code.
++                /*
++                 * CONNECT is a special method that bypasses the normal proxy
++                 * code.
+                  */
+                 if (r->method_number == M_CONNECT)
+                     rc = ap_proxy_connect_handler(r, cr, url, ents[i].hostname,
+@@ -422,7 +426,8 @@
+     ps->viaopt_set = 0; /* 0 means default */
+     ps->req = 0;
+     ps->req_set = 0;
+-    ps->recv_buffer_size = 0; /* this default was left unset for some reason */
++    ps->recv_buffer_size = 0;   /* this default was left unset for some
++                                 * reason */
+     ps->recv_buffer_size_set = 0;
+     ps->io_buffer_size = IOBUFSIZE;
+     ps->io_buffer_size_set = 0;
+@@ -454,8 +459,8 @@
+                         void *overridesv)
+ {
+     proxy_server_conf *ps = ap_pcalloc(p, sizeof(proxy_server_conf));
+-    proxy_server_conf *base = (proxy_server_conf *) basev;
+-    proxy_server_conf *overrides = (proxy_server_conf *) overridesv;
++    proxy_server_conf *base = (proxy_server_conf *)basev;
++    proxy_server_conf *overrides = (proxy_server_conf *)overridesv;
+ 
+     ps->proxies = ap_append_arrays(p, base->proxies, overrides->proxies);
+     ps->aliases = ap_append_arrays(p, base->aliases, overrides->aliases);
+@@ -490,7 +495,7 @@
+ {
+     server_rec *s = cmd->server;
+     proxy_server_conf *conf =
+-    (proxy_server_conf *) ap_get_module_config(s->module_config, &proxy_module);
++    (proxy_server_conf *)ap_get_module_config(s->module_config, &proxy_module);
+     struct proxy_remote *new;
+     char *p, *q;
+     int port;
+@@ -532,7 +537,7 @@
+ {
+     server_rec *s = cmd->server;
+     proxy_server_conf *conf =
+-    (proxy_server_conf *) ap_get_module_config(s->module_config, &proxy_module);
++    (proxy_server_conf *)ap_get_module_config(s->module_config, &proxy_module);
+     struct proxy_alias *new;
+ 
+     new = ap_push_array(conf->aliases);
+@@ -579,7 +584,10 @@
+         new->name = arg;
+         /* Don't do name lookups on things that aren't dotted */
+         if (strchr(arg, '.') != NULL && ap_proxy_host2addr(new->name, &hp) == NULL)
+-            /*@@@FIXME: This copies only the first of (possibly many) IP addrs */
++            /*
++             * @@@FIXME: This copies only the first of (possibly many) IP
++             * addrs
++             */
+             memcpy(&new->addr, hp.h_addr, sizeof(struct in_addr));
+         else
+             new->addr.s_addr = 0;
+@@ -616,7 +624,7 @@
+     proxy_server_conf *conf =
+     ap_get_module_config(s->module_config, &proxy_module);
+     struct dirconn_entry *New;
+-    struct dirconn_entry *list = (struct dirconn_entry *) conf->dirconn->elts;
++    struct dirconn_entry *list = (struct dirconn_entry *)conf->dirconn->elts;
+     int found = 0;
+     int i;
+ 
+@@ -733,7 +741,7 @@
+ 
+     if (sscanf(arg, "%lg", &val) != 1)
+         return "CacheMaxExpire value must be a float";
+-    psf->cache.maxexpire = (int) (val * (double) SEC_ONE_HR);
++    psf->cache.maxexpire = (int)(val * (double)SEC_ONE_HR);
+     psf->cache.maxexpire_set = 1;
+     return NULL;
+ }
+@@ -747,7 +755,7 @@
+ 
+     if (sscanf(arg, "%lg", &val) != 1)
+         return "CacheDefaultExpire value must be a float";
+-    psf->cache.defaultexpire = (int) (val * (double) SEC_ONE_HR);
++    psf->cache.defaultexpire = (int)(val * (double)SEC_ONE_HR);
+     psf->cache.defaultexpire_set = 1;
+     return NULL;
+ }
+@@ -761,7 +769,7 @@
+ 
+     if (sscanf(arg, "%lg", &val) != 1)
+         return "CacheGcInterval value must be a float";
+-    psf->cache.gcinterval = (int) (val * (double) SEC_ONE_HR);
++    psf->cache.gcinterval = (int)(val * (double)SEC_ONE_HR);
+     psf->cache.gcinterval_set = 1;
+     return NULL;
+ }
+@@ -823,7 +831,10 @@
+         new->name = arg;
+         /* Don't do name lookups on things that aren't dotted */
+         if (strchr(arg, '.') != NULL && ap_proxy_host2addr(new->name, &hp) == NULL)
+-            /*@@@FIXME: This copies only the first of (possibly many) IP addrs */
++            /*
++             * @@@FIXME: This copies only the first of (possibly many) IP
++             * addrs
++             */
+             memcpy(&new->addr, hp.h_addr, sizeof(struct in_addr));
+         else
+             new->addr.s_addr = 0;
+@@ -858,7 +869,7 @@
+     return NULL;
+ }
+ 
+-static const char*
++static const char *
+     set_cache_completion(cmd_parms *parms, void *dummy, char *arg)
+ {
+     proxy_server_conf *psf =
+@@ -876,7 +887,7 @@
+     return NULL;    
+ }
+ 
+-static const char*
++static const char *
+     set_via_opt(cmd_parms *parms, void *dummy, char *arg)
+ {
+     proxy_server_conf *psf =
+@@ -974,5 +985,3 @@
+     NULL,                       /* child_exit */
+     proxy_detect                /* post read-request */
+ };
+-
+-
+Index: modules/proxy/mod_proxy.h
+===================================================================
+RCS file: /home/cvs/apache-1.3/src/modules/proxy/mod_proxy.h,v
+retrieving revision 1.57
+retrieving revision 1.58
+diff -u -b -u -r1.57 -r1.58
+--- modules/proxy/mod_proxy.h	13 Mar 2002 21:05:32 -0000	1.57
++++ modules/proxy/mod_proxy.h	7 Apr 2002 18:57:36 -0000	1.58
+@@ -297,7 +297,7 @@
+                          char **passwordp, char **hostp, int *port);
+ const char *ap_proxy_date_canon(pool *p, const char *x);
+ table *ap_proxy_read_headers(request_rec *r, char *buffer, int size, BUFF *f);
+-long int ap_proxy_send_fb(BUFF *f, request_rec *r, cache_req *c, off_t len, int nowrite, size_t recv_buffer_size);
++long int ap_proxy_send_fb(BUFF *f, request_rec *r, cache_req *c, off_t len, int nowrite, int chunked, size_t recv_buffer_size);
+ void ap_proxy_write_headers(cache_req *c, const char *respline, table *t);
+ int ap_proxy_liststr(const char *list, const char *key, char **val);
+ void ap_proxy_hash(const char *it, char *val, int ndepth, int nlength);
+Index: modules/proxy/proxy_cache.c
+===================================================================
+RCS file: /home/cvs/apache-1.3/src/modules/proxy/proxy_cache.c,v
+retrieving revision 1.81
+retrieving revision 1.86
+diff -u -b -u -r1.81 -r1.86
+--- modules/proxy/proxy_cache.c	13 Mar 2002 21:05:32 -0000	1.81
++++ modules/proxy/proxy_cache.c	12 Apr 2002 12:34:46 -0000	1.86
+@@ -135,14 +135,14 @@
+ {
+     static int inside = 0;
+ 
+-    (void) ap_acquire_mutex(garbage_mutex);
++    (void)ap_acquire_mutex(garbage_mutex);
+     if (inside == 1) {
+-        (void) ap_release_mutex(garbage_mutex);
++        (void)ap_release_mutex(garbage_mutex);
+         return;
+     }
+     else
+         inside = 1;
+-    (void) ap_release_mutex(garbage_mutex);
++    (void)ap_release_mutex(garbage_mutex);
+ 
+     ap_block_alarms();          /* avoid SIGALRM on big cache cleanup */
+     if (should_proxy_garbage_coll(r))
+@@ -153,14 +153,13 @@
+ #endif
+     ap_unblock_alarms();
+ 
+-    (void) ap_acquire_mutex(garbage_mutex);
++    (void)ap_acquire_mutex(garbage_mutex);
+     inside = 0;
+-    (void) ap_release_mutex(garbage_mutex);
++    (void)ap_release_mutex(garbage_mutex);
+ }
+ 
+ 
+-static void
+-add_long61 (long61_t *accu, long val)
++static void add_long61(long61_t *accu, long val)
+ {
+     /* Add in lower 30 bits */
+     accu->lower += (val & 0x3FFFFFFFL);
+@@ -170,8 +169,7 @@
+     accu->lower &= 0x3FFFFFFFL;
+ }
+ 
+-static void
+-sub_long61 (long61_t *accu, long val)
++static void sub_long61(long61_t *accu, long val)
+ {
+     int carry = (val & 0x3FFFFFFFL) > accu->lower;
+     /* Subtract lower 30 bits */
+@@ -185,8 +183,7 @@
+  * return  0 when left == right
+  * return >0 when left > right
+  */
+-static long
+-cmp_long61 (long61_t *left, long61_t *right)
++static long cmp_long61(long61_t *left, long61_t *right)
+ {
+     return (left->upper == right->upper) ? (left->lower - right->lower)
+                                          : (left->upper - right->upper);
+@@ -282,7 +279,7 @@
+ {
+     void *sconf = r->server->module_config;
+     proxy_server_conf *pconf =
+-    (proxy_server_conf *) ap_get_module_config(sconf, &proxy_module);
++    (proxy_server_conf *)ap_get_module_config(sconf, &proxy_module);
+     const struct cache_conf *conf = &pconf->cache;
+ 
+     const char *cachedir = conf->root;
+@@ -295,27 +292,29 @@
+     if (cachedir == NULL || every == -1)
+         return 0;
+ 
+-    filename = ap_palloc(r->pool, strlen(cachedir) + strlen( DOT_TIME ) +1);
++    filename = ap_palloc(r->pool, strlen(cachedir) + strlen(DOT_TIME) + 1);
+ 
+     garbage_now = time(NULL);
+-    /* Usually, the modification time of <cachedir>/.time can only increase.
++    /*
++     * Usually, the modification time of <cachedir>/.time can only increase.
+      * Thus, even with several child processes having their own copy of
+-     * lastcheck, if time(NULL) still < lastcheck then it's not time
+-     * for GC yet.
++     * lastcheck, if time(NULL) still < lastcheck then it's not time for GC
++     * yet.
+      */
+     if (garbage_now != -1 && lastcheck != BAD_DATE && garbage_now < lastcheck + every)
+         return 0;
+ 
+-    strcpy(filename,cachedir);
+-    strcat(filename,DOT_TIME);
++    strcpy(filename, cachedir);
++    strcat(filename, DOT_TIME);
+ 
+-    /* At this point we have a bit of an engineering compromise. We could either
+-     * create and/or mark the .time file  (prior to the fork which might
+-     * fail on a resource issue) or wait until we are safely forked. The
+-     * advantage of doing it now in this process is that we get some
+-     * usefull live out of the global last check variable. (XXX which
+-     * should go scoreboard IMHO.) Note that the actual counting is 
+-     * at a later moment.
++    /*
++     * At this point we have a bit of an engineering compromise. We could
++     * either create and/or mark the .time file  (prior to the fork which
++     * might fail on a resource issue) or wait until we are safely forked.
++     * The advantage of doing it now in this process is that we get some
++     * usefull live out of the global last check variable. (XXX which should
++     * go scoreboard IMHO.) Note that the actual counting is at a later
++     * moment.
+      */
+    if (stat(filename, &buf) == -1) {   /* does not exist */
+         if (errno != ENOENT) {
+@@ -351,7 +350,7 @@
+     const char *cachedir;
+     void *sconf = r->server->module_config;
+     proxy_server_conf *pconf =
+-    (proxy_server_conf *) ap_get_module_config(sconf, &proxy_module);
++    (proxy_server_conf *)ap_get_module_config(sconf, &proxy_module);
+     const struct cache_conf *conf = &pconf->cache;
+     array_header *files;
+     struct gc_ent *fent;
+@@ -372,9 +371,9 @@
+     sub_garbage_coll(r, files, cachedir, "/");
+ 
+     if (cmp_long61(&curbytes, &cachesize) < 0L) {
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server,
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server,
+                          "proxy GC: Cache is %ld%% full (nothing deleted)",
+-                         (long)(((curbytes.upper<<20)|(curbytes.lower>>10))*100/conf->space));
++                     (long)(((curbytes.upper << 20) | (curbytes.lower >> 10)) * 100 / conf->space));
+         ap_unblock_alarms();
+         return;
+     }
+@@ -385,7 +384,7 @@
+     for (i = 0; i < files->nelts; i++) {
+         fent = &((struct gc_ent *) files->elts)[i];
+         sprintf(filename, "%s%s", cachedir, fent->file);
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "GC Unlinking %s (expiry %ld, garbage_now %ld)", filename, (long)fent->expire, (long)garbage_now);
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "GC Unlinking %s (expiry %ld, garbage_now %ld)", filename, (long)fent->expire, (long)garbage_now);
+ #if TESTING
+         fprintf(stderr, "Would unlink %s\n", filename);
+ #else
+@@ -403,16 +402,16 @@
+         }
+     }
+ 
+-    ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server,
++    ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server,
+                          "proxy GC: Cache is %ld%% full (%d deleted)",
+-                         (long)(((curbytes.upper<<20)|(curbytes.lower>>10))*100/conf->space), i);
++                 (long)(((curbytes.upper << 20) | (curbytes.lower >> 10)) * 100 / conf->space), i);
+     ap_unblock_alarms();
+ }
+ 
+ static int sub_garbage_coll(request_rec *r, array_header *files,
+                           const char *cachebasedir, const char *cachesubdir)
+ {
+-    char line[17*(3)];
++    char line[17 * (3)];
+     char cachedir[HUGE_STRING_LEN];
+     struct stat buf;
+     int fd, i;
+@@ -428,7 +427,7 @@
+ 
+     ap_snprintf(cachedir, sizeof(cachedir), "%s%s", cachebasedir, cachesubdir);
+     filename = ap_palloc(r->pool, strlen(cachedir) + HASH_LEN + 2);
+-    ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "GC Examining directory %s", cachedir);
++    ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "GC Examining directory %s", cachedir);
+     dir = opendir(cachedir);
+     if (dir == NULL) {
+         ap_log_error(APLOG_MARK, APLOG_ERR, r->server,
+@@ -440,7 +439,7 @@
+         if (ent->d_name[0] == '.')
+             continue;
+         sprintf(filename, "%s%s", cachedir, ent->d_name);
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "GC Examining file %s", filename);
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "GC Examining file %s", filename);
+ /* is it a temporary file? */
+         if (strncmp(ent->d_name, "tmp", 3) == 0) {
+ /* then stat it to see how old it is; delete temporary files > 1 day old */
+@@ -451,8 +450,8 @@
+             }
+             else if (garbage_now != -1 && buf.st_atime < garbage_now - SEC_ONE_DAY &&
+                      buf.st_mtime < garbage_now - SEC_ONE_DAY) {
+-                ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "GC unlink %s", filename);
+-                ap_log_error(APLOG_MARK, APLOG_INFO|APLOG_NOERRNO, r->server,
++                ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "GC unlink %s", filename);
++                ap_log_error(APLOG_MARK, APLOG_INFO | APLOG_NOERRNO, r->server,
+                              "proxy gc: deleting orphaned cache file %s", filename);
+ #if TESTING
+                 fprintf(stderr, "Would unlink %s\n", filename);
+@@ -472,15 +471,16 @@
+ #if defined(OS2) || defined(TPF)
+ /* is it a directory? */
+ #ifdef OS2
+-        if (ent->d_attr & A_DIR) {
++        if (ent->d_attr & A_DIR)
+ #elif defined(TPF)
+     if (stat(filename, &buf) == -1) {
+         if (errno != ENOENT)
+             ap_log_error(APLOG_MARK, APLOG_ERR, r->server,
+                  "proxy gc: stat(%s)", filename);
+     }
+-    if (S_ISDIR(buf.st_mode)) {
++        if (S_ISDIR(buf.st_mode))
+ #endif
++        {
+             char newcachedir[HUGE_STRING_LEN];
+             ap_snprintf(newcachedir, sizeof(newcachedir),
+                         "%s%s/", cachesubdir, ent->d_name);
+@@ -500,9 +500,9 @@
+ 
+ /* read the file */
+ #if defined(WIN32)
+-        /* On WIN32 open does not work for directories, 
+-         * so we us stat instead of fstat to determine 
+-         * if the file is a directory 
++        /*
++         * On WIN32 open does not work for directories, so we us stat instead
++         * of fstat to determine if the file is a directory
+          */
+         if (stat(filename, &buf) == -1) {
+             ap_log_error(APLOG_MARK, APLOG_ERR, r->server,
+@@ -545,7 +545,8 @@
+                 rmdir(newcachedir);
+ #endif
+                 --nfiles;
+-            } else {
++            }
++            else {
+                 /* Directory is not empty. Account for its size: */
+                 add_long61(&curbytes, ROUNDUP2BLOCKS(buf.st_size));
+             }
+@@ -554,7 +555,8 @@
+ #endif
+ 
+ #if defined(WIN32)
+-        /* Since we have determined above that the file is not a directory,
++        /*
++         * Since we have determined above that the file is not a directory,
+          * it should be safe to open it now 
+          */
+         fd = open(filename, O_RDONLY | O_BINARY);
+@@ -566,7 +568,7 @@
+         }
+ #endif
+  
+-        i = read(fd, line, 17*(3)-1);
++        i = read(fd, line, 17 * (3) - 1);
+         close(fd);
+         if (i == -1) {
+             ap_log_error(APLOG_MARK, APLOG_ERR, r->server,
+@@ -574,13 +576,13 @@
+             continue;
+         }
+         line[i] = '\0';
+-        garbage_expire = ap_proxy_hex2sec(line + 17*(2));
++        garbage_expire = ap_proxy_hex2sec(line + 17 * (2));
+         if (!ap_checkmask(line, "&&&&&&&&&&&&&&&& &&&&&&&&&&&&&&&& &&&&&&&&&&&&&&&&") ||
+             garbage_expire == BAD_DATE) {
+             /* bad file */
+             if (garbage_now != -1 && buf.st_atime > garbage_now + SEC_ONE_DAY &&
+                 buf.st_mtime > garbage_now + SEC_ONE_DAY) {
+-                ap_log_error(APLOG_MARK, APLOG_WARNING|APLOG_NOERRNO, r->server,
++                ap_log_error(APLOG_MARK, APLOG_WARNING | APLOG_NOERRNO, r->server,
+                              "proxy: deleting bad cache file with future date: %s", filename);
+ #if TESTING
+                 fprintf(stderr, "Would unlink bad file %s\n", filename);
+@@ -632,29 +634,28 @@
+ 
+     /* read the data from the cache file */
+ 
+-    /* Format:
++    /*
++     * Format:
+      *
+-     * The cache needs to keep track of the following information:
+-     * - Date, LastMod, Version, ReqTime, RespTime, ContentLength
+-     * - The original request headers (for Vary)
+-     * - The original response headers (for returning with a cached response)
+-     * - The body of the message
+-     *
+-     * date SP lastmod SP expire SP count SP request-time SP response-time SP content-lengthCRLF
+-     * (dates are stored as hex seconds since 1970)
+-     * Original URLCRLF
+-     * Original Request Headers
+-     * CRLF
+-     * Original Response Headers
+-     * CRLF
+-     * Body
++     * The cache needs to keep track of the following information: - Date,
++     * LastMod, Version, ReqTime, RespTime, ContentLength - The original
++     * request headers (for Vary) - The original response headers (for
++     * returning with a cached response) - The body of the message
++     * 
++     * date SP lastmod SP expire SP count SP request-time SP response-time SP
++     * content-lengthCRLF (dates are stored as hex seconds since 1970)
++     * Original URLCRLF Original Request Headers CRLF Original Response
++     * Headers CRLF Body
+      * 
+      */
+ 
+     /* retrieve cachefile information values */
+     len = ap_bgets(urlbuff, sizeof urlbuff, cachefp);
+-    if (len == -1)
++    if (len == -1) {
++        /* Delete broken cache file */
++        unlink(c->filename);
+         return -1;
++    }
+     if (len == 0 || urlbuff[len - 1] != '\n')
+         return 0;
+     urlbuff[len - 1] = '\0';
+@@ -663,18 +664,21 @@
+                    "&&&&&&&&&&&&&&&& &&&&&&&&&&&&&&&& &&&&&&&&&&&&&&&& &&&&&&&&&&&&&&&& &&&&&&&&&&&&&&&& &&&&&&&&&&&&&&&& &&&&&&&&&&&&&&&&"))
+         return 0;
+ 
+-    c->date = ap_proxy_hex2sec(urlbuff + 17*(0));
+-    c->lmod = ap_proxy_hex2sec(urlbuff + 17*(1));
+-    c->expire = ap_proxy_hex2sec(urlbuff + 17*(2));
+-    c->version = ap_proxy_hex2sec(urlbuff + 17*(3));
+-    c->req_time = ap_proxy_hex2sec(urlbuff + 17*(4));
+-    c->resp_time = ap_proxy_hex2sec(urlbuff + 17*(5));
+-    c->len = ap_proxy_hex2sec(urlbuff + 17*(6));
++    c->date = ap_proxy_hex2sec(urlbuff + 17 * (0));
++    c->lmod = ap_proxy_hex2sec(urlbuff + 17 * (1));
++    c->expire = ap_proxy_hex2sec(urlbuff + 17 * (2));
++    c->version = ap_proxy_hex2sec(urlbuff + 17 * (3));
++    c->req_time = ap_proxy_hex2sec(urlbuff + 17 * (4));
++    c->resp_time = ap_proxy_hex2sec(urlbuff + 17 * (5));
++    c->len = ap_proxy_hex2sec(urlbuff + 17 * (6));
+ 
+     /* check that we have the same URL */
+     len = ap_bgets(urlbuff, sizeof urlbuff, cachefp);
+-    if (len == -1)
++    if (len == -1) {
++        /* Delete broken cache file */
++        unlink(c->filename);
+         return -1;
++    }
+     if (len == 0 || strncmp(urlbuff, "X-URL: ", 7) != 0 ||
+         urlbuff[len - 1] != '\n')
+         return 0;
+@@ -684,13 +688,19 @@
+ 
+     /* then the original request headers */
+     c->req_hdrs = ap_proxy_read_headers(r, urlbuff, sizeof urlbuff, cachefp);
+-    if (c->req_hdrs == NULL)
++    if (c->req_hdrs == NULL) {
++        /* Delete broken cache file */
++        unlink(c->filename);
+         return -1;
++    }
+ 
+     /* then the original response headers */
+     len = ap_bgets(urlbuff, sizeof urlbuff, cachefp);
+-    if (len == -1)
++    if (len == -1) {
++        /* Delete broken cache file */
++        unlink(c->filename);
+         return -1;
++    }
+     if (len == 0 || urlbuff[len - 1] != '\n')
+         return 0;
+     urlbuff[--len] = '\0';
+@@ -702,8 +712,11 @@
+ 
+     c->status = atoi(strp);
+     c->hdrs = ap_proxy_read_headers(r, urlbuff, sizeof urlbuff, cachefp);
+-    if (c->hdrs == NULL)
++    if (c->hdrs == NULL) {
++        /* Delete broken cache file */
++        unlink(c->filename);
+         return -1;
++    }
+     if (c->len != -1)    /* add a content-length header */
+         if (ap_table_get(c->hdrs, "Content-Length") == NULL) {
+             ap_table_set(c->hdrs, "Content-Length",
+@@ -735,52 +748,53 @@
+     /* check for If-Match, If-Unmodified-Since */
+     while (1) {
+ 
+-        /* check If-Match and If-Unmodified-Since exist
++        /*
++         * check If-Match and If-Unmodified-Since exist
+          *
+-         * If neither of these exist, the request is not conditional, and
+-         * we serve it normally
++         * If neither of these exist, the request is not conditional, and we
++         * serve it normally
+          */
+         if (!c->im && BAD_DATE == c->ius) {
+             break;
+         }
+ 
+-        /* check If-Match
++        /*
++         * check If-Match
+          *
+-         * we check if the Etag on the cached file is in the list of Etags
+-         * in the If-Match field. The comparison must be a strong comparison,
+-         * so the Etag cannot be marked as weak. If the comparision fails
+-         * we return 412 Precondition Failed.
+-         *
+-         * if If-Match is specified AND
+-         * If-Match is not a "*" AND
+-         * Etag is missing or weak or not in the list THEN
+-         * return 412 Precondition Failed
++         * we check if the Etag on the cached file is in the list of Etags in
++         * the If-Match field. The comparison must be a strong comparison, so
++         * the Etag cannot be marked as weak. If the comparision fails we
++         * return 412 Precondition Failed.
++         * 
++         * if If-Match is specified AND If-Match is not a "*" AND Etag is
++         * missing or weak or not in the list THEN return 412 Precondition
++         * Failed
+          */
+ 
+         if (c->im) {
+             if (strcmp(c->im, "*") &&
+             (!etag || (strlen(etag) > 1 && 'W' == etag[0] && '/' == etag[1]) || !ap_proxy_liststr(c->im, etag, NULL))) {
+-                ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "If-Match specified, and it didn't - return 412");
++                ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "If-Match specified, and it didn't - return 412");
+             }
+             else {
+-                ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "If-Match specified, and it matched");
++                ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "If-Match specified, and it matched");
+                 break;
+             }
+         }
+ 
+-        /* check If-Unmodified-Since
++        /*
++         * check If-Unmodified-Since
+          *
+-         * if If-Unmodified-Since is specified AND
+-         * Last-Modified is specified somewhere AND
+-         * If-Unmodified-Since is in the past compared to Last-Modified THEN
+-         * return 412 Precondition Failed
++         * if If-Unmodified-Since is specified AND Last-Modified is specified
++         * somewhere AND If-Unmodified-Since is in the past compared to
++         * Last-Modified THEN return 412 Precondition Failed
+          */
+         if (BAD_DATE != c->ius && BAD_DATE != c->lmod) {
+             if (c->ius < c->lmod) {
+-                ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "If-Unmodified-Since specified, but it wasn't - return 412");
++                ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "If-Unmodified-Since specified, but it wasn't - return 412");
+             }
+             else {
+-                ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "If-Unmodified-Since specified, and it was unmodified");
++                ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "If-Unmodified-Since specified, and it was unmodified");
+                 break;
+             }
+         }
+@@ -788,13 +802,13 @@
+         /* if cache file is being updated */
+         if (c->origfp) {
+             ap_proxy_write_headers(c, c->resp_line, c->hdrs);
+-            ap_proxy_send_fb(c->origfp, r, c, c->len, 1, IOBUFSIZE);
++            ap_proxy_send_fb(c->origfp, r, c, c->len, 1, 0, IOBUFSIZE);
+             ap_proxy_cache_tidy(c);
+         }
+         else
+             ap_pclosef(r->pool, ap_bfileno(cachefp, B_WR));
+ 
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "Use your cached copy, conditional precondition failed.");
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "Use your cached copy, conditional precondition failed.");
+         return HTTP_PRECONDITION_FAILED;
+     }
+ 
+@@ -802,53 +816,54 @@
+     /* check for If-None-Match, If-Modified-Since */
+     while (1) {
+ 
+-        /* check for existance of If-None-Match and If-Modified-Since
++        /*
++         * check for existance of If-None-Match and If-Modified-Since
+          *
+-         * if neither of these headers have been set, then the request
+-         * is not conditional, and we just send the cached response and
+-         * be done with it.
++         * if neither of these headers have been set, then the request is not
++         * conditional, and we just send the cached response and be done with
++         * it.
+          */
+         if (!c->inm && BAD_DATE == c->ims) {
+             break;
+         }
+ 
+-        /* check If-None-Match
++        /*
++         * check If-None-Match
+          *
+-         * we check if the Etag on the cached file is in the list of Etags
+-         * in the If-None-Match field. The comparison must be a strong comparison,
+-         * so the Etag cannot be marked as weak. If the comparision fails
+-         * we return 412 Precondition Failed.
+-         *
+-         * if If-None-Match is specified:
+-         * if If-None-Match is a "*" THEN 304
+-         * else if Etag is specified AND we get a match THEN 304
+-         * else if Weak Etag is specified AND we get a match THEN 304
+-         * else sent the original object
++         * we check if the Etag on the cached file is in the list of Etags in
++         * the If-None-Match field. The comparison must be a strong
++         * comparison, so the Etag cannot be marked as weak. If the
++         * comparision fails we return 412 Precondition Failed.
++         * 
++         * if If-None-Match is specified: if If-None-Match is a "*" THEN 304
++         * else if Etag is specified AND we get a match THEN 304 else if Weak
++         * Etag is specified AND we get a match THEN 304 else sent the
++         * original object
+          */
+         if (c->inm) {
+             if (!strcmp(c->inm, "*")) {
+-                ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "If-None-Match: * specified, return 304");
++                ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "If-None-Match: * specified, return 304");
+             }
+             else if (etag && ap_proxy_liststr(c->inm, etag, NULL)) {
+-                ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "If-None-Match: specified and we got a strong match - return 304");
++                ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "If-None-Match: specified and we got a strong match - return 304");
+             }
+             else if (wetag && ap_proxy_liststr(c->inm, wetag, NULL)) {
+-                ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "If-None-Match specified, and we got a weak match - return 304");
++                ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "If-None-Match specified, and we got a weak match - return 304");
+             }
+             else
+                 break;
+         }
+ 
+-        /* check If-Modified-Since
++        /*
++         * check If-Modified-Since
+          *
+-         * if If-Modified-Since is specified AND
+-         * Last-Modified is specified somewhere:
+-         * if last modification date is earlier than If-Modified-Since THEN 304
+-         * else send the original object
++         * if If-Modified-Since is specified AND Last-Modified is specified
++         * somewhere: if last modification date is earlier than
++         * If-Modified-Since THEN 304 else send the original object
+          */
+         if (BAD_DATE != c->ims && BAD_DATE != c->lmod) {
+             if (c->ims >= c->lmod) {
+-                ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "If-Modified-Since specified and not modified, try return 304");
++                ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "If-Modified-Since specified and not modified, try return 304");
+             }
+             else
+                 break;
+@@ -858,47 +873,43 @@
+         /* are we updating the cache file? */
+         if (c->origfp) {
+             ap_proxy_write_headers(c, c->resp_line, c->hdrs);
+-            ap_proxy_send_fb(c->origfp, r, c, c->len, 1, IOBUFSIZE);
++            ap_proxy_send_fb(c->origfp, r, c, c->len, 1, 0, IOBUFSIZE);
+             ap_proxy_cache_tidy(c);
+         }
+         else
+             ap_pclosef(r->pool, ap_bfileno(cachefp, B_WR));
+ 
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "Use local copy, cached file hasn't changed");
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "Use local copy, cached file hasn't changed");
+         return HTTP_NOT_MODIFIED;
+     }
+ 
+ 
+     /* No conditional - just send it cousin! */
+-    ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "Local copy modified, send it");
++    ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "Local copy modified, send it");
+     r->status_line = strchr(c->resp_line, ' ') + 1;
+     r->status = c->status;
+ 
+     /* Prepare and send headers to client */
+-    ap_overlap_tables(r->headers_out, c->hdrs, AP_OVERLAP_TABLES_SET);
++    ap_proxy_table_replace(r->headers_out, c->hdrs);
+     /* make sure our X-Cache header does not stomp on a previous header */
+     ap_table_mergen(r->headers_out, "X-Cache", c->xcache);
+ 
+     /* content type is already set in the headers */
+     r->content_type = ap_table_get(r->headers_out, "Content-Type");
+ 
+-    /* cookies are special: they must not be merged (stupid browsers) */
+-    ap_proxy_table_unmerge(r->pool, r->headers_out, "Set-Cookie");
+-    ap_proxy_table_unmerge(r->pool, r->headers_out, "Set-Cookie2");
+-
+     ap_send_http_header(r);
+ 
+     /* are we rewriting the cache file? */
+     if (c->origfp) {
+         ap_proxy_write_headers(c, c->resp_line, c->hdrs);
+-        ap_proxy_send_fb(c->origfp, r, c, c->len, r->header_only, IOBUFSIZE);
++        ap_proxy_send_fb(c->origfp, r, c, c->len, r->header_only, 0, IOBUFSIZE);
+         ap_proxy_cache_tidy(c);
+         return OK;
+     }
+ 
+     /* no, we not */
+     if (!r->header_only) {
+-        ap_proxy_send_fb(cachefp, r, NULL, c->len, 0, IOBUFSIZE);
++        ap_proxy_send_fb(cachefp, r, NULL, c->len, 0, 0, IOBUFSIZE);
+     }
+     else {
+         ap_pclosef(r->pool, ap_bfileno(cachefp, B_WR));
+@@ -922,17 +933,17 @@
+  *         if last modified after if-modified-since then add
+  *            last modified date to request
+  */
+-int ap_proxy_cache_check(request_rec *r, char *url, struct cache_conf *conf,
++int ap_proxy_cache_check(request_rec *r, char *url, struct cache_conf * conf,
+                       cache_req **cr)
+ {
+-    const char *datestr, *pragma_req = NULL, *pragma_cresp = NULL, *cc_req = NULL, *cc_cresp = NULL, *vary = NULL;
++    const char *datestr, *pragma_req = NULL, *pragma_cresp = NULL, *cc_req = NULL,
++        *cc_cresp = NULL;
+     cache_req *c;
+-    time_t now;
+     BUFF *cachefp;
+     int i;
+     void *sconf = r->server->module_config;
+     proxy_server_conf *pconf =
+-    (proxy_server_conf *) ap_get_module_config(sconf, &proxy_module);
++    (proxy_server_conf *)ap_get_module_config(sconf, &proxy_module);
+     const char *agestr = NULL;
+     char *val;
+     time_t age_c = 0;
+@@ -989,7 +1000,7 @@
+     else {
+       c->filename = NULL;
+       c->fp = NULL;
+-      ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "No CacheRoot, so no caching. Declining.");
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "No CacheRoot, so no caching. Declining.");
+       return DECLINED;
+     }
+ 
+@@ -1017,22 +1028,24 @@
+           unlink(c->filename);
+       c->fp = NULL;
+       c->filename = NULL;
+-      ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "no-store forbids caching. Declining.");
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "no-store forbids caching. Declining.");
+       return DECLINED;
+     }
+ 
+ /* if the cache file exists, open it */
+     cachefp = NULL;
+-    ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "Request for %s, pragma_req=%s, ims=%ld", url,
+-             pragma_req, c->ims);
++    ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "Request for %s, pragma_req=%s, ims=%ld", url,
++                 (pragma_req == NULL) ? "(unset)" : pragma_req, c->ims);
+ /* find out about whether the request can access the cache */
+     if (c->filename != NULL && r->method_number == M_GET &&
+-        strlen(url) < 1024 ) {
++        strlen(url) < 1024) {
+       cachefp = ap_proxy_open_cachefile(r, c->filename); 
+     }
+ 
+ 
+-    /* if a cache file exists, try reading body and headers from cache file */
++    /*
++     * if a cache file exists, try reading body and headers from cache file
++     */
+     if (cachefp != NULL) {
+         i = rdcache(r, cachefp, c);
+         if (i == -1)
+@@ -1040,7 +1053,7 @@
+                          "proxy: error reading cache file %s", 
+                          c->filename);
+         else if (i == 0)
+-            ap_log_rerror(APLOG_MARK, APLOG_ERR|APLOG_NOERRNO, r,
++            ap_log_rerror(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, r,
+                          "proxy: bad (short?) cache file: %s", c->filename);
+         if (i != 1) {
+             ap_pclosef(r->pool, ap_bfileno(cachefp, B_WR));
+@@ -1049,7 +1062,6 @@
+         if (c->hdrs) {
+             cc_cresp = ap_table_get(c->hdrs, "Cache-Control");
+             pragma_cresp = ap_table_get(c->hdrs, "Pragma");
+-            vary = ap_table_get(c->hdrs, "Vary");
+             if ((agestr = ap_table_get(c->hdrs, "Age"))) {
+                 age_c = atoi(agestr);
+             }
+@@ -1065,7 +1077,8 @@
+ */
+     /* FIXME: Shouldn't we check the URL somewhere? */
+ 
+-    /* Check Content-Negotiation - Vary
++    /*
++     * Check Content-Negotiation - Vary
+      *
+      * At this point we need to make sure that the object we found in the cache
+      * is the same object that would be delivered to the client, when the
+@@ -1092,8 +1105,10 @@
+                 ++vary;
+             }
+ 
+-            /* is this header in the request and the header in the cached
+-             * request identical? If not, we give up and do a straight get */
++            /*
++             * is this header in the request and the header in the cached
++             * request identical? If not, we give up and do a straight get
++             */
+             h1 = ap_table_get(r->headers_in, name);
+             h2 = ap_table_get(c->req_hdrs, name);
+             if (h1 == h2) {
+@@ -1106,42 +1121,43 @@
+ 
+                 /* headers do not match, so Vary failed */
+                 c->fp = cachefp;
+-                ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "Vary header mismatch - object must be fetched from scratch. Declining.");
++                ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "Vary header mismatch - object must be fetched from scratch. Declining.");
+                 return DECLINED;
+             }
+         }
+     }
+ 
+ 
+-    /* We now want to check if our cached data is still fresh. This depends
++    /*
++     * We now want to check if our cached data is still fresh. This depends
+      * on a few things, in this order:
+      *
+-     * - RFC2616 14.9.4 End to end reload, Cache-Control: no-cache
+-     * no-cache in either the request or the cached response means that
+-     * we must revalidate the request unconditionally, overriding any
+-     * expiration mechanism. It's equivalent to max-age=0,must-revalidate.
+-     *
+-     * - RFC2616 14.32 Pragma: no-cache
+-     * This is treated the same as Cache-Control: no-cache.
+-     *
+-     * - RFC2616 14.9.3 Cache-Control: max-stale, must-revalidate, proxy-revalidate
+-     * if the max-stale request header exists, modify the stale calculations
+-     * below so that an object can be at most <max-stale> seconds stale before
+-     * we request a revalidation, _UNLESS_ a must-revalidate or
+-     * proxy-revalidate cached response header exists to stop us doing this.
+-     *
+-     * - RFC2616 14.9.3 Cache-Control: s-maxage
+-     * the origin server specifies the maximum age an object can be before
+-     * it is considered stale. This directive has the effect of proxy|must
+-     * revalidate, which in turn means simple ignore any max-stale setting.
+-     *
+-     * - RFC2616 14.9.4 Cache-Control: max-age
+-     * this header can appear in both requests and responses. If both are
+-     * specified, the smaller of the two takes priority.
+-     *
+-     * - RFC2616 14.21 Expires:
+-     * if this request header exists in the cached entity, and it's value is
+-     * in the past, it has expired.
++     * - RFC2616 14.9.4 End to end reload, Cache-Control: no-cache no-cache in
++     * either the request or the cached response means that we must
++     * revalidate the request unconditionally, overriding any expiration
++     * mechanism. It's equivalent to max-age=0,must-revalidate.
++     * 
++     * - RFC2616 14.32 Pragma: no-cache This is treated the same as
++     * Cache-Control: no-cache.
++     * 
++     * - RFC2616 14.9.3 Cache-Control: max-stale, must-revalidate,
++     * proxy-revalidate if the max-stale request header exists, modify the
++     * stale calculations below so that an object can be at most <max-stale>
++     * seconds stale before we request a revalidation, _UNLESS_ a
++     * must-revalidate or proxy-revalidate cached response header exists to
++     * stop us doing this.
++     * 
++     * - RFC2616 14.9.3 Cache-Control: s-maxage the origin server specifies the
++     * maximum age an object can be before it is considered stale. This
++     * directive has the effect of proxy|must revalidate, which in turn means
++     * simple ignore any max-stale setting.
++     * 
++     * - RFC2616 14.9.4 Cache-Control: max-age this header can appear in both
++     * requests and responses. If both are specified, the smaller of the two
++     * takes priority.
++     * 
++     * - RFC2616 14.21 Expires: if this request header exists in the cached
++     * entity, and it's value is in the past, it has expired.
+      * 
+      */
+ 
+@@ -1166,7 +1182,9 @@
+     else
+         maxage_cresp = -1;
+ 
+-    /* if both maxage request and response, the smaller one takes priority */
++    /*
++     * if both maxage request and response, the smaller one takes priority
++     */
+     if (-1 == maxage_req)
+         maxage = maxage_cresp;
+     else if (-1 == maxage_cresp)
+@@ -1187,37 +1205,35 @@
+         minfresh = 0;
+ 
+     /* override maxstale if must-revalidate or proxy-revalidate */
+-    if (maxstale && ( (cc_cresp && ap_proxy_liststr(cc_cresp, "must-revalidate", NULL)) || (cc_cresp && ap_proxy_liststr(cc_cresp, "proxy-revalidate", NULL)) ))
++    if (maxstale && ((cc_cresp && ap_proxy_liststr(cc_cresp, "must-revalidate", NULL)) || (cc_cresp && ap_proxy_liststr(cc_cresp, "proxy-revalidate", NULL))))
+         maxstale = 0;
+ 
+-    now = time(NULL);
+     if (cachefp != NULL &&
+ 
+         /* handle no-cache */
+-        !( (cc_req && ap_proxy_liststr(cc_req, "no-cache", NULL)) ||
++        !((cc_req && ap_proxy_liststr(cc_req, "no-cache", NULL)) ||
+           (pragma_req && ap_proxy_liststr(pragma_req, "no-cache", NULL)) ||
+           (cc_cresp && ap_proxy_liststr(cc_cresp, "no-cache", NULL)) ||
+-          (pragma_cresp && ap_proxy_liststr(pragma_cresp, "no-cache", NULL)) ) &&
++      (pragma_cresp && ap_proxy_liststr(pragma_cresp, "no-cache", NULL))) &&
+ 
+         /* handle expiration */
+-        ( (-1 < smaxage && age < (smaxage - minfresh)) ||
++        ((-1 < smaxage && age < (smaxage - minfresh)) ||
+           (-1 < maxage && age < (maxage + maxstale - minfresh)) ||
+-          (c->expire != BAD_DATE && age < (c->expire - c->date + maxstale - minfresh)) )
+-
++         (c->expire != BAD_DATE && age < (c->expire - c->date + maxstale - minfresh)))
+         ) {
+ 
+         /* it's fresh darlings... */
+ 
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "Unexpired data available");
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "Unexpired data available");
+ 
+         /* set age header on response */
+         ap_table_set(c->hdrs, "Age",
+                         ap_psprintf(r->pool, "%lu", (unsigned long)age));
+ 
+         /* add warning if maxstale overrode freshness calculation */
+-        if (!( (-1 < smaxage && age < smaxage) ||
++        if (!((-1 < smaxage && age < smaxage) ||
+              (-1 < maxage && age < maxage) ||
+-             (c->expire != BAD_DATE && (c->expire - c->date) > age) )) {
++              (c->expire != BAD_DATE && (c->expire - c->date) > age))) {
+             /* make sure we don't stomp on a previous warning */
+             ap_table_merge(c->hdrs, "Warning", "110 Response is stale");
+         }
+@@ -1229,11 +1245,12 @@
+ 
+     }
+ 
+-    /* at this point we have determined our cached data needs revalidation
++    /*
++     * at this point we have determined our cached data needs revalidation
+      * but first - we check 1 thing:
+      *
+-     * RFC2616 14.9.4 - if "only-if-cached" specified, send a
+-     * 504 Gateway Timeout - we're not allowed to revalidate the object
++     * RFC2616 14.9.4 - if "only-if-cached" specified, send a 504 Gateway
++     * Timeout - we're not allowed to revalidate the object
+      */
+     if (ap_proxy_liststr(cc_req, "only-if-cached", NULL)) {
+         if (cachefp)
+@@ -1242,11 +1259,12 @@
+     }
+ 
+ 
+-    /* If we already have cached data and a last-modified date, and it is
+-     * not a head request, then add an If-Modified-Since.
++    /*
++     * If we already have cached data and a last-modified date, and it is not
++     * a head request, then add an If-Modified-Since.
+      *
+-     * If we also have an Etag, then the object must have come from
+-     * an HTTP/1.1 server. Add an If-None-Match as well.
++     * If we also have an Etag, then the object must have come from an HTTP/1.1
++     * server. Add an If-None-Match as well.
+      *
+      * See RFC2616 13.3.4
+      */
+@@ -1257,13 +1275,15 @@
+ 
+         /* If-Modified-Since */
+         if (c->lmod != BAD_DATE) {
+-            /* use the later of the one from the request and the last-modified date
+-             * from the cache */
++            /*
++             * use the later of the one from the request and the
++             * last-modified date from the cache
++             */
+             if (c->ims == BAD_DATE || c->ims < c->lmod) {
+                 const char *q;
+ 
+                 if ((q = ap_table_get(c->hdrs, "Last-Modified")) != NULL)
+-                    ap_table_set(r->headers_in, "If-Modified-Since", (char *) q);
++                    ap_table_set(r->headers_in, "If-Modified-Since", (char *)q);
+             }
+         }
+ 
+@@ -1277,7 +1297,7 @@
+ 
+     c->fp = cachefp;
+ 
+-    ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "Local copy not present or expired. Declining.");
++    ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "Local copy not present or expired. Declining.");
+ 
+     return DECLINED;
+ }
+@@ -1304,10 +1324,10 @@
+     char *p;
+     const char *expire, *lmods, *dates, *clen;
+     time_t expc, date, lmod, now;
+-    char buff[17*7+1];
++    char buff[17 * 7 + 1];
+     void *sconf = r->server->module_config;
+     proxy_server_conf *conf =
+-    (proxy_server_conf *) ap_get_module_config(sconf, &proxy_module);
++    (proxy_server_conf *)ap_get_module_config(sconf, &proxy_module);
+     const char *cc_resp;
+     table *req_hdrs;
+ 
+@@ -1317,8 +1337,10 @@
+ 
+     /* we've received the response from the origin server */
+     
+-    /* read expiry date; if a bad date, then leave it so the client can
+-     * read it */
++    /*
++     * read expiry date; if a bad date, then leave it so the client can read
++     * it
++     */
+     expire = ap_table_get(resp_hdrs, "Expires");
+     if (expire != NULL)
+         expc = ap_parseHTTPdate(expire);
+@@ -1341,44 +1363,55 @@
+     /*
+      * what responses should we not cache?
+      *
+-     * At this point we decide based on the response headers whether it
+-     * is appropriate _NOT_ to cache the data from the server. There are
+-     * a whole lot of conditions that prevent us from caching this data.
+-     * They are tested here one by one to be clear and unambiguous. */
+-
+-    /* RFC2616 13.4 we are allowed to cache 200, 203, 206, 300, 301 or 410
+-     * We don't cache 206, because we don't (yet) cache partial responses.
+-     * We include 304 Not Modified here too as this is the origin server
+-     * telling us to serve the cached copy. */
++     * At this point we decide based on the response headers whether it is
++     * appropriate _NOT_ to cache the data from the server. There are a whole
++     * lot of conditions that prevent us from caching this data. They are
++     * tested here one by one to be clear and unambiguous.
++     */
++
++    /*
++     * RFC2616 13.4 we are allowed to cache 200, 203, 206, 300, 301 or 410 We
++     * don't cache 206, because we don't (yet) cache partial responses. We
++     * include 304 Not Modified here too as this is the origin server telling
++     * us to serve the cached copy.
++     */
+     if ((r->status != HTTP_OK && r->status != HTTP_NON_AUTHORITATIVE && r->status != HTTP_MULTIPLE_CHOICES && r->status != HTTP_MOVED_PERMANENTLY && r->status != HTTP_NOT_MODIFIED) ||
+ 
+     /* if a broken Expires header is present, don't cache it */
+         (expire != NULL && expc == BAD_DATE) ||
+ 
+-    /* if the server said 304 Not Modified but we have no cache file - pass
+-     * this untouched to the user agent, it's not for us. */
++    /*
++     * if the server said 304 Not Modified but we have no cache file - pass
++     * this untouched to the user agent, it's not for us.
++     */
+         (r->status == HTTP_NOT_MODIFIED && (c == NULL || c->fp == NULL)) ||
+ 
+-    /* 200 OK response from HTTP/1.0 and up without a Last-Modified header */
++    /*
++     * 200 OK response from HTTP/1.0 and up without a Last-Modified header
++     */
+         (r->status == HTTP_OK && lmods == NULL && is_HTTP1) ||
+ 
+     /* HEAD requests */
+         r->header_only ||
+ 
+-    /* RFC2616 14.9.2 Cache-Control: no-store response indicating do not
+-     * cache, or stop now if you are trying to cache it */
++    /*
++     * RFC2616 14.9.2 Cache-Control: no-store response indicating do not
++     * cache, or stop now if you are trying to cache it
++     */
+         ap_proxy_liststr(cc_resp, "no-store", NULL) ||
+ 
+-    /* RFC2616 14.9.1 Cache-Control: private
+-     * this object is marked for this user's eyes only. Behave as a tunnel. */
++    /*
++     * RFC2616 14.9.1 Cache-Control: private this object is marked for this
++     * user's eyes only. Behave as a tunnel.
++     */
+         ap_proxy_liststr(cc_resp, "private", NULL) ||
+ 
+-    /* RFC2616 14.8 Authorisation:
+-     * if authorisation is included in the request, we don't cache, but we
+-     * can cache if the following exceptions are true:
+-     * 1) If Cache-Control: s-maxage is included
+-     * 2) If Cache-Control: must-revalidate is included
+-     * 3) If Cache-Control: public is included
++    /*
++     * RFC2616 14.8 Authorisation: if authorisation is included in the
++     * request, we don't cache, but we can cache if the following exceptions
++     * are true: 1) If Cache-Control: s-maxage is included 2) If
++     * Cache-Control: must-revalidate is included 3) If Cache-Control: public
++     * is included
+      */
+         (ap_table_get(r->headers_in, "Authorization") != NULL
+ 
+@@ -1388,7 +1421,7 @@
+     /* or we've been asked not to cache it above */
+         nocache) {
+ 
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "Response is not cacheable, unlinking %s", c->filename);
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "Response is not cacheable, unlinking %s", c->filename);
+ 
+         /* close the file */
+         if (c->fp != NULL) {
+@@ -1403,15 +1436,15 @@
+     }
+ 
+ 
+-    /* It's safe to cache the response.
++    /*
++     * It's safe to cache the response.
+      *
+-     * We now want to update the cache file header information with
+-     * the new date, last modified, expire and content length and write
+-     * it away to our cache file. First, we determine these values from
+-     * the response, using heuristics if appropriate.
++     * We now want to update the cache file header information with the new
++     * date, last modified, expire and content length and write it away to
++     * our cache file. First, we determine these values from the response,
++     * using heuristics if appropriate.
+      *
+-     * In addition, we make HTTP/1.1 age calculations and write them away
+-     * too.
++     * In addition, we make HTTP/1.1 age calculations and write them away too.
+      */
+ 
+     /* Read the date. Generate one if one is not supplied */
+@@ -1430,7 +1463,7 @@
+         date = now;
+         dates = ap_gm_timestr_822(r->pool, now);
+         ap_table_set(resp_hdrs, "Date", dates);
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "Added date header");
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "Added date header");
+     }
+ 
+ /* set response_time for HTTP/1.1 age calculations */
+@@ -1442,16 +1475,17 @@
+     {
+         lmod = date;
+         lmods = dates;
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "Last modified is in the future, replacing with now");
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "Last modified is in the future, replacing with now");
+     }
+ /* if the response did not contain the header, then use the cached version */
+     if (lmod == BAD_DATE && c->fp != NULL) {
+         lmod = c->lmod;
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "Reusing cached last modified");
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "Reusing cached last modified");
+     }
+ 
+ /* we now need to calculate the expire data for the object. */
+-    if (expire == NULL && c->fp != NULL) {     /* no expiry data sent in response */
++    if (expire == NULL && c->fp != NULL) {      /* no expiry data sent in
++                                                 * response */
+         expire = ap_table_get(c->hdrs, "Expires");
+         if (expire != NULL)
+             expc = ap_parseHTTPdate(expire);
+@@ -1463,18 +1497,18 @@
+  *   else
+  *      expire date = now + defaultexpire
+  */
+-    ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "Expiry date is %ld", (long)expc);
++    ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "Expiry date is %ld", (long)expc);
+     if (expc == BAD_DATE) {
+         if (lmod != BAD_DATE) {
+-            double x = (double) (date - lmod) * conf->cache.lmfactor;
++            double x = (double)(date - lmod) * conf->cache.lmfactor;
+             double maxex = conf->cache.maxexpire;
+             if (x > maxex)
+                 x = maxex;
+-            expc = now + (int) x;
++            expc = now + (int)x;
+         }
+         else
+             expc = now + conf->cache.defaultexpire;
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "Expiry date calculated %ld", (long)expc);
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "Expiry date calculated %ld", (long)expc);
+     }
+ 
+ /* get the content-length header */
+@@ -1486,21 +1520,21 @@
+ 
+ /* we have all the header information we need - write it to the cache file */
+     c->version++;
+-    ap_proxy_sec2hex(date, buff + 17*(0));
+-    buff[17*(1)-1] = ' ';
+-    ap_proxy_sec2hex(lmod, buff + 17*(1));
+-    buff[17*(2)-1] = ' '; 
+-    ap_proxy_sec2hex(expc, buff + 17*(2));
+-    buff[17*(3)-1] = ' ';
+-    ap_proxy_sec2hex(c->version, buff + 17*(3));
+-    buff[17*(4)-1] = ' ';
+-    ap_proxy_sec2hex(c->req_time, buff + 17*(4));
+-    buff[17*(5)-1] = ' ';
+-    ap_proxy_sec2hex(c->resp_time, buff + 17*(5));
+-    buff[17*(6)-1] = ' '; 
+-    ap_proxy_sec2hex(c->len, buff + 17*(6));
+-    buff[17*(7)-1] = '\n';
+-    buff[17*(7)] = '\0';
++    ap_proxy_sec2hex(date, buff + 17 * (0));
++    buff[17 * (1) - 1] = ' ';
++    ap_proxy_sec2hex(lmod, buff + 17 * (1));
++    buff[17 * (2) - 1] = ' ';
++    ap_proxy_sec2hex(expc, buff + 17 * (2));
++    buff[17 * (3) - 1] = ' ';
++    ap_proxy_sec2hex(c->version, buff + 17 * (3));
++    buff[17 * (4) - 1] = ' ';
++    ap_proxy_sec2hex(c->req_time, buff + 17 * (4));
++    buff[17 * (5) - 1] = ' ';
++    ap_proxy_sec2hex(c->resp_time, buff + 17 * (5));
++    buff[17 * (6) - 1] = ' ';
++    ap_proxy_sec2hex(c->len, buff + 17 * (6));
++    buff[17 * (7) - 1] = '\n';
++    buff[17 * (7)] = '\0';
+ 
+ /* Was the server response a 304 Not Modified?
+  *
+@@ -1570,7 +1604,7 @@
+           c = ap_proxy_cache_error(c);
+           break;
+       }
+-      c->tempfile = ap_palloc(r->pool, strlen(conf->cache.root) +1+ L_tmpnam);
++        c->tempfile = ap_palloc(r->pool, strlen(conf->cache.root) + 1 + L_tmpnam);
+       strcpy(c->tempfile, conf->cache.root);
+       strcat(c->tempfile, "/");
+       p = tmpnam(NULL);
+@@ -1581,7 +1615,7 @@
+           break;
+       }
+ 
+-      ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "Create temporary file %s", c->tempfile);
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "Create temporary file %s", c->tempfile);
+ 
+ /* create the new file */
+       c->fp = ap_proxy_create_cachefile(r, c->tempfile);
+@@ -1677,7 +1711,7 @@
+         c->len = bc;
+         ap_bflush(c->fp);
+         ap_proxy_sec2hex(c->len, buff);
+-        curpos = lseek(ap_bfileno(c->fp, B_WR), 17*6, SEEK_SET);
++        curpos = lseek(ap_bfileno(c->fp, B_WR), 17 * 6, SEEK_SET);
+         if (curpos == -1)
+             ap_log_error(APLOG_MARK, APLOG_ERR, s,
+                          "proxy: error seeking on cache file %s", c->tempfile);
+@@ -1695,7 +1729,7 @@
+         return;
+     }
+ 
+-    if (ap_pclosef(c->req->pool, ap_bfileno(c->fp, B_WR)) == -1) {
++    if (ap_pclosef(c->req->pool, ap_bfileno(c->fp, B_WR))== -1) {
+         ap_log_error(APLOG_MARK, APLOG_ERR, s,
+                      "proxy: error closing cache file %s", c->tempfile);
+         unlink(c->tempfile);
+@@ -1705,12 +1739,13 @@
+     if (unlink(c->filename) == -1 && errno != ENOENT) {
+         ap_log_error(APLOG_MARK, APLOG_ERR, s,
+                      "proxy: error deleting old cache file %s",
+-                     c->tempfile);
++                     c->filename);
++        (void)unlink(c->tempfile);
+     }
+     else {
+         char *p;
+         proxy_server_conf *conf =
+-        (proxy_server_conf *) ap_get_module_config(s->module_config, &proxy_module);
++        (proxy_server_conf *)ap_get_module_config(s->module_config, &proxy_module);
+ 
+         for (p = c->filename + strlen(conf->cache.root) + 1;;) {
+             p = strchr(p, '/');
+@@ -1732,10 +1767,11 @@
+         }
+ #if defined(OS2) || defined(WIN32) || defined(NETWARE) || defined(MPE)
+         /* Under OS/2 use rename. */
+-        if (rename(c->tempfile, c->filename) == -1)
++        if (rename(c->tempfile, c->filename) == -1) {
+             ap_log_error(APLOG_MARK, APLOG_ERR, s,
+                          "proxy: error renaming cache file %s to %s",
+                          c->tempfile, c->filename);
++            (void)unlink(c->tempfile);
+     }
+ #else
+ 
+@@ -1743,11 +1779,9 @@
+             ap_log_error(APLOG_MARK, APLOG_ERR, s,
+                          "proxy: error linking cache file %s to %s",
+                          c->tempfile, c->filename);
+-    }
+-
+     if (unlink(c->tempfile) == -1)
+         ap_log_error(APLOG_MARK, APLOG_ERR, s,
+                      "proxy: error deleting temp file %s", c->tempfile);
+ #endif
+-
++    }
+ }
+Index: modules/proxy/proxy_connect.c
+===================================================================
+RCS file: /home/cvs/apache-1.3/src/modules/proxy/proxy_connect.c,v
+retrieving revision 1.48
+retrieving revision 1.49
+diff -u -b -u -r1.48 -r1.49
+--- modules/proxy/proxy_connect.c	13 Mar 2002 21:05:32 -0000	1.48
++++ modules/proxy/proxy_connect.c	25 Mar 2002 09:21:58 -0000	1.49
+@@ -96,14 +96,13 @@
+  * FIXME: no check for r->assbackwards, whatever that is.
+  */
+ 
+-static int
+-allowed_port(proxy_server_conf *conf, int port)
++static int allowed_port(proxy_server_conf *conf, int port)
+ {
+     int i;
+-    int *list = (int *) conf->allowed_connect_ports->elts;
++    int *list = (int *)conf->allowed_connect_ports->elts;
+ 
+-    for(i = 0; i < conf->allowed_connect_ports->nelts; i++) {
+-        if(port == list[i])
++    for (i = 0; i < conf->allowed_connect_ports->nelts; i++) {
++        if (port == list[i])
+             return 1;
+     }
+     return 0;
+@@ -125,8 +124,8 @@
+ 
+     void *sconf = r->server->module_config;
+     proxy_server_conf *conf =
+-    (proxy_server_conf *) ap_get_module_config(sconf, &proxy_module);
+-    struct noproxy_entry *npent = (struct noproxy_entry *)conf->noproxies->elts;
++    (proxy_server_conf *)ap_get_module_config(sconf, &proxy_module);
++    struct noproxy_entry *npent = (struct noproxy_entry *) conf->noproxies->elts;
+ 
+     memset(&server, '\0', sizeof(server));
+     server.sin_family = AF_INET;
+@@ -162,15 +161,16 @@
+             default:
+                 return HTTP_FORBIDDEN;
+         }
+-    } else if(!allowed_port(conf, port))
++    }
++    else if (!allowed_port(conf, port))
+         return HTTP_FORBIDDEN;
+ 
+     if (proxyhost) {
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server,
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server,
+             "CONNECT to remote proxy %s on port %d", proxyhost, proxyport);
+     }
+     else {
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server,
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server,
+             "CONNECT to %s on port %d", host, port);
+     }
+ 
+@@ -190,7 +190,7 @@
+ 
+ #ifdef CHECK_FD_SETSIZE
+     if (sock >= FD_SETSIZE) {
+-        ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_WARNING, NULL,
++        ap_log_error(APLOG_MARK, APLOG_NOERRNO | APLOG_WARNING, NULL,
+             "proxy_connect_handler: filedescriptor (%u) "
+             "larger than FD_SETSIZE (%u) "
+             "found, you probably need to rebuild Apache with a "
+@@ -215,61 +215,64 @@
+             "Could not connect to remote machine:<br>", strerror(errno), NULL));
+     }
+ 
+-    /* If we are connecting through a remote proxy, we need to pass
+-     * the CONNECT request on to it.
++    /*
++     * If we are connecting through a remote proxy, we need to pass the
++     * CONNECT request on to it.
+      */
+     if (proxyport) {
+-        /* FIXME: We should not be calling write() directly, but we currently
+-         * have no alternative.  Error checking ignored.  Also, we force
+-         * a HTTP/1.0 request to keep things simple.
++        /*
++         * FIXME: We should not be calling write() directly, but we currently
++         * have no alternative.  Error checking ignored.  Also, we force a
++         * HTTP/1.0 request to keep things simple.
+          */
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server,
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server,
+             "Sending the CONNECT request to the remote proxy");
+         ap_snprintf(buffer, sizeof(buffer), "CONNECT %s HTTP/1.0" CRLF, r->uri);
+-        send(sock, buffer, strlen(buffer),0);
++        send(sock, buffer, strlen(buffer), 0);
+         ap_snprintf(buffer, sizeof(buffer),
+             "Proxy-agent: %s" CRLF CRLF, ap_get_server_version());
+-        send(sock, buffer, strlen(buffer),0);
++        send(sock, buffer, strlen(buffer), 0);
+     }
+     else {
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server,
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server,
+             "Returning 200 OK Status");
+         ap_rvputs(r, "HTTP/1.0 200 Connection established" CRLF, NULL);
+         ap_rvputs(r, "Proxy-agent: ", ap_get_server_version(), CRLF CRLF, NULL);
+         ap_bflush(r->connection->client);
+     }
+ 
+-    while (1) { /* Infinite loop until error (one side closes the connection) */
++    while (1) {                 /* Infinite loop until error (one side closes
++                                 * the connection) */
+         FD_ZERO(&fds);
+         FD_SET(sock, &fds);
+         FD_SET(ap_bfileno(r->connection->client, B_WR), &fds);
+ 
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server,
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server,
+             "Going to sleep (select)");
+         i = ap_select((ap_bfileno(r->connection->client, B_WR) > sock ?
+             ap_bfileno(r->connection->client, B_WR) + 1 :
+             sock + 1), &fds, NULL, NULL, NULL);
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server,
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server,
+             "Woke from select(), i=%d", i);
+ 
+         if (i) {
+             if (FD_ISSET(sock, &fds)) {
+-                ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server,
++                ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server,
+                     "sock was set");
+-                if ((nbytes = recv(sock, buffer, HUGE_STRING_LEN,0)) != 0) {
++                if ((nbytes = recv(sock, buffer, HUGE_STRING_LEN, 0)) != 0) {
+                     if (nbytes == -1)
+                         break;
+                     if (send(ap_bfileno(r->connection->client, B_WR), buffer,
+-                        nbytes,0) == EOF)
++                             nbytes, 0) == EOF)
+                         break;
+-                    ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO,
++                    ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO,
+                         r->server, "Wrote %d bytes to client", nbytes);
+                 }
+                 else
+                     break;
+             }
+             else if (FD_ISSET(ap_bfileno(r->connection->client, B_WR), &fds)) {
+-                ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server,
++                ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server,
+                     "client->fd was set");
+                 if ((nbytes = recv(ap_bfileno(r->connection->client, B_WR),
+                     buffer, HUGE_STRING_LEN, 0)) != 0) {
+@@ -277,7 +280,7 @@
+                         break;
+                     if (send(sock, buffer, nbytes, 0) == EOF)
+                         break;
+-                    ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO,
++                    ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO,
+                         r->server, "Wrote %d bytes to server", nbytes);
+                 }
+                 else
+Index: modules/proxy/proxy_ftp.c
+===================================================================
+RCS file: /home/cvs/apache-1.3/src/modules/proxy/proxy_ftp.c,v
+retrieving revision 1.96
+retrieving revision 1.98
+diff -u -b -u -r1.96 -r1.98
+--- modules/proxy/proxy_ftp.c	13 Mar 2002 21:05:32 -0000	1.96
++++ modules/proxy/proxy_ftp.c	7 Apr 2002 18:57:36 -0000	1.98
+@@ -229,8 +229,7 @@
+ {
+     int len, status;
+     char linebuff[100], buff[5];
+-    char *mb = msgbuf,
+-         *me = &msgbuf[msglen];
++    char *mb = msgbuf, *me = &msgbuf[msglen];
+ 
+     len = ap_bgets(linebuff, sizeof linebuff, ctrl);
+     if (len == -1)
+@@ -241,7 +240,7 @@
+     else
+         status = 100 * linebuff[0] + 10 * linebuff[1] + linebuff[2] - 111 * '0';
+ 
+-    mb = ap_cpystrn(mb, linebuff+4, me - mb);
++    mb = ap_cpystrn(mb, linebuff + 4, me - mb);
+ 
+     if (linebuff[len - 1] != '\n')
+         (void)ap_bskiplf(ctrl);
+@@ -256,7 +255,7 @@
+             if (linebuff[len - 1] != '\n') {
+                 (void)ap_bskiplf(ctrl);
+             }
+-            mb = ap_cpystrn(mb, linebuff+4, me - mb);
++            mb = ap_cpystrn(mb, linebuff + 4, me - mb);
+         } while (memcmp(linebuff, buff, 4) != 0);
+     }
+     return status;
+@@ -275,7 +274,8 @@
+     conn_rec *con = r->connection;
+     pool *p = r->pool;
+     char *dir, *path, *reldir, *site, *type = NULL;
+-    char *basedir = ""; /* By default, path is relative to the $HOME dir */
++    char *basedir = "";         /* By default, path is relative to the $HOME
++                                 * dir */
+ 
+     /* create default sized buffers for the stuff below */
+     buf_size = IOBUFSIZE;
+@@ -283,9 +283,9 @@
+     buf2 = ap_palloc(r->pool, buf_size);
+ 
+     /* Save "scheme://site" prefix without password */
+-    site = ap_unparse_uri_components(p, &r->parsed_uri, UNP_OMITPASSWORD|UNP_OMITPATHINFO);
++    site = ap_unparse_uri_components(p, &r->parsed_uri, UNP_OMITPASSWORD | UNP_OMITPATHINFO);
+     /* ... and path without query args */
+-    path = ap_unparse_uri_components(p, &r->parsed_uri, UNP_OMITSITEPART|UNP_OMITQUERY);
++    path = ap_unparse_uri_components(p, &r->parsed_uri, UNP_OMITSITEPART | UNP_OMITQUERY);
+ 
+     /* If path began with /%2f, change the basedir */
+     if (strncasecmp(path, "/%2f", 4) == 0) {
+@@ -304,8 +304,8 @@
+     /* Copy path, strip (all except the last) trailing slashes */
+     /* (the trailing slash is needed for the dir component loop below) */
+     path = dir = ap_pstrcat(r->pool, path, "/", NULL);
+-    for (n = strlen(path); n > 1 && path[n-1] == '/' && path[n-2] == '/'; --n)
+-        path[n-1] = '\0';
++    for (n = strlen(path); n > 1 && path[n - 1] == '/' && path[n - 2] == '/'; --n)
++        path[n - 1] = '\0';
+ 
+     /* print "ftp://host/" */
+     n = ap_snprintf(buf, buf_size, DOCTYPE_HTML_3_2
+@@ -313,8 +313,8 @@
+                 "<base href=\"%s%s%s\"></head>\n"
+                 "<body><h2>Directory of "
+                 "<a href=\"/\">%s</a>/",
+-                site, basedir, ap_escape_html(p,path),
+-                site, basedir, ap_escape_uri(p,path),
++                    site, basedir, ap_escape_html(p, path),
++                    site, basedir, ap_escape_uri(p, path),
+                 site);
+     total_bytes_sent += ap_proxy_bputs2(buf, con->client, c);
+ 
+@@ -323,11 +323,10 @@
+         total_bytes_sent += ap_proxy_bputs2("<a href=\"/%2f/\">%2f</a>/", con->client, c);
+     }
+ 
+-    for (dir = path+1; (dir = strchr(dir, '/')) != NULL; )
+-    {
++    for (dir = path + 1; (dir = strchr(dir, '/')) != NULL;) {
+         *dir = '\0';
+-        if ((reldir = strrchr(path+1, '/'))==NULL) {
+-            reldir = path+1;
++        if ((reldir = strrchr(path + 1, '/')) == NULL) {
++            reldir = path + 1;
+         }
+         else
+             ++reldir;
+@@ -344,9 +343,10 @@
+ 
+     /* If the caller has determined the current directory, and it differs */
+     /* from what the client requested, then show the real name */
+-    if (cwd == NULL || strncmp (cwd, path, strlen(cwd)) == 0) {
++    if (cwd == NULL || strncmp(cwd, path, strlen(cwd)) == 0) {
+         ap_snprintf(buf, buf_size, "</h2>\n<hr /><pre>");
+-    } else {
++    }
++    else {
+         ap_snprintf(buf, buf_size, "</h2>\n(%s)\n<hr /><pre>",
+                     ap_escape_html(p, cwd));
+     }
+@@ -365,13 +365,13 @@
+         if (n == 0)
+             break;                /* EOF */
+ 
+-        if (buf[n-1] == '\n')  /* strip trailing '\n' */
++        if (buf[n - 1] == '\n') /* strip trailing '\n' */
+             buf[--n] = '\0';
+-        if (buf[n-1] == '\r')  /* strip trailing '\r' if present */
++        if (buf[n - 1] == '\r') /* strip trailing '\r' if present */
+             buf[--n] = '\0';
+ 
+         /* Handle unix-style symbolic link */
+-        if (buf[0] == 'l' && (filename=strstr(buf, " -> ")) != NULL) {
++        if (buf[0] == 'l' && (filename = strstr(buf, " -> ")) != NULL) {
+             char *link_ptr = filename;
+ 
+             do {
+@@ -382,7 +382,7 @@
+             *(link_ptr++) = '\0';
+             ap_snprintf(buf2, buf_size, "%s <a href=\"%s\">%s %s</a>\n",
+                         ap_escape_html(p, buf),
+-                        ap_escape_uri(p,filename),
++                        ap_escape_uri(p, filename),
+                         ap_escape_html(p, filename),
+                         ap_escape_html(p, link_ptr));
+             ap_cpystrn(buf, buf2, buf_size);
+@@ -416,13 +416,13 @@
+             /* Special handling for '.' and '..': append slash to link */
+             if (!strcmp(filename, ".") || !strcmp(filename, "..") || buf[0] == 'd') {
+                 ap_snprintf(buf2, buf_size, "%s <a href=\"%s/\">%s</a>\n",
+-                            ap_escape_html(p, buf), ap_escape_uri(p,filename),
++                         ap_escape_html(p, buf), ap_escape_uri(p, filename),
+                             ap_escape_html(p, filename));
+             }
+             else {
+                 ap_snprintf(buf2, buf_size, "%s <a href=\"%s\">%s</a>\n",
+                             ap_escape_html(p, buf),
+-                            ap_escape_uri(p,filename),
++                            ap_escape_uri(p, filename),
+                             ap_escape_html(p, filename));
+             }
+             ap_cpystrn(buf, buf2, buf_size);
+@@ -457,14 +457,15 @@
+  * Note that we "invent" a realm name which consists of the
+  * ftp://user@host part of the reqest (sans password -if supplied but invalid-)
+  */
+-static int ftp_unauthorized (request_rec *r, int log_it)
++static int ftp_unauthorized(request_rec *r, int log_it)
+ {
+     r->proxyreq = NOT_PROXY;
+-    /* Log failed requests if they supplied a password
+-     * (log username/password guessing attempts)
++    /*
++     * Log failed requests if they supplied a password (log username/password
++     * guessing attempts)
+      */
+     if (log_it)
+-        ap_log_rerror(APLOG_MARK, APLOG_INFO|APLOG_NOERRNO, r,
++        ap_log_rerror(APLOG_MARK, APLOG_INFO | APLOG_NOERRNO, r,
+                       "proxy: missing or failed auth to %s",
+                       ap_unparse_uri_components(r->pool,
+                       &r->parsed_uri, UNP_OMITPATHINFO));
+@@ -472,7 +473,7 @@
+     ap_table_setn(r->err_headers_out, "WWW-Authenticate",
+                   ap_pstrcat(r->pool, "Basic realm=\"",
+                   ap_unparse_uri_components(r->pool, &r->parsed_uri,
+-                                            UNP_OMITPASSWORD|UNP_OMITPATHINFO),
++                                       UNP_OMITPASSWORD | UNP_OMITPATHINFO),
+                   "\"", NULL));
+ 
+     return HTTP_UNAUTHORIZED;
+@@ -481,7 +482,7 @@
+ /* Set ftp server to TYPE {A,I,E} before transfer of a directory or file */
+ static int ftp_set_TYPE(request_rec *r, BUFF *ctrl, char xfer_type)
+ {
+-    static char old_type[2] = { 'A', '\0' }; /* After logon, mode is ASCII */
++    static char old_type[2] = {'A', '\0'};      /* After logon, mode is ASCII */
+     int ret = HTTP_OK;
+     int rc;
+ 
+@@ -492,7 +493,7 @@
+     old_type[0] = xfer_type;
+     ap_bvputs(ctrl, "TYPE ", old_type, CRLF, NULL);
+     ap_bflush(ctrl);
+-    ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: TYPE %s", old_type);
++    ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: TYPE %s", old_type);
+ 
+ /* responses: 200, 421, 500, 501, 504, 530 */
+     /* 200 Command okay. */
+@@ -502,7 +503,7 @@
+     /* 504 Command not implemented for that parameter. */
+     /* 530 Not logged in. */
+     rc = ftp_getrc(ctrl);
+-    ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: returned status %d", rc);
++    ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: returned status %d", rc);
+     if (rc == -1 || rc == 421) {
+         ap_kill_timeout(r);
+         ret = ap_proxyerror(r, HTTP_BAD_GATEWAY,
+@@ -515,14 +516,13 @@
+     }
+ /* Allow not implemented */
+     else if (rc == 504)
+-        /* ignore it silently */;
++         /* ignore it silently */ ;
+ 
+     return ret;
+ }
+ 
+ /* Common cleanup routine: close open BUFFers or sockets, and return an error */
+-static int
+-ftp_cleanup_and_return(request_rec *r, BUFF *ctrl, BUFF *data, int csock, int dsock, int rc)
++static int ftp_cleanup_and_return(request_rec *r, BUFF *ctrl, BUFF *data, int csock, int dsock, int rc)
+ {
+     if (ctrl != NULL)
+       ap_bclose(ctrl);
+@@ -569,7 +569,7 @@
+ 
+     void *sconf = r->server->module_config;
+     proxy_server_conf *conf =
+-    (proxy_server_conf *) ap_get_module_config(sconf, &proxy_module);
++    (proxy_server_conf *)ap_get_module_config(sconf, &proxy_module);
+     struct noproxy_entry *npent = (struct noproxy_entry *) conf->noproxies->elts;
+     struct nocache_entry *ncent = (struct nocache_entry *) conf->nocaches->elts;
+ 
+@@ -604,25 +604,27 @@
+         while (*path == '/')
+             ++path;
+ 
+-    /* The "Authorization:" header must be checked first.
+-     * We allow the user to "override" the URL-coded user [ & password ]
+-     * in the Browsers' User&Password Dialog.
+-     * NOTE that this is only marginally more secure than having the
+-     * password travel in plain as part of the URL, because Basic Auth
+-     * simply uuencodes the plain text password. 
+-     * But chances are still smaller that the URL is logged regularly.
++    /*
++     * The "Authorization:" header must be checked first. We allow the user
++     * to "override" the URL-coded user [ & password ] in the Browsers'
++     * User&Password Dialog. NOTE that this is only marginally more secure
++     * than having the password travel in plain as part of the URL, because
++     * Basic Auth simply uuencodes the plain text password. But chances are
++     * still smaller that the URL is logged regularly.
+      */
+     if ((password = ap_table_get(r->headers_in, "Authorization")) != NULL
+         && strcasecmp(ap_getword(r->pool, &password, ' '), "Basic") == 0
+         && (password = ap_pbase64decode(r->pool, password))[0] != ':') {
+-        /* Note that this allocation has to be made from r->connection->pool
+-         * because it has the lifetime of the connection.  The other allocations
+-         * are temporary and can be tossed away any time.
++        /*
++         * Note that this allocation has to be made from r->connection->pool
++         * because it has the lifetime of the connection.  The other
++         * allocations are temporary and can be tossed away any time.
+          */
+-        user = ap_getword_nulls (r->connection->pool, &password, ':');
++        user = ap_getword_nulls(r->connection->pool, &password, ':');
+         r->connection->ap_auth_type = "Basic";
+         r->connection->user = r->parsed_uri.user = user;
+-        nocache = 1;    /* This resource only accessible with username/password */
++        nocache = 1;            /* This resource only accessible with
++                                 * username/password */
+     }
+     else if ((user = r->parsed_uri.user) != NULL) {
+         user = ap_pstrdup(p, user);
+@@ -632,7 +634,8 @@
+             decodeenc(tmp);
+             password = tmp;
+         }
+-        nocache = 1;    /* This resource only accessible with username/password */
++        nocache = 1;            /* This resource only accessible with
++                                 * username/password */
+     }
+     else {
+         user = "anonymous";
+@@ -649,7 +652,7 @@
+                                  "Connect to remote machine blocked");
+     }
+ 
+-    ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: connect to %s:%d", host, port);
++    ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: connect to %s:%d", host, port);
+ 
+     parms = strchr(path, ';');
+     if (parms != NULL)
+@@ -672,26 +675,26 @@
+ #if !defined(TPF) && !defined(BEOS)
+     if (conf->recv_buffer_size > 0
+         && setsockopt(sock, SOL_SOCKET, SO_RCVBUF,
+-                       (const char *) &conf->recv_buffer_size, sizeof(int))
++                      (const char *)&conf->recv_buffer_size, sizeof(int))
+             == -1) {
+             ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
+                          "setsockopt(SO_RCVBUF): Failed to set ProxyReceiveBufferSize, using default");
+     }
+ #endif
+ 
+-    if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (void *) &one,
++    if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (void *)&one,
+                    sizeof(one)) == -1) {
+ #ifndef _OSD_POSIX /* BS2000 has this option "always on" */
+         ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
+                      "proxy: error setting reuseaddr option: setsockopt(SO_REUSEADDR)");
+         ap_pclosesocket(p, sock);
+         return HTTP_INTERNAL_SERVER_ERROR;
+-#endif /*_OSD_POSIX*/
++#endif                          /* _OSD_POSIX */
+     }
+ 
+ #ifdef SINIX_D_RESOLVER_BUG
+     {
+-        struct in_addr *ip_addr = (struct in_addr *) *server_hp.h_addr_list;
++        struct in_addr *ip_addr = (struct in_addr *)*server_hp.h_addr_list;
+ 
+         for (; ip_addr->s_addr != 0; ++ip_addr) {
+             memcpy(&server.sin_addr, ip_addr, sizeof(struct in_addr));
+@@ -726,8 +729,8 @@
+ /* shouldn't we implement telnet control options here? */
+ 
+ #ifdef CHARSET_EBCDIC
+-    ap_bsetflag(ctrl, B_ASCII2EBCDIC|B_EBCDIC2ASCII, 1);
+-#endif /*CHARSET_EBCDIC*/
++    ap_bsetflag(ctrl, B_ASCII2EBCDIC | B_EBCDIC2ASCII, 1);
++#endif                          /* CHARSET_EBCDIC */
+ 
+     /* possible results: */
+     /* 120 Service ready in nnn minutes. */
+@@ -735,7 +738,7 @@
+     /* 421 Service not available, closing control connection. */
+     ap_hard_timeout("proxy ftp", r);
+     i = ftp_getrc_msg(ctrl, resp, sizeof resp);
+-    ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: returned status %d", i);
++    ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: returned status %d", i);
+     if (i == -1 || i == 421) {
+         return ftp_cleanup_and_return(r, ctrl, data, sock, dsock,
+                       ap_proxyerror(r, HTTP_BAD_GATEWAY,
+@@ -743,17 +746,18 @@
+     }
+ #if 0
+     if (i == 120) {
+-        /* RFC2068 states:
+-         * 14.38 Retry-After
++        /*
++         * RFC2068 states: 14.38 Retry-After
+          * 
+          *  The Retry-After response-header field can be used with a 503 (Service
+-         *  Unavailable) response to indicate how long the service is expected to
+-         *  be unavailable to the requesting client. The value of this field can
+-         *  be either an HTTP-date or an integer number of seconds (in decimal)
+-         *  after the time of the response.
+-         *     Retry-After  = "Retry-After" ":" ( HTTP-date | delta-seconds )
++         * Unavailable) response to indicate how long the service is expected
++         * to be unavailable to the requesting client. The value of this
++         * field can be either an HTTP-date or an integer number of seconds
++         * (in decimal) after the time of the response. Retry-After  =
++         * "Retry-After" ":" ( HTTP-date | delta-seconds )
+          */
+-        ap_set_header("Retry-After", ap_psprintf(p, "%u", 60*wait_mins);
++/**INDENT** Error@756: Unbalanced parens */
++        ap_set_header("Retry-After", ap_psprintf(p, "%u", 60 * wait_mins);
+         return ftp_cleanup_and_return(r, ctrl, data, sock, dsock,
+                       ap_proxyerror(r, HTTP_SERVICE_UNAVAILABLE, resp));
+     }
+@@ -763,11 +767,11 @@
+                       ap_proxyerror(r, HTTP_BAD_GATEWAY, resp));
+     }
+ 
+-    ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: connected.");
++    ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: connected.");
+ 
+     ap_bvputs(ctrl, "USER ", user, CRLF, NULL);
+     ap_bflush(ctrl);                        /* capture any errors */
+-    ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: USER %s", user);
++    ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: USER %s", user);
+ 
+     /* possible results; 230, 331, 332, 421, 500, 501, 530 */
+     /* states: 1 - error, 2 - success; 3 - send password, 4,5 fail */
+@@ -780,7 +784,7 @@
+     /* 501 Syntax error in parameters or arguments. */
+     /* 530 Not logged in. */
+     i = ftp_getrc(ctrl);
+-    ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: returned status %d", i);
++    ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: returned status %d", i);
+     if (i == -1 || i == 421) {
+         return ftp_cleanup_and_return(r, ctrl, data, sock, dsock,
+                       ap_proxyerror(r, HTTP_BAD_GATEWAY,
+@@ -788,7 +792,7 @@
+     }
+     if (i == 530) {
+         return ftp_cleanup_and_return(r, ctrl, data, sock, dsock,
+-                                      ftp_unauthorized (r, 1));
++                                      ftp_unauthorized(r, 1));
+     }
+     if (i != 230 && i != 331) {
+         return ftp_cleanup_and_return(r, ctrl, data, sock, dsock,
+@@ -798,11 +802,11 @@
+     if (i == 331) {             /* send password */
+         if (password == NULL) {
+             return ftp_cleanup_and_return(r, ctrl, data, sock, dsock,
+-                                          ftp_unauthorized (r, 0));
++                                          ftp_unauthorized(r, 0));
+         }
+         ap_bvputs(ctrl, "PASS ", password, CRLF, NULL);
+         ap_bflush(ctrl);
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: PASS %s", password);
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: PASS %s", password);
+     /* possible results 202, 230, 332, 421, 500, 501, 503, 530 */
+     /* 230 User logged in, proceed. */
+     /* 332 Need account for login. */
+@@ -812,7 +816,7 @@
+     /* 503 Bad sequence of commands. */
+     /* 530 Not logged in. */
+         i = ftp_getrc(ctrl);
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: returned status %d", i);
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: returned status %d", i);
+         if (i == -1 || i == 421) {
+             return ftp_cleanup_and_return(r, ctrl, data, sock, dsock,
+                       ap_proxyerror(r, HTTP_BAD_GATEWAY,
+@@ -826,14 +830,15 @@
+         /* @@@ questionable -- we might as well return a 403 Forbidden here */
+         if (i == 530) /* log it: passwd guessing attempt? */
+             return ftp_cleanup_and_return(r, ctrl, data, sock, dsock,
+-                                          ftp_unauthorized (r, 1));
++                                          ftp_unauthorized(r, 1));
+         if (i != 230 && i != 202)
+             return ftp_cleanup_and_return(r, ctrl, data, sock, dsock,
+                                           HTTP_BAD_GATEWAY);
+     }
+ 
+-    /* Special handling for leading "%2f": this enforces a "cwd /"
+-     * out of the $HOME directory which was the starting point after login
++    /*
++     * Special handling for leading "%2f": this enforces a "cwd /" out of the
++     * $HOME directory which was the starting point after login
+      */
+     if (strncasecmp(path, "%2f", 3) == 0) {
+         path += 3;
+@@ -841,7 +846,7 @@
+             ++path;
+         ap_bputs("CWD /" CRLF, ctrl);
+         ap_bflush(ctrl);
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: CWD /");
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: CWD /");
+ 
+         /* possible results: 250, 421, 500, 501, 502, 530, 550 */
+         /* 250 Requested file action okay, completed. */
+@@ -852,7 +857,7 @@
+         /* 530 Not logged in. */
+         /* 550 Requested action not taken. */
+         i = ftp_getrc(ctrl);
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: returned status %d", i);
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: returned status %d", i);
+         if (i == -1 || i == 421)
+             return ftp_cleanup_and_return(r, ctrl, data, sock, dsock,
+                         ap_proxyerror(r, HTTP_BAD_GATEWAY,
+@@ -869,7 +874,7 @@
+  * this is what we must do if we don't know the OS type of the remote
+  * machine
+  */
+-    for ( ; (strp = strchr(path, '/')) != NULL ; path = strp + 1) {
++    for (; (strp = strchr(path, '/')) != NULL; path = strp + 1) {
+         char *slash = strp;
+ 
+         *slash = '\0';
+@@ -888,7 +893,7 @@
+ 
+         ap_bvputs(ctrl, "CWD ", path, CRLF, NULL);
+         ap_bflush(ctrl);
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: CWD %s", path);
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: CWD %s", path);
+         *slash = '/';
+ 
+ /* responses: 250, 421, 500, 501, 502, 530, 550 */
+@@ -900,7 +905,7 @@
+     /* 530 Not logged in. */
+     /* 550 Requested action not taken. */
+         i = ftp_getrc(ctrl);
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: returned status %d", i);
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: returned status %d", i);
+         if (i == -1 || i == 421)
+             return ftp_cleanup_and_return(r, ctrl, data, sock, dsock,
+                       ap_proxyerror(r, HTTP_BAD_GATEWAY,
+@@ -919,10 +924,11 @@
+ 
+     if (parms != NULL && strncmp(parms, "type=", 5) == 0
+         && ap_isalpha(parms[5])) {
+-        /* "type=d" forces a dir listing.
+-         * The other types (i|a|e) are directly used for the ftp TYPE command
++        /*
++         * "type=d" forces a dir listing. The other types (i|a|e) are
++         * directly used for the ftp TYPE command
+          */
+-        if ( ! (get_dirlisting = (parms[5] == 'd')))
++        if (!(get_dirlisting = (parms[5] == 'd')))
+             xfer_type = ap_toupper(parms[5]);
+ 
+         /* Check valid types, rather than ignoring invalid types silently: */
+@@ -948,7 +954,7 @@
+ #if !defined (TPF) && !defined(BEOS)
+     if (conf->recv_buffer_size) {
+         if (setsockopt(dsock, SOL_SOCKET, SO_RCVBUF,
+-               (const char *) &conf->recv_buffer_size, sizeof(int)) == -1) {
++                (const char *)&conf->recv_buffer_size, sizeof(int)) == -1) {
+             ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
+                          "setsockopt(SO_RCVBUF): Failed to set ProxyReceiveBufferSize, using default");
+         }
+@@ -957,7 +963,7 @@
+ 
+     ap_bputs("PASV" CRLF, ctrl);
+     ap_bflush(ctrl);
+-    ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: PASV command issued");
++    ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: PASV command issued");
+ /* possible results: 227, 421, 500, 501, 502, 530 */
+     /* 227 Entering Passive Mode (h1,h2,h3,h4,p1,p2). */
+     /* 421 Service not available, closing control connection. */
+@@ -979,9 +985,9 @@
+             presult = atoi(pstr);
+             if (*(pstr + strlen(pstr) + 1) == '=')
+                 pstr += strlen(pstr) + 2;
+-            else
+-            {
+-                pstr = strtok(NULL, "(");  /* separate address & port params */
++            else {
++                pstr = strtok(NULL, "(");       /* separate address & port
++                                                 * params */
+                 if (pstr != NULL)
+                     pstr = strtok(NULL, ")");
+             }
+@@ -989,14 +995,14 @@
+         else
+             presult = atoi(pasv);
+ 
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: returned status %d", presult);
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: returned status %d", presult);
+ 
+         if (presult == 227 && pstr != NULL && (sscanf(pstr,
+                  "%d,%d,%d,%d,%d,%d", &h3, &h2, &h1, &h0, &p1, &p0) == 6)) {
+             /* pardon the parens, but it makes gcc happy */
+             paddr = (((((h3 << 8) + h2) << 8) + h1) << 8) + h0;
+             pport = (p1 << 8) + p0;
+-            ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: contacting host %d.%d.%d.%d:%d",
++            ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: contacting host %d.%d.%d.%d:%d",
+                      h3, h2, h1, h0, pport);
+             data_addr.sin_family = AF_INET;
+             data_addr.sin_addr.s_addr = htonl(paddr);
+@@ -1020,7 +1026,7 @@
+ 
+     if (!pasvmode) {            /* set up data connection */
+         clen = sizeof(struct sockaddr_in);
+-        if (getsockname(sock, (struct sockaddr *) &server, &clen) < 0) {
++        if (getsockname(sock, (struct sockaddr *)&server, &clen) < 0) {
+             return ftp_cleanup_and_return(r, ctrl, data, sock, dsock,
+                       ap_proxyerror(r, HTTP_INTERNAL_SERVER_ERROR, 
+                                     "proxy: error getting socket address"));
+@@ -1033,16 +1039,16 @@
+                                     "proxy: error creating socket"));
+         }
+ 
+-        if (setsockopt(dsock, SOL_SOCKET, SO_REUSEADDR, (void *) &one,
++        if (setsockopt(dsock, SOL_SOCKET, SO_REUSEADDR, (void *)&one,
+                        sizeof(one)) == -1) {
+ #ifndef _OSD_POSIX /* BS2000 has this option "always on" */
+             return ftp_cleanup_and_return(r, ctrl, data, sock, dsock,
+                       ap_proxyerror(r, HTTP_INTERNAL_SERVER_ERROR, 
+                                     "proxy: error setting reuseaddr option"));
+-#endif /*_OSD_POSIX*/
++#endif                          /* _OSD_POSIX */
+         }
+ 
+-        if (bind(dsock, (struct sockaddr *) &server,
++        if (bind(dsock, (struct sockaddr *)&server,
+                  sizeof(struct sockaddr_in)) == -1) {
+ 
+             return ftp_cleanup_and_return(r, ctrl, data, sock, dsock,
+@@ -1068,16 +1074,16 @@
+     else {
+         ap_bvputs(ctrl, "SIZE ", path, CRLF, NULL);
+         ap_bflush(ctrl);
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: SIZE %s", path);
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: SIZE %s", path);
+         i = ftp_getrc_msg(ctrl, resp, sizeof resp);
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: returned status %d with response %s", i, resp);
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: returned status %d with response %s", i, resp);
+         if (i != 500) {         /* Size command not recognized */
+             if (i == 550) {     /* Not a regular file */
+-                ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: SIZE shows this is a directory");
++                ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: SIZE shows this is a directory");
+                 get_dirlisting = 1;
+                 ap_bvputs(ctrl, "CWD ", path, CRLF, NULL);
+                 ap_bflush(ctrl);
+-                ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: CWD %s", path);
++                ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: CWD %s", path);
+ 
+                 /* possible results: 250, 421, 500, 501, 502, 530, 550 */
+                 /* 250 Requested file action okay, completed. */
+@@ -1088,7 +1094,7 @@
+                 /* 530 Not logged in. */
+                 /* 550 Requested action not taken. */
+                 i = ftp_getrc(ctrl);
+-                ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: returned status %d", i);
++                ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: returned status %d", i);
+                 if (i == -1 || i == 421)
+                     return ftp_cleanup_and_return(r, ctrl, data, sock, dsock,
+                                 ap_proxyerror(r, HTTP_BAD_GATEWAY,
+@@ -1102,9 +1108,8 @@
+                 path = "";
+                 len = 0;
+             }
+-            else if (i == 213) { /* Size command ok */
+-                for (j = 0; j < sizeof resp && ap_isdigit(resp[j]); j++)
+-                        ;
++            else if (i == 213) {/* Size command ok */
++                for (j = 0; j < sizeof resp && ap_isdigit(resp[j]); j++);
+                 resp[j] = '\0';
+                 if (resp[0] != '\0')
+                     size = ap_pstrdup(p, resp);
+@@ -1115,7 +1120,7 @@
+ #ifdef AUTODETECT_PWD
+     ap_bvputs(ctrl, "PWD", CRLF, NULL);
+     ap_bflush(ctrl);
+-    ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: PWD");
++    ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: PWD");
+ /* responses: 257, 500, 501, 502, 421, 550 */
+     /* 257 "<directory-name>" <commentary> */
+     /* 421 Service not available, closing control connection. */
+@@ -1124,7 +1129,7 @@
+     /* 502 Command not implemented. */
+     /* 550 Requested action not taken. */
+     i = ftp_getrc_msg(ctrl, resp, sizeof resp);
+-    ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: PWD returned status %d", i);
++    ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: PWD returned status %d", i);
+     if (i == -1 || i == 421)
+         return ftp_cleanup_and_return(r, ctrl, data, sock, dsock,
+                                 ap_proxyerror(r, HTTP_BAD_GATEWAY,
+@@ -1136,19 +1141,19 @@
+         const char *dirp = resp;
+         cwd = ap_getword_conf(r->pool, &dirp);
+     }
+-#endif /*AUTODETECT_PWD*/
++#endif                          /* AUTODETECT_PWD */
+ 
+     if (get_dirlisting) {
+         if (len != 0)
+             ap_bvputs(ctrl, "LIST ", path, CRLF, NULL);
+         else
+             ap_bputs("LIST -lag" CRLF, ctrl);
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: LIST %s", (len == 0 ? "" : path));
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: LIST %s", (len == 0 ? "" : path));
+     }
+     else {
+         ftp_set_TYPE(r, ctrl, xfer_type);
+         ap_bvputs(ctrl, "RETR ", path, CRLF, NULL);
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: RETR %s", path);
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: RETR %s", path);
+     }
+     ap_bflush(ctrl);
+ /* RETR: 110, 125, 150, 226, 250, 421, 425, 426, 450, 451, 500, 501, 530, 550
+@@ -1168,19 +1173,20 @@
+     /* 530 Not logged in. */
+     /* 550 Requested action not taken. */
+     rc = ftp_getrc(ctrl);
+-    ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: returned status %d", rc);
++    ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: returned status %d", rc);
+     if (rc == -1 || rc == 421)
+         return ftp_cleanup_and_return(r, ctrl, data, sock, dsock,
+                                 ap_proxyerror(r, HTTP_BAD_GATEWAY,
+                                       "Error reading from remote server"));
+     if (rc == 550) {
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: RETR failed, trying LIST instead");
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: RETR failed, trying LIST instead");
+         get_dirlisting = 1;
+-        ftp_set_TYPE(r, ctrl, 'A'); /* directories must be transferred in ASCII */
++        ftp_set_TYPE(r, ctrl, 'A');     /* directories must be transferred in
++                                         * ASCII */
+ 
+         ap_bvputs(ctrl, "CWD ", path, CRLF, NULL);
+         ap_bflush(ctrl);
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: CWD %s", path);
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: CWD %s", path);
+         /* possible results: 250, 421, 500, 501, 502, 530, 550 */
+         /* 250 Requested file action okay, completed. */
+         /* 421 Service not available, closing control connection. */
+@@ -1190,7 +1196,7 @@
+         /* 530 Not logged in. */
+         /* 550 Requested action not taken. */
+         rc = ftp_getrc(ctrl);
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: returned status %d", rc);
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: returned status %d", rc);
+         if (rc == -1 || rc == 421)
+             return ftp_cleanup_and_return(r, ctrl, data, sock, dsock,
+                                 ap_proxyerror(r, HTTP_BAD_GATEWAY,
+@@ -1205,7 +1211,7 @@
+ #ifdef AUTODETECT_PWD
+         ap_bvputs(ctrl, "PWD", CRLF, NULL);
+         ap_bflush(ctrl);
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: PWD");
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: PWD");
+ /* responses: 257, 500, 501, 502, 421, 550 */
+         /* 257 "<directory-name>" <commentary> */
+         /* 421 Service not available, closing control connection. */
+@@ -1214,7 +1220,7 @@
+         /* 502 Command not implemented. */
+         /* 550 Requested action not taken. */
+         i = ftp_getrc_msg(ctrl, resp, sizeof resp);
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: PWD returned status %d", i);
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: PWD returned status %d", i);
+         if (i == -1 || i == 421)
+             return ftp_cleanup_and_return(r, ctrl, data, sock, dsock,
+                                 ap_proxyerror(r, HTTP_BAD_GATEWAY,
+@@ -1226,13 +1232,13 @@
+             const char *dirp = resp;
+             cwd = ap_getword_conf(r->pool, &dirp);
+         }
+-#endif /*AUTODETECT_PWD*/
++#endif                          /* AUTODETECT_PWD */
+ 
+         ap_bputs("LIST -lag" CRLF, ctrl);
+         ap_bflush(ctrl);
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: LIST -lag");
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: LIST -lag");
+         rc = ftp_getrc(ctrl);
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: returned status %d", rc);
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: returned status %d", rc);
+         if (rc == -1 || rc == 421)
+             return ftp_cleanup_and_return(r, ctrl, data, sock, dsock,
+                                 ap_proxyerror(r, HTTP_BAD_GATEWAY,
+@@ -1260,11 +1266,12 @@
+     }
+     else {
+ #ifdef CHARSET_EBCDIC
+-        r->ebcdic.conv_out = 0; /* do not convert what we read from the ftp server */
++        r->ebcdic.conv_out = 0; /* do not convert what we read from the ftp
++                                 * server */
+ #endif
+         if (r->content_type != NULL) {
+             ap_table_setn(resp_hdrs, "Content-Type", r->content_type);
+-            ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: Content-Type set to %s", r->content_type);
++            ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: Content-Type set to %s", r->content_type);
+         }
+         else {
+             ap_table_setn(resp_hdrs, "Content-Type", ap_default_type(r));
+@@ -1272,11 +1279,11 @@
+         if (xfer_type != 'A' && size != NULL) {
+             /* We "trust" the ftp server to really serve (size) bytes... */
+             ap_table_set(resp_hdrs, "Content-Length", size);
+-            ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: Content-Length set to %s", size);
++            ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: Content-Length set to %s", size);
+         }
+     }
+     if (r->content_encoding != NULL && r->content_encoding[0] != '\0') {
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: Content-Encoding set to %s", r->content_encoding);
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: Content-Encoding set to %s", r->content_encoding);
+         ap_table_setn(resp_hdrs, "Content-Encoding", r->content_encoding);
+     }
+ 
+@@ -1303,7 +1310,7 @@
+         ap_hard_timeout("proxy ftp data connect", r);
+         clen = sizeof(struct sockaddr_in);
+         do
+-            csd = accept(dsock, (struct sockaddr *) &server, &clen);
++            csd = accept(dsock, (struct sockaddr *)&server, &clen);
+         while (csd == -1 && errno == EINTR);
+         if (csd == -1) {
+             ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
+@@ -1335,7 +1342,7 @@
+                   ap_pstrcat(r->pool, "MISS from ",
+                              ap_get_server_name(r), NULL)); 
+     /* The Content-Type of this response is the upstream one. */
+-    r->content_type = ap_table_get (r->headers_out, "Content-Type");
++    r->content_type = ap_table_get(r->headers_out, "Content-Type");
+     /* finally output the headers to the client */
+     ap_send_http_header(r);
+ 
+@@ -1348,7 +1355,7 @@
+ /* we need to set this for ap_proxy_send_fb()... */
+             if (c != NULL)
+                 c->cache_completion = 0;
+-            ap_proxy_send_fb(data, r, c, -1, 0, conf->io_buffer_size);
++            ap_proxy_send_fb(data, r, c, -1, 0, 0, conf->io_buffer_size);
+         }
+         else {
+             send_dir(data, r, c, cwd);
+@@ -1357,8 +1364,9 @@
+         data = NULL;
+         dsock = -1;
+ 
+-        /* We checked for 125||150||226||250 above.
+-         * See if another rc is pending, and fetch it:
++        /*
++         * We checked for 125||150||226||250 above. See if another rc is
++         * pending, and fetch it:
+          */
+         if (rc == 125 || rc == 150)
+             rc = ftp_getrc(ctrl);
+@@ -1372,7 +1380,7 @@
+             data = NULL;
+             dsock = -1;
+         }
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: ABOR");
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: ABOR");
+ /* responses: 225, 226, 421, 500, 501, 502 */
+     /* 225 Data connection open; no transfer in progress. */
+     /* 226 Closing data connection. */
+@@ -1381,7 +1389,7 @@
+     /* 501 Syntax error in parameters or arguments. */
+     /* 502 Command not implemented. */
+         i = ftp_getrc(ctrl);
+-        ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: returned status %d", i);
++        ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: returned status %d", i);
+     }
+ 
+     ap_kill_timeout(r);
+@@ -1390,12 +1398,12 @@
+ /* finish */
+     ap_bputs("QUIT" CRLF, ctrl);
+     ap_bflush(ctrl);
+-    ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: QUIT");
++    ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: QUIT");
+ /* responses: 221, 500 */
+     /* 221 Service closing control connection. */
+     /* 500 Syntax error, command unrecognized. */
+     i = ftp_getrc(ctrl);
+-    ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: QUIT: status %d", i);
++    ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: QUIT: status %d", i);
+ 
+     ap_bclose(ctrl);
+ 
+Index: modules/proxy/proxy_http.c
+===================================================================
+RCS file: /home/cvs/apache-1.3/src/modules/proxy/proxy_http.c,v
+retrieving revision 1.88
+retrieving revision 1.95
+diff -u -b -u -r1.88 -r1.95
+--- modules/proxy/proxy_http.c	21 Mar 2002 11:38:03 -0000	1.88
++++ modules/proxy/proxy_http.c	17 Apr 2002 16:04:32 -0000	1.95
+@@ -76,8 +76,8 @@
+     const char *err;
+     int port;
+ 
+-    /* do syntatic check.
+-     * We break the URL into host, port, path, search
++    /*
++     * do syntatic check. We break the URL into host, port, path, search
+      */
+     port = def_port;
+     err = ap_proxy_canon_netloc(r->pool, &url, NULL, NULL, &host, &port);
+@@ -85,9 +85,10 @@
+         return HTTP_BAD_REQUEST;
+ 
+     /* now parse path/search args, according to rfc1738 */
+-    /* N.B. if this isn't a true proxy request, then the URL _path_
+-     * has already been decoded.  True proxy requests have r->uri
+-     * == r->unparsed_uri, and no others have that property.
++    /*
++     * N.B. if this isn't a true proxy request, then the URL _path_ has
++     * already been decoded.  True proxy requests have r->uri ==
++     * r->unparsed_uri, and no others have that property.
+      */
+     if (r->uri == r->unparsed_uri) {
+         search = strchr(url, '?');
+@@ -163,18 +164,21 @@
+     char portstr[32];
+     pool *p = r->pool;
+     int destport = 0;
++    int chunked = 0;
+     char *destportstr = NULL;
+     const char *urlptr = NULL;
+     const char *datestr, *urlstr;
++    const char *content_length;
+ 
+     void *sconf = r->server->module_config;
+     proxy_server_conf *conf =
+-    (proxy_server_conf *) ap_get_module_config(sconf, &proxy_module);
++    (proxy_server_conf *)ap_get_module_config(sconf, &proxy_module);
+     struct noproxy_entry *npent = (struct noproxy_entry *) conf->noproxies->elts;
+     struct nocache_entry *ncent = (struct nocache_entry *) conf->nocaches->elts;
+     int nocache = 0;
+ 
+-    if (conf->cache.root == NULL) nocache = 1;
++    if (conf->cache.root == NULL)
++        nocache = 1;
+ 
+     memset(&server, '\0', sizeof(server));
+     server.sin_family = AF_INET;
+@@ -232,8 +236,9 @@
+     }
+ 
+ 
+-    /* we have worked out who exactly we are going to connect to, now
+-     * make that connection...
++    /*
++     * we have worked out who exactly we are going to connect to, now make
++     * that connection...
+      */
+     sock = ap_psocket(p, PF_INET, SOCK_STREAM, IPPROTO_TCP);
+     if (sock == -1) {
+@@ -245,7 +250,7 @@
+ #if !defined(TPF) && !defined(BEOS)
+     if (conf->recv_buffer_size) {
+         if (setsockopt(sock, SOL_SOCKET, SO_RCVBUF,
+-                       (const char *) &conf->recv_buffer_size, sizeof(int))
++                       (const char *)&conf->recv_buffer_size, sizeof(int))
+             == -1) {
+             ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
+                          "setsockopt(SO_RCVBUF): Failed to set ProxyReceiveBufferSize, using default");
+@@ -255,7 +260,7 @@
+ 
+ #ifdef SINIX_D_RESOLVER_BUG
+     {
+-        struct in_addr *ip_addr = (struct in_addr *) *server_hp.h_addr_list;
++        struct in_addr *ip_addr = (struct in_addr *)*server_hp.h_addr_list;
+ 
+         for (; ip_addr->s_addr != 0; ++ip_addr) {
+             memcpy(&server.sin_addr, ip_addr, sizeof(struct in_addr));
+@@ -287,16 +292,17 @@
+     /* record request_time for HTTP/1.1 age calculation */
+     c->req_time = time(NULL);
+ 
+-    /* build upstream-request headers by stripping r->headers_in from
+-     * connection specific headers.
+-     * We must not remove the Connection: header from r->headers_in,
+-     * we still have to react to Connection: close
++    /*
++     * build upstream-request headers by stripping r->headers_in from
++     * connection specific headers. We must not remove the Connection: header
++     * from r->headers_in, we still have to react to Connection: close
+      */
+     req_hdrs = ap_copy_table(r->pool, r->headers_in);
+     ap_proxy_clear_connection(r->pool, req_hdrs);
+ 
+-    /* At this point, we start sending the HTTP/1.1 request to the
+-     * remote server (proxy or otherwise).
++    /*
++     * At this point, we start sending the HTTP/1.1 request to the remote
++     * server (proxy or otherwise).
+      */
+     f = ap_bcreate(p, B_RDWR | B_SOCKET);
+     ap_bpushfd(f, sock, sock);
+@@ -313,12 +319,14 @@
+     if (conf->viaopt == via_block) {
+         /* Block all outgoing Via: headers */
+         ap_table_unset(req_hdrs, "Via");
+-    } else if (conf->viaopt != via_off) {
++    }
++    else if (conf->viaopt != via_off) {
+         /* Create a "Via:" request header entry and merge it */
+         i = ap_get_server_port(r);
+-        if (ap_is_default_port(i,r)) {
+-            strcpy(portstr,"");
+-        } else {
++        if (ap_is_default_port(i, r)) {
++            strcpy(portstr, "");
++        }
++        else {
+             ap_snprintf(portstr, sizeof portstr, ":%d", i);
+         }
+         /* Generate outgoing Via: header with/without server comment: */
+@@ -336,20 +344,23 @@
+                         );
+     }
+ 
+-    /* Add X-Forwarded-For: so that the upstream has a chance to
+-       determine, where the original request came from. */
++    /*
++     * Add X-Forwarded-For: so that the upstream has a chance to determine,
++     * where the original request came from.
++     */
+     ap_table_mergen(req_hdrs, "X-Forwarded-For", r->connection->remote_ip);
+     
+     /* we don't yet support keepalives - but we will soon, I promise! */
+     ap_table_set(req_hdrs, "Connection", "close");
+ 
+     reqhdrs_arr = ap_table_elts(req_hdrs);
+-    reqhdrs_elts = (table_entry *) reqhdrs_arr->elts;
++    reqhdrs_elts = (table_entry *)reqhdrs_arr->elts;
+     for (i = 0; i < reqhdrs_arr->nelts; i++) {
+         if (reqhdrs_elts[i].key == NULL || reqhdrs_elts[i].val == NULL
+ 
+-        /* Clear out hop-by-hop request headers not to send:
+-         * RFC2616 13.5.1 says we should strip these headers:
++        /*
++         * Clear out hop-by-hop request headers not to send: RFC2616 13.5.1
++         * says we should strip these headers:
+          */
+             || !strcasecmp(reqhdrs_elts[i].key, "Host") /* Already sent */
+             || !strcasecmp(reqhdrs_elts[i].key, "Keep-Alive")
+@@ -357,15 +368,15 @@
+             || !strcasecmp(reqhdrs_elts[i].key, "Trailer")
+             || !strcasecmp(reqhdrs_elts[i].key, "Transfer-Encoding")
+             || !strcasecmp(reqhdrs_elts[i].key, "Upgrade")
+-
+-            /* XXX: @@@ FIXME: "Proxy-Authorization" should *only* be 
+-             * suppressed if THIS server requested the authentication,
+-             * not when a frontend proxy requested it!
++        /*
++         * XXX: @@@ FIXME: "Proxy-Authorization" should *only* be suppressed
++         * if THIS server requested the authentication, not when a frontend
++         * proxy requested it!
+              *
+-             * The solution to this problem is probably to strip out
+-             * the Proxy-Authorisation header in the authorisation
+-             * code itself, not here. This saves us having to signal
+-             * somehow whether this request was authenticated or not.
++         * The solution to this problem is probably to strip out the
++         * Proxy-Authorisation header in the authorisation code itself, not
++         * here. This saves us having to signal somehow whether this request
++         * was authenticated or not.
+              */
+             || !strcasecmp(reqhdrs_elts[i].key, "Proxy-Authorization"))
+             continue;
+@@ -377,14 +388,17 @@
+ 
+     /* send the request data, if any. */
+     if (ap_should_client_block(r)) {
+-        while ((i = ap_get_client_block(r, buffer, sizeof buffer)) > 0)
++        while ((i = ap_get_client_block(r, buffer, sizeof buffer)) > 0) {
++            ap_reset_timeout(r);
+             ap_bwrite(f, buffer, i);
+     }
++    }
+     ap_bflush(f);
+     ap_kill_timeout(r);
+ 
+ 
+-    /* Right - now it's time to listen for a response.
++    /*
++     * Right - now it's time to listen for a response.
+      */
+     ap_hard_timeout("proxy receive", r);
+ 
+@@ -397,16 +411,17 @@
+                      proxyhost ? proxyhost : desthost, len);
+         return ap_proxyerror(r, HTTP_BAD_GATEWAY,
+                              "Error reading from remote server");
+-    } else if (len == 0) {
++    }
++    else if (len == 0) {
+         ap_bclose(f);
+         ap_kill_timeout(r);
+         return ap_proxyerror(r, HTTP_BAD_GATEWAY,
+                              "Document contains no data");
+     }
+ 
+-    /* Is it an HTTP/1 response?
+-     * Do some sanity checks on the response.
+-     * (This is buggy if we ever see an HTTP/1.10)
++    /*
++     * Is it an HTTP/1 response? Do some sanity checks on the response. (This
++     * is buggy if we ever see an HTTP/1.10)
+      */
+     if (ap_checkmask(buffer, "HTTP/#.# ###*")) {
+         int major, minor;
+@@ -436,7 +451,7 @@
+ 
+         resp_hdrs = ap_proxy_read_headers(r, buffer, HUGE_STRING_LEN, f);
+         if (resp_hdrs == NULL) {
+-            ap_log_error(APLOG_MARK, APLOG_WARNING|APLOG_NOERRNO, r->server,
++            ap_log_error(APLOG_MARK, APLOG_WARNING | APLOG_NOERRNO, r->server,
+                  "proxy: Bad HTTP/%d.%d header returned by %s (%s)",
+                  major, minor, r->uri, r->method);
+             resp_hdrs = ap_make_table(p, 20);
+@@ -447,9 +462,10 @@
+         if (conf->viaopt != via_off && conf->viaopt != via_block) {
+             /* Create a "Via:" response header entry and merge it */
+             i = ap_get_server_port(r);
+-            if (ap_is_default_port(i,r)) {
+-                strcpy(portstr,"");
+-            } else {
++            if (ap_is_default_port(i, r)) {
++                strcpy(portstr, "");
++            }
++            else {
+                 ap_snprintf(portstr, sizeof portstr, ":%d", i);
+             }
+             ap_table_mergen((table *)resp_hdrs, "Via",
+@@ -464,11 +480,21 @@
+                             );
+         }
+ 
+-        /* strip hop-by-hop headers defined by Connection */
++        /* is this content chunked? */
++        chunked = ap_find_last_token(r->pool,
++                                     ap_table_get(resp_hdrs, "Transfer-Encoding"),
++                                     "chunked");
++
++        /* strip hop-by-hop headers defined by Connection and RFC2616 */
+         ap_proxy_clear_connection(p, resp_hdrs);
++
++        content_length = ap_table_get(resp_hdrs, "Content-Length");
++        if (content_length != NULL)
++            c->len = strtol(content_length, NULL, 10);
++
+         /* Now add out bound headers set by other modules */
+         resp_hdrs = ap_overlay_tables(r->pool, r->err_headers_out, resp_hdrs);
+-}
++    }
+     else {
+         /* an http/0.9 response */
+         backasswards = 1;
+@@ -482,10 +508,11 @@
+     ap_kill_timeout(r);
+ 
+     /*
+-     * HTTP/1.1 requires us to accept 3 types of dates, but only generate
+-     * one type
++     * HTTP/1.1 requires us to accept 3 types of dates, but only generate one
++     * type
+      */
+-    /* we SET the dates here, obliterating possible multiple dates, as only
++    /*
++     * we SET the dates here, obliterating possible multiple dates, as only
+      * one of each date makes sense in each response.
+      */
+     if ((datestr = ap_table_get(resp_hdrs, "Date")) != NULL)
+@@ -501,7 +528,7 @@
+     if ((urlstr = ap_table_get(resp_hdrs, "URI")) != NULL)
+       ap_table_set(resp_hdrs, "URI", proxy_location_reverse_map(r, urlstr));
+     if ((urlstr = ap_table_get(resp_hdrs, "Content-Location")) != NULL)
+-      ap_table_set(resp_hdrs, "Content-Location", proxy_location_reverse_map(r , urlstr));
++        ap_table_set(resp_hdrs, "Content-Location", proxy_location_reverse_map(r, urlstr));
+ 
+ /* check if NoCache directive on this host */
+     if (nocache == 0) {
+@@ -515,8 +542,9 @@
+             }
+         }
+ 
+-    /* update the cache file, possibly even fulfilling the request if
+-     * it turns out a conditional allowed us to serve the object from the
++        /*
++         * update the cache file, possibly even fulfilling the request if it
++         * turns out a conditional allowed us to serve the object from the
+      * cache...
+      */
+     i = ap_proxy_cache_update(c, resp_hdrs, !backasswards, nocache);
+@@ -530,20 +558,22 @@
+     }
+ 
+     /* Setup the headers for our client from upstreams response-headers */
+-    ap_overlap_tables(r->headers_out, resp_hdrs, AP_OVERLAP_TABLES_SET);
++    ap_proxy_table_replace(r->headers_out, resp_hdrs);
+     /* Add X-Cache header - be careful not to obliterate any upstream headers */
+     ap_table_mergen(r->headers_out, "X-Cache",
+                   ap_pstrcat(r->pool, "MISS from ",
+                              ap_get_server_name(r), NULL));
+     /* The Content-Type of this response is the upstream one. */
+-    r->content_type = ap_table_get (r->headers_out, "Content-Type");
+-    ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "Content-Type: %s", r->content_type);
++    r->content_type = ap_table_get(r->headers_out, "Content-Type");
++    ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "Content-Type: %s", r->content_type);
+ 
+     /* finally output the headers to the client */
+     ap_send_http_header(r);
+ 
+-    /* Is it an HTTP/0.9 respose? If so, send the extra data we read
+-       from upstream as the start of the reponse to client */
++    /*
++     * Is it an HTTP/0.9 respose? If so, send the extra data we read from
++     * upstream as the start of the reponse to client
++     */
+     if (backasswards) {
+         ap_hard_timeout("proxy send assbackward", r);
+ 
+@@ -558,11 +588,13 @@
+ 
+ 
+ #ifdef CHARSET_EBCDIC
+-    /* What we read/write after the header should not be modified
+-     * (i.e., the cache copy is ASCII, not EBCDIC, even for text/html)
++    /*
++     * What we read/write after the header should not be modified (i.e., the
++     * cache copy is ASCII, not EBCDIC, even for text/html)
+      */
+-    ap_bsetflag(f, B_ASCII2EBCDIC|B_EBCDIC2ASCII, 0);
+-    ap_bsetflag(r->connection->client, B_ASCII2EBCDIC|B_EBCDIC2ASCII, 0);
++    r->ebcdic.conv_in = r->ebcdic.conv_out = 0;
++    ap_bsetflag(f, B_ASCII2EBCDIC | B_EBCDIC2ASCII, 0);
++    ap_bsetflag(r->connection->client, B_ASCII2EBCDIC | B_EBCDIC2ASCII, 0);
+ #endif
+ 
+ /* send body */
+@@ -578,7 +610,7 @@
+  * content length is not known. We need to make 100% sure c->len is always
+  * set correctly before we get here to correctly do keepalive.
+  */
+-        ap_proxy_send_fb(f, r, c, c->len, 0, conf->io_buffer_size);
++        ap_proxy_send_fb(f, r, c, c->len, 0, chunked, conf->io_buffer_size);
+     }
+ 
+     /* ap_proxy_send_fb() closes the socket f for us */
+Index: modules/proxy/proxy_util.c
+===================================================================
+RCS file: /home/cvs/apache-1.3/src/modules/proxy/proxy_util.c,v
+retrieving revision 1.109
+retrieving revision 1.119
+diff -u -b -u -r1.109 -r1.119
+--- modules/proxy/proxy_util.c	21 Mar 2002 11:38:03 -0000	1.109
++++ modules/proxy/proxy_util.c	15 Apr 2002 09:41:22 -0000	1.119
+@@ -73,9 +73,10 @@
+ /* already called in the knowledge that the characters are hex digits */
+ int ap_proxy_hex2c(const char *x)
+ {
+-    int i, ch;
+-
++    int i;
+ #ifndef CHARSET_EBCDIC
++    int ch;
++
+     ch = x[0];
+     if (ap_isdigit(ch))
+         i = ch - '0';
+@@ -93,9 +94,9 @@
+     else
+         i += ch - ('a' - 10);
+     return i;
+-#else /*CHARSET_EBCDIC*/
+-    return (1 == sscanf(x, "%2x", &i)) ? os_toebcdic[i&0xFF] : 0;
+-#endif /*CHARSET_EBCDIC*/
++#else                           /* CHARSET_EBCDIC */
++    return (1 == sscanf(x, "%2x", &i)) ? os_toebcdic[i & 0xFF] : 0;
++#endif                          /* CHARSET_EBCDIC */
+ }
+ 
+ void ap_proxy_c2hex(int ch, char *x)
+@@ -115,14 +116,14 @@
+         x[2] = ('A' - 10) + i;
+     else
+         x[2] = '0' + i;
+-#else /*CHARSET_EBCDIC*/
+-    static const char ntoa[] = { "0123456789ABCDEF" };
++#else                           /* CHARSET_EBCDIC */
++    static const char ntoa[] = {"0123456789ABCDEF"};
+     ch = os_toascii[ch & 0xFF];
+     x[0] = '%';
+-    x[1] = ntoa[(ch>>4)&0x0F];
+-    x[2] = ntoa[ch&0x0F];
++    x[1] = ntoa[(ch >> 4) & 0x0F];
++    x[2] = ntoa[ch & 0x0F];
+     x[3] = '\0';
+-#endif /*CHARSET_EBCDIC*/
++#endif                          /* CHARSET_EBCDIC */
+ }
+ 
+ /*
+@@ -267,7 +268,8 @@
+         /* if (i == 0) the no port was given; keep default */
+         if (strp[i] != '\0') {
+             return "Bad port number in URL";
+-        } else if (i > 0) {
++        }
++        else if (i > 0) {
+             *port = atoi(strp);
+             if (*port > 65535)
+                 return "Port number in URL > 65535";
+@@ -299,7 +301,7 @@
+     return NULL;
+ }
+ 
+-static const char * const lwday[7] =
++static const char *const lwday[7] =
+ {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+ 
+ /*
+@@ -365,63 +367,6 @@
+ }
+ 
+ 
+-/* NOTE: This routine is taken from http_protocol::getline()
+- * because the old code found in the proxy module was too
+- * difficult to understand and maintain.
+- */
+-/* Get a line of protocol input, including any continuation lines
+- * caused by MIME folding (or broken clients) if fold != 0, and place it
+- * in the buffer s, of size n bytes, without the ending newline.
+- *
+- * Returns -1 on error, or the length of s.
+- *
+- * Note: Because bgets uses 1 char for newline and 1 char for NUL,
+- *       the most we can get is (n - 2) actual characters if it
+- *       was ended by a newline, or (n - 1) characters if the line
+- *       length exceeded (n - 1).  So, if the result == (n - 1),
+- *       then the actual input line exceeded the buffer length,
+- *       and it would be a good idea for the caller to puke 400 or 414.
+- */
+-static int proxy_getline(char *s, int n, BUFF *in, int fold)
+-{
+-    char *pos, next;
+-    int retval;
+-    int total = 0;
+-
+-    pos = s;
+-
+-    do {
+-        retval = ap_bgets(pos, n, in);     /* retval == -1 if error, 0 if EOF */
+-
+-        if (retval <= 0)
+-            return ((retval < 0) && (total == 0)) ? -1 : total;
+-
+-        /* retval is the number of characters read, not including NUL      */
+-
+-        n -= retval;            /* Keep track of how much of s is full     */
+-        pos += (retval - 1);    /* and where s ends                        */
+-        total += retval;        /* and how long s has become               */
+-
+-        if (*pos == '\n') {     /* Did we get a full line of input?        */
+-            *pos = '\0';
+-            --total;
+-            ++n;
+-        }
+-        else
+-            return total;       /* if not, input line exceeded buffer size */
+-
+-        /* Continue appending if line folding is desired and
+-         * the last line was not empty and we have room in the buffer and
+-         * the next line begins with a continuation character.
+-         */
+-    } while (fold && (retval != 1) && (n > 1)
+-                  && (ap_blookc(&next, in) == 1)
+-                  && ((next == ' ') || (next == '\t')));
+-
+-    return total;
+-}
+-
+-
+ /*
+  * Reads headers from a buffer and returns an array of headers.
+  * Returns NULL on file error
+@@ -445,37 +390,40 @@
+      * Read header lines until we get the empty separator line, a read error,
+      * the connection closes (EOF), or we timeout.
+      */
+-    while ((len = proxy_getline(buffer, size, f, 1)) > 0) {
++    while ((len = ap_getline(buffer, size, f, 1)) > 0) {
+         
+         if (!(value = strchr(buffer, ':'))) {     /* Find the colon separator */
+ 
+-            /* Buggy MS IIS servers sometimes return invalid headers
+-             * (an extra "HTTP/1.0 200, OK" line sprinkled in between
+-             * the usual MIME headers). Try to deal with it in a sensible
+-             * way, but log the fact.
+-             * XXX: The mask check is buggy if we ever see an HTTP/1.10 */
++            /*
++             * Buggy MS IIS servers sometimes return invalid headers (an
++             * extra "HTTP/1.0 200, OK" line sprinkled in between the usual
++             * MIME headers). Try to deal with it in a sensible way, but log
++             * the fact. XXX: The mask check is buggy if we ever see an
++             * HTTP/1.10
++             */
+ 
+             if (!ap_checkmask(buffer, "HTTP/#.# ###*")) {
+                 /* Nope, it wasn't even an extra HTTP header. Give up. */
+                 return NULL;
+             }
+ 
+-            ap_log_error(APLOG_MARK, APLOG_WARNING|APLOG_NOERRNO, r->server,
+-                         "proxy: Ignoring duplicate HTTP header "
+-                         "returned by %s (%s)", r->uri, r->method);
++            ap_log_error(APLOG_MARK, APLOG_WARNING | APLOG_NOERRNO, r->server,
++                         "proxy: Ignoring duplicate HTTP status line "
++                         "returned by buggy server %s (%s)", r->uri, r->method);
+             continue;
+         }
+ 
+         *value = '\0';
+         ++value;
+-        /* XXX: RFC2068 defines only SP and HT as whitespace, this test is
++        /*
++         * XXX: RFC2068 defines only SP and HT as whitespace, this test is
+          * wrong... and so are many others probably.
+          */
+         while (ap_isspace(*value))
+             ++value;            /* Skip to start of value   */
+ 
+         /* should strip trailing whitespace as well */
+-        for (end = &value[strlen(value)-1]; end > value && ap_isspace(*end); --end)
++        for (end = &value[strlen(value) - 1]; end > value && ap_isspace(*end); --end)
+             *end = '\0';
+ 
+         /* make sure we add so as not to destroy duplicated headers */
+@@ -483,7 +431,7 @@
+ 
+         /* the header was too long; at the least we should skip extra data */
+         if (len >= size - 1) { 
+-            while ((len = proxy_getline(field, MAX_STRING_LEN, f, 1))
++            while ((len = ap_getline(field, MAX_STRING_LEN, f, 1))
+                     >= MAX_STRING_LEN - 1) {
+                 /* soak up the extra data */
+             }
+@@ -494,23 +442,28 @@
+     return resp_hdrs;
+ }
+ 
+-/* read data from f, write it to:
++/* read data from (socket BUFF*) f, write it to:
+  * - c->fp, if it is open
+  * - r->connection->client, if nowrite == 0
+  */
+ 
+-long int ap_proxy_send_fb(BUFF *f, request_rec *r, cache_req *c, off_t len, int nowrite, size_t recv_buffer_size)
++long int ap_proxy_send_fb(BUFF *f, request_rec *r, cache_req *c, off_t len, int nowrite, int chunked, size_t recv_buffer_size)
+ {
+-    int  ok;
++    int ok, end_of_chunk;
+     char *buf;
+     size_t buf_size;
++    size_t remaining = 0;
+     long total_bytes_rcvd;
+-    register int n, o, w;
++    register int n = 0, o, w;
+     conn_rec *con = r->connection;
+-    int alternate_timeouts = 1; /* 1 if we alternate between soft & hard timeouts */
++    int alternate_timeouts = 1; /* 1 if we alternate between soft & hard
++                                 * timeouts */
+ 
+     /* allocate a buffer to store the bytes in */
+-    /* make sure it is at least IOBUFSIZE, as recv_buffer_size may be zero for system default */
++    /*
++     * make sure it is at least IOBUFSIZE, as recv_buffer_size may be zero
++     * for system default
++     */
+     buf_size = MAX(recv_buffer_size, IOBUFSIZE);
+     buf = ap_palloc(r->pool, buf_size);
+ 
+@@ -520,15 +473,14 @@
+ 
+ #ifdef CHARSET_EBCDIC
+     /* The cache copy is ASCII, not EBCDIC, even for text/html) */
+-    ap_bsetflag(f, B_ASCII2EBCDIC|B_EBCDIC2ASCII, 0);
+-    if (c != NULL && c->fp != NULL)
+-        ap_bsetflag(c->fp, B_ASCII2EBCDIC|B_EBCDIC2ASCII, 0);
+-    ap_bsetflag(con->client, B_ASCII2EBCDIC|B_EBCDIC2ASCII, 0);
++    ap_bsetflag(f, B_ASCII2EBCDIC | B_EBCDIC2ASCII, 0);
++    ap_bsetflag(con->client, B_ASCII2EBCDIC | B_EBCDIC2ASCII, 0);
+ #endif
+ 
+-    /* Since we are reading from one buffer and writing to another,
+-     * it is unsafe to do a soft_timeout here, at least until the proxy
+-     * has its own timeout handler which can set both buffers to EOUT.
++    /*
++     * Since we are reading from one buffer and writing to another, it is
++     * unsafe to do a soft_timeout here, at least until the proxy has its own
++     * timeout handler which can set both buffers to EOUT.
+      */
+ 
+     ap_kill_timeout(r);
+@@ -538,12 +490,13 @@
+     ap_hard_timeout("proxy send body", r);
+     alternate_timeouts = 0;
+ #else
+-    /* CHECKME! Since hard_timeout won't work in unix on sends with partial
+-     * cache completion, we have to alternate between hard_timeout
+-     * for reads, and soft_timeout for send.  This is because we need
+-     * to get a return from ap_bwrite to be able to continue caching.
+-     * BUT, if we *can't* continue anyway, just use hard_timeout.
+-     * (Also, if no cache file is written, use hard timeouts)
++    /*
++     * CHECKME! Since hard_timeout won't work in unix on sends with partial
++     * cache completion, we have to alternate between hard_timeout for reads,
++     * and soft_timeout for send.  This is because we need to get a return
++     * from ap_bwrite to be able to continue caching. BUT, if we *can't*
++     * continue anyway, just use hard_timeout. (Also, if no cache file is
++     * written, use hard timeouts)
+      */
+ 
+     if (c == NULL || c->len <= 0 || c->cache_completion == 1.0) {
+@@ -552,22 +505,92 @@
+     }
+ #endif
+ 
+-    /* Loop and ap_bread() while we can successfully read and write,
+-     * or (after the client aborted) while we can successfully
+-     * read and finish the configured cache_completion.
++    /*
++     * Loop and ap_bread() while we can successfully read and write, or
++     * (after the client aborted) while we can successfully read and finish
++     * the configured cache_completion.
+      */
+-    for (ok = 1; ok; ) {
++    for (end_of_chunk = ok = 1; ok;) {
+         if (alternate_timeouts)
+             ap_hard_timeout("proxy recv body from upstream server", r);
+ 
+-        /* Read block from server */
++
++        /* read a chunked block */
++        if (chunked) {
++            long chunk_start = 0;
++            n = 0;
++
++            /* start of a new chunk */
++            if (end_of_chunk) {
++                end_of_chunk = 0;
++                /* get the chunk size from the stream */
++                chunk_start = ap_getline(buf, buf_size, f, 0);
++                if ((chunk_start <= 0) || ((size_t)chunk_start + 1 >= buf_size) || !ap_isxdigit(*buf)) {
++                    n = -1;
++                }
++                /* parse the chunk size */
++                else {
++                    remaining = ap_get_chunk_size(buf);
++                    if (remaining == 0) { /* Last chunk indicated, get footers */
++                        /* as we are a proxy, we discard the footers, as the headers
++                         * have already been sent at this point.
++                         */
++                        if (NULL == ap_proxy_read_headers(r, buf, buf_size, f)) {
++                            n = -1;
++                        }
++                    }
++                }
++            }
++
++            /* read the chunk */
++            if (remaining > 0) {
++                n = ap_bread(f, buf, MIN((int)buf_size, (int)remaining));
++                if (n > -1) {
++                    remaining -= n;
++                    end_of_chunk = (remaining == 0);
++                }
++            }
++
++            /* soak up trailing CRLF */
++            if (end_of_chunk) {
++                int ch; /* int because it may hold an EOF */
++                /*
++                 * For EBCDIC, the proxy has configured the BUFF layer to
++                 * transparently pass the ascii characters thru (also writing
++                 * an ASCII copy to the cache, where appropriate).
++                 * Therefore, we see here an ASCII-CRLF (\015\012),
++                 * not an EBCDIC-CRLF (\r\n).
++                 */
++                if ((ch = ap_bgetc(f)) == EOF) {
++                    /* Protocol error: EOF detected within chunk */
++                    n = -1;
++                    ap_log_rerror(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r,
++                                  "proxy: remote protocol error, eof while reading chunked from proxy");
++                }
++                else
++                {
++                    if (ch == '\015') { /* _ASCII_ CR */
++                        ch = ap_bgetc(f);
++                    }
++                    if (ch != '\012') {
++                        n = -1;
++                    }
++                }
++            }
++        }
++
++        /* otherwise read block normally */
++        else {
+         if (-1 == len) {
+             n = ap_bread(f, buf, buf_size);
+         }
+         else {
+-            n = ap_bread(f, buf, MIN((off_t)buf_size, len - total_bytes_rcvd));
++                n = ap_bread(f, buf, MIN((int)buf_size,
++                                         (int)(len - total_bytes_rcvd)));
++            }
+         }
+ 
++
+         if (alternate_timeouts)
+             ap_kill_timeout(r);
+         else
+@@ -587,11 +610,12 @@
+         total_bytes_rcvd += n;
+ 
+         /* if we've received everything... */
+-        /* in the case of slow frontends and expensive backends,
+-         * we want to avoid leaving a backend connection hanging
+-         * while the frontend takes it's time to absorb the bytes.
+-         * so: if we just read the last block, we close the backend
+-         * connection now instead of later - it's no longer needed.
++        /*
++         * in the case of slow frontends and expensive backends, we want to
++         * avoid leaving a backend connection hanging while the frontend
++         * takes it's time to absorb the bytes. so: if we just read the last
++         * block, we close the backend connection now instead of later - it's
++         * no longer needed.
+          */
+         if (total_bytes_rcvd == len) {
+             ap_bclose(f);
+@@ -599,13 +623,17 @@
+         }
+ 
+         /* Write to cache first. */
+-        /*@@@ XXX FIXME: Assuming that writing the cache file won't time out?!!? */
++        /*
++         * @@@ XXX FIXME: Assuming that writing the cache file won't time
++         * out?!!?
++         */
+         if (c != NULL && c->fp != NULL) {
+             if (ap_bwrite(c->fp, &buf[0], n) != n) {
+                 ap_log_rerror(APLOG_MARK, APLOG_ERR, c->req,
+                     "proxy: error writing to %s", c->tempfile);
+                 c = ap_proxy_cache_error(c);
+-            } else {
++            }
++            else {
+                 c->written += n;
+             }
+         }
+@@ -624,16 +652,17 @@
+ 
+             if (w <= 0) {
+                 if (c != NULL) {
+-                    /* when a send failure occurs, we need to decide
+-                     * whether to continue loading and caching the
+-                     * document, or to abort the whole thing
++                    /*
++                     * when a send failure occurs, we need to decide whether
++                     * to continue loading and caching the document, or to
++                     * abort the whole thing
+                      */
+                     ok = (c->len > 0) &&
+                          (c->cache_completion > 0) &&
+                          (c->len * c->cache_completion < total_bytes_rcvd);
+ 
+-                    if (! ok) {
+-                        if (c->fp!=NULL) {
++                    if (!ok) {
++                        if (c->fp != NULL) {
+                         ap_pclosef(c->req->pool, ap_bfileno(c->fp, B_WR));
+                         c->fp = NULL;
+                         }
+@@ -706,7 +735,7 @@
+     int len, i;
+     const char *p;
+     char valbuf[HUGE_STRING_LEN];
+-    valbuf[sizeof(valbuf)-1] = 0; /* safety terminating zero */
++    valbuf[sizeof(valbuf) - 1] = 0;     /* safety terminating zero */
+ 
+     len = strlen(key);
+ 
+@@ -734,7 +763,7 @@
+                 while (ap_isspace(*list)) {
+                     list++;
+                 }
+-                strncpy(valbuf, list, MIN(p-list, sizeof(valbuf)-1));
++                strncpy(valbuf, list, MIN(p - list, sizeof(valbuf) - 1));
+                 *val = valbuf;
+             }
+             return 1;
+@@ -760,7 +789,7 @@
+     static const char enc_table[32] = "abcdefghijklmnopqrstuvwxyz012345";
+ 
+     ap_MD5Init(&context);
+-    ap_MD5Update(&context, (const unsigned char *) it, strlen(it));
++    ap_MD5Update(&context, (const unsigned char *)it, strlen(it));
+     ap_MD5Final(digest, &context);
+ 
+ /* encode 128 bits as 26 characters, using a modified uuencoding */
+@@ -805,8 +834,10 @@
+     int i, k, d;
+     unsigned int x;
+ #if defined(MPE) || (defined(AIX) && defined(__ps2__))
+-    /* Believe it or not, AIX 1.x does not allow you to name a file '@',
+-     * so hack around it in the encoding. */
++    /*
++     * Believe it or not, AIX 1.x does not allow you to name a file '@', so
++     * hack around it in the encoding.
++     */
+     static const char enc_table[64] =
+         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_%";
+ #else
+@@ -815,7 +846,7 @@
+ #endif
+ 
+     ap_MD5Init(&context);
+-    ap_MD5Update(&context, (const unsigned char *) it, strlen(it));
++    ap_MD5Update(&context, (const unsigned char *)it, strlen(it));
+     ap_MD5Final(digest, &context);
+ 
+ /* encode 128 bits as 22 characters, using a modified uuencoding */
+@@ -867,7 +898,7 @@
+     }
+ /* no longer necessary, as the source hex is 8-byte int */
+ /*    if (j == 0xffffffff)*/
+-/*      return -1;*/            /* so that it works with 8-byte ints */
++    /*      return -1;*//* so that it works with 8-byte ints */
+ /*    else */
+         return j;
+ }
+@@ -938,7 +969,7 @@
+  * This routine returns its own error message
+  */
+ const char *
+-     ap_proxy_host2addr(const char *host, struct hostent *reqhp)
++     ap_proxy_host2addr(const char *host, struct hostent * reqhp)
+ {
+     int i;
+     struct hostent *hp;
+@@ -955,14 +986,14 @@
+     }
+     else {
+         ptd->ipaddr = ap_inet_addr(host);
+-        hp = gethostbyaddr((char *) &ptd->ipaddr, sizeof(ptd->ipaddr), AF_INET);
++        hp = gethostbyaddr((char *)&ptd->ipaddr, sizeof(ptd->ipaddr), AF_INET);
+         if (hp == NULL) {
+             memset(&ptd->hpbuf, 0, sizeof(ptd->hpbuf));
+             ptd->hpbuf.h_name = 0;
+             ptd->hpbuf.h_addrtype = AF_INET;
+             ptd->hpbuf.h_length = sizeof(ptd->ipaddr);
+             ptd->hpbuf.h_addr_list = ptd->charpbuf;
+-            ptd->hpbuf.h_addr_list[0] = (char *) &ptd->ipaddr;
++            ptd->hpbuf.h_addr_list[0] = (char *)&ptd->ipaddr;
+             ptd->hpbuf.h_addr_list[1] = 0;
+             hp = &ptd->hpbuf;
+         }
+@@ -985,12 +1016,13 @@
+         || url[1] != '/' || url[2] != '/')
+         return NULL;
+ 
+-    url = ap_pstrdup(r->pool, &url[1]); /* make it point to "//", which is what proxy_canon_netloc expects */
++    url = ap_pstrdup(r->pool, &url[1]); /* make it point to "//", which is
++                                         * what proxy_canon_netloc expects */
+ 
+     err = ap_proxy_canon_netloc(r->pool, &url, &user, &password, &host, &port);
+ 
+     if (err != NULL)
+-        ap_log_rerror(APLOG_MARK, APLOG_ERR|APLOG_NOERRNO, r,
++        ap_log_rerror(APLOG_MARK, APLOG_ERR | APLOG_NOERRNO, r,
+                      "%s", err);
+ 
+     r->hostname = host;
+@@ -1011,9 +1043,12 @@
+     /* "partial" addresses (with less than 4 quads) correctly, i.e.  */
+     /* 192.168.123 is parsed as 192.168.0.123, which is not what I want. */
+     /* I therefore have to parse the IP address manually: */
+-    /*if (proxy_readmask(This->name, &This->addr.s_addr, &This->mask.s_addr) == 0) */
++    /*
++     * if (proxy_readmask(This->name, &This->addr.s_addr, &This->mask.s_addr)
++     * == 0)
++     */
+     /* addr and mask were set by proxy_readmask() */
+-    /*return 1; */
++    /* return 1; */
+ 
+     /* Parse IP addr manually, optionally allowing */
+     /* abbreviated net addresses like 192.168. */
+@@ -1070,7 +1105,10 @@
+         while (quads > 0 && ip_addr[quads - 1] == 0)
+             --quads;
+ 
+-        /* "IP Address should be given in dotted-quad form, optionally followed by a netmask (e.g., 192.168.111.0/24)"; */
++        /*
++         * "IP Address should be given in dotted-quad form, optionally
++         * followed by a netmask (e.g., 192.168.111.0/24)";
++         */
+         if (quads < 1)
+             return 0;
+ 
+@@ -1157,7 +1195,7 @@
+ 
+         /* Try to deal with multiple IP addr's for a host */
+         for (ip_listptr = the_host.h_addr_list; *ip_listptr; ++ip_listptr) {
+-            ip_list = (struct in_addr *) *ip_listptr;
++            ip_list = (struct in_addr *)*ip_listptr;
+             if (This->addr.s_addr == (ip_list->s_addr & This->mask.s_addr)) {
+ #if DEBUGGING
+                 fprintf(stderr, "3)IP-Match: %s[%s] <-> ", found, inet_ntoa(*ip_list));
+@@ -1256,7 +1294,7 @@
+     if (addr[i] != '\0' || ap_proxy_host2addr(addr, &host) != NULL)
+         return 0;
+ 
+-    This->hostentry = ap_pduphostent (p, &host);
++    This->hostentry = ap_pduphostent(p, &host);
+ 
+     /* Strip trailing dots */
+     for (i = strlen(addr) - 1; i > 0 && addr[i] == '.'; --i)
+@@ -1318,7 +1356,7 @@
+ 
+     ap_hard_timeout("proxy connect", r);
+     do {
+-        i = connect(sock, (struct sockaddr *) addr, sizeof(struct sockaddr_in));
++        i = connect(sock, (struct sockaddr *)addr, sizeof(struct sockaddr_in));
+ #if defined(WIN32) || defined(NETWARE)
+         if (i == SOCKET_ERROR)
+             errno = WSAGetLastError();
+@@ -1351,7 +1389,8 @@
+           c = ap_proxy_cache_error(c);
+             return 0; /* no need to continue, it failed already */
+     }
+-    return 1; /* tell ap_table_do() to continue calling us for more headers */
++    return 1;                   /* tell ap_table_do() to continue calling us
++                                 * for more headers */
+ }
+ 
+ /* send a text line to one or two BUFF's; return line length */
+@@ -1366,7 +1405,8 @@
+ /* do a HTTP/1.1 age calculation */
+ time_t ap_proxy_current_age(cache_req *c, const time_t age_value)
+ {
+-    time_t apparent_age, corrected_received_age, response_delay, corrected_initial_age, resident_time, current_age;
++    time_t apparent_age, corrected_received_age, response_delay, corrected_initial_age,
++           resident_time, current_age;
+ 
+     /* Perform an HTTP/1.1 age calculation. (RFC2616 13.2.3) */
+ 
+@@ -1398,7 +1438,7 @@
+                           "proxy: error opening cache file %s",
+                           filename);
+         else
+-            ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "File %s not found", filename);
++            ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "File %s not found", filename);
+ 
+     }
+     return cachefp;
+@@ -1431,10 +1471,10 @@
+     const char *name;
+     char *next = ap_pstrdup(p, ap_table_get(headers, "Connection"));
+ 
++    /* Some proxies (Squid, ICS) use the non-standard "Proxy-Connection" header. */
+     ap_table_unset(headers, "Proxy-Connection");
+-        if (!next) 
+-        return;
+ 
++    if (next != NULL) {
+     while (*next) { 
+         name = next;
+         while (*next && !ap_isspace(*next) && (*next != ','))
+@@ -1446,6 +1486,30 @@
+         ap_table_unset(headers, name);
+     }
+     ap_table_unset(headers, "Connection");
++    }
++
++    /* unset hop-by-hop headers defined in RFC2616 13.5.1 */
++    ap_table_unset(headers,"Keep-Alive");
++    /*
++     * XXX: @@@ FIXME: "Proxy-Authenticate" should IMO *not* be stripped
++     * because in a chain of proxies some "front" proxy might need
++     * proxy authentication, while a "back-end" proxy which needs none can
++     * simply pass the "Proxy-Authenticate" back to the client, and pass
++     * the client's "Proxy-Authorization" to the front-end proxy.
++     * (See the note in proxy_http.c for the "Proxy-Authorization" case.)
++     *
++     *   MnKr 04/2002
++     */
++    ap_table_unset(headers,"Proxy-Authenticate");
++    ap_table_unset(headers,"TE");
++    ap_table_unset(headers,"Trailer");
++    /* it is safe to just chop the transfer-encoding header
++     * here, because proxy doesn't support any other encodings
++     * to the backend other than chunked.
++     */
++    ap_table_unset(headers,"Transfer-Encoding");
++    ap_table_unset(headers,"Upgrade");
++
+ }
+ 
+ /* overlay one table on another
+@@ -1467,7 +1531,7 @@
+  */
+ int ap_proxy_table_replace(table *base, table *overlay)
+ {
+-    table_entry *elts = (table_entry *) overlay->a.elts;
++    table_entry *elts = (table_entry *)overlay->a.elts;
+     int i, q = 0;
+     const char *val;
+ 
+@@ -1490,40 +1554,11 @@
+     return q;
+ }
+ 
+-/* unmerge an element in the table */
+-void ap_proxy_table_unmerge(pool *p, table *t, char *key)
+-{
+-    long int offset = 0;
+-    long int count = 0;
+-    char *value = NULL;
+-
+-    /* get the value to unmerge */
+-    const char *initial = ap_table_get(t, key);
+-    if (!initial) {
+-        return;
+-    }
+-    value = ap_pstrdup(p, initial);
+-
+-    /* remove the value from the headers */
+-    ap_table_unset(t, key);
+-
+-    /* find each comma */
+-    while (value[count]) {
+-        if (value[count] == ',') {
+-            value[count] = 0;
+-            ap_table_add(t, key, value + offset);
+-            offset = count + 1;
+-        }
+-        count++;
+-    }
+-    ap_table_add(t, key, value + offset);
+-}
+-
+ #if defined WIN32
+ 
+ static DWORD tls_index;
+ 
+-BOOL WINAPI DllMain (HINSTANCE dllhandle, DWORD reason, LPVOID reserved)
++BOOL WINAPI DllMain(HINSTANCE dllhandle, DWORD reason, LPVOID reserved)
+ {
+     LPVOID memptr;
+ 
+@@ -1531,13 +1566,13 @@
+     case DLL_PROCESS_ATTACH:
+         tls_index = TlsAlloc();
+     case DLL_THREAD_ATTACH: /* intentional no break */
+-        TlsSetValue (tls_index, malloc (sizeof (struct per_thread_data)));
++        TlsSetValue(tls_index, malloc(sizeof(struct per_thread_data)));
+         break;
+     case DLL_THREAD_DETACH:
+-        memptr = TlsGetValue (tls_index);
++        memptr = TlsGetValue(tls_index);
+         if (memptr) {
+-            free (memptr);
+-            TlsSetValue (tls_index, 0);
++            free(memptr);
++            TlsSetValue(tls_index, 0);
+         }
+         break;
+     }
+@@ -1551,7 +1586,7 @@
+ {
+ #if defined(WIN32)
+ 
+-    return (struct per_thread_data *) TlsGetValue (tls_index);
++    return (struct per_thread_data *)TlsGetValue(tls_index);
+ 
+ #else
+ 
+ 
