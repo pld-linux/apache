@@ -22,6 +22,7 @@ Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}-icons.tar.gz
 Source4:	%{name}.sysconfig
+Source5:	%{name}-non-english-man-pages.tar.bz2
 Source6:	%{name}-httpd.conf
 Source8:	%{name}-mod_vhost_alias.conf
 Source9:	%{name}-mod_status.conf
@@ -562,6 +563,7 @@ mv -f $RPM_BUILD_ROOT%{_datadir}/html/manual $RPM_BUILD_ROOT%{_datadir}
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/apache
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
 install %{SOURCE4} $RPM_BUILD_ROOT/etc/sysconfig/apache
+bzip2 -dc %{SOURCE5} | tar xf - -C $RPM_BUILD_ROOT%{_mandir}
 
 touch $RPM_BUILD_ROOT/var/log/httpd/{access,error,agent,referer}_log
 
@@ -1011,6 +1013,9 @@ rm -rf $RPM_BUILD_ROOT
 
 %{_mandir}/man1/htdigest.1*
 %{_mandir}/man8/*
+%lang(hu) %{_mandir}/hu/man8/*
+%lang(ko) %{_mandir}/ko/man8/*
+%lang(pl) %{_mandir}/pl/man8/*
 
 %attr(750,root,root) %dir /var/log/httpd
 %attr(750,root,root) %dir /var/log/archiv/httpd
