@@ -393,8 +393,7 @@ Requires:	%{name}(EAPI) = %{version}
 %patch9 -p1
 
 %build
-CFLAGS="-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
-LDFLAGS="-s"; export LDFLAGS CFLAGS
+LDFLAGS="-s"; export LDFLAGS 
 OPTIM="$RPM_OPT_FLAGS" \
 ./configure \
 	--prefix=%{_prefix} \
