@@ -91,6 +91,7 @@ BuildRequires:	libtool >= 2:1.5
 %{?with_ssl:BuildRequires:	openssl-tools >= 0.9.7d}
 BuildRequires:	perl-devel >= 1:5.6
 BuildRequires:	rpm-perlprov >= 4.1-13
+BuildRequires:	rpmbuild(macros) >= 1.159
 BuildRequires:	zlib-devel
 PreReq:		perl-base
 PreReq:		rc-scripts
@@ -103,14 +104,16 @@ Requires(postun):	/usr/sbin/groupdel
 Requires(post,preun):	/sbin/chkconfig
 Requires(post,postun):	/sbin/ldconfig
 Requires(post):	fileutils
+Requires:	/etc/mime.types
 Requires:	%{name}-apxs = %{version}-%{release}
 Requires:	apr-util >= 1:0.9.5-5
-Requires:	/etc/mime.types
 Requires:	mailcap
 Requires:	psmisc >= 20.1
-Provides:	httpd = %{version}
-Provides:	webserver = %{version}
 Provides:	apache(modules-api) = %{_apache_modules_api}
+Provides:	group(http)
+Provides:	httpd = %{version}
+Provides:	user(http)
+Provides:	webserver = %{version}
 Obsoletes:	apache-extra
 Obsoletes:	apache6
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -895,8 +898,8 @@ fi
 %postun
 /sbin/ldconfig
 if [ "$1" = "0" ]; then
-	/usr/sbin/userdel http
-	/usr/sbin/groupdel http
+	%userremove http
+	%groupremove http
 fi
 
 %post mod_actions
