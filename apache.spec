@@ -15,9 +15,7 @@ Source1:	apache.init
 Source2:	apache.logrotate
 Source3:	apache-icons.tar.gz
 Source4:	apache.sysconfig
-Source5:	apache-access.conf
 Source6:	apache-httpd.conf
-Source7:	apache-srm.conf
 Source8:	apache-mod_vhost_alias.conf
 Source9:	apache-mod_status.conf
 Source10:	apache-mod_proxy.conf
@@ -439,9 +437,7 @@ touch $RPM_BUILD_ROOT/var/log/httpd/{access,error,agent,referer}_log
 
 install errordocs/* $RPM_BUILD_ROOT%{_datadir}/errordocs
 
-install %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/access.conf
 install %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
-install %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/srm.conf
 
 install %{SOURCE8}  $RPM_BUILD_ROOT%{_sysconfdir}/mod_vhost_alias.conf
 install %{SOURCE9}  $RPM_BUILD_ROOT%{_sysconfdir}/mod_status.conf
@@ -892,9 +888,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(754,root,root) /etc/rc.d/init.d/httpd
 
 %attr(750,root,root) %dir %{_sysconfdir}
-%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/access.conf
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf
-%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/srm.conf
 %attr(640,root,root) %{_sysconfdir}/magic
 
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/sysconfig/*
