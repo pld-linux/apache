@@ -21,8 +21,10 @@ Source8:	apache-virtual-host.conf
 Patch0:		apache-PLD.patch
 Patch1:		apache-suexec.patch
 Patch2:		apache-htdocs.patch
-Patch7:		apache-errordocs.patch
-Patch8:		apache-apxs.patch
+Patch3:		apache-errordocs.patch
+Patch4:		apache-apxs.patch
+Patch5:		apache-phhttpd.patch
+Patch6:		apache-EAPI.patch
 Copyright:	BSD-like
 Provides:	httpd
 Provides:	webserver
@@ -31,7 +33,7 @@ Prereq:		/usr/sbin/useradd
 Prereq:		/usr/bin/getgid
 Prereq:		/bin/id
 Prereq:		sh-utils
-#BuildRequires:	mm-devel
+BuildRequires:	mm-devel
 Requires:	rc-scripts
 Requires:	mailcap
 Requires:	/etc/mime.types
@@ -39,6 +41,7 @@ URL:		http://www.apache.org/
 BuildRoot:	/tmp/%{name}-%{version}-root
 Obsoletes:	apache-extra
 Obsoletes:	apache6
+Obsoletes:	apache-doc
 
 %define		_sysconfdir	/etc/httpd
 %define		_includedir	%{_prefix}/include/apache
@@ -103,20 +106,6 @@ Dynamiques Partages (DSOs) pour Apache.
 %description -l pl devel
 Pliki nag³ówkowe dla serwera WWW Apache.
 
-%package doc
-Summary:	Apache dokumentation
-Summary(pl):	Dokumentacja do Apache
-Group:		Documentation
-Group(pl):	Dokumentacja
-Requires:	%{name} = %{version}
-Obsoletes:	apache-manual
-
-%description doc
-Documentation for apache in HTML format.
-
-%description -l pl doc
-Dokumentacja do Apache w formacie HTML.
-
 %package mod_actions
 Summary:	Apache module for run CGI whenever a file of a certain type is requested
 Group:		Networking/Daemons
@@ -168,6 +157,17 @@ Requires:	%{name} = %{version}
 %description mod_dir
 This package contains mod_dir which provides "trailing slash" redirects and
 serving directory index files.
+
+%package mod_expires
+Summary:	Apache module for the generation of Expires headers according
+Group:		Networking/Daemons
+Group(pl):	Sieciowe/Serwery
+Prereq:		/usr/sbin/apxs
+Requires:	%{name} = %{version}
+
+%description mod_expires
+This package contains mod_expires modulep. It rovides for the generation of
+Expires headers according to user-specified criteria.
 
 %package mod_headers
 Summary:	Apache module allows for the customization of HTTP response headers
@@ -296,11 +296,12 @@ of this document.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
-%patch7 -p1
-%patch8 -p1
+%patch3 -p1
+%patch4 -p1
+%patch5 -p1
+%patch6 -p1
 
 %build
-
 LDFLAGS="-s"
 export LDFLAGS
 OPTIM="$RPM_OPT_FLAGS" \
@@ -324,7 +325,8 @@ OPTIM="$RPM_OPT_FLAGS" \
 	--suexec-caller=http \
 	--suexec-uidmin=500 \
 	--suexec-gidmin=500 \
-	--disable-rule=WANTHSREGEX
+	--disable-rule=WANTHSREGEX \
+	--enable-rule=EAPI
 make
 
 %install
@@ -401,7 +403,6 @@ fi
 /usr/sbin/apxs -e -a -n mod_cern_meta %{_libexecdir}/mod_cern_meta.so 1>&2
 /usr/sbin/apxs -e -a -n mod_cgi %{_libexecdir}/mod_cgi.so 1>&2
 /usr/sbin/apxs -e -a -n mod_env %{_libexecdir}/mod_env.so 1>&2
-/usr/sbin/apxs -e -a -n mod_expires %{_libexecdir}/mod_expires.so 1>&2
 /usr/sbin/apxs -e -a -n mod_include %{_libexecdir}/mod_include.so 1>&2
 /usr/sbin/apxs -e -a -n mod_log_agent %{_libexecdir}/mod_log_agent.so 1>&2
 /usr/sbin/apxs -e -a -n mod_log_config %{_libexecdir}/mod_log_config.so 1>&2
@@ -425,7 +426,6 @@ if [ "$1" = "0" ]; then
 	/usr/sbin/apxs -e -A -n mod_cern_meta %{_libexecdir}/mod_cern_meta.so 1>&2
 	/usr/sbin/apxs -e -A -n mod_cgi %{_libexecdir}/mod_cgi.so 1>&2
 	/usr/sbin/apxs -e -A -n mod_env %{_libexecdir}/mod_env.so 1>&2
-	/usr/sbin/apxs -e -A -n mod_expires %{_libexecdir}/mod_expires.so 1>&2
 	/usr/sbin/apxs -e -A -n mod_include %{_libexecdir}/mod_include.so 1>&2
 	/usr/sbin/apxs -e -A -n mod_log_agent %{_libexecdir}/mod_log_agent.so 1>&2
 	/usr/sbin/apxs -e -A -n mod_log_config %{_libexecdir}/mod_log_config.so 1>&2
@@ -486,6 +486,13 @@ if [ "$1" = "0" ]; then
 	/usr/sbin/apxs -e -A -n mod_dir %{_libexecdir}/mod_dir.so 1>&2
 fi
 
+%post mod_expires
+/usr/sbin/apxs -e -a -n mod_expires %{_libexecdir}/mod_expires.so 1>&2
+
+%preun mod_expires
+if [ "$1" = "0" ]; then
+	/usr/sbin/apxs -e -A -n mod_expires %{_libexecdir}/mod_expires.so 1>&2
+fi
 %post mod_headers
 /usr/sbin/apxs -e -a -n mod_headers %{_libexecdir}/mod_headers.so 1>&2
 
@@ -574,6 +581,65 @@ rm -rf $RPM_BUILD_ROOT
 %doc ABOUT_APACHE.gz src/CHANGES.gz KEYS.gz README.gz
 %doc conf/mime.types
 
+%dir %{_datadir}/manual
+%dir %{_datadir}/manual/images/
+%{_datadir}/manual/images/sub.gif
+%{_datadir}/manual/images/index.gif
+%{_datadir}/manual/images/home.gif 
+%{_datadir}/manual/misc
+%dir %{_datadir}/manual/search
+%attr(755,root,root) %{_datadir}/manual/search/manual-index.cgi
+%{_datadir}/manual/vhosts
+%{_datadir}/manual/LICENSE
+%{_datadir}/manual/bind.html
+%{_datadir}/manual/cgi_path.html
+%{_datadir}/manual/content-negotiation.html
+%{_datadir}/manual/custom-error.html
+%{_datadir}/manual/dns-caveats.html
+%{_datadir}/manual/dso.html
+%{_datadir}/manual/env.html
+%{_datadir}/manual/footer.html
+%{_datadir}/manual/handler.html
+%{_datadir}/manual/header.html
+%{_datadir}/manual/index.html
+%{_datadir}/manual/install.html
+%{_datadir}/manual/invoking.html
+%{_datadir}/manual/keepalive.html
+%{_datadir}/manual/location.html
+%{_datadir}/manual/multilogs.html
+%{_datadir}/manual/new_features_1_3.html
+%{_datadir}/manual/process-model.html
+%{_datadir}/manual/sections.html
+%{_datadir}/manual/sourcereorg.html
+%{_datadir}/manual/suexec.html
+%{_datadir}/manual/upgrading_to_1_3.html
+%{_datadir}/manual/mod/core.html
+%{_datadir}/manual/mod/directive-dict.html
+%{_datadir}/manual/mod/directives.html
+%{_datadir}/manual/mod/footer.html
+%{_datadir}/manual/mod/header.html
+%{_datadir}/manual/mod/index.html
+%{_datadir}/manual/mod/mod_access.html
+%{_datadir}/manual/mod/mod_alias.html
+%{_datadir}/manual/mod/mod_asis.html
+%{_datadir}/manual/mod/mod_auth.html
+%{_datadir}/manual/mod/mod_auth_db.html
+%{_datadir}/manual/mod/mod_auth_dbm.html
+%{_datadir}/manual/mod/mod_autoindex.html
+%{_datadir}/manual/mod/mod_cgi.html
+%{_datadir}/manual/mod/mod_cookies.html
+%{_datadir}/manual/mod/mod_env.html
+%{_datadir}/manual/mod/mod_include.html
+%{_datadir}/manual/mod/mod_log_agent.html
+%{_datadir}/manual/mod/mod_log_config.html
+%{_datadir}/manual/mod/mod_log_referer.html
+%{_datadir}/manual/mod/mod_mime.html
+%{_datadir}/manual/mod/mod_mime_magic.html
+%{_datadir}/manual/mod/mod_negotiation.html
+%{_datadir}/manual/mod/mod_setenvif.html
+%{_datadir}/manual/mod/mod_speling.html
+%{_datadir}/manual/mod/mod_userdir.html
+
 %attr(754,root,root) /etc/rc.d/init.d/httpd
 
 %attr(750,root,root) %dir %{_sysconfdir}
@@ -620,7 +686,6 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libexecdir}/mod_cern_meta.so
 %attr(755,root,root) %{_libexecdir}/mod_cgi.so
 %attr(755,root,root) %{_libexecdir}/mod_env.so
-%attr(755,root,root) %{_libexecdir}/mod_expires.so
 %attr(755,root,root) %{_libexecdir}/mod_include.so
 %attr(755,root,root) %{_libexecdir}/mod_log_agent.so
 %attr(755,root,root) %{_libexecdir}/mod_log_config.so
@@ -659,44 +724,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %{_includedir}
 
-%files doc
-%defattr(644,root,root,755)
-%dir %{_datadir}/manual/
-%{_datadir}/manual/images
-%{_datadir}/manual/misc
-%dir %{_datadir}/manual/search
-%attr(755,root,root) %{_datadir}/manual/search/manual-index.cgi
-%{_datadir}/manual/vhosts
-%{_datadir}/manual/LICENSE
-%{_datadir}/manual/*.html
-%{_datadir}/manual/mod/core.html
-%{_datadir}/manual/mod/directive-dict.html
-%{_datadir}/manual/mod/directives.html
-%{_datadir}/manual/mod/footer.html
-%{_datadir}/manual/mod/header.html
-%{_datadir}/manual/mod/index.html
-%{_datadir}/manual/mod/mod_access.html
-%{_datadir}/manual/mod/mod_alias.html
-%{_datadir}/manual/mod/mod_asis.html
-%{_datadir}/manual/mod/mod_auth.html
-%{_datadir}/manual/mod/mod_auth_db.html
-%{_datadir}/manual/mod/mod_auth_dbm.html
-%{_datadir}/manual/mod/mod_autoindex.html
-%{_datadir}/manual/mod/mod_cgi.html
-%{_datadir}/manual/mod/mod_cookies.html
-%{_datadir}/manual/mod/mod_env.html
-%{_datadir}/manual/mod/mod_expires.html
-%{_datadir}/manual/mod/mod_include.html
-%{_datadir}/manual/mod/mod_log_agent.html
-%{_datadir}/manual/mod/mod_log_config.html
-%{_datadir}/manual/mod/mod_log_referer.html
-%{_datadir}/manual/mod/mod_mime.html
-%{_datadir}/manual/mod/mod_mime_magic.html
-%{_datadir}/manual/mod/mod_negotiation.html
-%{_datadir}/manual/mod/mod_setenvif.html
-%{_datadir}/manual/mod/mod_speling.html
-%{_datadir}/manual/mod/mod_userdir.html
-
 %files mod_actions
 %attr(755,root,root) %{_libexecdir}/mod_actions.so
 %attr(644,root,root) %{_datadir}/manual/mod/mod_actions.html
@@ -712,6 +739,10 @@ rm -rf $RPM_BUILD_ROOT
 %files mod_dir
 %attr(755,root,root) %{_libexecdir}/mod_dir.so
 %attr(644,root,root) %{_datadir}/manual/mod/mod_dir.html
+
+%files mod_expires
+%attr(755,root,root) %{_libexecdir}/mod_expires.so
+%attr(644,root,root) %{_datadir}/manual/mod/mod_expires.html
 
 %files mod_headers
 %attr(755,root,root) %{_libexecdir}/mod_headers.so
