@@ -10,8 +10,8 @@ Summary(fr):	Le serveur web le plus utilise sur Internet
 Summary(pl):	Serwer WWW (World Wide Web)
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
-Version:	1.3.19
-Release:	7
+Version:	1.3.20
+Release:	1
 License:	Apache Group License
 Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
@@ -35,7 +35,7 @@ Patch5:		%{name}-mod_ssl-addon.patch
 Patch6:		%{name}-mod_ssl-eapi.patch
 Patch7:		%{name}-EAPI_MM_CORE_PATH-correction.patch
 Patch8:		%{name}-EAPI_MM=SYSTEM.patch
-Patch9:		%{name}-v6-PLD-7.patch.gz
+Patch9:		%{name}-ipv6-PLD.patch
 Patch10:	%{name}-modules_symbols.patch
 Patch11:	%{name}-apxs_force_rm_cp.patch
 Patch12:	%{name}-db3.patch
@@ -510,6 +510,7 @@ wa¿no¶ci mo¿e byæ ustalana w zale¿no¶ci od czasu modyfikacji plików
 %patch18 -p1
 %patch19 -p1
 %{?bcond_off_apache_ipv6:%patch20 -p1}
+
 %build
 OPTIM="%{rpmcflags}" \
 ./configure \
