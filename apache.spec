@@ -27,7 +27,7 @@ Summary(uk):	îÁÊÐÏÐÕÌÑÒÎ¦ÛÉÊ Web-Server
 Summary(zh_CN):	Internet ÉÏÓ¦ÓÃ×î¹ã·ºµÄ Web ·þÎñ³ÌÐò¡£
 Name:		apache
 Version:	1.3.29
-Release:	2
+Release:	3
 License:	Apache Group
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/%{name}_%{version}.tar.gz
@@ -49,22 +49,25 @@ Patch3:		%{name}-errordocs.patch
 Patch4:		%{name}-apxs.patch
 Patch5:		%{name}-mod_ssl-addon.patch
 Patch6:		%{name}-mod_ssl-eapi.patch
-Patch7:		%{name}-EAPI_MM_CORE_PATH-correction.patch
-Patch8:		%{name}-EAPI_MM=SYSTEM.patch
-Patch9:		%{name}-ipv6-PLD.patch
-Patch10:	%{name}-modules_symbols.patch
-Patch11:	%{name}-apxs_force_rm_cp.patch
-Patch12:	%{name}-db3.patch
-Patch13:	%{name}-lookup_map_ldap.patch
-Patch14:	%{name}-man.patch
-Patch15:	%{name}-fpic.patch
-Patch16:	%{name}-buff.patch
-Patch17:	%{name}-mkstemp.patch
-Patch18:	%{name}-EAPI-missing_files.patch
-Patch19:	%{name}-PLD-nov6.patch
-Patch20:	%{name}-configdir_skip_backups.patch
-Patch21:	%{name}-apxs-quiet.patch
-Patch22:	%{name}-CAN-2003-0020.patch
+# http://allafrica.com/tools/apache/mod_proxy/
+Patch7:		http://allafrica.com/tools/apache/mod_proxy/mod_proxy-khk_1.3.26-patch.diff
+Patch8:		%{name}-EAPI_MM_CORE_PATH-correction.patch
+Patch9:		%{name}-EAPI_MM=SYSTEM.patch
+Patch10:	%{name}-ipv6-PLD.patch
+Patch11:	%{name}-modules_symbols.patch
+Patch12:	%{name}-apxs_force_rm_cp.patch
+Patch13:	%{name}-db3.patch
+Patch14:	%{name}-lookup_map_ldap.patch
+Patch15:	%{name}-man.patch
+Patch16:	%{name}-fpic.patch
+Patch17:	%{name}-buff.patch
+Patch18:	%{name}-mkstemp.patch
+Patch19:	%{name}-EAPI-missing_files.patch
+Patch20:	%{name}-PLD-nov6.patch
+Patch21:	%{name}-configdir_skip_backups.patch
+Patch22:	%{name}-apxs-quiet.patch
+Patch23:	%{name}-CAN-2003-0020.patch
+
 URL:		http://www.apache.org/
 BuildRequires:	db3-devel
 BuildRequires:	mm-devel >= 1.1.3
@@ -535,11 +538,13 @@ This package contains module with implementation a proxy/cache for
 Apache. It implements proxying capability for FTP, CONNECT (for SSL),
 HTTP/0.9, and HTTP/1.0. The module can be configured to connect to
 other proxy modules for these and other protocols.
+Contains patch from: http://allafrica.com/tools/apache/mod_proxy/
 
 %description mod_proxy -l pl
 Modu³ zawiera implementacjê serwera proxy/cache dla Apache.
 Iplementacja zawiera obs³ugê FTP, CONNECT (dla SSL), HTTP/0.9 i
 HTTP/1.0.
+Zawiera ³atê z: http://allafrica.com/tools/apache/mod_proxy/
 
 %package mod_rewrite
 Summary:	Apache module with rule-based engine for rewrite requested URLs on the fly
@@ -660,20 +665,21 @@ wa¿no¶ci mo¿e byæ ustalana w zale¿no¶ci od czasu modyfikacji plików
 %patch6 -p0
 %patch7 -p1
 %patch8 -p1
-%{!?_without_ipv6:%patch9 -p1}
-%patch10 -p1
+%patch9 -p1
+%{!?_without_ipv6:%patch10 -p1}
 %patch11 -p1
 %patch12 -p1
-%{?_with_rewrite_ldap:%patch13 -p1}
-%patch14 -p1
+%patch13 -p1
+%{?_with_rewrite_ldap:%patch14 -p1}
 %patch15 -p1
 %patch16 -p1
 %patch17 -p1
 %patch18 -p1
-%{?_without_ipv6:%patch19 -p1}
-%patch20 -p1
+%patch19 -p1
+%{?_without_ipv6:%patch20 -p1}
 %patch21 -p1
-%patch22 -p0
+%patch22 -p1
+%patch23 -p0
 
 %build
 OPTIM="%{rpmcflags} -DHARD_SERVER_LIMIT=2048" \
