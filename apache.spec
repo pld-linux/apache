@@ -111,7 +111,7 @@ OPTIM=$RPM_OPT_FLAGS LDFLAGS=-s\
 	--enable-module=all \
 	--enable-shared=max \
 	--disable-module=auth_db \
-	--proxycachedir=/var/spool/proxy \
+	--proxycachedir=/var/cache/www/apache \
 	--with-perl=%{_bindir}/perl \
 	--enable-suexec \
 	--suexec-caller=http \
@@ -132,7 +132,7 @@ mv $RPM_BUILD_ROOT/home/httpd/htdocs $RPM_BUILD_ROOT/home/httpd/html
 
 install -d $RPM_BUILD_ROOT/etc/{httpd/conf,logrotate.d,rc.d/init.d}
 install -d $RPM_BUILD_ROOT/home/httpd/{html/manual,icons,cgi-bin}
-install -d $RPM_BUILD_ROOT/{usr/{lib/apache,sbin,man/man{1,8}},var/log/httpd}
+install -d $RPM_BUILD_ROOT/{usr/{share,lib/apache,sbin,man/man{1,8}},var/log/httpd}
 
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/apache
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
@@ -144,10 +144,12 @@ rm -f $RPM_BUILD_ROOT/home/httpd/html/manual/expand.pl
 
 touch $RPM_BUILD_ROOT/var/log/httpd/{access,error}_log
 
-mv -f apache-extra/errordocs	$RPM_BUILD_ROOT/home/httpd/
+cp -a apache-extra/errordocs	$RPM_BUILD_ROOT/home/httpd/
 cp -a apache-extra/icons/*	$RPM_BUILD_ROOT/home/httpd/icons
 cp -a apache-extra/*.conf	$RPM_BUILD_ROOT/etc/httpd/conf
 cp -a apache-extra/m*		$RPM_BUILD_ROOT/etc/httpd/conf
+
+mv $RPM_BUILD_ROOT/usr/man $RPM_BUILD_ROOT%{_mandir}
 
 gzip -9nf $RPM_BUILD_ROOT%{_mandir}/{man1/*,man8/*}
 gzip -9nf ABOUT_APACHE src/CHANGES KEYS README
@@ -183,13 +185,13 @@ fi
 %attr(644,root,root) /home/httpd/html/*.gif
 %attr(700,root,root) %config %verify(not size mtime md5) /etc/rc.d/init.d/*
 
-%attr(755,root,root,755) /home/httpd/cgi-bin
-%attr(755,root,root,755) /usr/libexec/apache
+%attr(755,root,root) /home/httpd/cgi-bin
+%attr(755,root,root) /usr/libexec/apache
 
-%attr(755,root,root,755) %dir /home/httpd/icons
+%attr(755,root,root) %dir /home/httpd/icons
 /home/httpd/icons/*.gif
 
-%attr(755,root,root,755) %dir /home/httpd/errordocs
+%attr(755,root,root) %dir /home/httpd/errordocs
 /home/httpd/errordocs/*
 
 %attr(755,root,root) %{_bindir}/dbmmanage 
@@ -202,6 +204,7 @@ fi
 %attr(755,root,root) %{_sbindir}/httpd
 %attr(755,root,root) %{_sbindir}/logresolve
 %attr(755,root,root) %{_sbindir}/rotatelogs
+%dir %attr(750,http,http) /var/cache/www/apache
 
 %{_mandir}/man[18]/*
 
