@@ -194,7 +194,7 @@ Internet ÉÏ×îÁ÷ÐÐµÄ Web ·þÎñ³ÌÐò¡£
 
 %package suexec
 Summary:	Apache suexec wrapper
-Summary(pl):	Suexec wrapper do serwera www Apache
+Summary(pl):	Suexec wrapper do serwera WWW Apache
 Summary(ru):	Apache suEXEC CGI wrapper
 Summary(uk):	Apache suEXEC CGI wrapper
 Group:		Development/Tools
@@ -246,7 +246,7 @@ Summary(is):	Hausaskrár með Apache vefþjóninum
 Summary(it):	File include per il web server Apache
 Summary(ja):	Apache Web ¥µ¡¼¥Ð¡¼ÍÑ¤Î³«È¯¥Ä¡¼¥ë
 Summary(no):	Headerfiler for webtjeneren Apache
-Summary(pl):	Pliki nag³ówkowe do tworzenai modu³ów rozszerzeñ do serwera www Apache
+Summary(pl):	Pliki nag³ówkowe do tworzenia modu³ów rozszerzeñ do serwera WWW Apache
 Summary(pt):	Ficheiros de inclusão para o servidor Web Apache
 Summary(pt_BR):	Arquivos de inclusão do Apache para desenvolvimento de módulos
 Summary(ru):	æÁÊÌÙ ÚÁÇÏÌÏ×ËÏ× ÄÌÑ web server'Á Apache
