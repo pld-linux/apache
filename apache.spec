@@ -28,7 +28,7 @@ Summary(zh_CN):	Internet ÉÏÓ¦ÓÃ×î¹ã·ºµÄ Web ·þÎñ³ÌÐò¡£
 Name:		apache
 Version:	1.3.28
 Release:	0.1
-License:	Apache Group 
+License:	Apache Group
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/%{name}_%{version}.tar.gz
 # Source0-md5:	2cdece7b4881d541e072de6a2b65db77
@@ -77,11 +77,11 @@ Requires(pre):	/usr/sbin/useradd
 Requires(post,preun):	/sbin/chkconfig
 Requires(postun):	/usr/sbin/groupdel
 Requires(postun):	/usr/sbin/userdel
-Provides:	%{name}(EAPI) = %{version}
 Requires:	/etc/mime.types
-Provides:	httpd
 Requires:	mailcap
 Requires:	psmisc >= 20.1
+Provides:	%{name}(EAPI) = %{version}
+Provides:	httpd
 Provides:	webserver
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 Obsoletes:	httpd
@@ -312,7 +312,6 @@ Paketet apache-devel innehåller huvudfilerna för Apache.
 Summary:	Apache module for run CGI whenever a file of a certain type is requested
 Summary(pl):	Modu³ dla apache do uruchamiania skryptów cgi
 Group:		Networking/Daemons
-Requires(post,preun):	%{_sbindir}/apxs
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
