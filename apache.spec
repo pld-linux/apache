@@ -614,7 +614,7 @@ cp -f %{_prefix}/share/automake/config.* srclib/apr-util/xml/expat/conftools/
 	--enable-speling \
 	--enable-rewrite \
 	--enable-so \
-	--with-mpm=prefork \
+	--with-mpm=perchild \
 	--with-suexec-bin=%{_sbindir} \
 	--with-suexec-caller=http \
 	--with-suexec-docroot=%{_datadir} \
