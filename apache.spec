@@ -44,7 +44,6 @@ Prereq:		/usr/sbin/useradd
 Prereq:		/usr/bin/getgid
 Prereq:		/bin/id
 Prereq:		sh-utils
-BuildRequires:	db2-devel
 BuildRequires:	mm-devel >= 1.1.3
 %{?mod_rewrite_ldap:BuildRequires: openldap-devel}
 Requires:	rc-scripts
