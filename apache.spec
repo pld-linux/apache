@@ -27,7 +27,7 @@ Summary(uk):	îÁÊĞÏĞÕÌÑÒÎ¦ÛÉÊ Web-Server
 Summary(zh_CN):	Internet ÉÏÓ¦ÓÃ×î¹ã·ºµÄ Web ·şÎñ³ÌĞò¡£
 Name:		apache
 Version:	1.3.26
-Release:	3
+Release:	4
 License:	Apache Group 
 Group:		Networking/Daemons
 URL:		http://www.apache.org/
@@ -94,6 +94,7 @@ Obsoletes:	indexhtml
 %define		_includedir	%{_prefix}/include/apache
 %define		_datadir	/home/httpd
 %define		_libexecdir	%{_prefix}/lib/apache
+%define		apxs		/usr/sbin/apxs
 
 %description
 Apache is a powerful, full-featured, efficient and freely-available
