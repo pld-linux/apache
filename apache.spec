@@ -758,23 +758,23 @@ fi
 
 %post
 /sbin/chkconfig --add httpd
-%{_sbindir}/apxs -e -a -n access %{_libexecdir}/mod_access.so 1>&2
-%{_sbindir}/apxs -e -a -n alias %{_libexecdir}/mod_alias.so 1>&2
-%{_sbindir}/apxs -e -a -n asis %{_libexecdir}/mod_asis.so 1>&2
-%{_sbindir}/apxs -e -a -n autoindex %{_libexecdir}/mod_autoindex.so 1>&2
-%{_sbindir}/apxs -e -a -n cern_meta %{_libexecdir}/mod_cern_meta.so 1>&2
-%{_sbindir}/apxs -e -a -n cgi %{_libexecdir}/mod_cgi.so 1>&2
-%{_sbindir}/apxs -e -a -n env %{_libexecdir}/mod_env.so 1>&2
-%{_sbindir}/apxs -e -a -n include %{_libexecdir}/mod_include.so 1>&2
-%{_sbindir}/apxs -e -a -n log_agent %{_libexecdir}/mod_log_agent.so 1>&2
-%{_sbindir}/apxs -e -a -n log_config %{_libexecdir}/mod_log_config.so 1>&2
-%{_sbindir}/apxs -e -a -n log_referer %{_libexecdir}/mod_log_referer.so 1>&2
-%{_sbindir}/apxs -e -a -n mime_magic %{_libexecdir}/mod_mime_magic.so 1>&2
-%{_sbindir}/apxs -e -a -n mime %{_libexecdir}/mod_mime.so 1>&2
-%{_sbindir}/apxs -e -a -n negotiation %{_libexecdir}/mod_negotiation.so 1>&2
-%{_sbindir}/apxs -e -a -n setenvif %{_libexecdir}/mod_setenvif.so 1>&2
-%{_sbindir}/apxs -e -a -n speling %{_libexecdir}/mod_speling.so 1>&2
-%{_sbindir}/apxs -e -a -n userdir %{_libexecdir}/mod_userdir.so 1>&2
+%{apxs} -e -a -n access %{_libexecdir}/mod_access.so 1>&2
+%{apxs} -e -a -n alias %{_libexecdir}/mod_alias.so 1>&2
+%{apxs} -e -a -n asis %{_libexecdir}/mod_asis.so 1>&2
+%{apxs} -e -a -n autoindex %{_libexecdir}/mod_autoindex.so 1>&2
+%{apxs} -e -a -n cern_meta %{_libexecdir}/mod_cern_meta.so 1>&2
+%{apxs} -e -a -n cgi %{_libexecdir}/mod_cgi.so 1>&2
+%{apxs} -e -a -n env %{_libexecdir}/mod_env.so 1>&2
+%{apxs} -e -a -n include %{_libexecdir}/mod_include.so 1>&2
+%{apxs} -e -a -n log_agent %{_libexecdir}/mod_log_agent.so 1>&2
+%{apxs} -e -a -n log_config %{_libexecdir}/mod_log_config.so 1>&2
+%{apxs} -e -a -n log_referer %{_libexecdir}/mod_log_referer.so 1>&2
+%{apxs} -e -a -n mime_magic %{_libexecdir}/mod_mime_magic.so 1>&2
+%{apxs} -e -a -n mime %{_libexecdir}/mod_mime.so 1>&2
+%{apxs} -e -a -n negotiation %{_libexecdir}/mod_negotiation.so 1>&2
+%{apxs} -e -a -n setenvif %{_libexecdir}/mod_setenvif.so 1>&2
+%{apxs} -e -a -n speling %{_libexecdir}/mod_speling.so 1>&2
+%{apxs} -e -a -n userdir %{_libexecdir}/mod_userdir.so 1>&2
 umask 137
 touch /var/log/httpd/{access,error,agent,referer}_log
 if [ -f /var/lock/subsys/httpd ]; then
@@ -785,23 +785,23 @@ fi
 
 %preun
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n access %{_libexecdir}/mod_access.so 1>&2
-	%{_sbindir}/apxs -e -A -n alias %{_libexecdir}/mod_alias.so 1>&2
-	%{_sbindir}/apxs -e -A -n asis %{_libexecdir}/mod_asis.so 1>&2
-	%{_sbindir}/apxs -e -A -n autoindex %{_libexecdir}/mod_autoindex.so 1>&2
-	%{_sbindir}/apxs -e -A -n cern_meta %{_libexecdir}/mod_cern_meta.so 1>&2
-	%{_sbindir}/apxs -e -A -n cgi %{_libexecdir}/mod_cgi.so 1>&2
-	%{_sbindir}/apxs -e -A -n env %{_libexecdir}/mod_env.so 1>&2
-	%{_sbindir}/apxs -e -A -n include %{_libexecdir}/mod_include.so 1>&2
-	%{_sbindir}/apxs -e -A -n log_agent %{_libexecdir}/mod_log_agent.so 1>&2
-	%{_sbindir}/apxs -e -A -n log_config %{_libexecdir}/mod_log_config.so 1>&2
-	%{_sbindir}/apxs -e -A -n log_referer %{_libexecdir}/mod_log_referer.so 1>&2
-	%{_sbindir}/apxs -e -A -n mime %{_libexecdir}/mod_mime.so 1>&2
-	%{_sbindir}/apxs -e -A -n mime_magic %{_libexecdir}/mod_mime_magic.so 1>&2
-	%{_sbindir}/apxs -e -A -n negotiation %{_libexecdir}/mod_negotiation.so 1>&2
-	%{_sbindir}/apxs -e -A -n setenvif %{_libexecdir}/mod_setenvif.so 1>&2
-	%{_sbindir}/apxs -e -A -n speling %{_libexecdir}/mod_speling.so 1>&2
-	%{_sbindir}/apxs -e -A -n userdir %{_libexecdir}/mod_userdir.so 1>&2
+	%{apxs} -e -A -n access %{_libexecdir}/mod_access.so 1>&2
+	%{apxs} -e -A -n alias %{_libexecdir}/mod_alias.so 1>&2
+	%{apxs} -e -A -n asis %{_libexecdir}/mod_asis.so 1>&2
+	%{apxs} -e -A -n autoindex %{_libexecdir}/mod_autoindex.so 1>&2
+	%{apxs} -e -A -n cern_meta %{_libexecdir}/mod_cern_meta.so 1>&2
+	%{apxs} -e -A -n cgi %{_libexecdir}/mod_cgi.so 1>&2
+	%{apxs} -e -A -n env %{_libexecdir}/mod_env.so 1>&2
+	%{apxs} -e -A -n include %{_libexecdir}/mod_include.so 1>&2
+	%{apxs} -e -A -n log_agent %{_libexecdir}/mod_log_agent.so 1>&2
+	%{apxs} -e -A -n log_config %{_libexecdir}/mod_log_config.so 1>&2
+	%{apxs} -e -A -n log_referer %{_libexecdir}/mod_log_referer.so 1>&2
+	%{apxs} -e -A -n mime %{_libexecdir}/mod_mime.so 1>&2
+	%{apxs} -e -A -n mime_magic %{_libexecdir}/mod_mime_magic.so 1>&2
+	%{apxs} -e -A -n negotiation %{_libexecdir}/mod_negotiation.so 1>&2
+	%{apxs} -e -A -n setenvif %{_libexecdir}/mod_setenvif.so 1>&2
+	%{apxs} -e -A -n speling %{_libexecdir}/mod_speling.so 1>&2
+	%{apxs} -e -A -n userdir %{_libexecdir}/mod_userdir.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd stop 1>&2
 	fi
@@ -817,7 +817,7 @@ if [ "$1" = "0" ]; then
 fi
 
 %post mod_actions
-%{_sbindir}/apxs -e -a -n actions %{_libexecdir}/mod_actions.so 1>&2
+%{apxs} -e -a -n actions %{_libexecdir}/mod_actions.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -826,14 +826,14 @@ fi
 
 %preun mod_actions
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n actions %{_libexecdir}/mod_actions.so 1>&2
+	%{apxs} -e -A -n actions %{_libexecdir}/mod_actions.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
 fi
 
 %post mod_auth
-%{_sbindir}/apxs -e -a -n auth %{_libexecdir}/mod_auth.so 1>&2
+%{apxs} -e -a -n auth %{_libexecdir}/mod_auth.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -842,14 +842,14 @@ fi
 
 %preun mod_auth
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n auth %{_libexecdir}/mod_auth.so 1>&2
+	%{apxs} -e -A -n auth %{_libexecdir}/mod_auth.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
 fi
 
 %post mod_auth_anon
-%{_sbindir}/apxs -e -a -n auth_anon %{_libexecdir}/mod_auth_anon.so 1>&2
+%{apxs} -e -a -n auth_anon %{_libexecdir}/mod_auth_anon.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -858,14 +858,14 @@ fi
 
 %preun mod_auth_anon
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n auth_anon %{_libexecdir}/mod_auth_anon.so 1>&2
+	%{apxs} -e -A -n auth_anon %{_libexecdir}/mod_auth_anon.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
 fi
 
 %post mod_auth_db
-%{_sbindir}/apxs -e -a -n auth_db %{_libexecdir}/mod_auth_db.so 1>&2
+%{apxs} -e -a -n auth_db %{_libexecdir}/mod_auth_db.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -874,14 +874,14 @@ fi
 
 %preun mod_auth_db
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n auth_db %{_libexecdir}/mod_auth_db.so 1>&2
+	%{apxs} -e -A -n auth_db %{_libexecdir}/mod_auth_db.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
 fi
 
 %post mod_auth_digest
-%{_sbindir}/apxs -e -a -n auth_digest %{_libexecdir}/mod_auth_digest.so 1>&2
+%{apxs} -e -a -n auth_digest %{_libexecdir}/mod_auth_digest.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -890,17 +890,17 @@ fi
 
 %preun mod_auth_digest
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n auth_digest %{_libexecdir}/mod_auth_digest.so 1>&2
+	%{apxs} -e -A -n auth_digest %{_libexecdir}/mod_auth_digest.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
 fi
 
 %triggerpostun mod_auth_db -- apache-mod_auth_db <= 1.3.20-2
-%{_sbindir}/apxs -e -A -n auth_dbm %{_libexecdir}/mod_auth_dbm.so 1>&2
+%{apxs} -e -A -n auth_dbm %{_libexecdir}/mod_auth_dbm.so 1>&2
 
 %post mod_define
-%{_sbindir}/apxs -e -a -n define %{_libexecdir}/mod_define.so 1>&2
+%{apxs} -e -a -n define %{_libexecdir}/mod_define.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -909,14 +909,14 @@ fi
 
 %preun mod_define
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n define %{_libexecdir}/mod_define.so 1>&2
+	%{apxs} -e -A -n define %{_libexecdir}/mod_define.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
 fi
 
 %post mod_digest
-%{_sbindir}/apxs -e -a -n digest %{_libexecdir}/mod_digest.so 1>&2
+%{apxs} -e -a -n digest %{_libexecdir}/mod_digest.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -925,14 +925,14 @@ fi
 
 %preun mod_digest
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n digest %{_libexecdir}/mod_digest.so 1>&2
+	%{apxs} -e -A -n digest %{_libexecdir}/mod_digest.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
 fi
 
 %post mod_dir
-%{_sbindir}/apxs -e -a -n dir %{_libexecdir}/mod_dir.so 1>&2
+%{apxs} -e -a -n dir %{_libexecdir}/mod_dir.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -941,14 +941,14 @@ fi
 
 %preun mod_dir
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n dir %{_libexecdir}/mod_dir.so 1>&2
+	%{apxs} -e -A -n dir %{_libexecdir}/mod_dir.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
 fi
 
 %post mod_expires
-%{_sbindir}/apxs -e -a -n expires %{_libexecdir}/mod_expires.so 1>&2
+%{apxs} -e -a -n expires %{_libexecdir}/mod_expires.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -957,14 +957,14 @@ fi
 
 %preun mod_expires
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n expires %{_libexecdir}/mod_expires.so 1>&2
+	%{apxs} -e -A -n expires %{_libexecdir}/mod_expires.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
 fi
 
 %post mod_headers
-%{_sbindir}/apxs -e -a -n headers %{_libexecdir}/mod_headers.so 1>&2
+%{apxs} -e -a -n headers %{_libexecdir}/mod_headers.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -973,14 +973,14 @@ fi
 
 %preun mod_headers
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n headers %{_libexecdir}/mod_headers.so 1>&2
+	%{apxs} -e -A -n headers %{_libexecdir}/mod_headers.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
 fi
 
 %post mod_mmap_static
-%{_sbindir}/apxs -e -a -n mmap_static %{_libexecdir}/mod_mmap_static.so 1>&2
+%{apxs} -e -a -n mmap_static %{_libexecdir}/mod_mmap_static.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -989,14 +989,14 @@ fi
 
 %preun mod_mmap_static
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n mmap_static %{_libexecdir}/mod_mmap_static.so 1>&2
+	%{apxs} -e -A -n mmap_static %{_libexecdir}/mod_mmap_static.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
 fi
 
 %post mod_imap
-%{_sbindir}/apxs -e -a -n imap %{_libexecdir}/mod_imap.so 1>&2
+%{apxs} -e -a -n imap %{_libexecdir}/mod_imap.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -1005,14 +1005,14 @@ fi
 
 %preun mod_imap
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n imap %{_libexecdir}/mod_imap.so 1>&2
+	%{apxs} -e -A -n imap %{_libexecdir}/mod_imap.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
 fi
 
 %post mod_info
-%{_sbindir}/apxs -e -a -n info %{_libexecdir}/mod_info.so 1>&2
+%{apxs} -e -a -n info %{_libexecdir}/mod_info.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -1021,14 +1021,14 @@ fi
 
 %preun mod_info
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n info %{_libexecdir}/mod_info.so 1>&2
+	%{apxs} -e -A -n info %{_libexecdir}/mod_info.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
 fi
 
 %post mod_proxy
-%{_sbindir}/apxs -e -a -n proxy %{_libexecdir}/libproxy.so 1>&2
+%{apxs} -e -a -n proxy %{_libexecdir}/libproxy.so 1>&2
 if [ -f /etc/httpd/httpd.conf ] && ! grep -q "^Include.*mod_proxy.conf" /etc/httpd/httpd.conf; then
 	echo "Include /etc/httpd/mod_proxy.conf" >> /etc/httpd/httpd.conf
 fi
@@ -1040,7 +1040,7 @@ fi
 
 %preun mod_proxy
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n proxy %{_libexecdir}/libproxy.so 1>&2
+	%{apxs} -e -A -n proxy %{_libexecdir}/libproxy.so 1>&2
 	grep -v "^Include.*mod_proxy.conf" /etc/httpd/httpd.conf > \
 		/etc/httpd/httpd.conf.tmp
 	mv -f /etc/httpd/httpd.conf.tmp /etc/httpd/httpd.conf
@@ -1050,7 +1050,7 @@ if [ "$1" = "0" ]; then
 fi
 
 %post mod_rewrite
-%{_sbindir}/apxs -e -a -n rewrite %{_libexecdir}/mod_rewrite.so 1>&2
+%{apxs} -e -a -n rewrite %{_libexecdir}/mod_rewrite.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -1059,14 +1059,14 @@ fi
 
 %preun mod_rewrite
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n rewrite %{_libexecdir}/mod_rewrite.so 1>&2
+	%{apxs} -e -A -n rewrite %{_libexecdir}/mod_rewrite.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
 fi
 
 %post mod_status
-%{_sbindir}/apxs -e -a -n status %{_libexecdir}/mod_status.so 1>&2
+%{apxs} -e -a -n status %{_libexecdir}/mod_status.so 1>&2
 if [ -f /etc/httpd/httpd.conf ] && ! grep -q "^Include.*mod_status.conf" /etc/httpd/httpd.conf; then
 	echo "Include /etc/httpd/mod_status.conf" >> /etc/httpd/httpd.conf
 fi
@@ -1078,7 +1078,7 @@ fi
 
 %preun mod_status
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n status %{_libexecdir}/mod_status.so 1>&2
+	%{apxs} -e -A -n status %{_libexecdir}/mod_status.so 1>&2
 	grep -v "^Include.*mod_status.conf" /etc/httpd/httpd.conf > \
 		/etc/httpd/httpd.conf.tmp
 	mv -f /etc/httpd/httpd.conf.tmp /etc/httpd/httpd.conf
@@ -1088,7 +1088,7 @@ if [ "$1" = "0" ]; then
 fi
 
 %post mod_usertrack
-%{_sbindir}/apxs -e -a -n usertrack %{_libexecdir}/mod_usertrack.so 1>&2
+%{apxs} -e -a -n usertrack %{_libexecdir}/mod_usertrack.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -1097,14 +1097,14 @@ fi
 
 %preun mod_usertrack
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n usertrack %{_libexecdir}/mod_usertrack.so 1>&2
+	%{apxs} -e -A -n usertrack %{_libexecdir}/mod_usertrack.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
 fi
 
 %post mod_unique_id
-%{_sbindir}/apxs -e -a -n unique_id %{_libexecdir}/mod_unique_id.so 1>&2
+%{apxs} -e -a -n unique_id %{_libexecdir}/mod_unique_id.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -1113,14 +1113,14 @@ fi
 
 %preun mod_unique_id
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n unique_id %{_libexecdir}/mod_unique_id.so 1>&2
+	%{apxs} -e -A -n unique_id %{_libexecdir}/mod_unique_id.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
 fi
 
 %post mod_vhost_alias
-%{_sbindir}/apxs -e -a -n vhost_alias %{_libexecdir}/mod_vhost_alias.so 1>&2
+%{apxs} -e -a -n vhost_alias %{_libexecdir}/mod_vhost_alias.so 1>&2
 if [ -f /etc/httpd/httpd.conf ] && ! grep -q "^Include.*mod_vhost_alias.conf" /etc/httpd/httpd.conf; then
 	echo "Include /etc/httpd/mod_vhost_alias.conf" >> /etc/httpd/httpd.conf
 fi
@@ -1132,7 +1132,7 @@ fi
 
 %preun mod_vhost_alias
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n vhost_alias %{_libexecdir}/mod_vhost_alias.so 1>&2
+	%{apxs} -e -A -n vhost_alias %{_libexecdir}/mod_vhost_alias.so 1>&2
 	grep -v "^Include.*mod_vhost_alias.conf" /etc/httpd/httpd.conf > \
 		/etc/httpd/httpd.conf.tmp
 	mv -f /etc/httpd/httpd.conf.tmp /etc/httpd/httpd.conf
