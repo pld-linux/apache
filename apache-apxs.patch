@@ -6,7 +6,7 @@ diff -urN httpd-2.0.35.org/support/apxs.in httpd-2.0.35/support/apxs.in
  # read the configuration variables once
  my %config_vars = ();
 -get_config_vars("$prefix/build/config_vars.mk",\%config_vars);
-+get_config_vars("/etc/httpd/build/config_vars.mk",\%config_vars);
++get_config_vars("/usr/lib/apache/build/config_vars.mk",\%config_vars);
  
  my $exec_prefix    = get_vars("exec_prefix");
  my $CFG_TARGET     = get_vars("progname");
