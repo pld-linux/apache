@@ -440,6 +440,7 @@ Summary:	Apache module: Compress content before it is delivered to the client
 Summary(pl):	Modu³ Apache'a kompresuj±cy dane przed przes³aniem ich do klienta
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}-%{release}
+Requires:	%{name}-mod_headers = %{version}-%{release}
 
 %description mod_deflate
 Compress content before it is delivered to the client.
