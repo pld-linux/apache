@@ -65,6 +65,7 @@ Provides:	%{name}(EAPI) = %{version}
 Obsoletes:	apache-extra
 Obsoletes:	apache6
 Obsoletes:	apache-doc
+Obsoletes:	indexhtml
 
 %define		_sysconfdir	/etc/httpd
 %define		_includedir	%{_prefix}/include/apache
@@ -945,6 +946,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc ABOUT_APACHE.gz src/CHANGES.gz KEYS.gz README.gz
 %doc conf/mime.types
 
+%dir %{_datadir}
 %dir %{_datadir}/manual
 %dir %{_datadir}/manual/images/
 %{_datadir}/manual/images/sub.gif
@@ -953,41 +955,59 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/manual/misc
 %dir %{_datadir}/manual/search
 %attr(755,root,root) %{_datadir}/manual/search/manual-index.cgi
-%{_datadir}/manual/vhosts
 %{_datadir}/manual/LICENSE
 %{_datadir}/manual/bind.html
 %{_datadir}/manual/cgi_path.html
+%lang(en) %{_datadir}/manual/configuring.html.en
+%lang(ja) %{_datadir}/manual/configuring.html.ja.jis
 %{_datadir}/manual/content-negotiation.html
-%{_datadir}/manual/custom-error.html
+%lang(en) %{_datadir}/manual/custom-error.html.en
+%lang(ja) %{_datadir}/manual/custom-error.html.ja.jis
 %{_datadir}/manual/dns-caveats.html
 %{_datadir}/manual/dso.html
 %{_datadir}/manual/env.html
 %{_datadir}/manual/footer.html
-%{_datadir}/manual/handler.html
+%lang(en) %{_datadir}/manual/handler.html.en
+%lang(ja) %{_datadir}/manual/handler.html.ja.jis
 %{_datadir}/manual/header.html
-%{_datadir}/manual/index.html
-%{_datadir}/manual/install.html
+%lang(en) %{_datadir}/manual/index.html.en
+%lang(ja) %{_datadir}/manual/index.html.ja.jis
+%lang(en) %{_datadir}/manual/install.html.en
+%lang(ja) %{_datadir}/manual/install.html.ja.jis
 %{_datadir}/manual/invoking.html
 %{_datadir}/manual/keepalive.html
 %{_datadir}/manual/location.html
 %{_datadir}/manual/multilogs.html
-%{_datadir}/manual/new_features_1_3.html
+%lang(en) %{_datadir}/manual/new_features_1_3.html.en
+%lang(ja) %{_datadir}/manual/new_features_1_3.html.ja.jis
 %{_datadir}/manual/process-model.html
 %{_datadir}/manual/sections.html
+%lang(en) %{_datadir}/manual/server-wide.html.en
+%lang(ja) %{_datadir}/manual/server-wide.html.ja.jis
 %{_datadir}/manual/sourcereorg.html
+%{_datadir}/manual/stopping.html
 %{_datadir}/manual/suexec.html
 %{_datadir}/manual/upgrading_to_1_3.html
+%dir %{_datadir}/manual/howto
+%lang(en) %{_datadir}/manual/howto/cgi.html.en
+%lang(ja) %{_datadir}/manual/howto/cgi.html.ja.jis
+%{_datadir}/manual/howto/footer.html
+%{_datadir}/manual/howto/header.html
+%{_datadir}/manual/howto/ssi.html
 %dir %{_datadir}/manual/mod
 %{_datadir}/manual/mod/core.html
-%{_datadir}/manual/mod/directive-dict.html
+%lang(en) %{_datadir}/manual/mod/directive-dict.html.en
+%lang(ja) %{_datadir}/manual/mod/directive-dict.html.ja.jis
 %{_datadir}/manual/mod/directives.html
 %{_datadir}/manual/mod/footer.html
 %{_datadir}/manual/mod/header.html
+%{_datadir}/manual/mod/index-bytype.html
 %{_datadir}/manual/mod/index.html
 %{_datadir}/manual/mod/mod_access.html
 %{_datadir}/manual/mod/mod_alias.html
 %{_datadir}/manual/mod/mod_asis.html
 %{_datadir}/manual/mod/mod_autoindex.html
+%{_datadir}/manual/mod/mod_cern_meta.html
 %{_datadir}/manual/mod/mod_cgi.html
 %{_datadir}/manual/mod/mod_cookies.html
 %{_datadir}/manual/mod/mod_env.html
@@ -997,10 +1017,28 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/manual/mod/mod_log_referer.html
 %{_datadir}/manual/mod/mod_mime.html
 %{_datadir}/manual/mod/mod_mime_magic.html
-%{_datadir}/manual/mod/mod_negotiation.html
+%lang(en) %{_datadir}/manual/mod/mod_negotiation.html.en
+%lang(ja) %{_datadir}/manual/mod/mod_negotiation.html.ja.jis
 %{_datadir}/manual/mod/mod_setenvif.html
 %{_datadir}/manual/mod/mod_speling.html
 %{_datadir}/manual/mod/mod_userdir.html
+%lang(en) %{_datadir}/manual/mod/module-dict.html.en
+%lang(ja) %{_datadir}/manual/mod/module-dict.html.ja.jis
+%{_datadir}/manual/programs
+%dir %{_datadir}/manual/vhosts
+%{_datadir}/manual/vhosts/details.html
+%{_datadir}/manual/vhosts/examples.html
+%{_datadir}/manual/vhosts/fd-limits.html
+%{_datadir}/manual/vhosts/footer.html
+%{_datadir}/manual/vhosts/header.html
+%{_datadir}/manual/vhosts/host.html
+%lang(en) %{_datadir}/manual/vhosts/index.html.en
+%lang(ja) %{_datadir}/manual/vhosts/index.html.ja.jis
+%{_datadir}/manual/vhosts/ip-based.html
+%{_datadir}/manual/vhosts/mass.html
+%{_datadir}/manual/vhosts/name-based.html
+%{_datadir}/manual/vhosts/vhosts-in-depth.html
+%{_datadir}/manual/vhosts/virtual-host.html
 
 %attr(754,root,root) /etc/rc.d/init.d/httpd
 
