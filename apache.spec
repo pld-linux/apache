@@ -1,14 +1,17 @@
 Summary:	HTTP server daemon to provide WWW services
+Summary(de):	Leading World Wide Web-Server
+Summary(fr):	Serveur Web leader du marché
+Summary(pl):	Serwer WWW (World Wide Web)
+Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	1.3.4
-Release:	3d
+Release:	4d
 Group:		Networking/Daemons
 Group(pl):	Sieci/Demony
 Source0:	ftp://ftp.apache.org/apache/dist/%{name}_%{version}.tar.gz
 Source1:	httpd.init
 Source2:	%{name}.log
-Source3:	%{name}-config.tar.gz
-Source4:	httpd.conf
+Source3:	%{name}-extra.tar.bz2
 ########	http://www.eos.ncsu.edu/apache
 Source5:	mod_auth_kerb-3.6.tar.gz
 Patch0:		%{name}-1.3.2-suexec.patch
@@ -20,10 +23,6 @@ Provides:	httpd
 Prereq:		/sbin/chkconfig
 URL:		http://www.apache.org/
 BuildRoot:	/tmp/%{name}-%{version}-root
-Summary(de):	Leading World Wide Web-Server
-Summary(fr):	Serveur Web leader du marché
-Summary(pl):	Serwer WWW (World Wide Web)
-Summary(tr):	Lider WWW tarayýcý
 
 %description
 Apache is a full featured web server that is freely available, and also
@@ -91,7 +90,7 @@ Documentation for apache in HTML format.
 Dokumentacja do Apache w formacie HTML
 
 %prep 
-%setup -q -n apache_%{version}
+%setup -q -n apache_%{version} -a3
 %patch0 -p1
 %patch1 -p1
 
@@ -135,15 +134,16 @@ install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
 
 install -d $RPM_BUILD_ROOT/usr/include/apache
 
-tar zxf %{SOURCE3} -C $RPM_BUILD_ROOT/etc/httpd/conf
-
-rm -f $RPM_BUILD_ROOT/etc/httpd/conf/httpd.conf
-install %{SOURCE4} $RPM_BUILD_ROOT/etc/httpd/conf
-
+rm -f $RPM_BUILD_ROOT/etc/httpd/conf/*
 rm -f $RPM_BUILD_ROOT/home/httpd/html/manual/expand.pl
 
 touch $RPM_BUILD_ROOT/var/log/httpd/{access,error}_log
- 
+
+mv -f apache-extra/errordocs	$RPM_BUILD_ROOT/home/httpd/
+cp -a apache-extra/icons/*	$RPM_BUILD_ROOT/home/httpd/icons
+cp -a apache-extra/*.conf	$RPM_BUILD_ROOT/etc/httpd/conf
+cp -a apache-extra/m*		$RPM_BUILD_ROOT/etc/httpd/conf
+
 bzip2 -9 $RPM_BUILD_ROOT/usr/man/{man1/*,man8/*}
 bzip2 -9 ABOUT_APACHE src/CHANGES KEYS README
 
@@ -180,9 +180,12 @@ fi
 
 %attr(755,root,root,755) /home/httpd/cgi-bin
 %attr(755,root,root,755) /usr/libexec/apache
-%attr(755,root,root,755) %dir /home/httpd/icons
 
-%attr(644,root,root) /home/httpd/icons/*.gif
+%attr(755,root,root,755) %dir /home/httpd/icons
+/home/httpd/icons/*.gif
+
+%attr(755,root,root,755) %dir /home/httpd/errordocs
+/home/httpd/errordocs/*
 
 %attr(755,root,root) /usr/bin/dbmmanage 
 %attr(755,root,root) /usr/bin/htdigest
@@ -214,6 +217,10 @@ fi
 /home/httpd/html/manual
 
 %changelog
+* Mon Jan 25 1999 Wojtek ¦lusarczyk <wojtek@shadow.eu.org>
+  [1.3.4-4d]
+- added errordocs.  
+
 * Thu Jan 21 1999 Wojtek ¦lusarczyk <wojtek@shadow.eu.org>
   [1.3.4-3d]
 - fixed files permission,
