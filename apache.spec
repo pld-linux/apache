@@ -36,6 +36,9 @@ Prereq:		sh-utils
 BuildRequires:	mm-devel
 Requires:	rc-scripts
 Requires:	mailcap
+Requires:	/etc/mime.types
+Requires:	file
+Requires:	/usr/share/misc/magic
 URL:		http://www.apache.org/
 BuildRoot:	/tmp/%{name}-%{version}-root
 Obsoletes:	apache-extra
