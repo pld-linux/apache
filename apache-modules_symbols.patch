@@ -1169,3 +1169,89 @@ diff -urN apache_1.3.14.orig/src/modules/standard/mod_log_referer.c apache_1.3.1
      NULL,                       /* header parser */
      NULL,                       /* child_init */
      NULL,                       /* child_exit */
+--- apache_1.3.23/src/modules/experimental/mod_auth_digest.c.orig	Thu Feb  8 00:43:50 2001
++++ apache_1.3.23/src/modules/experimental/mod_auth_digest.c	Mon Mar  4 22:30:20 2002
+@@ -97,7 +97,7 @@
+ 
+ /* The section for the Configure script:
+  * MODULE-DEFINITION-START
+- * Name: digest_auth_module
++ * Name: auth_digest_module
+  * ConfigStart
+ 
+     RULE_DEV_RANDOM=`./helpers/CutRule DEV_RANDOM $file`
+@@ -262,7 +262,7 @@
+ static void          *client_mm = NULL;
+ #endif	/* HAVE_SHMEM_MM */
+ 
+-module MODULE_VAR_EXPORT digest_auth_module;
++module MODULE_VAR_EXPORT auth_digest_module;
+ 
+ /*
+  * initialization code
+@@ -963,7 +963,7 @@
+     resp->raw_request_uri = r->unparsed_uri;
+     resp->psd_request_uri = &r->parsed_uri;
+     resp->needed_auth = 0;
+-    ap_set_module_config(r->request_config, &digest_auth_module, resp);
++    ap_set_module_config(r->request_config, &auth_digest_module, resp);
+ 
+     res = get_digest_rec(r, resp);
+     resp->client = get_client(resp->opaque_num, r);
+@@ -1606,14 +1606,14 @@
+     while (mainreq->main != NULL)  mainreq = mainreq->main;
+     while (mainreq->prev != NULL)  mainreq = mainreq->prev;
+     resp = (digest_header_rec *) ap_get_module_config(mainreq->request_config,
+-						      &digest_auth_module);
++						      &auth_digest_module);
+     resp->needed_auth = 1;
+ 
+ 
+     /* get our conf */
+ 
+     conf = (digest_config_rec *) ap_get_module_config(r->per_dir_config,
+-						      &digest_auth_module);
++						      &auth_digest_module);
+ 
+ 
+     /* check for existence and syntax of Auth header */
+@@ -1839,7 +1839,7 @@
+ {
+     const digest_config_rec *conf =
+ 		(digest_config_rec *) ap_get_module_config(r->per_dir_config,
+-							   &digest_auth_module);
++							   &auth_digest_module);
+     const char *user = r->connection->user;
+     int m = r->method_number;
+     int method_restricted = 0;
+@@ -1909,7 +1909,7 @@
+ 
+     note_digest_auth_failure(r, conf,
+ 	(digest_header_rec *) ap_get_module_config(r->request_config,
+-						   &digest_auth_module),
++						   &auth_digest_module),
+ 	0);
+     return AUTH_REQUIRED;
+ }
+@@ -1934,10 +1934,10 @@
+ {
+     const digest_config_rec *conf =
+ 		(digest_config_rec *) ap_get_module_config(r->per_dir_config,
+-							   &digest_auth_module);
++							   &auth_digest_module);
+     digest_header_rec *resp =
+ 		(digest_header_rec *) ap_get_module_config(r->request_config,
+-							   &digest_auth_module);
++							   &auth_digest_module);
+     const char *ai = NULL, *digest = NULL, *nextnonce = "";
+ 
+     if (resp == NULL || !resp->needed_auth || conf == NULL)
+@@ -2076,7 +2076,7 @@
+ }
+ 
+ 
+-module MODULE_VAR_EXPORT digest_auth_module =
++module MODULE_VAR_EXPORT auth_digest_module =
+ {
+     STANDARD_MODULE_STUFF,
+     initialize_module,		/* initializer */
