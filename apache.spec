@@ -9,6 +9,7 @@ Version:	1.3.12
 Release:	12
 License:	BSD-like
 Group:		Networking/Daemons
+Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
 Source0:	ftp://ftp.apache.org/dist/%{name}_%{version}.tar.gz
 Source1:	%{name}.init
@@ -77,9 +78,10 @@ sunucusudur.
 %package suexec
 Summary:	Apache suexec wrapper
 Summary(pl):	Suexec wrapper do serwera www Apache
-Group:		Networking/Development
-######		Unknown group!
-Group(pl):	Sieciowe/Programowanie
+Group:		Development/Tools
+Group(de):	Entwicklung/Werkzeuge
+Group(fr):	Development/Outils
+Group(pl):	Programowanie/Narzêdzia
 Requires:	%{name}(EAPI) = %{version}
 
 %description suexec
@@ -98,6 +100,7 @@ Summary:	Module development tools for the Apache web server
 Summary(fr):	Les outils de developpement de modules pour le serveur web Apache
 Summary(pl):	Pliki nag³ówkowe do tworzenai modu³ów rozszerzeñ do serwera www Apache
 Group:		Networking/Utilities
+Group(de):	Netzwerkwesen/Werkzeuge
 Group(pl):	Sieciowe/Narzêdzia
 Requires:	%{name}(EAPI) = %{version}
 Provides:	%{name}(EAPI)-devel
@@ -119,6 +122,7 @@ Pliki nag³ówkowe dla serwera WWW Apache.
 Summary:	Apache module for run CGI whenever a file of a certain type is requested
 Summary(pl):	Modu³ dla apache do uruchamiania skryptów cgi
 Group:		Networking/Daemons
+Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
 Requires:	%{name}(EAPI) = %{version}
@@ -136,6 +140,7 @@ Ten modu³ pozwala na uruchamianie skryptów w momencie gdy nadchodzi
 Summary:	Apache module with "anonymous" user access authentication
 Summary(pl):	Modu³ apache oferuj±cy anonimow± autoryzacjê u¿ytkownia
 Group:		Networking/Daemons
+Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
 Requires:	%{name}(EAPI) = %{version}
@@ -161,6 +166,7 @@ postaci adresu pocztowego u¿ytkownika).
 Summary:	Apache module - authentication variables for arbitrary directives
 Summary(pl):	Modu³ apache do definiowania zmiennych
 Group:		Networking/Daemons
+Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
 Requires:	%{name}(EAPI) = %{version}
@@ -176,6 +182,7 @@ Modu³ ten umo¿liwia definicjê zmiennych i dyrektyw.
 Summary:	Apache user authentication module using MD5 Digest Authentication 
 Summary(pl):	Modu³ apache do autoryzacji MD5
 Group:		Networking/Daemons
+Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
 Requires:	%{name}(EAPI) = %{version}
@@ -192,6 +199,7 @@ Authentication.
 Summary:	Apache module for "trailing slash" redirects and serving directory index files
 Summary(pl):	Modu³ oferuj±cy przekierowania i serwowanie indeksu katalogu.
 Group:		Networking/Daemons
+Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
 Requires:	%{name}(EAPI) = %{version}
@@ -207,6 +215,7 @@ Modu³ oferuj±cy przekierowania i serwowanie indeksu katalogu.
 Summary:	Apache module allows for the customization of HTTP response headers
 Summary(pl):	Modu³ pozwalaj±cy na modyfikacjê nag³ówków HTTP
 Group:		Networking/Daemons
+Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
 Requires:	%{name}(EAPI) = %{version}
@@ -224,6 +233,7 @@ wysy³anych do przegl±darki.
 Summary:	Apache module for mmap()ing statically configured list files
 Summary(pl):	Modu³ s³u¿±cy do mmap()owania plików.
 Group:		Networking/Daemons
+Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
 Requires:	%{name}(EAPI) = %{version}
@@ -241,6 +251,7 @@ Modu³ umo¿liwia mmap()owanie statycznie skonfigurowanych plików
 Summary:	Apache module with imap-file handler
 Summary(pl):	Modu³ z obs³ug± imap-file
 Group:		Networking/Daemons
+Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
 Requires:	%{name}(EAPI) = %{version}
@@ -257,6 +268,7 @@ Modu³ umozliwiaj±cy obs³ugê plików .map (imap-file handler)
 Summary:	Apache module with comprehensive overview of the server configuration
 Summary(pl):	Modu³ dostarczaj±cy informacji na temat serwera.
 Group:		Networking/Daemons
+Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
 Requires:	%{name}(EAPI) = %{version}
@@ -274,6 +286,7 @@ modu³ach itp.
 Summary:	Apache module with Web proxy
 Summary(pl):	Modu³ dodaj±cy obs³ugê serwera proxy
 Group:		Networking/Daemons
+Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
 Requires:	%{name}(EAPI) = %{version}
@@ -293,6 +306,7 @@ HTTP/1.0.
 Summary:	Apache module with rule-based engine for rewrite requested URLs on the fly
 Summary(pl):	Modu³ do ,,przepisywania'' adresów URL w locie
 Group:		Networking/Daemons
+Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
 Requires:	%{name}(EAPI) = %{version}
@@ -308,6 +322,7 @@ Modu³ oferuj±cy mo¿liwo¶æ ,,przepisywania'' adresów URL w locie.
 Summary:	Server status report module for apache
 Summary(pl):	Modu³ dostarczaj±cy informacje statystyczne o serwerze.
 Group:		Networking/Daemons
+Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
 Requires:	%{name}(EAPI) = %{version}
@@ -327,6 +342,7 @@ pracy serwera apache (w postaci strony HTML).
 Summary:	Apache module for user tracking using cookies
 Summary(pl):	Modu³ s³u¿±cy do ¶ledzenia ,,ciasteczek''.
 Group:		Networking/Daemons
+Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
 Requires:	%{name}(EAPI) = %{version}
@@ -343,6 +359,7 @@ Modu³ pozwalaj±cy na ¶ledzenie ,,ciasteczek''.
 Summary:	Apache module for dynamically configured mass virtual hosting
 Summary(pl):	Modu³ dodaj±cy obs³ugê hostów wirtualnych.
 Group:		Networking/Daemons
+Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
 Requires:	%{name}(EAPI) = %{version}
@@ -358,6 +375,7 @@ wirtualnych.
 %package mod_unique_id
 Summary:	Apache module which provides a magic token for each request
 Group:		Networking/Daemons
+Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
 Requires:	%{name}(EAPI) = %{version}
@@ -374,6 +392,7 @@ which are beyond the scope of this document.
 %package mod_expires
 Summary:	Apache module which provides .... 
 Group:		Networking/Daemons
+Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
 Requires:	%{name}(EAPI) = %{version}
@@ -395,8 +414,8 @@ Requires:	%{name}(EAPI) = %{version}
 %patch10 -p1
 
 %build
-LDFLAGS="-s"; export LDFLAGS 
-OPTIM="$RPM_OPT_FLAGS" \
+OPTIM="%{!?debug:$RPM_OPT_FLAGS}%{?debug:-O -g}" \
+LDFLAGS="%{!?debug:-s}" \
 ./configure \
 	--prefix=%{_prefix} \
 	--sysconfdir=%{_sysconfdir} \
@@ -457,7 +476,7 @@ gzip -9nf $RPM_BUILD_ROOT%{_mandir}/man*/* \
 %pre
 if [ -n "`getgid http`" ]; then
 	if [ "`getgid http`" != "51" ]; then
-		echo "Warning: group http haven't gid=51. Corect this before install apache" 1>&2
+		echo "Warning:group http haven't gid=51. Corect this before install apache" 1>&2
 		exit 1
 	fi
 else
