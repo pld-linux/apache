@@ -48,6 +48,7 @@ Source21:	%{name}-server.key
 Patch0:		%{name}-configdir_skip_backups.patch
 Patch1:		%{name}-layout.patch
 Patch2:		%{name}-suexec.patch
+Patch3:		%{name}-nolibs.patch
 BuildRequires:	db-devel
 BuildRequires:	expat-devel
 BuildRequires:	gdbm-devel >= 1.8.3
@@ -605,8 +606,12 @@ Pliki nag³ówkowe, biblioteki dla konsolidatora APR.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 %build
+cd srclib/apr
+%{__autoconf}
+cd ../..
 %configure \
 	--enable-layout=PLD \
 	--enable-modules=all \
