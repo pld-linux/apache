@@ -24,9 +24,8 @@ Patch1:		apache-suexec.patch
 Patch2:		apache-htdocs.patch
 Patch3:		apache-errordocs.patch
 Patch4:		apache-apxs.patch
-Patch5:		apache-phhttpd.patch
-Patch6:		apache-EAPI.patch
-Patch7:		apache-v6-PLD-1.patch.gz
+Patch5:		apache-EAPI.patch
+Patch6:		apache-v6-PLD-1.patch.gz
 Copyright:	BSD-like
 Provides:	httpd
 Provides:	webserver
@@ -139,6 +138,17 @@ tracking and customization according to a user profile while still keeping
 the site open for 'unregistered' users. One advantage of using Auth-based
 user tracking is that, unlike magic-cookies and funny URL pre/postfixes, it
 is completely browser independent and it allows users to share URLs.
+
+%package mod_define
+Summary:	Apache module - authentication variables for arbitrary directives
+Group:		Networking/Daemons
+Group(pl):	Sieciowe/Serwery
+Prereq:		%{_sbindir}/apxs
+Requires:	%{name}(EAPI) = %{version}
+
+%description mod_define
+It provides the definition variables for arbitrary directives, i.e.
+variables which can be expanded on any(!) directive line.
 
 %package mod_digest
 Summary:	Apache user authentication module using MD5 Digest Authentication 
@@ -301,8 +311,7 @@ Requires:	%{name}(EAPI) = %{version}
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
-%patch6 -p1
-%patch7 -p1
+#%patch6 -p1
 
 %build
 
@@ -329,8 +338,8 @@ OPTIM="$RPM_OPT_FLAGS" \
 	--suexec-uidmin=500 \
 	--suexec-gidmin=500 \
 	--disable-rule=WANTHSREGEX \
-	--enable-rule=EAPI \
-	--enable-rule=INET6
+	--enable-rule=EAPI
+#	--enable-rule=INET6
 make
 
 %install
@@ -390,13 +399,6 @@ fi
 
 %post
 /sbin/chkconfig --add httpd
-umask 137
-touch /var/log/httpd/{access,error,agent,referer}_log
-if [ -f /var/lock/subsys/httpd ]; then
-	/etc/rc.d/init.d/httpd restart 1>&2
-else
-	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
-fi
 %{_sbindir}/apxs -e -a -n access %{_libexecdir}/mod_access.so 1>&2
 %{_sbindir}/apxs -e -a -n alias %{_libexecdir}/mod_alias.so 1>&2
 %{_sbindir}/apxs -e -a -n asis %{_libexecdir}/mod_asis.so 1>&2
@@ -417,6 +419,13 @@ fi
 %{_sbindir}/apxs -e -a -n setenvif %{_libexecdir}/mod_setenvif.so 1>&2
 %{_sbindir}/apxs -e -a -n speling %{_libexecdir}/mod_speling.so 1>&2
 %{_sbindir}/apxs -e -a -n userdir %{_libexecdir}/mod_userdir.so 1>&2
+umask 137
+touch /var/log/httpd/{access,error,agent,referer}_log
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+fi
 
 %preun
 if [ "$1" = "0" ]; then
@@ -472,6 +481,14 @@ fi
 %preun mod_auth_anon
 if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n anon_auth %{_libexecdir}/mod_auth_anon.so 1>&2
+fi
+
+%post mod_define
+%{_sbindir}/apxs -e -a -n digest %{_libexecdir}/mod_define.so 1>&2
+
+%preun mod_define
+if [ "$1" = "0" ]; then
+	%{_sbindir}/apxs -e -A -n digest %{_libexecdir}/mod_define.so 1>&2
 fi
 
 %post mod_digest
@@ -736,6 +753,10 @@ rm -rf $RPM_BUILD_ROOT
 %files mod_auth_anon
 %attr(755,root,root) %{_libexecdir}/mod_auth_anon.so
 %attr(644,root,root) %{_datadir}/manual/mod/mod_auth_anon.html
+
+%files mod_define
+%attr(755,root,root) %{_libexecdir}/mod_define.so
+%attr(644,root,root) %{_datadir}/manual/mod/mod_define.html
 
 %files mod_digest
 %attr(755,root,root) %{_libexecdir}/mod_digest.so
