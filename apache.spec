@@ -3,6 +3,8 @@
 # - mod_case_filter_in
 # - mod_optional_fn_{export,import}
 # - mod_optional_hook_{export,import}
+# - mod_ext_filter
+# - mod_echo
 # - config examples for mod_*
 # - switch from worker to perchild when it will be working in apache
 %include	/usr/lib/rpm/macros.perl
@@ -14,7 +16,7 @@ Summary(pl):	Serwer WWW (World Wide Web)
 Summary(pt_BR):	Servidor HTTPD para prover serviços WWW
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
-Version:	2.0.39
+Version:	2.0.40
 Release:	0.3
 License:	Apache Group License
 Group:		Networking/Daemons
@@ -36,12 +38,14 @@ Source20:	%{name}-server.crt
 Source21:	%{name}-server.key
 Patch0:		%{name}-apxs.patch
 Patch1:		%{name}-configdir_skip_backups.patch
+Patch2:		%{name}-layout.patch
+Patch3:		%{name}-suexec.patch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 BuildRequires:	openssl-devel
 BuildRequires:	openssl-tools
 BuildRequires:	db4-devel
 BuildRequires:	zlib-devel
-BuildRequires:	expat-static
+BuildRequires:	expat-devel
 BuildRequires:	perl-devel >= 5.004
 BuildRequires:	gdbm-devel
 BuildRequires:	byacc
@@ -564,6 +568,8 @@ Statyczne biblioteki APR.
 %setup -q -n httpd-%{version}
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
+%patch3 -p1
 
 %build
 %configure \
@@ -1084,6 +1090,7 @@ fi
 %attr(755,root,root) %dir %{_libexecdir}/build
 %attr(755,root,root) %{_libexecdir}/build/*.mk
 %attr(755,root,root) %{_libexecdir}/build/*.sh
+%attr(755,root,root) %{_libexecdir}/build/libtool
 
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/sysconfig/*
 %attr(640,root,root) %config(noreplace) /etc/logrotate.d/*
@@ -1105,6 +1112,16 @@ fi
 %attr(755,root,root) %{_libexecdir}/mod_speling.so
 %attr(755,root,root) %{_libexecdir}/mod_userdir.so
 
+# look at TODO on top
+%attr(755,root,root) %{_libexecdir}/mod_case_filter.so
+%attr(755,root,root) %{_libexecdir}/mod_case_filter_in.so
+%attr(755,root,root) %{_libexecdir}/mod_echo.so
+%attr(755,root,root) %{_libexecdir}/mod_ext_filter.so
+%attr(755,root,root) %{_libexecdir}/mod_optional_fn_export.so
+%attr(755,root,root) %{_libexecdir}/mod_optional_fn_import.so
+%attr(755,root,root) %{_libexecdir}/mod_optional_hook_export.so
+%attr(755,root,root) %{_libexecdir}/mod_optional_hook_import.so
+
 %attr(755,root,root) %{_sbindir}/htdigest
 
 %attr(755,root,root) %{_sbindir}/ab
@@ -1114,6 +1131,7 @@ fi
 %attr(755,root,root) %{_sbindir}/httpd
 %attr(755,root,root) %{_sbindir}/logresolve
 %attr(755,root,root) %{_sbindir}/rotatelogs
+%attr(755,root,root) %{_sbindir}/envvars*
 
 %dir %attr(770,root,http) /var/run/apache
 
@@ -1126,9 +1144,13 @@ fi
 
 %dir %{_datadir}
 %dir %{_datadir}/manual
+%{_datadir}/manual/LICENSE
 %{_datadir}/manual/*.html
+%{_datadir}/manual/*.xml
 %{_datadir}/manual/*.html.en
 %lang(ja) %{_datadir}/manual/*.html.ja.jis
+%lang(ja) %{_datadir}/manual/*.xml.ja
+%lang(ko) %{_datadir}/manual/*.html.ko.euc-kr
 %lang(de) %{_datadir}/manual/*.html.de
 %lang(fr) %{_datadir}/manual/*.html.fr
 %{_datadir}/manual/developer
@@ -1141,7 +1163,13 @@ fi
 %{_datadir}/manual/images/[achips]*
 %{_datadir}/manual/misc
 %dir %{_datadir}/manual/mod
+%{_datadir}/manual/mod/[fh]*.html
 %{_datadir}/manual/mod/[cdfhipw]*.html.en
+%{_datadir}/manual/mod/[acd]*.xml
+%lang(ja) %{_datadir}/manual/mod/[ad]*.xml.ja*
+%lang(ja) %{_datadir}/manual/mod/index.html.ja.jis
+%lang(ja) %{_datadir}/manual/mod/index.xml.ja
+%{_datadir}/manual/mod/index.xml
 %{_datadir}/manual/mod/mpm*.html.en
 %{_datadir}/manual/mod/mod_access.html.en
 %{_datadir}/manual/mod/mod_alias.html.en
@@ -1168,10 +1196,8 @@ fi
 %config(noreplace,missingok) %{_datadir}/html/index.html
 %config(noreplace,missingok) %{_datadir}/html/index.html.en
 %{_datadir}/html/*.gif
-%dir %{_datadir}/icons
-%{_datadir}/icons/*.gif
-%dir %{_datadir}/icons/small
-%{_datadir}/icons/small/*.gif
+%{_datadir}/html/*.png
+%{_datadir}/icons
 %attr(755,root,root) %{_datadir}/cgi-bin
 
 %{_datadir}/error
