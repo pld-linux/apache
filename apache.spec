@@ -25,8 +25,8 @@ Summary(pt_BR):	Servidor HTTPD para prover serviços WWW
 Summary(ru):	óÁÍÙÊ ÐÏÐÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
-Version:	2.0.47
-Release:	0.8
+Version:	2.0.48
+Release:	0.1
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -51,7 +51,6 @@ Patch1:		%{name}-layout.patch
 Patch2:		%{name}-suexec.patch
 Patch3:		%{name}-nolibs.patch
 Patch4:		%{name}-apr.patch
-Patch5:		%{name}-new-apr.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	db-devel
 BuildRequires:	expat-devel
@@ -62,8 +61,8 @@ BuildRequires:	perl-devel >= 5.004
 BuildRequires:	rpm-perlprov >= 4.0.4
 BuildRequires:	zlib-devel
 BuildRequires:	libtool >= 1.5
-BuildRequires:	apr-devel >= 1:0.9.4
-BuildRequires:	apr-util-devel >= 1:0.9.4
+BuildRequires:	apr-devel >= 1:0.9.4-1
+BuildRequires:	apr-util-devel >= 1:0.9.4-1
 PreReq:		perl
 PreReq:		rc-scripts
 Requires(pre):	/bin/id
@@ -574,7 +573,6 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
-%patch5 -p1
 
 %build
 # sanity check
