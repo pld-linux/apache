@@ -52,7 +52,22 @@ case "$1" in
 	# Stop daemons.
 	if [ -f /var/lock/subsys/httpd ]; then
 		msg_stopping httpd.${HTTPD_MPM}
+		if [ -f /var/run/httpd.pid ]; then
+			PID=`cat /var/run/httpd.pid`
+		else
+			PID=0
+		fi
 		daemon httpd.${HTTPD_MPM} -f /etc/httpd/httpd.conf -k stop
+		# Wait for httpd to really stop
+		if [ ! $PID -eq 0 ]; then
+			show "Waiting for httpd to stop"
+			busy
+			while ps ax | grep $PID.\*httpd > /dev/null
+			do
+				sleep 1
+			done
+			ok
+		fi
 		rm -f /var/lock/subsys/httpd /var/run/httpd.pid /var/run/httpd.loc* >/dev/null 2>&1
 	else
 		msg_not_running httpd.${HTTPD_MPM}
