@@ -35,7 +35,7 @@ Patch5:		%{name}-mod_ssl-addon.patch
 Patch6:		%{name}-mod_ssl-eapi.patch
 Patch7:		%{name}-EAPI_MM_CORE_PATH-correction.patch
 Patch8:		%{name}-EAPI_MM=SYSTEM.patch
-Patch9:		%{name}-v6-PLD-5.patch.gz
+Patch9:		%{name}-v6-PLD-6.patch.gz
 Patch10:	%{name}-modules_symbols.patch
 Patch11:	%{name}-apxs_force_rm_cp.patch
 Patch12:	%{name}-db3.patch
