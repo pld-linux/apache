@@ -31,7 +31,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.0.50
-Release:	5
+Release:	6
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -1711,6 +1711,8 @@ fi
 %attr(755,root,root) %{_sbindir}/envvars*
 %attr(750,root,root) %dir %{_sysconfdir}
 %dir %{_libexecdir}
+%dir %{_libexecdir}/build
+%{_libexecdir}/build/config_vars.mk
 %{_mandir}/man8/apxs.8*
 
 %files devel
@@ -1718,8 +1720,7 @@ fi
 %{_includedir}
 %{_libexecdir}/*.exp
 %attr(750,root,root) %dir %{_sysconfdir}/build
-%attr(755,root,root) %dir %{_libexecdir}/build
-%attr(644,root,root) %{_libexecdir}/build/*.mk
+%attr(644,root,root) %{_libexecdir}/build/[lprs]*.mk
 %attr(755,root,root) %{_libexecdir}/build/*.sh
 %attr(755,root,root) %{_libexecdir}/build/libtool
 
