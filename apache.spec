@@ -1333,6 +1333,7 @@ fi
 %files mod_rewrite
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_rewrite.so
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_rewrite.conf
 %{_datadir}/manual/mod/mod_rewrite.html.en
 %{_datadir}/manual/images/mod_rewrite*
 
