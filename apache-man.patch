@@ -1,0 +1,61 @@
+diff -uNr apache_1.3.10.orig/Makefile.tmpl apache_1.3.10/Makefile.tmpl
+--- apache_1.3.10.orig/Makefile.tmpl	Tue Jan 11 20:47:41 2000
++++ apache_1.3.10/Makefile.tmpl	Tue Jan 18 14:12:31 2000
+@@ -315,7 +315,14 @@
+ 			done; \
+ 		fi; \
+ 	fi
+-	$(INSTALL_DATA) $(TOP)/$(SRC)/support/httpd.8 $(root)$(mandir)/man8/$(TARGET).8
++	cat $(TOP)/$(SRC)/support/httpd.8 |\
++                    sed -e 's;@@ServerRoot@@;$(prefix);' \
++                        -e 's;@@SysconfDir@@;$(sysconfdir);' \
++                        -e 's;@@LogfileDir@@;$(logfiledir);' \
++                        -e 's;@@RuntimeDir@@;$(runtimedir);' \
++                        > $(TOP)/$(SRC)/.apaci.install.tmp
++	$(INSTALL_DATA) $(TOP)/$(SRC)/.apaci.install.tmp \
++                        $(root)$(mandir)/man8/$(TARGET).8
+ 	-@$(RM) $(SRC)/.apaci.install.conf; touch $(SRC)/.apaci.install.conf
+ 	-@if [ ".`grep '^[ 	]*SharedModule' $(TOP)/$(SRC)/Configuration.apaci`" != . ]; then \
+ 		for mod in `egrep '^[ 	]*SharedModule' $(TOP)/$(SRC)/Configuration.apaci |\
+diff -uNr apache_1.3.10.orig/src/support/httpd.8 apache_1.3.10/src/support/httpd.8
+--- apache_1.3.10.orig/src/support/httpd.8	Tue Aug 10 15:54:47 1999
++++ apache_1.3.10/src/support/httpd.8	Tue Jan 18 14:10:55 2000
+@@ -133,7 +133,7 @@
+ .BI \-d " serverroot"
+ Set the initial value for the ServerRoot directive to \fIserverroot\fP. This
+ can be overridden by the ServerRoot command in the configuration file. The
+-default is \fB/usr/local/apache\fP.
++default is \fB@@ServerRoot@@\fP.
+ .TP
+ .BI \-f " config"
+ Execute the commands in the file \fIconfig\fP on startup. If \fIconfig\fP
+@@ -191,21 +191,21 @@
+ , and then exit.
+ .SH FILES
+ .PD 0
+-.B /usr/local/apache/conf/httpd.conf
++.B @@SysconfDir@@/httpd.conf
+ .br
+-.B /usr/local/apache/conf/srm.conf
++.B @@SysconfDir@@/srm.conf
+ .br
+-.B /usr/local/apache/conf/access.conf
++.B @@SysconfDir@@/access.conf
+ .br
+-.B /usr/local/apache/conf/mime.types
++.B @@SysconfDir@@/mime.types
+ .br
+-.B /usr/local/apache/conf/magic
++.B @@SysconfDir@@/magic
+ .br
+-.B /usr/local/apache/logs/error_log
++.B @@LogfileDir@@/error_log
+ .br
+-.B /usr/local/apache/logs/access_log
++.B @@LogfileDir@@/access_log
+ .br
+-.B /usr/local/apache/logs/httpd.pid
++.B @@RuntimeDir@@/httpd.pid
+ .PD
+ .SH SEE ALSO
+ .BR inetd (8).
