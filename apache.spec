@@ -11,7 +11,7 @@ Summary(pl):	Serwer WWW (World Wide Web)
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	1.3.20
-Release:	1
+Release:	2
 License:	Apache Group License
 Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
@@ -47,6 +47,7 @@ Patch17:	%{name}-mkstemp.patch
 Patch18:	%{name}-EAPI-missing_files.patch
 Patch19:	%{name}-mod_include-segv.patch
 Patch20:	%{name}-PLD-nov6.patch
+Patch21:	%{name}-configdir_skip_backups.patch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 BuildRequires:  db3-devel
 BuildRequires:	mm-devel >= 1.1.3
@@ -510,6 +511,7 @@ wa¿no¶ci mo¿e byæ ustalana w zale¿no¶ci od czasu modyfikacji plików
 %patch18 -p1
 %patch19 -p1
 %{?_without_apache_ipv6:%patch20 -p1}
+%patch21 -p1
 
 %build
 OPTIM="%{rpmcflags}" \
