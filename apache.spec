@@ -103,7 +103,7 @@ install $RPM_SOURCE_DIR/httpd.init $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
 # Only needed for from_cvs tarballs, but doesn't hurt otherwise
 rm -f $RPM_BUILD_ROOT/home/httpd/html/manual/expand.pl
 
-strip --strip-debug $RPM_BUILD_ROOT/usr/libexec/apache/*.so
+strip --strip-debug $RPM_BUILD_ROOT/usr/libexec/apache/*.so || :
 
 for I in 0 1 2 6; do
         ln -s ../init.d/httpd $RPM_BUILD_ROOT/etc/rc.d/rc$I.d/K15httpd
