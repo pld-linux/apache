@@ -1,0 +1,24 @@
+===================================================================
+RCS file: /home/cvspublic/httpd-2.0/server/protocol.c,v
+retrieving revision 1.156
+retrieving revision 1.157
+diff -u -r1.156 -r1.157
+--- httpd-2.0/server/protocol.c	2004/10/25 06:40:08	1.156
++++ httpd-2.0/server/protocol.c	2004/10/25 10:24:17	1.157
+@@ -502,6 +502,16 @@
+ 
+     r->unparsed_uri = apr_pstrdup(r->pool, uri);
+ 
++    /* http://issues.apache.org/bugzilla/show_bug.cgi?id=31875
++     * http://issues.apache.org/bugzilla/show_bug.cgi?id=28450
++     *
++     * This is not in fact a URI, it's a path.  That matters in the
++     * case of a leading double-slash.  We need to resolve the issue
++     * by normalising that out before treating it as a URI.
++     */
++    while ((uri[0] == '/') && (uri[1] == '/')) {
++        ++uri ;
++    }
+     if (r->method_number == M_CONNECT) {
+         status = apr_uri_parse_hostinfo(r->pool, uri, &r->parsed_uri);
+     }
