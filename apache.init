@@ -34,13 +34,13 @@ fi
 
 [ -z "$HTTPD_MPM" ] && HTTPD_MPM="prefork"
 if   [ -d "${HTTPD_CONF:-'/etc/httpd/httpd.conf'}" ]; then
-	CFG="-d ${HTTPD_CONF:-'/etc/httpd/httpd.conf'}"
-elif [ -f "${HTTPD_CONF:-'/etc/httpd/httpd.conf'}" ]; then
 	CFG="-f ${HTTPD_CONF:-'/etc/httpd/httpd.conf'}"
 elif [ -n "$HTTPD_CONF" ]; then
 	echo "error: HTTPD_CONF='$HTTPD_CONF': not a file, not a directory"
 	exit 1
-else CFG=""; fi
+else
+    	CFG=""
+fi
 
 RETVAL=0
 # See how we were called.
@@ -60,26 +60,8 @@ case "$1" in
 	# Stop daemons.
 	if [ -f /var/lock/subsys/httpd ]; then
 		msg_stopping httpd.${HTTPD_MPM}
-		if [ -f /var/run/httpd.pid ]; then
-			PID=$(filter_chroot `cat /var/run/httpd.pid`)
-			if [ -z "$PID" ]; then
-				PID=0
-			fi
-		else
-			PID=0
-		fi
-		daemon httpd.${HTTPD_MPM} -f /etc/httpd/httpd.conf -k stop
+		daemon --waitforname httpd.${HTTPD_MPM} --waitfortime 60 httpd.${HTTPD_MPM} $CFG -k stop
 		RET=$?
-		# Wait for httpd to really stop
-		if [ ! $PID -eq 0 -a $RET -eq 0 ]; then
-			show "Waiting for httpd to stop"
-			busy
-			while ps -o command $PID | grep -q ^httpd
-			do
-				sleep 1
-			done
-			ok
-		fi
 		# Delete pidfile only when apache was called successfully
 		if [ $RET -eq 0 ]; then
 			rm -f /var/lock/subsys/httpd /var/run/httpd.pid /var/run/httpd.loc* >/dev/null 2>&1
@@ -91,7 +73,7 @@ case "$1" in
   status)
 	status httpd.${HTTPD_MPM}
 	RETVAL=$?
-	/usr/sbin/httpd.${HTTPD_MPM} -f /etc/httpd/httpd.conf -S
+	/usr/sbin/httpd.${HTTPD_MPM} $CFG -S
 	;;
   restart)
   	$0 stop
@@ -100,7 +82,7 @@ case "$1" in
   reload|force-reload|graceful)
 	if [ -f /var/lock/subsys/httpd ]; then
 		msg_reloading httpd.${HTTPD_MPM}
-		daemon httpd.${HTTPD_MPM} -f /etc/httpd/httpd.conf -k graceful
+		daemon httpd.${HTTPD_MPM} $CFG -k graceful
 		RETVAL=$?
 	else
 		msg_not_running httpd.${HTTPD_MPM} >&2
