@@ -1,7 +1,7 @@
-If you use -fpic instead of -fPIC, linker fall down, go boom.
---- apache_1.3.14/src/Configure.fpic	Fri Dec  1 15:25:17 2000
-+++ apache_1.3.14/src/Configure	Fri Dec  1 15:25:42 2000
-@@ -1034,14 +1034,14 @@
+diff -urN apache_1.3.17.org/src/Configure apache_1.3.17/src/Configure
+--- apache_1.3.17.org/src/Configure	Wed Jan 31 18:58:27 2001
++++ apache_1.3.17/src/Configure	Wed Jan 31 18:58:58 2001
+@@ -1055,14 +1055,14 @@
  	    LDFLAGS_MOD_SHLIB=$LDFLAGS_SHLIB
  	    ;;
  	*-linux1)
@@ -11,7 +11,7 @@ If you use -fpic instead of -fPIC, linker fall down, go boom.
  	    LDFLAGS_MOD_SHLIB=$LDFLAGS_SHLIB
  	    LDFLAGS_SHLIB_EXPORT="-rdynamic"
  	    ;;
- 	*-linux2)
+ 	*-linux2*)
  		LD_SHLIB="gcc"
 -	    CFLAGS_SHLIB="-fpic"
 +	    CFLAGS_SHLIB="-fPIC"
