@@ -1,6 +1,6 @@
 #
 # Conditional build:
-# mod_rewrite_ldap	- enable ldap map supoort for mod_rewrite (alpha)
+# _with_rewrite_ldap	- enable ldap map support for mod_rewrite (alpha)
 # _without_ipv6		- disable IPv6 support
 #
 %include	/usr/lib/rpm/macros.perl
@@ -27,7 +27,7 @@ Summary(uk):	îÁÊÐÏÐÕÌÑÒÎ¦ÛÉÊ Web-Server
 Summary(zh_CN):	Internet ÉÏÓ¦ÓÃ×î¹ã·ºµÄ Web ·þÎñ³ÌÐò¡£
 Name:		apache
 Version:	1.3.27
-Release:	4 
+Release:	4
 License:	Apache Group 
 Group:		Networking/Daemons
 URL:		http://www.apache.org/
@@ -67,11 +67,10 @@ Patch22:	%{name}-security_htdigest_bufferoverflow.patch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 BuildRequires:	db3-devel
 BuildRequires:	mm-devel >= 1.1.3
-%{?mod_rewrite_ldap:BuildRequires: openldap-devel}
+%{?_with_rewrite_ldap:BuildRequires: openldap-devel}
 PreReq:		rc-scripts
 PreReq:		mm
 PreReq:		perl
-Requires(pre):	sh-utils
 Requires(pre):	/usr/bin/getgid
 Requires(pre):	/bin/id
 Requires(pre):	/usr/sbin/useradd
@@ -182,8 +181,6 @@ webbserver. Apache är också den populäraste webbservern på Internet.
 %description -l tr
 Apache serbest daðýtýlan ve çok kullanýlan yetenekli bir web
 sunucusudur.
-
-%description -l uk
 
 %description -l zh_CN
 Apache ÊÇ¹¦ÄÜÇ¿¾¢ÆëÈ«¡¢¸ßÐ§ÇÒÃâ·ÑÌá¹©µÄ Web ·þÎñ³ÌÐò£¬ Í¬Ê±Ò²ÊÇ
@@ -314,6 +311,7 @@ Paketet apache-devel innehåller huvudfilerna för Apache.
 Summary:	Apache module for run CGI whenever a file of a certain type is requested
 Summary(pl):	Modu³ dla apache do uruchamiania skryptów cgi
 Group:		Networking/Daemons
+Requires(post,preun):	%{_sbindir}/apxs
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -665,7 +663,7 @@ wa¿no¶ci mo¿e byæ ustalana w zale¿no¶ci od czasu modyfikacji plików
 %patch10 -p1
 %patch11 -p1
 %patch12 -p1
-%{?mod_rewrite_ldap:%patch13 -p1}
+%{?_with_rewrite_ldap:%patch13 -p1}
 %patch14 -p1
 %patch15 -p1
 %patch16 -p1
@@ -711,7 +709,7 @@ rm -f src/modules/standard/mod_auth_db.so
 %{__make} -C src/modules/standard mod_auth_db.so LIBS_SHLIB="-ldb"
 
 rm -f src/modules/standard/mod_rewrite.so
-%{__make} -C src/modules/standard mod_rewrite.so LIBS_SHLIB="-ldb %{?mod_rewrite_ldap:-lldap -llber}"
+%{__make} -C src/modules/standard mod_rewrite.so LIBS_SHLIB="-ldb %{?_with_rewrite_ldap:-lldap -llber}"
 
 %install
 rm -rf $RPM_BUILD_ROOT
