@@ -14,8 +14,8 @@ Summary(pl):	Serwer WWW (World Wide Web)
 Summary(pt_BR):	Servidor HTTPD para prover serviços WWW
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
-Version:	2.0.36
-Release:	0.2
+Version:	2.0.39
+Release:	0.1
 License:	Apache Group License
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/
@@ -641,7 +641,7 @@ install -d $RPM_BUILD_ROOT%{_var}/{run,cache}/apache
 	cgidir=$RPM_BUILD_ROOT%{_datadir}/cgi-bin \
 	includedir=$RPM_BUILD_ROOT%{_includedir} \
 	localstatedir=$RPM_BUILD_ROOT%{_localstatedir} \
-	runtimedir=$RPM_BUILD_ROOT{_var}/run \
+	runtimedir=$RPM_BUILD_ROOT%{_var}/run \
 	logdir=$RPM_BUILD_ROOT%{_var}/log/httpd \
 	proxycachedir=$RPM_BUILD_ROOT%{_var}/cache/httpd
 
@@ -1143,22 +1143,22 @@ fi
 %{_datadir}/manual/images/[achips]*
 %{_datadir}/manual/misc
 %dir %{_datadir}/manual/mod
-%{_datadir}/manual/mod/[cdfhipw]*.html
-%{_datadir}/manual/mod/mpm*.html
-%{_datadir}/manual/mod/mod_access.html
-%{_datadir}/manual/mod/mod_alias.html
-%{_datadir}/manual/mod/mod_asis.html
-%{_datadir}/manual/mod/mod_autoindex.html
-%{_datadir}/manual/mod/mod_cern_meta.html
-%{_datadir}/manual/mod/mod_cgi.html
-%{_datadir}/manual/mod/mod_env.html
-%{_datadir}/manual/mod/mod_include.html
-%{_datadir}/manual/mod/mod_log_config.html
-%{_datadir}/manual/mod/mod_mime*.html
-%{_datadir}/manual/mod/mod_negotiation.html
-%{_datadir}/manual/mod/mod_setenvif.html
-%{_datadir}/manual/mod/mod_speling.html
-%{_datadir}/manual/mod/mod_userdir.html
+%{_datadir}/manual/mod/[cdfhipw]*.html.en
+%{_datadir}/manual/mod/mpm*.html.en
+%{_datadir}/manual/mod/mod_access.html.en
+%{_datadir}/manual/mod/mod_alias.html.en
+%{_datadir}/manual/mod/mod_asis.html.en
+%{_datadir}/manual/mod/mod_autoindex.html.en
+%{_datadir}/manual/mod/mod_cern_meta.html.en
+%{_datadir}/manual/mod/mod_cgi.html.en
+%{_datadir}/manual/mod/mod_env.html.en
+%{_datadir}/manual/mod/mod_include.html.en
+%{_datadir}/manual/mod/mod_log_config.html.en
+%{_datadir}/manual/mod/mod_mime*.html.en
+%{_datadir}/manual/mod/mod_negotiation.html.en
+%{_datadir}/manual/mod/mod_setenvif.html.en
+%{_datadir}/manual/mod/mod_speling.html.en
+%{_datadir}/manual/mod/mod_userdir.html.en
 %{_datadir}/manual/platform
 %{_datadir}/manual/programs
 %dir %{_datadir}/manual/search
@@ -1182,7 +1182,7 @@ fi
 %defattr(644,root,root,755)
 %attr(4755,root,root) %{_sbindir}/suexec
 %attr(755,root,root) %{_libexecdir}/mod_suexec.so
-%{_datadir}/manual/mod/mod_suexec.html
+%{_datadir}/manual/mod/mod_suexec.html.en
 
 %files devel
 %defattr(644,root,root,755)
@@ -1202,21 +1202,21 @@ fi
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_actions.conf
 %attr(755,root,root) %{_libexecdir}/mod_actions.so
-%{_datadir}/manual/mod/mod_actions.html
+%{_datadir}/manual/mod/mod_actions.html.en
 
 %files mod_auth
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_auth.conf
 %attr(755,root,root) %{_libexecdir}/mod_auth.so
 %attr(755,root,root) %{_sbindir}/htpasswd
-%{_datadir}/manual/mod/mod_auth.html
+%{_datadir}/manual/mod/mod_auth.html.en
 %{_mandir}/man1/htpasswd.1*
 
 %files mod_auth_anon
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_auth_anon.conf
 %attr(755,root,root) %{_libexecdir}/mod_auth_anon.so
-%{_datadir}/manual/mod/mod_auth_anon.html
+%{_datadir}/manual/mod/mod_auth_anon.html.en
 
 %files mod_auth_dbm
 %defattr(644,root,root,755)
@@ -1224,14 +1224,14 @@ fi
 %attr(755,root,root) %{_libexecdir}/mod_auth_dbm.so
 %attr(755,root,root) %{_sbindir}/dbmmanage
 %attr(755,root,root) %{_sbindir}/htdbm
-%{_datadir}/manual/mod/mod_auth_dbm.html
+%{_datadir}/manual/mod/mod_auth_dbm.html.en
 %{_mandir}/man1/dbmmanage.1*
 
 %files mod_auth_digest
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_auth_digest.conf
 %attr(755,root,root) %{_libexecdir}/mod_auth_digest.so
-%{_datadir}/manual/mod/mod_auth_digest.html
+%{_datadir}/manual/mod/mod_auth_digest.html.en
 
 %files mod_cache
 %defattr(644,root,root,755)
@@ -1239,79 +1239,79 @@ fi
 %attr(755,root,root) %{_libexecdir}/mod_cache.so
 %attr(755,root,root) %{_libexecdir}/mod_disk_cache.so
 %attr(755,root,root) %{_libexecdir}/mod_mem_cache.so
-%{_datadir}/manual/mod/mod_cache.html
+%{_datadir}/manual/mod/mod_cache.html.en
 
 %files mod_cgid
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_cgid.conf
 %attr(755,root,root) %{_libexecdir}/mod_cgid.so
-%{_datadir}/manual/mod/mod_cgid.html
+%{_datadir}/manual/mod/mod_cgid.html.en
 
 %files mod_charset_lite
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_charset_lite.conf
 %attr(755,root,root) %{_libexecdir}/mod_charset_lite.so
-%{_datadir}/manual/mod/mod_charset_lite.html
+%{_datadir}/manual/mod/mod_charset_lite.html.en
 
 %files mod_dav
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_dav.conf
 %attr(755,root,root) %{_libexecdir}/mod_dav*.so
-%{_datadir}/manual/mod/mod_dav*.html
+%{_datadir}/manual/mod/mod_dav*.html.en
 
 %files mod_deflate
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_deflate.conf
 %attr(755,root,root) %{_libexecdir}/mod_deflate.so
-%{_datadir}/manual/mod/mod_deflate.html
+%{_datadir}/manual/mod/mod_deflate.html.en
 
 %files mod_dir
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_dir.conf
 %attr(755,root,root) %{_libexecdir}/mod_dir.so
-%{_datadir}/manual/mod/mod_dir.html
+%{_datadir}/manual/mod/mod_dir.html.en
 
 %files mod_expires
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_expires.conf
 %attr(755,root,root) %{_libexecdir}/mod_expires.so
-%{_datadir}/manual/mod/mod_expires.html
+%{_datadir}/manual/mod/mod_expires.html.en
 
 %files mod_file_cache
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_file_cache.conf
 %attr(755,root,root) %{_libexecdir}/mod_file_cache.so
-%{_datadir}/manual/mod/mod_file_cache.html
+%{_datadir}/manual/mod/mod_file_cache.html.en
 
 %files mod_headers
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_headers.conf
 %attr(755,root,root) %{_libexecdir}/mod_headers.so
-%{_datadir}/manual/mod/mod_headers.html
+%{_datadir}/manual/mod/mod_headers.html.en
 
 %files mod_imap
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_imap.conf
 %attr(755,root,root) %{_libexecdir}/mod_imap.so
-%{_datadir}/manual/mod/mod_imap.html
+%{_datadir}/manual/mod/mod_imap.html.en
 
 %files mod_info
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_info.conf
 %attr(755,root,root) %{_libexecdir}/mod_info.so
-%{_datadir}/manual/mod/mod_info.html
+%{_datadir}/manual/mod/mod_info.html.en
 
 %files mod_proxy
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_proxy.conf
 %attr(755,root,root) %{_libexecdir}/mod_proxy*.so
-%doc %{_datadir}/manual/mod/mod_proxy*.html
+%doc %{_datadir}/manual/mod/mod_proxy*.html.en
 %attr(770,root,http) /var/cache/apache
 
 %files mod_rewrite
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_rewrite.so
-%{_datadir}/manual/mod/mod_rewrite.html
+%{_datadir}/manual/mod/mod_rewrite.html.en
 %{_datadir}/manual/images/mod_rewrite*
 
 %files mod_ssl
@@ -1321,30 +1321,30 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_ssl.conf
 %attr(755,root,root) %{_libexecdir}/mod_ssl.so
 %{_datadir}/manual/ssl
-%{_datadir}/manual/mod/mod_ssl.html
+%{_datadir}/manual/mod/mod_ssl.html.en
 
 %files mod_status
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_status.conf
 %attr(755,root,root) %{_libexecdir}/mod_status.so
-%{_datadir}/manual/mod/mod_status.html
+%{_datadir}/manual/mod/mod_status.html.en
 
 %files mod_usertrack
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_usertrack.conf
 %attr(755,root,root) %{_libexecdir}/mod_usertrack.so
-%{_datadir}/manual/mod/mod_usertrack.html
+%{_datadir}/manual/mod/mod_usertrack.html.en
 
 %files mod_unique_id
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_unique_id.conf
 %attr(755,root,root) %{_libexecdir}/mod_unique_id.so
-%{_datadir}/manual/mod/mod_unique_id.html
+%{_datadir}/manual/mod/mod_unique_id.html.en
 
 %files mod_vhost_alias
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_vhost_alias.so
-%{_datadir}/manual/mod/mod_vhost_alias.html
+%{_datadir}/manual/mod/mod_vhost_alias.html.en
 %{_datadir}/manual/vhosts
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_vhost_alias.conf
 
