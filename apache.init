@@ -34,10 +34,10 @@ case "$1" in
 	if [ ! -f /var/lock/subsys/httpd ]; then
 		show Starting httpd
 		daemon httpd
+		touch /var/lock/subsys/httpd
 	else
 		echo "httpd already is running"
 	fi
-	touch /var/lock/subsys/httpd
 	;;
   stop)
 	show Shutting down httpd
@@ -46,6 +46,7 @@ case "$1" in
 	;;
   status)
 	status httpd
+	/usr/sbin/httpd -S
 	;;
   restart|reload)
 	$0 stop
