@@ -56,8 +56,8 @@ URL:		http://httpd.apache.org/
 BuildRequires:	db-devel
 BuildRequires:	expat-devel
 BuildRequires:	gdbm-devel >= 1.8.3
-%{!?_without_ssl:BuildRequires:	openssl-devel >= 0.9.7}
-%{!?_without_ssl:BuildRequires:	openssl-tools >= 0.9.7}
+%{!?_without_ssl:BuildRequires:	openssl-devel >= 0.9.7c}
+%{!?_without_ssl:BuildRequires:	openssl-tools >= 0.9.7c}
 BuildRequires:	perl-devel >= 5.004
 BuildRequires:	rpm-perlprov >= 4.0.4
 BuildRequires:	zlib-devel
