@@ -27,7 +27,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.0.48
-Release:	0.1
+Release:	0.1.2
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -54,7 +54,7 @@ Patch3:		%{name}-nolibs.patch
 Patch4:		%{name}-apr.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	apr-devel >= 1:0.9.4-1
-BuildRequires:	apr-util-devel >= 1:0.9.4-1
+BuildRequires:	apr-util-devel >= 1:0.9.5-0.3
 BuildRequires:	db-devel
 BuildRequires:	expat-devel
 BuildRequires:	gdbm-devel >= 1.8.3
