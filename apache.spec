@@ -58,7 +58,12 @@ BuildRequires:	zlib-devel
 BuildRequires:	libtool
 PreReq:		perl
 PreReq:		rc-scripts
-Requires(pre):	user-http
+Requires(pre): /usr/bin/getgid
+Requires(pre): /bin/id
+Requires(pre): /usr/sbin/groupadd
+Requires(pre): /usr/sbin/useradd
+Requires(postun):      /usr/sbin/userdel
+Requires(postun):      /usr/sbin/groupdel
 Requires(post,preun):	/sbin/chkconfig
 Requires(post,postun):	/sbin/ldconfig
 Requires(post):		fileutils
@@ -731,6 +736,24 @@ ln -sf index.html.en $RPM_BUILD_ROOT%{_datadir}/html/index.html
 %clean
 rm -rf $RPM_BUILD_ROOT
 
+%pre
+if [ -n "`getgid http`" ]; then
+       if [ "`getgid http`" != "51" ]; then
+               echo "Error: group http doesn't have gid=51. Correct this before installing apache." 1>&2
+               exit 1
+       fi
+else
+       /usr/sbin/groupadd -g 51 -r -f http
+fi
+if [ -n "`id -u http 2>/dev/null`" ]; then
+       if [ "`id -u http`" != "51" ]; then
+               echo "Error: user http doesn't have uid=51. Correct this before installing apache." 1>&2
+               exit 1
+       fi
+else
+       /usr/sbin/useradd -u 51 -r -d /home/services/httpd -s /bin/false -c "HTTP User" -g http http 1>&2
+fi
+
 %post
 /sbin/ldconfig
 /sbin/chkconfig --add httpd
@@ -752,6 +775,10 @@ fi
 
 %postun
 /sbin/ldconfig
+if [ "$1" = "0" ]; then
+       /usr/sbin/userdel http
+       /usr/sbin/groupdel http
+fi
 
 %post mod_actions
 if [ -f /var/lock/subsys/httpd ]; then
