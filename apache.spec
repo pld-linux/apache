@@ -1,6 +1,3 @@
-cvs server: [21:06:10] waiting for kloczek's lock in /cvsroot/SOURCES
-cvs server: [21:06:40] waiting for walker's lock in /cvsroot/SOURCES
-cvs server: [21:07:10] obtained lock in /cvsroot/SOURCES
 # TODO:
 # - mod_case_filter
 # - mod_case_filter_in
@@ -30,6 +27,9 @@ Source6:	%{name}-httpd.conf
 Source8:	%{name}-mod_vhost_alias.conf
 Source9:	%{name}-mod_status.conf
 Source10:	%{name}-mod_proxy.conf
+Source11:	%{name}-mod_info.conf
+Source12:	%{name}-mod_ssl.conf
+Source13:	%{name}-mod_dav.conf
 Patch0:		%{name}-apxs.patch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 BuildRequires:	automake
@@ -660,10 +660,12 @@ install %{SOURCE4} $RPM_BUILD_ROOT/etc/sysconfig/apache
 
 touch $RPM_BUILD_ROOT/var/log/httpd/{access,error,agent,referer}_log
 
-install %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
+install %{SOURCE6}  $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
 install %{SOURCE8}  $RPM_BUILD_ROOT%{_sysconfdir}/mod_vhost_alias.conf
 install %{SOURCE9}  $RPM_BUILD_ROOT%{_sysconfdir}/mod_status.conf
 install %{SOURCE10} $RPM_BUILD_ROOT%{_sysconfdir}/mod_proxy.conf
+install %{SOURCE11} $RPM_BUILD_ROOT%{_sysconfdir}/mod_info.conf
+install %{SOURCE12} $RPM_BUILD_ROOT%{_sysconfdir}/mod_ssl.conf
 
 ln -sf index.html.en $RPM_BUILD_ROOT%{_datadir}/html/index.html
 
@@ -864,6 +866,9 @@ fi
 
 %post mod_dav
 %{_sbindir}/apxs -e -a -n dev %{_libexecdir}/mod_dav.so 1>&2
+if [ -f /etc/httpd/httpd.conf ] && ! grep -q "^Include.*mod_dav.conf" /etc/httpd/httpd.conf; then
+	echo "Include /etc/httpd/mod_dav.conf" >> /etc/httpd/httpd.conf
+fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -873,6 +878,9 @@ fi
 %preun mod_dav
 if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n dav %{_libexecdir}/mod_dav.so 1>&2
+	grep -v "^Include.*mod_dav.conf" /etc/httpd/httpd.conf > \
+		/etc/httpd/httpd.conf.tmp
+	mv -f /etc/httpd/httpd.conf.tmp /etc/httpd/httpd.conf
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
@@ -992,6 +1000,9 @@ fi
 
 %post mod_info
 %{_sbindir}/apxs -e -a -n info %{_libexecdir}/mod_info.so 1>&2
+if [ -f /etc/httpd/httpd.conf ] && ! grep -q "^Include.*mod_info.conf" /etc/httpd/httpd.conf; then
+	echo "Include /etc/httpd/mod_info.conf" >> /etc/httpd/httpd.conf
+fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -1000,6 +1011,9 @@ fi
 
 %preun mod_info
 if [ "$1" = "0" ]; then
+	grep -v "^Include.*mod_info.conf" /etc/httpd/httpd.conf > \
+		/etc/httpd/httpd.conf.tmp
+	mv -f /etc/httpd/httpd.conf.tmp /etc/httpd/httpd.conf
 	%{_sbindir}/apxs -e -A -n info %{_libexecdir}/mod_info.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
@@ -1052,6 +1066,9 @@ fi
 
 %post mod_ssl
 %{_sbindir}/apxs -e -a -n ssl %{_libexecdir}/mod_ssl.so 1>&2
+if [ -f /etc/httpd/httpd.conf ] && ! grep -q "^Include.*mod_ssl.conf" /etc/httpd/httpd.conf; then
+	echo "Include /etc/httpd/mod_ssl.conf" >> /etc/httpd/httpd.conf
+fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -1061,6 +1078,9 @@ fi
 %preun mod_ssl
 if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n ssl %{_libexecdir}/mod_ssl.so 1>&2
+	grep -v "^Include.*mod_ssl.conf" /etc/httpd/httpd.conf > \
+		/etc/httpd/httpd.conf.tmp
+	mv -f /etc/httpd/httpd.conf.tmp /etc/httpd/httpd.conf
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
@@ -1313,6 +1333,7 @@ fi
 
 %files mod_dav
 %defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/mod_dav.conf
 %attr(755,root,root) %{_libexecdir}/mod_dav*.so
 %{_datadir}/manual/mod/mod_dav*.html
 
@@ -1343,6 +1364,7 @@ fi
 
 %files mod_info
 %defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/mod_info.conf
 %attr(755,root,root) %{_libexecdir}/mod_info.so
 %{_datadir}/manual/mod/mod_info.html
 
@@ -1361,6 +1383,7 @@ fi
 
 %files mod_ssl
 %defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/mod_ssl.conf
 %attr(755,root,root) %{_libexecdir}/mod_ssl.so
 %{_datadir}/manual/ssl
 %{_datadir}/manual/mod/mod_ssl.html
