@@ -13,6 +13,7 @@
 # - --with-suexec-uidmin=500 or =1000 ?
 # - subpackages for MPMs
 # - check if all modules (*.so) are exactly the same for different MPMs
+# - SECURITY: http://securitytracker.com/alerts/2004/Sep/1011213.html
 #
 # Conditional build:
 %bcond_without	ssl		# build without SSL support
