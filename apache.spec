@@ -34,7 +34,7 @@ Summary(ru):	óÁÍÙÊ ÐÏÐÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.0.53
-Release:	2
+Release:	2.1
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -291,6 +291,7 @@ Summary(pl):	Modu³ Apache'a identyfikuj±cy u¿ytkowników na podstawie plików teks
 Group:		Networking/Daemons
 Provides:	apache(mod_auth) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Requires:	htpasswd
 
 %description mod_auth
 This package contains mod_auth module. It provides for user
@@ -698,6 +699,29 @@ Caches a static list of files in memory.
 %description mod_file_cache -l pl
 Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 
+%package -n htpasswd-%{name}
+Summary:	Apache2 htpasswd utility
+Group:		Networking/Utilities
+Provides:	htpasswd
+
+%description -n htpasswd-%{name}
+htpasswd from Apache2
+
+Usage:
+        htpasswd [-cmdpsD] passwordfile username
+        htpasswd -b[cmdpsD] passwordfile username password
+
+        htpasswd -n[mdps] username
+        htpasswd -nb[mdps] username password
+ -c  Create a new file.
+ -n  Don't update file; display results on stdout.
+ -m  Force MD5 encryption of the password.
+ -d  Force CRYPT encryption of the password (default).
+ -p  Do not encrypt the password (plaintext).
+ -s  Force SHA encryption of the password.
+ -b  Use the password from the command line rather than prompting for it.
+ -D  Delete the specified user.
+
 %prep
 %setup -q -n httpd-%{version}
 %patch0 -p1
@@ -924,6 +948,9 @@ ln -sf index.html.en $RPM_BUILD_ROOT%{_datadir}/html/index.html
 find $RPM_BUILD_ROOT%{_datadir}/manual -type f \
 	-name '*.xml' -o -name '*.xml.*' -o -name '*.html' \
 	| xargs rm -f
+
+# htpasswd goes to %{_bindir}
+mv $RPM_BUILD_ROOT%{_sbindir}/htpasswd $RPM_BUILD_ROOT%{_bindir}/
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -1578,8 +1605,6 @@ fi
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_auth.conf
 %attr(755,root,root) %{_libexecdir}/mod_auth.so
-%attr(755,root,root) %{_sbindir}/htpasswd
-%{_mandir}/man1/htpasswd.1*
 
 %files mod_auth_anon
 %defattr(644,root,root,755)
@@ -1713,3 +1738,8 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_vhost_alias.so
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_vhost_alias.conf
+
+%files -n htpasswd-%{name}
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_bindir}/htpasswd
+%{_mandir}/man1/htpasswd.1*
