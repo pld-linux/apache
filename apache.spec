@@ -27,7 +27,7 @@ Summary(uk):	Ó¡ –œ–’Ã—“Œ¶€…  Web-Server
 Summary(zh_CN):	Internet …œ”¶”√◊Óπ„∑∫µƒ Web ∑˛ŒÒ≥Ã–Ú°£
 Name:		apache
 Version:	1.3.26
-Release:	1
+Release:	2
 License:	Apache Group License
 Group:		Networking/Daemons
 URL:		http://www.apache.org/
@@ -1174,6 +1174,7 @@ fi
 %attr(755,root,root) %{_libexecdir}/mod_speling.so
 %attr(755,root,root) %{_libexecdir}/mod_userdir.so
 
+%attr(755,root,root) %{_bindir}/checkgid
 %attr(755,root,root) %{_bindir}/htdigest
 
 %attr(755,root,root) %{_sbindir}/ab
@@ -1427,8 +1428,10 @@ fi
 %{_datadir}/errordocs
 %dir %{_datadir}/icons
 %{_datadir}/icons/*.gif
+%{_datadir}/icons/*.png
 %dir %{_datadir}/icons/small
 %{_datadir}/icons/small/*.gif
+%{_datadir}/icons/small/*.png
 %attr(755,root,root) %{_datadir}/cgi-bin
 
 %files suexec
@@ -1456,6 +1459,7 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_auth.so
 %attr(755,root,root) %{_bindir}/htpasswd
+%{_datadir}/manual/howto/auth.html
 %{_datadir}/manual/mod/mod_auth.html
 
 %files mod_auth_anon
