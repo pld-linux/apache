@@ -81,8 +81,8 @@ Patch21:	%{name}-v6only-ENOPROTOOPT.patch
 Patch22:	%{name}-conffile-path.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	automake
-BuildRequires:	apr-devel >= 1:0.9.4-1
-BuildRequires:	apr-util-devel >= 1:0.9.5-0.3
+BuildRequires:	apr-devel >= 1:0.9.5-6
+BuildRequires:	apr-util-devel >= 1:0.9.5-5
 BuildRequires:	db-devel
 BuildRequires:	expat-devel
 BuildRequires:	gdbm-devel >= 1.8.3
@@ -104,7 +104,7 @@ Requires(postun):	/usr/sbin/groupdel
 Requires(post,preun):	/sbin/chkconfig
 Requires(post,postun):	/sbin/ldconfig
 Requires(post):	fileutils
-Requires:	apr-util >= 1:0.9.4-1
+Requires:	apr-util >= 1:0.9.5-5
 Requires:	/etc/mime.types
 Requires:	mailcap
 Requires:	psmisc >= 20.1
@@ -213,7 +213,7 @@ Summary(pt_BR):	Arquivos de inclusЦo do Apache para desenvolvimento de mСdulos
 Summary(ru):	Средства разработки модулей для веб-сервера Apache
 Group:		Networking/Utilities
 Requires:	%{name} = %{version}-%{release}
-Requires:	apr-util-devel >= 1:0.9.4
+Requires:	apr-util-devel >= 1:0.9.5-5
 Requires:	libtool
 Obsoletes:	apache-static
 
