@@ -12,8 +12,8 @@ Summary(pl):	Serwer WWW (World Wide Web)
 Summary(pt_BR):	Servidor HTTPD para prover serviços WWW
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
-Version:	1.3.22
-Release:	3
+Version:	1.3.23
+Release:	1
 License:	Apache Group License
 Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
@@ -612,7 +612,7 @@ install %{SOURCE10} $RPM_BUILD_ROOT%{_sysconfdir}/mod_proxy.conf
 
 ln -sf index.html.en $RPM_BUILD_ROOT%{_datadir}/html/index.html
 
-gzip -9nf ABOUT_APACHE src/CHANGES KEYS README
+gzip -9nf ABOUT_APACHE src/CHANGES README
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -1127,9 +1127,6 @@ fi
 %{_datadir}/manual/stopping.html.html
 %lang(en) %{_datadir}/manual/stopping.html.en
 %lang(fr) %{_datadir}/manual/stopping.html.fr
-%{_datadir}/manual/suexec.html.html
-%lang(en) %{_datadir}/manual/suexec.html.en
-%lang(ja) %{_datadir}/manual/suexec.html.ja.jis
 %{_datadir}/manual/upgrading_to_1_3.html
 %{_datadir}/manual/urlmapping.html
 %dir %{_datadir}/manual/howto
@@ -1206,7 +1203,6 @@ fi
 %{_datadir}/manual/programs/logresolve.html
 %{_datadir}/manual/programs/other.html
 %{_datadir}/manual/programs/rotatelogs.html
-%{_datadir}/manual/programs/suexec.html
 %dir %{_datadir}/manual/vhosts
 %{_datadir}/manual/vhosts/details.html
 %{_datadir}/manual/vhosts/examples.html
@@ -1243,6 +1239,7 @@ fi
 %lang(ko) %{_datadir}/html/index.html.kr.iso-kr
 %lang(de_LU) %{_datadir}/html/index.html.lu
 %lang(nl) %{_datadir}/html/index.html.nl
+%lang(nn) %{_datadir}/html/index.html.nn
 %lang(no) %{_datadir}/html/index.html.no
 %lang(pl) %{_datadir}/html/index.html.po.iso-pl
 %lang(pt_PT) %{_datadir}/html/index.html.pt
@@ -1268,6 +1265,10 @@ fi
 %files suexec
 %defattr(644,root,root,755)
 %attr(4755,root,root) %{_sbindir}/suexec
+%{_datadir}/manual/suexec.html.html
+%lang(en) %{_datadir}/manual/suexec.html.en
+%lang(ja) %{_datadir}/manual/suexec.html.ja.jis
+%{_datadir}/manual/programs/suexec.html
 
 %files devel
 %defattr(644,root,root,755)
@@ -1310,7 +1311,9 @@ fi
 %files mod_dir
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_dir.so
-%{_datadir}/manual/mod/mod_dir.html
+%{_datadir}/manual/mod/mod_dir.html.html
+%lang(en) %{_datadir}/manual/mod/mod_dir.html.en
+%lang(ja) %{_datadir}/manual/mod/mod_dir.html.ja.jis
 
 %files mod_expires
 %defattr(644,root,root,755)
