@@ -32,7 +32,7 @@ Summary(ru):	óÁÍÙÊ ÐÏÐÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.0.48
-Release:	0.2.0
+Release:	0.3.0
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -60,6 +60,40 @@ Patch4:		%{name}-apr.patch
 # taken from suse. project homepage http://www.metux.de/mpm/en/?patpage=index
 Patch5:		httpd-2.0.47-metuxmpm-r6.diff
 Patch6:		%{name}-posix_syntax
+Patch7:		httpd-2.0.40-xfsz.patch
+Patch8: 	httpd-2.0.45-davetag.patch
+Patch9: 	httpd-2.0.45-davfs.patch
+Patch10:        httpd-2.0.45-encode.patch
+Patch11:        httpd-2.0.45-export.patch
+Patch12:        httpd-2.0.45-proxy.patch
+Patch13:        httpd-2.0.46-dav401dest.patch
+Patch14:        httpd-2.0.46-davbadfrag.patch
+Patch15:        httpd-2.0.46-execfail.patch
+Patch16:        httpd-2.0.46-graceful.patch
+Patch17:        httpd-2.0.46-logtimez.patch
+Patch18:        httpd-2.0.46-md5dig.patch
+Patch19:        httpd-2.0.46-metharray.patch
+Patch20:        httpd-2.0.46-rolog.patch
+Patch21:        httpd-2.0.46-shmcb.patch
+Patch22:        httpd-2.0.46-sslerr.patch
+Patch23:        httpd-2.0.46-sslio.patch
+Patch24:        httpd-2.0.46-sslmutex.patch
+Patch25:        httpd-2.0.47-ldapshm.patch
+Patch26:        httpd-2.0.47-sslcleanup.patch
+Patch27:        httpd-2.0.48-abench.patch
+Patch28:        httpd-2.0.48-autoindex.patch
+Patch29:        httpd-2.0.48-CAN-2003-0020.patch
+Patch30:        httpd-2.0.48-corelimit.patch
+Patch31:        httpd-2.0.48-debuglog.patch
+Patch32:        httpd-2.0.48-dynlimit.patch
+Patch33:        httpd-2.0.48-fdsetsize.patch
+Patch34:        httpd-2.0.48-include.patch
+Patch35:        httpd-2.0.48-proxy11.patch
+Patch36:        httpd-2.0.48-sslpphrase.patch
+Patch37:        httpd-2.0.48-sslvars.patch
+Patch38:        httpd-2.0.48-status.patch
+Patch39:        httpd-2.0.48-usertrack.patch
+Patch40:        httpd-2.0.48-worker.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	automake
 BuildRequires:	apr-devel >= 1:0.9.4-1
@@ -611,6 +645,40 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 %patch4 -p1
 %patch6 -p1
 #%patch5 -p1
+%patch7 -p1
+%patch8 -p1
+%patch9 -p1
+%patch10 -p1
+%patch11 -p1
+%patch12 -p1
+%patch13 -p1
+%patch14 -p1
+%patch15 -p1
+%patch16 -p1
+%patch17 -p1
+%patch18 -p1
+%patch19 -p1
+%patch20 -p1
+%patch21 -p1
+%patch22 -p1
+%patch23 -p1
+%patch24 -p1
+%patch25 -p1
+%patch26 -p1
+%patch27 -p1
+%patch28 -p1
+%patch29 -p1
+%patch30 -p1
+%patch31 -p1
+%patch32 -p1
+%patch33 -p1
+%patch34 -p1
+%patch35 -p1
+%patch36 -p1
+%patch37 -p1
+%patch38 -p1
+%patch39 -p1
+%patch40 -p1
 
 %build
 # sanity check
@@ -624,6 +692,7 @@ fi
 %{__perl} -pi -e "s:\@exp_installbuilddir\@:%{_libdir}/apache/build:g" \
         support/apxs.in
 install /usr/share/automake/config.* build/
+CPPFLAGS="-DBIG_SECURITY_HOLE=1"
 %configure \
 	--prefix=%{_libexecdir} \
 	--enable-layout=PLD \
