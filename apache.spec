@@ -27,7 +27,7 @@ Summary(uk):	Ó¡ –œ–’Ã—“Œ¶€…  Web-Server
 Summary(zh_CN):	Internet …œ”¶”√◊Óπ„∑∫µƒ Web ∑˛ŒÒ≥Ã–Ú°£
 Name:		apache
 Version:	1.3.23
-Release:	5
+Release:	6
 License:	Apache Group License
 Group:		Networking/Daemons
 URL:		http://www.apache.org/
@@ -1386,7 +1386,7 @@ fi
 %lang(nn) %{_datadir}/html/index.html.nn
 %lang(no) %{_datadir}/html/index.html.no
 %lang(pl) %{_datadir}/html/index.html.po.iso-pl
-%lang(pt_PT) %{_datadir}/html/index.html.pt
+%lang(pt) %{_datadir}/html/index.html.pt
 %lang(pt_BR) %{_datadir}/html/index.html.pt-br
 %lang(ru) %{_datadir}/html/index.html.ru.cp-1251
 %lang(ru) %{_datadir}/html/index.html.ru.cp866
@@ -1395,7 +1395,7 @@ fi
 %lang(ru) %{_datadir}/html/index.html.ru.ucs2
 %lang(ru) %{_datadir}/html/index.html.ru.ucs4
 %lang(ru) %{_datadir}/html/index.html.ru.utf8
-%lang(se) %{_datadir}/html/index.html.se
+%lang(sv) %{_datadir}/html/index.html.se
 %lang(zh_TW) %{_datadir}/html/index.html.zh.Big5
 
 %{_datadir}/html/*.gif
