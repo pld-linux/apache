@@ -7,6 +7,11 @@
 # - mod_echo
 # - config examples for mod_*
 # - switch from worker to perchild when it will be working in apache
+# - check if all modules are (de)registered in %%post/%%postun
+# - find smart way to deregister module if its moved from main package to subpackage (maybe test -f ?)
+# - add %%post/%%postun to suexec
+# - --with-suexec-gidmin=500 or =100 ?
+# - --with-suexec-uidmin=500 or =1000 ?
 %include	/usr/lib/rpm/macros.perl
 Summary:	The most widely used Web server on the Internet
 Summary(de):	Leading World Wide Web-Server
@@ -17,7 +22,7 @@ Summary(pt_BR):	Servidor HTTPD para prover serviços WWW
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.0.40
-Release:	0.3
+Release:	0.4
 License:	Apache Group License
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/
@@ -616,7 +621,7 @@ Statyczne biblioteki APR.
 	--enable-rewrite \
 	--enable-so \
 	--with-mpm=worker \
-	--with-suexec-bin=%{_sbindir} \
+	--with-suexec-bin=%{_sbindir}/suexec \
 	--with-suexec-caller=http \
 	--with-suexec-docroot=%{_datadir} \
 	--with-suexec-uidmin=500 \
