@@ -1,7 +1,13 @@
 diff -urN httpd-2.0.35.org/support/apxs.in httpd-2.0.35/support/apxs.in
---- httpd-2.0.35.org/support/apxs.in	Sun Apr  7 20:03:52 2002
-+++ httpd-2.0.35/support/apxs.in	Sun Apr  7 20:11:06 2002
-@@ -66,7 +66,7 @@
+--- httpd-2.0.35.org/support/apxs.in	Thu Apr 11 14:09:07 2002
++++ httpd-2.0.35/support/apxs.in	Thu Apr 11 14:11:26 2002
+@@ -61,12 +61,12 @@
+ ##  Configuration
+ ##
+ 
+-my $prefix         = "@prefix@";
++my $prefix         = "/usr/lib/apache";
+ my $CFG_PREFIX     = $prefix;
  
  # read the configuration variables once
  my %config_vars = ();
@@ -10,3 +16,30 @@ diff -urN httpd-2.0.35.org/support/apxs.in httpd-2.0.35/support/apxs.in
  
  my $exec_prefix    = get_vars("exec_prefix");
  my $CFG_TARGET     = get_vars("progname");
+@@ -415,7 +415,7 @@
+         $la =~ s|\.c$|.la|;
+         my $o = $s;
+         $o =~ s|\.c$|.o|;
+-        push(@cmds, "$prefix/build/libtool $ltflags --mode=compile $CFG_CC $cflags -I$CFG_INCLUDEDIR $opt -c -o $lo $s && touch $slo");
++        push(@cmds, "/usr/bin/libtool $ltflags --mode=compile $CFG_CC $cflags -I$CFG_INCLUDEDIR $opt -c -o $lo $s && touch $slo");
+         unshift(@objs, $lo);
+     }
+ 
+@@ -440,7 +440,7 @@
+         $opt .= " -l$opt_l";
+     }
+ 
+-    push(@cmds, "$prefix/build/libtool $ltflags --mode=link $CFG_CC -o $dso_file -rpath $CFG_LIBEXECDIR -module -avoid-version $opt $lo");
++    push(@cmds, "/usr/bin/libtool $ltflags --mode=link $CFG_CC -o $dso_file -rpath $CFG_LIBEXECDIR -module -avoid-version $opt $lo");
+ 
+     #   execute the commands
+     &execute_cmds(@cmds);
+@@ -472,7 +472,7 @@
+         $t =~ s|\.la$|\.so|;
+         if ($opt_i) {
+ 	    push(@cmds, "$prefix/build/instdso.sh SH_LIBTOOL='" .
+-                 "$prefix/build/libtool' $f $CFG_LIBEXECDIR");
++                 "/usr/bin/libtool' $f $CFG_LIBEXECDIR");
+ 	    push(@cmds, "chmod 755 $CFG_LIBEXECDIR/$t");
+         }
+ 
