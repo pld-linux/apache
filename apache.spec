@@ -18,6 +18,7 @@
 # Conditional build:
 %bcond_without	ssl	# don't build with SSL support
 %bcond_without	ldap	# don't build with LDAP support
+%bcond_with	metuxmpm	# use METUX MPM
 #
 %include	/usr/lib/rpm/macros.perl
 # this is internal macro, don't change to %%apache_modules_api
@@ -646,7 +647,7 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 %patch3 -p1
 %patch4 -p1
 %patch6 -p1
-#%patch5 -p1
+%{?with_metuxmpm:%patch5 -p1}
 %patch7 -p1
 %patch8 -p1
 %patch9 -p1
@@ -742,7 +743,11 @@ CPPFLAGS="-DBIG_SECURITY_HOLE=1"
 	--enable-speling \
 	--enable-rewrite \
 	--enable-so \
+%if %{with metuxmpm}
+	--with-mpm=metuxmpm \
+%else
 	--with-mpm=worker \
+%endif
 	--with-suexec-bin=%{_sbindir}/suexec \
 	--with-suexec-caller=http \
 	--with-suexec-docroot=%{_datadir} \
