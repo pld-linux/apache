@@ -64,7 +64,6 @@ Patch18:	%{name}-EAPI-missing_files.patch
 Patch19:	%{name}-PLD-nov6.patch
 Patch20:	%{name}-configdir_skip_backups.patch
 Patch21:	%{name}-apxs-quiet.patch
-Patch22:	%{name}-security_htdigest_bufferoverflow.patch
 URL:		http://www.apache.org/
 BuildRequires:	db3-devel
 BuildRequires:	mm-devel >= 1.1.3
@@ -674,7 +673,6 @@ wa¿no¶ci mo¿e byæ ustalana w zale¿no¶ci od czasu modyfikacji plików
 %{?_without_ipv6:%patch19 -p1}
 %patch20 -p1
 %patch21 -p1
-%patch22 -p1
 
 %build
 OPTIM="%{rpmcflags} -DHARD_SERVER_LIMIT=2048" \
@@ -1231,7 +1229,9 @@ fi
 %{_datadir}/manual/configuring.html.en
 %lang(fr) %{_datadir}/manual/configuring.html.fr
 %lang(ja) %{_datadir}/manual/configuring.html.ja.jis
-%{_datadir}/manual/content-negotiation.html
+%{_datadir}/manual/content-negotiation.html.html
+%{_datadir}/manual/content-negotiation.html.en
+%lang(ja) %{_datadir}/manual/content-negotiation.html.ja.jis
 %{_datadir}/manual/custom-error.html.html
 %{_datadir}/manual/custom-error.html.en
 %lang(fr) %{_datadir}/manual/custom-error.html.fr
@@ -1300,6 +1300,7 @@ fi
 %{_datadir}/manual/mod/core.html.html
 %{_datadir}/manual/mod/core.html.en
 %lang(fr) %{_datadir}/manual/mod/core.html.fr
+%lang(ja) %{_datadir}/manual/mod/core.html.ja.jis
 %{_datadir}/manual/mod/directive-dict.html.html
 %{_datadir}/manual/mod/directive-dict.html.en
 %lang(fr) %{_datadir}/manual/mod/directive-dict.html.fr
@@ -1322,6 +1323,7 @@ fi
 %{_datadir}/manual/mod/mod_access.html.html
 %{_datadir}/manual/mod/mod_access.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_access.html.ja.jis
+%{_datadir}/manual/mod/mod_alias.html.html
 %{_datadir}/manual/mod/mod_alias.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_alias.html.ja.jis
 %{_datadir}/manual/mod/mod_asis.html.html
@@ -1337,7 +1339,9 @@ fi
 %lang(ja) %{_datadir}/manual/mod/mod_env.html.ja.jis
 %{_datadir}/manual/mod/mod_include.html
 %{_datadir}/manual/mod/mod_log_agent.html
-%{_datadir}/manual/mod/mod_log_config.html
+%{_datadir}/manual/mod/mod_log_config.html.html
+%{_datadir}/manual/mod/mod_log_config.html.en
+%lang(ja) %{_datadir}/manual/mod/mod_log_config.html.ja.jis
 %{_datadir}/manual/mod/mod_log_referer.html
 %{_datadir}/manual/mod/mod_mime.html.html
 %{_datadir}/manual/mod/mod_mime.html.en
@@ -1434,7 +1438,7 @@ fi
 %lang(ru) %{_datadir}/html/index.html.ru.ucs4
 %lang(ru) %{_datadir}/html/index.html.ru.utf8
 %lang(sv) %{_datadir}/html/index.html.se
-%lang(zh_TW) %{_datadir}/html/index.html.zh
+%lang(zh_TW) %{_datadir}/html/index.html.zh-tw.big5
 
 %{_datadir}/html/*.gif
 %{_datadir}/errordocs
@@ -1472,6 +1476,7 @@ fi
 %attr(755,root,root) %{_libexecdir}/mod_auth.so
 %attr(755,root,root) %{_bindir}/htpasswd
 %{_datadir}/manual/howto/auth.html
+%{_datadir}/manual/mod/mod_auth.html.html
 %{_datadir}/manual/mod/mod_auth.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_auth.html.ja.jis
 
