@@ -6,7 +6,7 @@ Summary(pl):	Serwer WWW (World Wide Web)
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	1.3.12
-Release:	5
+Release:	6
 License:	BSD-like
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
@@ -28,6 +28,7 @@ Patch5:		apache-EAPI.patch
 Patch6:		apache-v6-PLD-2.patch.gz
 Patch7:		apache-mm_conf.patch
 Patch8:		apache-modules_symbols.patch
+Patch9:		apache-apxs_force_rm_cp.patch
 Provides:	httpd
 Provides:	webserver
 Prereq:		/sbin/chkconfig
@@ -386,9 +387,10 @@ Requires:	%{name}(EAPI) = %{version}
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
+%patch6 -p1
 %patch7 -p1
 %patch8 -p1
-%patch6 -p1
+%patch9 -p1
 
 %build
 
