@@ -1,0 +1,13 @@
+--- apache_1.3.17/src/modules/standard/mod_include.c.orig	Fri Feb  9 20:24:46 2001
++++ apache_1.3.17/src/modules/standard/mod_include.c	Fri Feb  9 21:50:39 2001
+@@ -718,8 +718,8 @@
+                 for (p = r; p != NULL && !founddupe; p = p->main) {
+ 		    request_rec *q;
+ 		    for (q = p; q != NULL; q = q->prev) {
+-			if ( (strcmp(q->filename, rr->filename) == 0) ||
+-			     (strcmp(q->uri, rr->uri) == 0) ){
++			if ( (q->filename!=NULL && (strcmp(q->filename, rr->filename) == 0))
++			     || (q->uri!=NULL && (strcmp(q->uri, rr->uri) == 0)) ){
+ 			    founddupe = 1;
+ 			    break;
+ 			}
