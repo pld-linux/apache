@@ -1063,10 +1063,9 @@ diff -Nur apache_1.3.28.orig/src/main/http_config.c apache_1.3.28/src/main/http_
  }
  
  
-diff -Nur apache_1.3.28.orig/src/main/http_core.c apache_1.3.28/src/main/http_core.c
---- apache_1.3.28.orig/src/main/http_core.c	Mon Jul  7 15:02:28 2003
-+++ apache_1.3.28/src/main/http_core.c	Fri Jul 25 12:11:48 2003
-@@ -71,6 +71,7 @@
+--- apache_1.3.31/src/main/http_core.c.orig	Mon May  3 22:15:26 2004
++++ apache_1.3.31/src/main/http_core.c	Wed May 12 13:06:21 2004
+@@ -28,6 +28,7 @@
  #include "util_md5.h"
  #include "scoreboard.h"
  #include "fnmatch.h"
@@ -1074,7 +1073,16 @@ diff -Nur apache_1.3.28.orig/src/main/http_core.c apache_1.3.28/src/main/http_co
  
  #ifdef USE_MMAP_FILES
  #include <sys/mman.h>
-@@ -651,7 +652,9 @@
+@@ -565,7 +565,7 @@
+      * file if you care. So the adhoc value should do.
+      */
+     return ap_psprintf(r->pool,"%pp%pp%pp%pp%pp",
+-           (void *)&((r->connection->local_addr).sin_addr ),
++           (void *)&(((struct sockaddr_in *)&(r->connection->local_addr))->sin_addr),
+            (void *)ap_user_name,
+            (void *)ap_listeners,
+            (void *)ap_server_argv0,
+@@ -660,7 +661,9 @@
   */
  static ap_inline void do_double_reverse (conn_rec *conn)
  {
@@ -1085,7 +1093,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_core.c apache_1.3.28/src/main/http_co
  
      if (conn->double_reverse) {
  	/* already done */
-@@ -663,19 +666,43 @@
+@@ -672,19 +675,43 @@
          conn->remote_host = ""; /* prevent another lookup */
  	return;
      }
@@ -1140,7 +1148,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_core.c apache_1.3.28/src/main/http_co
      /* invalidate possible reverse-resolved hostname if forward lookup fails */
      conn->remote_host = "";
  }
-@@ -683,10 +710,9 @@
+@@ -692,10 +719,9 @@
  API_EXPORT(const char *) ap_get_remote_host(conn_rec *conn, void *dir_config,
  					    int type)
  {
@@ -1152,7 +1160,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_core.c apache_1.3.28/src/main/http_co
  
      /* If we haven't checked the host name, and we want to */
      if (dir_config) {
-@@ -708,10 +734,14 @@
+@@ -717,10 +743,14 @@
  	    || hostname_lookups != HOSTNAME_LOOKUP_OFF)) {
  	old_stat = ap_update_child_status(conn->child_num, SERVER_BUSY_DNS,
  					  (request_rec*)NULL);
@@ -1171,7 +1179,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_core.c apache_1.3.28/src/main/http_co
  	    ap_str_tolower(conn->remote_host);
  	   
  	    if (hostname_lookups == HOSTNAME_LOOKUP_DOUBLE) {
-@@ -789,6 +819,7 @@
+@@ -798,6 +828,7 @@
  {
      conn_rec *conn = r->connection;
      core_dir_config *d;
@@ -1179,7 +1187,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_core.c apache_1.3.28/src/main/http_co
  
      d = (core_dir_config *)ap_get_module_config(r->per_dir_config,
  						&core_module);
-@@ -798,23 +829,22 @@
+@@ -807,23 +838,22 @@
      }
      if (d->use_canonical_name == USE_CANONICAL_NAME_DNS) {
          if (conn->local_host == NULL) {
@@ -1215,26 +1223,16 @@ diff -Nur apache_1.3.28.orig/src/main/http_core.c apache_1.3.28/src/main/http_co
  	    (void) ap_update_child_status(conn->child_num, old_stat, r);
  	}
  	return conn->local_host;
-@@ -833,11 +863,13 @@
- 
-     if (d->use_canonical_name == USE_CANONICAL_NAME_OFF
- 	|| d->use_canonical_name == USE_CANONICAL_NAME_DNS) {
--        return r->hostname ? ntohs(r->connection->local_addr.sin_port)
--			   : port;
--    }
--    /* default */
--    return port;
-+        return r->hostname
-+	    ?  ntohs(((struct sockaddr_in *)&r->connection->local_addr)->sin_port)
-+	    : port;
-+    }
-+    return r->hostname
-+	? ntohs(((struct sockaddr_in *)&r->connection->local_addr)->sin_port)
-+	: port;
- }
- 
- API_EXPORT(char *) ap_construct_url(pool *p, const char *uri,
-@@ -2569,12 +2601,25 @@
+@@ -835,7 +865,7 @@
+ API_EXPORT(unsigned) ap_get_server_port(const request_rec *r)
+ {
+     unsigned port;
+-    unsigned cport = ntohs(r->connection->local_addr.sin_port);
++    unsigned cport = ntohs(((struct sockaddr_in *)&r->connection->local_addr)->sin_port);
+     core_dir_config *d =
+       (core_dir_config *)ap_get_module_config(r->per_dir_config, &core_module);
+     
+@@ -2621,12 +2651,25 @@
  
  static const char *set_bind_address(cmd_parms *cmd, void *dummy, char *arg) 
  {
@@ -1261,7 +1259,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_core.c apache_1.3.28/src/main/http_co
      return NULL;
  }
  
-@@ -2606,48 +2651,71 @@
+@@ -2658,48 +2701,71 @@
      return NULL;
  }
  
@@ -1363,7 +1361,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_core.c apache_1.3.28/src/main/http_co
      new->fd = -1;
      new->used = 0;
      new->next = ap_listeners;
-@@ -3524,7 +3592,7 @@
+@@ -3602,7 +3668,7 @@
  { "ThreadStackSize", set_threadstacksize, NULL, RSRC_CONF, TAKE1,
    "Stack size each created thread will use."},
  #endif
@@ -1372,7 +1370,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_core.c apache_1.3.28/src/main/http_co
    "A port number or a numeric IP address and a port number"},
  { "SendBufferSize", set_send_buffer_size, NULL, RSRC_CONF, TAKE1,
    "Send buffer size in bytes"},
-@@ -3558,7 +3626,7 @@
+@@ -3636,7 +3702,7 @@
    "Name of the config file to be included" },
  { "LogLevel", set_loglevel, NULL, RSRC_CONF, TAKE1,
    "Level of verbosity in error logging" },
@@ -1754,10 +1752,9 @@ diff -Nur apache_1.3.28.orig/src/main/http_main.c apache_1.3.28/src/main/http_ma
  	case '?':
  	    break;
  	case 'R':
-diff -Nur apache_1.3.28.orig/src/main/http_vhost.c apache_1.3.28/src/main/http_vhost.c
---- apache_1.3.28.orig/src/main/http_vhost.c	Mon Feb  3 18:13:23 2003
-+++ apache_1.3.28/src/main/http_vhost.c	Fri Jul 25 11:01:55 2003
-@@ -68,6 +68,7 @@
+--- apache_1.3.31/src/main/http_vhost.c.orig	Mon Mar 29 23:03:25 2004
++++ apache_1.3.31/src/main/http_vhost.c	Wed May 12 13:49:13 2004
+@@ -25,6 +25,7 @@
  #include "http_log.h"
  #include "http_vhost.h"
  #include "http_protocol.h"
@@ -1765,7 +1762,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_vhost.c apache_1.3.28/src/main/http_v
  
  /*
   * After all the definitions there's an explanation of how it's all put
-@@ -165,78 +166,114 @@
+@@ -122,78 +123,114 @@
   * *paddr is the variable used to keep track of **paddr between calls
   * port is the default port to assume
   */
@@ -1929,7 +1926,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_vhost.c apache_1.3.28/src/main/http_v
      return NULL;
  }
  
-@@ -250,7 +287,8 @@
+@@ -207,7 +244,8 @@
      /* start the list of addreses */
      addrs = &s->addrs;
      while (hostname[0]) {
@@ -1939,7 +1936,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_vhost.c apache_1.3.28/src/main/http_v
  	if (err) {
  	    *addrs = NULL;
  	    return err;
-@@ -268,10 +306,11 @@
+@@ -225,10 +263,11 @@
  }
  
  
@@ -1953,7 +1950,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_vhost.c apache_1.3.28/src/main/http_v
  			    cmd->server->port);
  }
  
-@@ -345,6 +384,19 @@
+@@ -302,6 +341,19 @@
      return ((key >> 8) ^ key) % IPHASH_TABLE_SIZE;
  }
  
@@ -1973,7 +1970,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_vhost.c apache_1.3.28/src/main/http_v
  
  
  static ipaddr_chain *new_ipaddr_chain(pool *p,
-@@ -372,25 +424,77 @@
+@@ -329,25 +381,77 @@
      return new;
  }
  
@@ -2061,7 +2058,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_vhost.c apache_1.3.28/src/main/http_v
      return NULL;
  }
  
-@@ -416,21 +520,7 @@
+@@ -373,21 +477,7 @@
      int len;
      char buf[MAX_STRING_LEN];
  
@@ -2084,7 +2081,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_vhost.c apache_1.3.28/src/main/http_v
      if (ic->names == NULL) {
  	if (ic->server == NULL)
  	    fprintf(f, "%-22s WARNING: No <VirtualHost> defined for this NameVirtualHost!\n", buf);
-@@ -558,10 +648,37 @@
+@@ -515,10 +605,37 @@
       * occured in the config file, we'll copy it in that order.
       */
      for (sar = name_vhost_list; sar; sar = sar->next) {
@@ -2092,7 +2089,8 @@ diff -Nur apache_1.3.28.orig/src/main/http_vhost.c apache_1.3.28/src/main/http_v
 +	unsigned bucket = hash_addr((struct sockaddr *)&sar->host_addr);
  	ipaddr_chain *ic = new_ipaddr_chain(p, NULL, sar);
 +	int wildcard;
-+
+ 
+-	if (sar->host_addr.s_addr != INADDR_ANY) {
 +	wildcard = 0;
 +	switch (sar->host_addr.ss_family) {
 +	case AF_INET:
@@ -2118,18 +2116,22 @@ diff -Nur apache_1.3.28.orig/src/main/http_vhost.c apache_1.3.28/src/main/http_v
 +	  }
 +#endif
 +	}
- 
--	if (sar->host_addr.s_addr != INADDR_ANY) {
++
 +	if (!wildcard) {
  	    *iphash_table_tail[bucket] = ic;
  	    iphash_table_tail[bucket] = &ic->next;
  	}
-@@ -588,12 +705,45 @@
+@@ -545,12 +662,45 @@
  	has_default_vhost_addr = 0;
  	for (sar = s->addrs; sar; sar = sar->next) {
  	    ipaddr_chain *ic;
 +	    int wildcard;
-+
+ 
+-	    if (sar->host_addr.s_addr == DEFAULT_VHOST_ADDR
+-		|| sar->host_addr.s_addr == INADDR_ANY) {
+-		ic = find_default_server(sar->host_port);
+-		if (!ic || !add_name_vhost_config(p, main_s, s, sar, ic)) {
+-		    if (ic && ic->sar->host_port != 0) {
 +	    wildcard = 0;
 +	    switch (sar->host_addr.ss_family) {
 +	    case AF_INET:
@@ -2157,12 +2159,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_vhost.c apache_1.3.28/src/main/http_v
 +	      }
 +#endif
 +	    }
- 
--	    if (sar->host_addr.s_addr == DEFAULT_VHOST_ADDR
--		|| sar->host_addr.s_addr == INADDR_ANY) {
--		ic = find_default_server(sar->host_port);
--		if (!ic || !add_name_vhost_config(p, main_s, s, sar, ic)) {
--		    if (ic && ic->sar->host_port != 0) {
++
 +	    if (wildcard) {
 +		/* add it to default bucket for each appropriate sar
 +		 * since we need to do a port test
@@ -2175,7 +2172,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_vhost.c apache_1.3.28/src/main/http_v
  			ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_WARNING,
  			    main_s, "_default_ VirtualHost overlap on port %u,"
  			    " the first has precedence", sar->host_port);
-@@ -606,10 +756,11 @@
+@@ -563,10 +713,11 @@
  	    }
  	    else {
  		/* see if it matches something we've already got */
@@ -2189,7 +2186,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_vhost.c apache_1.3.28/src/main/http_v
  
  		    ic = new_ipaddr_chain(p, s, sar);
  		    ic->next = *iphash_table_tail[bucket];
-@@ -646,19 +797,33 @@
+@@ -603,19 +754,33 @@
  	    }
  	    else {
  		struct hostent *h;
@@ -2228,11 +2225,11 @@ diff -Nur apache_1.3.28.orig/src/main/http_vhost.c apache_1.3.28/src/main/http_v
  		    s->server_hostname =
  			ap_pstrdup(p, "bogus_host_without_reverse_dns");
  		}
-@@ -705,35 +870,58 @@
-     char *host = ap_palloc(r->pool, strlen(r->hostname) + 1);
+@@ -663,45 +828,80 @@
      const char *src;
      char *dst;
-+    const char *u = NULL, *v = NULL;
+     const char *port_str;
++    const char *u, *v = NULL;
  
      /* check and copy the host part */
 -    src = r->hostname;
@@ -2251,67 +2248,93 @@ diff -Nur apache_1.3.28.orig/src/main/http_vhost.c apache_1.3.28/src/main/http_v
 -	    goto bad;
 -	}
 -        if (*src == ':') {
+-            port_str = src + 1;
 -            /* check the port part */
 -            while (*++src) {
 -                if (!ap_isdigit(*src)) {
--                    goto bad;
++    if (*u == '[') { /* IPv6 numeral address in brackets */
++        v = strchr(u, ']');
++        if (v == NULL) {
++            /* missing closing bracket */
++            goto bad;
++        }
++        if (v == (u + 1)) {
++            /* bad empty address */
++            goto bad;
++        }
++        for (src = u+1; src < v; src++)  /* copy IPv6 adress */
++            *dst = *src;
++        v++;
++        if (*v == ':') {
++            port_str = v + 1;
++            v++;
++            while (*v) {  /* check if portnum is correct */
++                if (!ap_isdigit(*v++))
+                     goto bad;
 -                }
--            }
+             }
 -            if (src[-1] == ':')
--                goto bad;
--            else
++            if (v[-1] == ':')
++     	        goto bad;
++             else {
++                 /* a known "good" port value */
++                 int iport;
++                 iport = atoi(port_str);
++                 if (iport < 1 || iport > 65535) {
++                     goto bad;
++                 }
++                 r->parsed_uri.port_str = ap_pstrdup(r->pool, port_str);
++                 r->parsed_uri.port = iport;
++             }
++        }
++    } else {
++        while (*src) {
++            if (*src == '.') {
++                *dst++ = *src++;
++                if (*src == '.')
++                    goto bad;
++                else
++                    continue;
++            }
++            if (*src == '/' || *src == '\\') {
+                 goto bad;
+-            else {
+-                /* a known "good" port value */
+-                int iport;
+-                iport = atoi(port_str);
+-                if (iport < 1 || iport > 65535) {
++            }
++            if (*src == ':') {
++                port_str = src + 1;
++                /* sheck the port part */
++                while (*++src) {
++                    if (!ap_isdigit(*src)) {
++                        goto bad;
++                    }
++                }
++                if (src[-1] == ':')
+                     goto bad;
++                else {
++                  /* a known "good" port value */
++                    int iport;
++                    iport = atoi(port_str);
++                    if (iport < 1 || iport > 65535) {
++                        goto bad;
++                    }
++                    r->parsed_uri.port_str = ap_pstrdup(r->pool, port_str);
++                    r->parsed_uri.port = iport;
+                 }
+-                r->parsed_uri.port_str = ap_pstrdup(r->pool, port_str);
+-                r->parsed_uri.port = iport;
 -                break;
-+     if (*u == '[') { /* IPv6 numeral address in brackets */
-+         v = strchr(u, ']');
-+       if (v == NULL) {
-+           /* missing closing bracket */
-+             goto bad;
-+       }
-+         if (v == (u + 1)) {
-+             /* bad empty address */
-+             goto bad;
-+       }
-+       for (src = u+1; src < v; src++)  /* copy IPv6 adress */
-+           *dst = *src;
-+       v++;
-+       if (*v == ':') {
-+          v++;
-+          while (*v) {  /* check if portnum is correct */
-+              if (!ap_isdigit(*v++))
-+                  goto bad;
-+          }
+             }
++            *dst++ = *src++;
          }
 -	*dst++ = *src++;
-+     } else {
-+         while (*src) {
-+           if (*src == '.') {
-+               *dst++ = *src++;
-+               if (*src == '.')
-+                   goto bad;
-+               else
-+                   continue;
-+           }
-+           if (*src == '/' || *src == '\\') {
-+               goto bad;
-+           }
-+           if (*src == ':') {
-+               /* sheck the port part */
-+               while (*++src) {
-+                   if (!ap_isdigit(*src)) {
-+                       goto bad;
-+                   }
-+               }
-+               if (src[-1] == ':')
-+                   goto bad;
-+               else
-+                   break;
-+           }
-+           *dst++ = *src++;
-+         }
      }
      /* strip trailing gubbins */
      if (dst > host && dst[-1] == '.') {
-@@ -748,7 +936,7 @@
+@@ -716,7 +916,7 @@
  bad:
      r->status = HTTP_BAD_REQUEST;
      ap_log_rerror(APLOG_MARK, APLOG_NOERRNO|APLOG_ERR, r,
@@ -2320,7 +2343,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_vhost.c apache_1.3.28/src/main/http_v
      return;
  }
  
-@@ -851,11 +1039,25 @@
+@@ -819,11 +1019,25 @@
       *   names we'll match have ports associated with them
       */
      const char *host = r->hostname;
@@ -2347,7 +2370,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_vhost.c apache_1.3.28/src/main/http_v
      last_s = NULL;
  
      /* Recall that the name_chain is a list of server_addr_recs, some of
-@@ -910,7 +1112,22 @@
+@@ -878,7 +1092,22 @@
      server_rec *s;
      server_rec *last_s;
      name_chain *src;
@@ -2371,7 +2394,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_vhost.c apache_1.3.28/src/main/http_v
  
      /*
       * This is in conjunction with the ServerPath code in http_core, so we
-@@ -970,10 +1187,22 @@
+@@ -938,10 +1167,22 @@
  API_EXPORT(void) ap_update_vhost_given_ip(conn_rec *conn)
  {
      ipaddr_chain *trav;
@@ -2396,7 +2419,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_vhost.c apache_1.3.28/src/main/http_v
      if (trav) {
  	/* save the name_chain for later in case this is a name-vhost */
  	conn->vhost_lookup_data = trav->names;
-@@ -991,6 +1220,7 @@
+@@ -959,6 +1200,7 @@
  	return;
      }
  
@@ -3379,10 +3402,9 @@ diff -Nur apache_1.3.28.orig/src/modules/proxy/proxy_ftp.c apache_1.3.28/src/mod
          do
              csd = accept(dsock, (struct sockaddr *)&server, &clen);
          while (csd == -1 && errno == EINTR);
-diff -Nur apache_1.3.28.orig/src/modules/proxy/proxy_http.c apache_1.3.28/src/modules/proxy/proxy_http.c
---- apache_1.3.28.orig/src/modules/proxy/proxy_http.c	Fri Jul 25 11:00:49 2003
-+++ apache_1.3.28/src/modules/proxy/proxy_http.c	Fri Jul 25 11:25:37 2003
-@@ -156,9 +156,8 @@
+--- apache_1.3.31/src/modules/proxy/proxy_http.c.orig	Wed May 12 12:56:16 2004
++++ apache_1.3.31/src/modules/proxy/proxy_http.c	Wed May 12 14:09:27 2004
+@@ -113,9 +113,8 @@
      table *req_hdrs, *resp_hdrs;
      array_header *reqhdrs_arr;
      table_entry *reqhdrs_elts;
@@ -3394,7 +3416,7 @@ diff -Nur apache_1.3.28.orig/src/modules/proxy/proxy_http.c apache_1.3.28/src/mo
      BUFF *f;
      char buffer[HUGE_STRING_LEN];
      char portstr[32];
-@@ -184,9 +183,6 @@
+@@ -141,9 +140,6 @@
      if (conf->cache.root == NULL)
          nocache = 1;
  
@@ -3404,7 +3426,7 @@ diff -Nur apache_1.3.28.orig/src/modules/proxy/proxy_http.c apache_1.3.28/src/mo
      /* We break the URL into host, port, path-search */
  
      urlptr = strstr(url, "://");
-@@ -194,6 +190,8 @@
+@@ -151,6 +147,8 @@
          return HTTP_BAD_REQUEST;
      urlptr += 3;
      destport = DEFAULT_HTTP_PORT;
@@ -3413,7 +3435,7 @@ diff -Nur apache_1.3.28.orig/src/modules/proxy/proxy_http.c apache_1.3.28/src/mo
  #ifdef EAPI
      ap_hook_use("ap::mod_proxy::http::handler::set_destport", 
                  AP_HOOK_SIG2(int,ptr), 
-@@ -212,7 +210,20 @@
+@@ -169,7 +167,20 @@
          urlptr = strp;
          desthost = q;
      }
@@ -3435,7 +3457,7 @@ diff -Nur apache_1.3.28.orig/src/modules/proxy/proxy_http.c apache_1.3.28/src/mo
      strp2 = strchr(desthost, ':');
      if (strp2 != NULL) {
          *(strp2++) = '\0';
-@@ -222,46 +233,71 @@
+@@ -179,46 +190,71 @@
          }
      }
  
@@ -3531,7 +3553,7 @@ diff -Nur apache_1.3.28.orig/src/modules/proxy/proxy_http.c apache_1.3.28/src/mo
  
  #if !defined(TPF) && !defined(BEOS)
      if (conf->recv_buffer_size) {
-@@ -274,28 +310,12 @@
+@@ -231,38 +267,13 @@
      }
  #endif
  
@@ -3544,6 +3566,11 @@ diff -Nur apache_1.3.28.orig/src/modules/proxy/proxy_http.c apache_1.3.28/src/mo
 -            i = ap_proxy_doconnect(sock, &server, r);
 -            if (i == 0)
 -                break;
+-            /*
+-             * Even if the connection was unsuccesful we should
+-             * reinit the socket
+-             */
+-            sock = ap_psocket_ex(p, PF_INET, SOCK_STREAM, IPPROTO_TCP, 1);
 -        }
 -    }
 -#else
@@ -3552,18 +3579,23 @@ diff -Nur apache_1.3.28.orig/src/modules/proxy/proxy_http.c apache_1.3.28/src/mo
 -        memcpy(&server.sin_addr, server_hp.h_addr_list[j],
 -               sizeof(struct in_addr));
 -        i = ap_proxy_doconnect(sock, &server, r);
-+	i = ap_proxy_doconnect(sock, res->ai_addr, r);
++        i = ap_proxy_doconnect(sock, res->ai_addr, r);
          if (i == 0)
              break;
--        j++;
-+	ap_pclosesocket(p, sock); 
+-        /*
+-         * Even if the connection was unsuccesful we should
+-         * reinit the socket
+-         */
+-        sock = ap_psocket_ex(p, PF_INET, SOCK_STREAM, IPPROTO_TCP, 1);
++        ap_pclosesocket(p, sock);
+         j++;
      }
 -#endif
 +    freeaddrinfo(res0);
      if (i == -1) {
          if (proxyhost != NULL)
              return DECLINED;    /* try again another way */
-@@ -597,17 +617,30 @@
+@@ -564,17 +575,30 @@
          ap_table_set(resp_hdrs, "Content-Location", proxy_location_reverse_map(r, urlstr));
  
  /* check if NoCache directive on this host */
@@ -3732,10 +3764,9 @@ diff -Nur apache_1.3.28.orig/src/modules/proxy/proxy_util.c apache_1.3.28/src/mo
      }
      ap_kill_timeout(r);
  
-diff -Nur apache_1.3.28.orig/src/modules/standard/mod_access.c apache_1.3.28/src/modules/standard/mod_access.c
---- apache_1.3.28.orig/src/modules/standard/mod_access.c	Mon Feb  3 18:13:27 2003
-+++ apache_1.3.28/src/modules/standard/mod_access.c	Fri Jul 25 11:01:55 2003
-@@ -74,7 +74,10 @@
+--- apache_1.3.31/src/modules/standard/mod_access.c.orig	Sun Mar  7 22:47:14 2004
++++ apache_1.3.31/src/modules/standard/mod_access.c	Wed May 12 14:38:21 2004
+@@ -31,7 +31,10 @@
      T_ALL,
      T_IP,
      T_HOST,
@@ -3747,14 +3778,9 @@ diff -Nur apache_1.3.28.orig/src/modules/standard/mod_access.c apache_1.3.28/src
  };
  
  typedef struct {
-@@ -82,9 +85,15 @@
-     union {
- 	char *from;
- 	struct {
--	    unsigned long net;
--	    unsigned long mask;
-+	    struct in_addr net;
-+	    struct in_addr mask;
+@@ -42,6 +45,12 @@
+ 	    struct in_addr net;
+ 	    struct in_addr mask;
  	} ip;
 +#ifdef INET6
 +	struct {
@@ -3765,11 +3791,11 @@ diff -Nur apache_1.3.28.orig/src/modules/standard/mod_access.c apache_1.3.28/src
      } x;
      enum allowdeny_type type;
  } allowdeny;
-@@ -167,90 +176,230 @@
+@@ -124,94 +133,223 @@
  
      }
      else if ((s = strchr(where, '/'))) {
--	unsigned long mask;
+-	struct in_addr mask;
 +	struct addrinfo hints, *resnet, *resmask;
 +	struct sockaddr_storage net, mask;
 +	int error;
@@ -3782,15 +3808,19 @@ diff -Nur apache_1.3.28.orig/src/modules/standard/mod_access.c apache_1.3.28/src
  	*s++ = '\0';
  
 -	if (!is_ip(where)
--	    || (a->x.ip.net = ap_inet_addr(where)) == INADDR_NONE) {
+-	    || (a->x.ip.net.s_addr = ap_inet_addr(where)) == INADDR_NONE) {
+-	    a->type = T_FAIL;
+-	    return "syntax error in network portion of network/netmask";
 +	justdigits = 0;
 +	for (p = s; *p; p++) {
 +	    if (!isdigit(*p))
 +		break;
-+	}
+ 	}
 +	if (!*p)
 +	    justdigits++;
-+
+ 
+-	/* is_ip just tests if it matches [\d.]+ */
+-	if (!is_ip(s)) {
 +	memset(&hints, 0, sizeof(hints));
 +	hints.ai_family = PF_UNSPEC;
 +	hints.ai_socktype = SOCK_STREAM;	/*dummy*/
@@ -3803,18 +3833,16 @@ diff -Nur apache_1.3.28.orig/src/modules/standard/mod_access.c apache_1.3.28/src
 +	    if (resnet)
 +		freeaddrinfo(resnet);
  	    a->type = T_FAIL;
- 	    return "syntax error in network portion of network/netmask";
+-	    return "syntax error in mask portion of network/netmask";
++	    return "syntax error in network portion of network/netmask";
  	}
-+	if (resnet->ai_next) {
-+	    freeaddrinfo(resnet);
-+	    a->type = T_FAIL;
-+	    return "network/netmask resolved to multiple addresses";
-+	}
-+	memcpy(&net, resnet->ai_addr, resnet->ai_addrlen);
-+	freeaddrinfo(resnet);
- 
--	/* is_ip just tests if it matches [\d.]+ */
--	if (!is_ip(s)) {
+-	/* is it in /a.b.c.d form? */
+-	if (strchr(s, '.')) {
+-	    mask.s_addr = ap_inet_addr(s);
+-	    if (mask.s_addr == INADDR_NONE) {
+-		a->type = T_FAIL;
+-		return "syntax error in mask portion of network/netmask";
+-	    }
 +	switch (net.ss_family) {
 +	case AF_INET:
 +	    a->type = T_IP;
@@ -3828,15 +3856,15 @@ diff -Nur apache_1.3.28.orig/src/modules/standard/mod_access.c apache_1.3.28/src
 +	    break;
 +#endif
 +	default:
- 	    a->type = T_FAIL;
--	    return "syntax error in mask portion of network/netmask";
++	    a->type = T_FAIL;
 +	    return "unknown address family for network";
  	}
--	/* is it in /a.b.c.d form? */
--	if (strchr(s, '.')) {
--	    mask = ap_inet_addr(s);
--	    if (mask == INADDR_NONE) {
-+
+-	else {
+-	    int i;
+ 
+-	    /* assume it's in /nnn form */
+-	    i = atoi(s);
+-	    if (i > 32 || i <= 0) {
 +	if (!justdigits) {
 +	    memset(&hints, 0, sizeof(hints));
 +	    hints.ai_family = PF_UNSPEC;
@@ -3850,21 +3878,13 @@ diff -Nur apache_1.3.28.orig/src/modules/standard/mod_access.c apache_1.3.28/src
 +		if (resmask)
 +		    freeaddrinfo(resmask);
  		a->type = T_FAIL;
- 		return "syntax error in mask portion of network/netmask";
- 	    }
--	}
--	else {
--	    /* assume it's in /nnn form */
--	    mask = atoi(s);
--	    if (mask > 32 || mask <= 0) {
--		a->type = T_FAIL;
 -		return "invalid mask in network/netmask";
 -	    }
--	    mask = 0xFFFFFFFFUL << (32 - mask);
--	    mask = htonl(mask);
+-	    mask.s_addr = 0xFFFFFFFFUL << (32 - i);
+-	    mask.s_addr = htonl(mask.s_addr);
 -	}
 -	a->x.ip.mask = mask;
--        a->x.ip.net  = (a->x.ip.net & mask);   /* pjr - This fixes PR 4770 */
+-        a->x.ip.net.s_addr  = (a->x.ip.net.s_addr & mask.s_addr);   /* pjr - This fixes PR 4770 */
 -    }
 -    else if (ap_isdigit(*where) && is_ip(where)) {
 -	/* legacy syntax for ip addrs: a.b.c. ==> a.b.c.0/24 for example */
@@ -3875,12 +3895,14 @@ diff -Nur apache_1.3.28.orig/src/modules/standard/mod_access.c apache_1.3.28/src
 -	a->type = T_IP;
 -	/* parse components */
 -	s = where;
--	a->x.ip.net = 0;
--	a->x.ip.mask = 0;
+-	a->x.ip.net.s_addr = 0;
+-	a->x.ip.mask.s_addr = 0;
 -	shift = 24;
 -	while (*s) {
 -	    t = s;
 -	    if (!ap_isdigit(*t)) {
++		return "syntax error in mask portion of network/netmask";
++	    }
 +	    if (resmask->ai_next) {
 +		freeaddrinfo(resmask);
  		a->type = T_FAIL;
@@ -3903,6 +3925,7 @@ diff -Nur apache_1.3.28.orig/src/modules/standard/mod_access.c apache_1.3.28/src
 +		return "network/netmask resolved to different address family";
  	    }
 -	    if (shift < 0) {
+-		a->type = T_FAIL;
 -		return "invalid ip address, only 4 octets allowed";
 +
 +	    switch (a->type) {
@@ -3950,16 +3973,17 @@ diff -Nur apache_1.3.28.orig/src/modules/standard/mod_access.c apache_1.3.28/src
 +	      }
 +#endif
  	    }
--	    a->x.ip.net |= octet << shift;
--	    a->x.ip.mask |= 0xFFUL << shift;
+-	    a->x.ip.net.s_addr |= (unsigned int)octet << shift;
+-	    a->x.ip.mask.s_addr |= 0xFFUL << shift;
 -	    s = t;
 -	    shift -= 8;
  	}
--	a->x.ip.net = ntohl(a->x.ip.net);
--	a->x.ip.mask = ntohl(a->x.ip.mask);
+-	a->x.ip.net.s_addr = ntohl(a->x.ip.net.s_addr);
+-	a->x.ip.mask.s_addr = ntohl(a->x.ip.mask.s_addr);
      }
      else {
 -	a->type = T_HOST;
+-    }
 +	struct addrinfo hints, *res;
 +	struct sockaddr_storage ss;
 +	int error;
@@ -4003,7 +4027,7 @@ diff -Nur apache_1.3.28.orig/src/modules/standard/mod_access.c apache_1.3.28/src
 +		    a->type = T_FAIL;
 +		    return "each octet must be between 0 and 255 inclusive";
 +		}
-+		a->x.ip.net.s_addr |= octet << shift;
++		a->x.ip.net.s_addr |= (unsigned int)octet << shift;
 +		a->x.ip.mask.s_addr |= 0xFFUL << shift;
 +		s = t;
 +		shift -= 8;
@@ -4055,16 +4079,17 @@ diff -Nur apache_1.3.28.orig/src/modules/standard/mod_access.c apache_1.3.28/src
 +	    a->type = T_FAIL;
 +	    return "unknown address family for network";
 +	}
-     }
++      }
  
      return NULL;
-@@ -315,12 +464,63 @@
+ }
+@@ -275,13 +413,63 @@
  	    return 1;
  
  	case T_IP:
--	    if (ap[i].x.ip.net != INADDR_NONE
+-	    if (ap[i].x.ip.net.s_addr != INADDR_NONE
 -		&& (r->connection->remote_addr.sin_addr.s_addr
--		    & ap[i].x.ip.mask) == ap[i].x.ip.net) {
+-		    & ap[i].x.ip.mask.s_addr) == ap[i].x.ip.net.s_addr) {
 -		return 1;
 +	    if (ap[i].x.ip.net.s_addr == INADDR_NONE)
 +		break;
@@ -4085,9 +4110,9 @@ diff -Nur apache_1.3.28.orig/src/modules/standard/mod_access.c apache_1.3.28/src
 +		}
 +		break;
 +#endif
-+	    }
-+	    break;
-+
+ 	    }
+ 	    break;
+ 
 +#ifdef INET6
 +	case T_IP6:
 +	  {
@@ -4119,13 +4144,13 @@ diff -Nur apache_1.3.28.orig/src/modules/standard/mod_access.c apache_1.3.28/src
 +		if (memcmp(&masked, &ap[i].x.ip6.net6, sizeof(masked)) == 0)
 +		    return 1;
 +		break;
- 	    }
- 	    break;
++	    }
++	    break;
 +	  }
 +#endif
- 
  	case T_HOST:
  	    if (!gothost) {
+ 		remotehost = ap_get_remote_host(r->connection, r->per_dir_config,
 diff -Nur apache_1.3.28.orig/src/modules/standard/mod_unique_id.c apache_1.3.28/src/modules/standard/mod_unique_id.c
 --- apache_1.3.28.orig/src/modules/standard/mod_unique_id.c	Mon Feb  3 18:13:30 2003
 +++ apache_1.3.28/src/modules/standard/mod_unique_id.c	Fri Jul 25 11:01:55 2003
@@ -4673,3 +4698,27 @@ diff -Nur apache_1.3.28.orig/src/support/logresolve.c apache_1.3.28/src/support/
      const char *rname = ap_get_remote_host(r->connection, r->per_dir_config,
  					   REMOTE_NAME);
      dcfg = ap_get_module_config(r->per_dir_config, &usertrack_module);
+--- apache_1.3.31/src/modules/standard/mod_rewrite.c.orig	Wed May 12 14:57:09 2004
++++ apache_1.3.31/src/modules/standard/mod_rewrite.c	Wed May 12 15:40:04 2004
+@@ -3651,8 +3651,19 @@
+         result = r->connection->remote_ip;
+     }
+     else if (strcasecmp(var, "REMOTE_PORT") == 0) {
+-        return ap_psprintf(r->pool, "%d",
+-                           ntohs(r->connection->remote_addr.sin_port));
++	char servbuf[NI_MAXSERV];
++	servbuf[0] = '\0';
++	if (!getnameinfo((struct sockaddr *)&r->connection->remote_addr,
++#ifndef HAVE_SOCKADDR_LEN
++		     SA_LEN((struct sockaddr *)&r->connection->remote_addr),
++#else
++		     r->connection->remote_addr.ss_len,
++#endif
++		     NULL, 0, servbuf, sizeof(servbuf), NI_NUMERICSERV)) {
++		return ap_pstrdup(r->pool, servbuf);
++	} else {
++		return ap_pstrdup(r->pool, "");
++	}
+     }
+     else if (strcasecmp(var, "REMOTE_HOST") == 0) {
+         result = (char *)ap_get_remote_host(r->connection,
