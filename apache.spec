@@ -26,12 +26,12 @@ Summary(tr):	Lider WWW tarayýcý
 Summary(uk):	îÁÊÐÏÐÕÌÑÒÎ¦ÛÉÊ Web-Server
 Summary(zh_CN):	Internet ÉÏÓ¦ÓÃ×î¹ã·ºµÄ Web ·þÎñ³ÌÐò¡£
 Name:		apache
-Version:	1.3.31
-Release:	2.1
+Version:	1.3.32
+Release:	1
 License:	Apache Group
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/%{name}_%{version}.tar.gz
-# Source0-md5:	bd548a06ac48dda496b4e613572bb020
+# Source0-md5:	45164531fb57bfa18af4b9efd0850dd3
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}-icons.tar.gz
@@ -410,7 +410,6 @@ Summary(pl):	Modu³ apache do wy¶wietlania indeksu plików
 Group:		Networking/Daemons
 Requires(post,preun):	%{apxs}
 Requires:	%{name}(EAPI) = %{version}-%{release}
-Obsoletes:	Apache-Gallery
 
 %description mod_autoindex
 This package contains mod_autoindex module. It provides
@@ -1294,10 +1293,6 @@ fi
 %{_datadir}/manual/bind.html.en
 %lang(fr) %{_datadir}/manual/bind.html.fr
 %lang(ja) %{_datadir}/manual/bind.html.ja.jis
-%{_datadir}/manual/cgi_path.html.html
-%{_datadir}/manual/cgi_path.html.en
-%lang(fr) %{_datadir}/manual/cgi_path.html.fr
-%lang(ja) %{_datadir}/manual/cgi_path.html.ja.jis
 %{_datadir}/manual/configuring.html.html
 %{_datadir}/manual/configuring.html.en
 %lang(fr) %{_datadir}/manual/configuring.html.fr
@@ -1312,6 +1307,7 @@ fi
 %{_datadir}/manual/dns-caveats.html.html
 %{_datadir}/manual/dns-caveats.html.en
 %lang(fr) %{_datadir}/manual/dns-caveats.html.fr
+%lang(ja) %{_datadir}/manual/dns-caveats.html.ja.jis
 %{_datadir}/manual/dso.html
 %{_datadir}/manual/env.html.html
 %{_datadir}/manual/env.html.en
@@ -1333,6 +1329,7 @@ fi
 %{_datadir}/manual/invoking.html.html
 %{_datadir}/manual/invoking.html.en
 %lang(fr) %{_datadir}/manual/invoking.html.fr
+%lang(ja) %{_datadir}/manual/invoking.html.ja.jis
 %{_datadir}/manual/keepalive.html.html
 %{_datadir}/manual/keepalive.html.en
 %lang(ja) %{_datadir}/manual/keepalive.html.ja.jis
@@ -1497,6 +1494,7 @@ fi
 %lang(es) %{_datadir}/html/index.html.es
 %lang(fr) %{_datadir}/html/index.html.fr
 %lang(he) %{_datadir}/html/index.html.he.iso8859-8
+%lang(hu) %{_datadir}/html/index.html.hu
 %lang(it) %{_datadir}/html/index.html.it
 %lang(ja) %{_datadir}/html/index.html.ja.jis
 %lang(ko) %{_datadir}/html/index.html.kr.iso-kr
