@@ -23,7 +23,7 @@ Summary(pt_BR):	Servidor HTTPD para prover serviços WWW
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.0.44
-Release:	0.2
+Release:	0.3
 License:	Apache Group License
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/
@@ -48,7 +48,7 @@ Patch2:		%{name}-layout.patch
 Patch3:		%{name}-suexec.patch
 BuildRequires:	db-devel
 BuildRequires:	expat-devel
-BuildRequires:	gdbm-devel
+BuildRequires:	gdbm-devel >= 1.8.3
 %{!?_without_ssl:BuildRequires:	openssl-devel >= 0.9.7}
 %{!?_without_ssl:BuildRequires:	openssl-tools >= 0.9.7}
 BuildRequires:	perl-devel >= 5.004
