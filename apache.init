@@ -22,8 +22,10 @@
 [ -f /etc/sysconfig/apache ] && . /etc/sysconfig/apache
 
 # Check that networking is up.
-[ "${NETWORKING}" = "no" ] && echo "Error: Networking is down" && exit 0
-
+if [ "${NETWORKING}" = "no" ]; then
+	echo "WARNING: Networking is down. Apache can't be runed."
+	exit 1
+fi
 
 # See how we were called.
 case "$1" in
