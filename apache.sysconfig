@@ -14,3 +14,6 @@ HTTPD_OPTS=""
 # prefork, worker, perchild (experimental), metuxmpm (experimental)
 # (note that some may be not available)
 HTTPD_MPM="prefork"
+
+# perhaps set 128MB memory limit
+#SERVICE_LIMITS="$DEFAULT_SERVICE_LIMITS -m 128000"
