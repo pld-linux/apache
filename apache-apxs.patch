@@ -1,6 +1,5 @@
-diff -urN httpd-2.0.39.org/support/apxs.in httpd-2.0.39/support/apxs.in
---- httpd-2.0.39.org/support/apxs.in	Wed Jun 19 10:18:00 2002
-+++ httpd-2.0.39/support/apxs.in	Wed Jun 19 10:20:23 2002
+--- httpd-2.0.43/support/apxs.in.wiget	Thu Sep 19 07:43:16 2002
++++ httpd-2.0.43/support/apxs.in	Fri Oct  4 11:35:05 2002
 @@ -64,11 +64,11 @@
  my %config_vars = ();
  
@@ -15,7 +14,7 @@ diff -urN httpd-2.0.39.org/support/apxs.in httpd-2.0.39/support/apxs.in
  my $CFG_PREFIX     = $prefix;
  my $exec_prefix    = get_vars("exec_prefix");
  my $datadir        = get_vars("datadir");
-@@ -227,9 +227,7 @@
+@@ -228,9 +228,7 @@
  my $httpd = get_vars("sbindir") . "/" . get_vars("progname");
  $httpd = eval qq("$httpd");
  $httpd = eval qq("$httpd");
@@ -26,7 +25,7 @@ diff -urN httpd-2.0.39.org/support/apxs.in httpd-2.0.39/support/apxs.in
  
  #allow apxs to be run from the source tree, before installation
  if ($0 =~ m:support/apxs$:) {
-@@ -423,7 +421,7 @@
+@@ -424,7 +422,7 @@
          $la =~ s|\.c$|.la|;
          my $o = $s;
          $o =~ s|\.c$|.o|;
@@ -35,16 +34,16 @@ diff -urN httpd-2.0.39.org/support/apxs.in httpd-2.0.39/support/apxs.in
          unshift(@objs, $lo);
      }
  
-@@ -448,7 +446,7 @@
-         $opt .= " -l$opt_l";
+@@ -473,7 +471,7 @@
+         $opt .= " -rpath $CFG_LIBEXECDIR -module -avoid-version";
      }
  
--    push(@cmds, "$installbuilddir/libtool $ltflags --mode=link $CFG_CC -o $dso_file -rpath $CFG_LIBEXECDIR -module -avoid-version $opt $lo");
-+    push(@cmds, "/usr/bin/libtool $ltflags --mode=link $CFG_CC -o $dso_file -rpath $CFG_LIBEXECDIR -module -avoid-version $opt $lo");
+-    push(@cmds, "$installbuilddir/libtool $ltflags --mode=link $CFG_CC -o $dso_file $opt $lo");
++    push(@cmds, "/usr/bin/libtool $ltflags --mode=link $CFG_CC -o $dso_file $opt $lo");
  
      #   execute the commands
      &execute_cmds(@cmds);
-@@ -480,7 +478,7 @@
+@@ -505,7 +503,7 @@
          $t =~ s|\.la$|\.so|;
          if ($opt_i) {
  	    push(@cmds, "$installbuilddir/instdso.sh SH_LIBTOOL='" .
