@@ -1,32 +1,36 @@
-diff -urN apache_1.3.17.org/src/modules/standard/mod_auth_dbm.c apache_1.3.17/src/modules/standard/mod_auth_dbm.c
---- apache_1.3.17.org/src/modules/standard/mod_auth_dbm.c	Fri Feb  2 15:29:26 2001
-+++ apache_1.3.17/src/modules/standard/mod_auth_dbm.c	Fri Feb  2 15:29:38 2001
-@@ -81,8 +81,12 @@
- #define dbm_fetch sdbm_fetch
+diff -Nur apache_1.3.17.orig/src/helpers/find-dbm-lib apache_1.3.17/src/helpers/find-dbm-lib
+--- apache_1.3.17.orig/src/helpers/find-dbm-lib	Wed Dec 13 00:24:03 2000
++++ apache_1.3.17/src/helpers/find-dbm-lib	Wed Feb  7 23:17:03 2001
+@@ -17,6 +17,8 @@
+ 		    DBM_LIB="-ldbm"
+ 		elif ./helpers/TestCompile lib ndbm dbm_open; then
+ 		    DBM_LIB="-lndbm"
++		elif ./helpers/TestCompile lib db __db_ndbm_open; then
++		    DBM_LIB="-ldb"
+ 		elif ./helpers/TestCompile lib db1 dbm_open; then
+ 		    # For Red Hat 7
+ 		    DBM_LIB="-ldb1"
+diff -Nur apache_1.3.17.orig/src/modules/standard/mod_auth_dbm.c apache_1.3.17/src/modules/standard/mod_auth_dbm.c
+--- apache_1.3.17.orig/src/modules/standard/mod_auth_dbm.c	Wed Feb  7 23:10:02 2001
++++ apache_1.3.17/src/modules/standard/mod_auth_dbm.c	Wed Feb  7 23:14:06 2001
+@@ -82,7 +82,8 @@
  #define dbm_close sdbm_close
  #elif defined(__GLIBC__) && defined(__GLIBC_MINOR__) \
--    && __GLIBC__ >= 2 && __GLIBC_MINOR__ >= 1
-+    && __GLIBC__ >= 2 && __GLIBC_MINOR__ == 1
- #include <db1/ndbm.h>
-+#elif defined(__GLIBC__) && defined(__GLIBC_MINOR__) \
-+    && __GLIBC__ >= 2 && __GLIBC_MINOR__ >= 2
+     && __GLIBC__ >= 2 && __GLIBC_MINOR__ >= 1
+-#include <db1/ndbm.h>
 +#define DB_DBM_HSEARCH 1
 +#include <db.h>
  #else
  #include <ndbm.h>
  #endif
-diff -urN apache_1.3.17.org/src/modules/standard/mod_rewrite.h apache_1.3.17/src/modules/standard/mod_rewrite.h
---- apache_1.3.17.org/src/modules/standard/mod_rewrite.h	Fri Feb  2 15:29:26 2001
-+++ apache_1.3.17/src/modules/standard/mod_rewrite.h	Fri Feb  2 15:31:21 2001
-@@ -131,8 +131,12 @@
-      */
+diff -Nur apache_1.3.17.orig/src/modules/standard/mod_rewrite.h apache_1.3.17/src/modules/standard/mod_rewrite.h
+--- apache_1.3.17.orig/src/modules/standard/mod_rewrite.h	Thu Jan 18 23:31:44 2001
++++ apache_1.3.17/src/modules/standard/mod_rewrite.h	Wed Feb  7 23:15:22 2001
+@@ -132,7 +132,8 @@
  #ifndef NO_DBM_REWRITEMAP
  #if defined(__GLIBC__) && defined(__GLIBC_MINOR__) \
--    && __GLIBC__ >= 2 && __GLIBC_MINOR__ >= 1
-+    && __GLIBC__ >= 2 && __GLIBC_MINOR__ == 1
- #include <db1/ndbm.h>
-+#elif defined(__GLIBC__) && defined(__GLIBC_MINOR__) \
-+    && __GLIBC__ >= 2 && __GLIBC_MINOR__ >= 2
+     && __GLIBC__ >= 2 && __GLIBC_MINOR__ >= 1
+-#include <db1/ndbm.h>
 +#define DB_DBM_HSEARCH 1
 +#include <db.h>
  #else
