@@ -1765,9 +1765,9 @@ Index: src/modules/proxy/proxy_http.c
 --- src/modules/proxy/proxy_http.c	27 Mar 2002 15:23:04 -0000	1.1.1.13
 +++ src/modules/proxy/proxy_http.c	27 Mar 2002 15:30:03 -0000	1.21
 @@ -166,6 +166,9 @@
-     char *destportstr = NULL;
      const char *urlptr = NULL;
      const char *datestr, *urlstr;
+     const char *content_length;
 +#ifdef EAPI
 +    char *peer;
 +#endif

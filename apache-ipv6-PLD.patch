@@ -2966,15 +2966,16 @@ diff -Nur apache_1.3.24.orig/src/modules/proxy/proxy_connect.c apache_1.3.24/src
      }
  
      /* Check if it is an allowed port */
-@@ -160,33 +193,41 @@
+@@ -160,34 +193,42 @@
              case DEFAULT_SNEWS_PORT:
                  break;
              default:
 +		freeaddrinfo(res0);
                  return HTTP_FORBIDDEN;
          }
--    } else if(!allowed_port(conf, port))
-+    } else if(!allowed_port(conf, port)) {
+     }
+-    else if (!allowed_port(conf, port))
++    else if (!allowed_port(conf, port)) {
 +	freeaddrinfo(res0);
          return HTTP_FORBIDDEN;
 +    }
@@ -2993,11 +2994,11 @@ diff -Nur apache_1.3.24.orig/src/modules/proxy/proxy_connect.c apache_1.3.24/src
 +	if (error)
 +	    return HTTP_INTERNAL_SERVER_ERROR;	/* XXX */
 +
-         ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server,
+         ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server,
              "CONNECT to remote proxy %s on port %d", proxyhost, proxyport);
      }
      else {
-         ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server,
+         ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server,
 -            "CONNECT to %s on port %d", host, port);
 +            "CONNECT to %s on port %d", hoststr, port);
      }
@@ -3127,23 +3128,23 @@ diff -Nur apache_1.3.24.orig/src/modules/proxy/proxy_ftp.c apache_1.3.24/src/mod
  #if !defined(TPF) && !defined(BEOS)
 -    if (conf->recv_buffer_size > 0
 -        && setsockopt(sock, SOL_SOCKET, SO_RCVBUF,
--                       (const char *) &conf->recv_buffer_size, sizeof(int))
+-                      (const char *)&conf->recv_buffer_size, sizeof(int))
 -            == -1) {
 -            ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
 -                         "setsockopt(SO_RCVBUF): Failed to set ProxyReceiveBufferSize, using default");
 -    }
 +	if (conf->recv_buffer_size > 0
 +	    && setsockopt(sock, SOL_SOCKET, SO_RCVBUF,
-+			   (const char *) &conf->recv_buffer_size, sizeof(int))
++			  (const char *)&conf->recv_buffer_size, sizeof(int))
 +		== -1) {
 +		ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
 +			     "setsockopt(SO_RCVBUF): Failed to set ProxyReceiveBufferSize, using default");
 +	}
  #endif
  
--    if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (void *) &one,
+-    if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (void *)&one,
 -                   sizeof(one)) == -1) {
-+	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (void *) &one,
++	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (void *)&one,
 +		       sizeof(one)) == -1) {
  #ifndef _OSD_POSIX /* BS2000 has this option "always on" */
 -        ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
@@ -3155,12 +3156,12 @@ diff -Nur apache_1.3.24.orig/src/modules/proxy/proxy_ftp.c apache_1.3.24/src/mod
 +	    ap_pclosesocket(p, sock);
 +	    freeaddrinfo(res0);
 +	    return HTTP_INTERNAL_SERVER_ERROR;
- #endif /*_OSD_POSIX*/
+ #endif                          /* _OSD_POSIX */
 -    }
 -
 -#ifdef SINIX_D_RESOLVER_BUG
 -    {
--        struct in_addr *ip_addr = (struct in_addr *) *server_hp.h_addr_list;
+-        struct in_addr *ip_addr = (struct in_addr *)*server_hp.h_addr_list;
 -
 -        for (; ip_addr->s_addr != 0; ++ip_addr) {
 -            memcpy(&server.sin_addr, ip_addr, sizeof(struct in_addr));
@@ -3215,7 +3216,7 @@ diff -Nur apache_1.3.24.orig/src/modules/proxy/proxy_ftp.c apache_1.3.24/src/mod
 +    ap_bputs(CRLF, ctrl);
      ap_bflush(ctrl);
 +    Explain0("FTP: passive command issued");
-     ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: PASV command issued");
+     ap_log_error(APLOG_MARK, APLOG_DEBUG | APLOG_NOERRNO, r->server, "FTP: PASV command issued");
 -/* possible results: 227, 421, 500, 501, 502, 530 */
 +/* possible results: 227, 228, 229, 421, 500, 501, 502, 530 */
      /* 227 Entering Passive Mode (h1,h2,h3,h4,p1,p2). */
@@ -3323,7 +3324,7 @@ diff -Nur apache_1.3.24.orig/src/modules/proxy/proxy_ftp.c apache_1.3.24/src/mod
      if (!pasvmode) {            /* set up data connection */
 -        clen = sizeof(struct sockaddr_in);
 +        clen = sizeof(server);
-         if (getsockname(sock, (struct sockaddr *) &server, &clen) < 0) {
+         if (getsockname(sock, (struct sockaddr *)&server, &clen) < 0) {
              return ftp_cleanup_and_return(r, ctrl, data, sock, dsock,
                        ap_proxyerror(r, HTTP_INTERNAL_SERVER_ERROR, 
                                      "proxy: error getting socket address"));
@@ -3335,15 +3336,15 @@ diff -Nur apache_1.3.24.orig/src/modules/proxy/proxy_ftp.c apache_1.3.24/src/mod
              return ftp_cleanup_and_return(r, ctrl, data, sock, dsock,
                        ap_proxyerror(r, HTTP_INTERNAL_SERVER_ERROR, 
 @@ -1042,13 +1115,28 @@
- #endif /*_OSD_POSIX*/
+ #endif                          /* _OSD_POSIX */
          }
  
--        if (bind(dsock, (struct sockaddr *) &server,
+-        if (bind(dsock, (struct sockaddr *)&server,
 -                 sizeof(struct sockaddr_in)) == -1) {
 +#ifndef SIN6_LEN
-+	if (bind(dsock, (struct sockaddr *) &server, SA_LEN((struct sockaddr *)&server)) == -1)
++	if (bind(dsock, (struct sockaddr *)&server, SA_LEN((struct sockaddr *)&server)) == -1)
 +#else
-+	if (bind(dsock, (struct sockaddr *) &server, server.ss_len) == -1)
++	if (bind(dsock, (struct sockaddr *)&server, server.ss_len) == -1)
 +#endif
 + 	{
 +	    char hostnamebuf[MAXHOSTNAMELEN], portnamebuf[MAXHOSTNAMELEN];
@@ -3432,7 +3433,7 @@ diff -Nur apache_1.3.24.orig/src/modules/proxy/proxy_http.c apache_1.3.24/src/mo
      strp2 = strchr(desthost, ':');
      if (strp2 != NULL) {
          *(strp2++) = '\0';
-@@ -218,45 +229,69 @@
+@@ -218,46 +229,69 @@
      }
  
      /* check if ProxyBlock directive on this host */
@@ -3513,8 +3514,9 @@ diff -Nur apache_1.3.24.orig/src/modules/proxy/proxy_http.c apache_1.3.24/src/mo
 -    }
 -
 -
--    /* we have worked out who exactly we are going to connect to, now
--     * make that connection...
+-    /*
+-     * we have worked out who exactly we are going to connect to, now make
+-     * that connection...
 -     */
 -    sock = ap_psocket(p, PF_INET, SOCK_STREAM, IPPROTO_TCP);
 -    if (sock == -1) {
@@ -3544,7 +3546,7 @@ diff -Nur apache_1.3.24.orig/src/modules/proxy/proxy_http.c apache_1.3.24/src/mo
  
 -#ifdef SINIX_D_RESOLVER_BUG
 -    {
--        struct in_addr *ip_addr = (struct in_addr *) *server_hp.h_addr_list;
+-        struct in_addr *ip_addr = (struct in_addr *)*server_hp.h_addr_list;
 -
 -        for (; ip_addr->s_addr != 0; ++ip_addr) {
 -            memcpy(&server.sin_addr, ip_addr, sizeof(struct in_addr));
@@ -3718,7 +3720,7 @@ diff -Nur apache_1.3.24.orig/src/modules/proxy/proxy_util.c apache_1.3.24/src/mo
 +    }
 +#endif
      do {
--        i = connect(sock, (struct sockaddr *) addr, sizeof(struct sockaddr_in));
+-        i = connect(sock, (struct sockaddr *)addr, sizeof(struct sockaddr_in));
 +        i = connect(sock, addr, salen);
  #if defined(WIN32) || defined(NETWARE)
          if (i == SOCKET_ERROR)
