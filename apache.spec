@@ -1,5 +1,3 @@
-# _without_ssl	- don't build with SSL support
-# _without_ldap	- don't build with LDAP support
 # TODO:
 # - mod_case_filter
 # - mod_case_filter_in
@@ -16,6 +14,10 @@
 # - --with-suexec-uidmin=500 or =1000 ?
 # - multiple MPM support in subpackages like apache-mpm-worker, apache-mpm-prefork
 #   and so on. See SuSE 9 apache rpm for idea how to do this.
+#
+# Conditional build:
+%bcond_without	ssl	# don't build with SSL support
+%bcond_without	ldap	# don't build with LDAP support
 #
 %include	/usr/lib/rpm/macros.perl
 # this is internal macro, don't change to %%apache_modules_api
@@ -66,9 +68,9 @@ BuildRequires:	db-devel
 BuildRequires:	expat-devel
 BuildRequires:	gdbm-devel >= 1.8.3
 BuildRequires:	libtool >= 1.5
-%{!?_without_ldap:BuildRequires:	openldap-devel}
-%{!?_without_ssl:BuildRequires:	openssl-devel >= 0.9.7c}
-%{!?_without_ssl:BuildRequires:	openssl-tools >= 0.9.7c}
+%{?with_ldap:BuildRequires:	openldap-devel}
+%{?with_ssl:BuildRequires:	openssl-devel >= 0.9.7c}
+%{?with_ssl:BuildRequires:	openssl-tools >= 0.9.7c}
 BuildRequires:	perl-devel >= 5.004
 BuildRequires:	rpm-perlprov >= 4.0.4
 BuildRequires:	zlib-devel
@@ -90,12 +92,12 @@ Requires:	psmisc >= 20.1
 Provides:	httpd = %{version}
 Provides:	webserver = %{version}
 Provides:	apache(modules-api) = %{_apache_modules_api}
-BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 Obsoletes:	apache-extra
 Obsoletes:	apache-doc
 Obsoletes:	apache6
 Obsoletes:	apache1
 Obsoletes:	indexhtml
+BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_sysconfdir	/etc/httpd
 %define		_includedir	%{_prefix}/include/apache
@@ -651,13 +653,13 @@ install /usr/share/automake/config.* build/
 	--enable-proxy-connect \
 	--enable-proxy-ftp \
 	--enable-proxy-http \
-	%{!?_without_ssl:--enable-ssl} \
+	%{?with_ssl:--enable-ssl} \
 	--enable-optional-hook-export \
 	--enable-optional-hook-import \
 	--enable-optional-fn-import \
 	--enable-optional-fn-export \
-	%{!?_without_ldap:--enable-ldap} \
-	%{!?_without_ldap:--enable-auth-ldap} \
+	%{?with_ldap:--enable-ldap} \
+	%{?with_ldap:--enable-auth-ldap} \
 	--enable-dav \
 	--enable-info \
 	--enable-suexec \
@@ -719,7 +721,7 @@ install %{SOURCE4} $RPM_BUILD_ROOT/etc/sysconfig/apache
 
 touch $RPM_BUILD_ROOT/var/log/httpd/{access,error,agent,referer,suexec}_log
 
-%if %{?_without_ssl:0}%{!?_without_ssl:1}
+%if %{with ssl}
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/ssl
 install %{SOURCE20} $RPM_BUILD_ROOT%{_sysconfdir}/ssl/server.crt
 install %{SOURCE21} $RPM_BUILD_ROOT%{_sysconfdir}/ssl/server.key
@@ -1282,7 +1284,7 @@ fi
 %attr(755,root,root) %{_libexecdir}/mod_auth_anon.so
 %{_datadir}/manual/mod/mod_auth_anon.html.en
 
-%if %{!?_without_ldap:1}%{?_without_ldap:0}
+%if %{with ldap}
 %files mod_auth_ldap
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_auth_ldap.conf
@@ -1290,7 +1292,7 @@ fi
 %{_datadir}/manual/mod/mod_auth_ldap.html.en
 %endif
 
-%if %{!?_without_ldap:1}%{?_without_ldap:0}
+%if %{with ldap}
 %files mod_ldap
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_ldap.conf
@@ -1395,7 +1397,7 @@ fi
 %{_datadir}/manual/mod/mod_rewrite.html.en
 %{_datadir}/manual/images/mod_rewrite*
 
-%if %{!?_without_ssl:1}%{?_without_ssl:0}
+%if %{with ssl}
 %files mod_ssl
 %defattr(644,root,root,755)
 %attr(750,root,root) %dir %{_sysconfdir}/ssl
