@@ -54,7 +54,7 @@ case "$1" in
 		msg_stopping httpd.${HTTPD_MPM}
 		if [ -f /var/run/httpd.pid ]; then
 			PID=$(filter_chroot `cat /var/run/httpd.pid`)
-			if [ ! $PID ]; then
+			if [ -z "$PID" ]; then
 				PID=0
 			fi
 		else
