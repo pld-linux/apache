@@ -1,26 +1,26 @@
 /var/log/httpd/access_log {
-    olddir /var/log/archive/httpd
+    olddir /var/log/archiv/httpd
     postrotate
 	/usr/bin/killall -HUP httpd
     endscript
 }
 
 /var/log/httpd/agent_log {
-    olddir /var/log/archive/httpd
+    olddir /var/log/archiv/httpd
     postrotate
 	/usr/bin/killall -HUP httpd
     endscript
 }
 
 /var/log/httpd/error_log {
-    olddir /var/log/archive/httpd
+    olddir /var/log/archiv/httpd
     postrotate
 	/usr/bin/killall -HUP httpd
     endscript
 }
 
 /var/log/httpd/referer_log {
-    olddir /var/log/archive/httpd
+    olddir /var/log/archiv/httpd
     postrotate
 	/usr/bin/killall -HUP httpd
     endscript
