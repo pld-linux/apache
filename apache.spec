@@ -31,7 +31,7 @@ Release:	5
 License:	Apache Group 
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/%{name}_%{version}.tar.gz
-Source1:	%{name}.init
+Source1:	%{name}1.init
 Source2:	%{name}.logrotate
 Source3:	%{name}-icons.tar.gz
 Source4:	%{name}.sysconfig
