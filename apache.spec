@@ -15,7 +15,6 @@
 # - subpackages for MPMs
 # - check if all modules (*.so) are exactly the same for different MPMs
 # - install stage fails with distcc (make -jN)
-# - polish description and summary at package htpasswd
 #
 # Conditional build:
 %bcond_without	ssl		# build without SSL support
@@ -701,28 +700,24 @@ Caches a static list of files in memory.
 Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 
 %package -n htpasswd-%{name}
-Summary:	Apache2 htpasswd utility
+Summary:	Apache 2 htpasswd utility: manage user files for basic authentication
+Summary(pl):	Narzêdzie htpasswd z Apache'a 2 do zarz±dzania plikami uwierzytelnienia basic
 Group:		Networking/Utilities
 Provides:	htpasswd
 Obsoletes:	htpasswd
 
 %description -n htpasswd-%{name}
-htpasswd from Apache2
+htpasswd is used to create and update the flat-files used to store
+usernames and password for basic authentication of HTTP users. This
+package contains htpasswd from Apache 2; this version supports
+plaintext passwords and CRYPT (default), MD5 and SHA1 encryptions.
 
-Usage:
-        htpasswd [-cmdpsD] passwordfile username
-        htpasswd -b[cmdpsD] passwordfile username password
-
-        htpasswd -n[mdps] username
-        htpasswd -nb[mdps] username password
- -c  Create a new file.
- -n  Don't update file; display results on stdout.
- -m  Force MD5 encryption of the password.
- -d  Force CRYPT encryption of the password (default).
- -p  Do not encrypt the password (plaintext).
- -s  Force SHA encryption of the password.
- -b  Use the password from the command line rather than prompting for it.
- -D  Delete the specified user.
+%description -n htpasswd-%{name} -l pl
+htpasswd s³u¿y do tworzenia i uaktualniania p³askich plików s³u¿±cych
+do przechowywania nazw u¿ytkowników i hase³ do uwierzytelnienia basic
+u¿ytkowników HTTP. Ten pakiet zawiera htpasswd z Apache'a 2; ta wersja
+obs³uguje has³a zapisane czystym tekstem oraz zakodowane algorytmami
+CRYPT (domy¶lnym), MD5 i SHA1.
 
 %prep
 %setup -q -n httpd-%{version}
