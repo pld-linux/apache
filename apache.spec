@@ -2,11 +2,11 @@
 Summary:	The most widely used Web server on the Internet
 Summary(de):	Leading World Wide Web-Server
 Summary(fr):	Le serveur web le plus utilise sur Internet
-Summary(pl):	Serwer WWW (World Wide Web) ze wsparciem dla IPv6
+Summary(pl):	Serwer WWW (World Wide Web)
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
-Version:	1.3.9
-Release:	9
+Version:	1.3.11
+Release:	4
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Source0:	ftp://ftp.apache.org/apache/dist/%{name}_%{version}.tar.gz
@@ -18,13 +18,9 @@ Source5:	apache-access.conf
 Source6:	apache-httpd.conf
 Source7:	apache-srm.conf
 Source8:	apache-virtual-host.conf
-Patch0:		apache-suexec.patch
-Patch1:		ftp://ftp.kame.net/pub/kame/misc/apache-139-v6-19991013a.diff.gz
-Patch2:		ftp://ftp.nemoto.ecei.tohoku.ac.jp/pub/Net/IPv6/Patches/apache-139-v6-19991013a.new4.patch.gz
-Patch3:		ftp://ftp.nemoto.ecei.tohoku.ac.jp/pub/Net/IPv6/Patches/apache-139-v6-19991013a.new4_to_4.1.patch
-Patch4:		apache-htdocs.patch
-Patch5:		apache-pld.patch
-Patch6:		apache-EAPI.patch
+Patch0:		apache-PLD.patch
+Patch1:		apache-suexec.patch
+Patch2:		apache-htdocs.patch
 Patch7:		apache-errordocs.patch
 Patch8:		apache-apxs.patch
 Copyright:	BSD-like
@@ -35,7 +31,7 @@ Prereq:		/usr/sbin/useradd
 Prereq:		/usr/bin/getgid
 Prereq:		/usr/bin/id
 Prereq:		sh-utils
-BuildRequires:	mm-devel
+#BuildRequires:	mm-devel
 Requires:	rc-scripts
 Requires:	mailcap
 Requires:	/etc/mime.types
@@ -53,10 +49,6 @@ Obsoletes:	apache6
 Apache is a powerful, full-featured, efficient and freely-available Web
 server. Apache is also the most popular Web server on the Internet.
 
-This special version also includes many optimizations, Extended Application
-Programming Interface (EAPI), Shared memory module, Hotwired XSSI module,
-hooks for SSL module and several cosmetic improvements.
-
 %description -l de
 Apache ist ein voll funktionsfähiger Web-Server, der kostenlos
 erhältlich und weit verbreitet ist.
@@ -65,15 +57,9 @@ erhältlich und weit verbreitet ist.
 Apache est un serveur Web puissant, efficace, gratuit et complet. Apache est
 aussi le serveur Web le plus populaire sur Internet.
 
-Cette version speciale inclut egalement plusieurs optimisations, l'Interface
-de Programmation d'Applications Etendu (EAPI), le module de memoire
-partagee, un module XSSI de Hotwired , des attaches pour le module SSL ainsi
-que plusieurs ameliorations cosmetiques.
-
 %description -l pl
 Apache jest serwerem WWW (World Wide Web). Instaluj±c ten pakiet bêdziesz 
-móg³ prezentowaæ w³asne strony WWW w sieci internet. Apache umo¿liwia równie¿
-konfigurowanie serwerów wirtualnych. Ta wersja wspiera IPv6.
+móg³ prezentowaæ w³asne strony WWW w sieci internet.
 
 %description -l tr
 Apache serbest daðýtýlan ve çok kullanýlan yetenekli bir web sunucusudur.
@@ -136,10 +122,6 @@ Dokumentacja do Apache w formacie HTML.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
 %patch7 -p1
 %patch8 -p1
 
@@ -168,8 +150,6 @@ OPTIM="$RPM_OPT_FLAGS" \
 	--suexec-caller=http \
 	--suexec-uidmin=500 \
 	--suexec-gidmin=500 \
-	--enable-rule=INET6 \
-	--enable-rule=EAPI \
 	--disable-rule=WANTHSREGEX
 make
 
@@ -182,7 +162,7 @@ make install-quiet root="$RPM_BUILD_ROOT"
 
 install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig} \
 	$RPM_BUILD_ROOT%{_datadir}/errordocs \
-	$RPM_BUILD_ROOT/var/{log/httpd,state/apache/mm}
+	$RPM_BUILD_ROOT/var/{log/{httpd,archiv/httpd},state/apache/mm}
 
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/apache
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
@@ -199,10 +179,12 @@ install %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
 install %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/srm.conf
 install %{SOURCE8} $RPM_BUILD_ROOT%{_sysconfdir}/virtual-host.conf
 
+ln -sf index.html.en $RPM_BUILD_ROOT/home/httpd/html/index.html
+
 strip --strip-unneeded $RPM_BUILD_ROOT%{_libexecdir}/*.so
 
 gzip -9nf $RPM_BUILD_ROOT%{_mandir}/man*/* \
-	ABOUT_APACHE src/CHANGES KEYS README README.v6 README.EAPI
+	ABOUT_APACHE src/CHANGES KEYS README
 
 %pre
 if [ -n "`getgid http`" ]; then
@@ -263,11 +245,11 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %doc ABOUT_APACHE.gz src/CHANGES.gz KEYS.gz README.gz
-%doc conf/mime.types README.v6.gz
+%doc conf/mime.types
 
 %attr(754,root,root) /etc/rc.d/init.d/*
 
-%attr(751,root,root) %dir %{_sysconfdir}
+%attr(750,root,root) %dir %{_sysconfdir}
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/*
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/sysconfig/*
 %attr(640,root,root) %config(noreplace) /etc/logrotate.d/*
@@ -301,6 +283,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man[18]/*
 
 %attr(750,root,root) %dir /var/log/httpd
+%attr(750,root,root) %dir /var/log/archiv/httpd
 %attr(640,root,root) %ghost /var/log/httpd/*
 
 %files suexec
