@@ -39,6 +39,7 @@ BuildRequires:	zlib-devel
 BuildRequires:	expat-static
 BuildRequires:	perl-devel >= 5.004
 BuildRequires:	gdbm-devel
+BuildRequires:	byacc
 Provides:	httpd = %{version}
 Provides:	webserver = %{version}
 Provides:	%{name}(EAPI) = %{version}
