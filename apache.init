@@ -50,8 +50,7 @@ case "$1" in
 	# Stop daemons.
 	if [ -f /var/lock/subsys/httpd ]; then
 		msg_stopping httpd
-		killproc httpd
-		sleep 1
+		daemon httpd -k stop
 		rm -f /var/lock/subsys/httpd /var/run/httpd.pid /var/run/httpd.loc* >/dev/null 2>&1
 	else
 		msg_not_running httpd
@@ -63,27 +62,16 @@ case "$1" in
 	/usr/sbin/httpd -S
 	;;
   restart)
-	$0 stop
+  	$0 stop
 	$0 start
-	exit $?
 	;;
-  reload|force-reload)
+  reload|force-reload|graceful)
 	if [ -f /var/lock/subsys/httpd ]; then
 		msg_reloading httpd
-		killproc httpd -HUP
+		daemon httpd -k graceful
 		RETVAL=$?
 	else
 		msg_not_running httpd >&2
-		RETVAL=7
-	fi
-	;;
-  graceful)
-  	if [ -f /var/lock/subsys/httpd ]; then
-	    	msg_reloading httpd
-		killproc httpd -USR1
-		RETVAL=$?
-	else
-	    	msg_not_running httpd >&2
 		RETVAL=7
 	fi
 	;;
