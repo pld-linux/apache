@@ -338,7 +338,7 @@ Modu³ kompresuj±cy dane przed przes³aniem ich do klienta.
 
 %package mod_dir
 Summary:	Apache module for "trailing slash" redirects and serving directory index files
-Summary(pl):	Modu³ oferuj±cy przekierowania i serwowanie indeksu katalogu.
+Summary(pl):	Modu³ oferuj±cy przekierowania i serwowanie indeksu katalogu
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}
 
@@ -380,7 +380,7 @@ Modu³ umozliwiaj±cy obs³ugê plików .map (imap-file handler)
 
 %package mod_info
 Summary:	Apache module with comprehensive overview of the server configuration
-Summary(pl):	Modu³ dostarczaj±cy informacji na temat serwera.
+Summary(pl):	Modu³ dostarczaj±cy informacji na temat serwera
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}
 
@@ -439,7 +439,7 @@ Silna kryptografia z u¿yciem SSL.
 
 %package mod_status
 Summary:	Server status report module for apache
-Summary(pl):	Modu³ dostarczaj±cy informacje statystyczne o serwerze.
+Summary(pl):	Modu³ dostarczaj±cy informacje statystyczne o serwerze
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}
 
@@ -456,7 +456,7 @@ pracy serwera apache (w postaci strony HTML).
 
 %package mod_usertrack
 Summary:	Apache module for user tracking using cookies
-Summary(pl):	Modu³ s³u¿±cy do ¶ledzenia ,,ciasteczek''.
+Summary(pl):	Modu³ s³u¿±cy do ¶ledzenia ,,ciasteczek''
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}
 
@@ -470,7 +470,7 @@ Modu³ pozwalaj±cy na ¶ledzenie ,,ciasteczek''.
 
 %package mod_vhost_alias
 Summary:	Apache module for dynamically configured mass virtual hosting
-Summary(pl):	Modu³ dodaj±cy obs³ugê hostów wirtualnych.
+Summary(pl):	Modu³ dodaj±cy obs³ugê hostów wirtualnych
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}
 
@@ -560,8 +560,8 @@ The includes and linker libraries for development with APR.
 Pliki nag³ówkowe, biblioteki dla linkera APR.
 
 %package -n apr-static
-Summary:	Static APR libraries.
-Summary(pl):	Statyczne biblioteki APR.
+Summary:	Static APR libraries
+Summary(pl):	Statyczne biblioteki APR
 Group:		Development/Libraries
 Requires:	apr-devel = %{version}
 
