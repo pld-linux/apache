@@ -530,7 +530,7 @@ rm -f src/modules/standard/mod_rewrite.so
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig} \
 	$RPM_BUILD_ROOT%{_datadir}/errordocs \
-	$RPM_BUILD_ROOT/var/{log/{httpd,archiv/httpd},run/apache}
+	$RPM_BUILD_ROOT/var/{log/{httpd,archiv/httpd},{lib,run}/apache}
 
 %{__make} install-quiet root="$RPM_BUILD_ROOT"
 
