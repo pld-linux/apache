@@ -666,6 +666,7 @@ install %{SOURCE9}  $RPM_BUILD_ROOT%{_sysconfdir}/mod_status.conf
 install %{SOURCE10} $RPM_BUILD_ROOT%{_sysconfdir}/mod_proxy.conf
 install %{SOURCE11} $RPM_BUILD_ROOT%{_sysconfdir}/mod_info.conf
 install %{SOURCE12} $RPM_BUILD_ROOT%{_sysconfdir}/mod_ssl.conf
+install %{SOURCE13} $RPM_BUILD_ROOT%{_sysconfdir}/mod_dav.conf
 
 ln -sf index.html.en $RPM_BUILD_ROOT%{_datadir}/html/index.html
 
