@@ -1,0 +1,5 @@
+- Release 1
+- removed may broken ipv6 patch and added correct patch made in
+  Arkadiusz Mi¶kiewicz <misiek@pld.org.pl>
+- resurect release.patch (by misiek)
+- simplifications in %%install
