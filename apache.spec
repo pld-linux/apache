@@ -31,7 +31,7 @@ Summary(ru):	óÁÍÙÊ ÐÏÐÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.0.50
-Release:	6
+Release:	6.1
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -52,6 +52,7 @@ Source13:	%{name}-mod_dav.conf
 Source14:	%{name}-mod_dir.conf
 Source15:	%{name}-mod_suexec.conf
 Source16:	%{name}-mod_deflate.conf
+Source17:	%{name}-mod_autoindex.conf
 Source20:	%{name}-server.crt
 Source21:	%{name}-server.key
 Patch0:		%{name}-configdir_skip_backups.patch
@@ -353,6 +354,21 @@ authentication using MD5 Digest Authentication.
 %description mod_auth_digest -l pl
 Modu³ ten dostarcza metodê autoryzacji bazuj±c± na MD5 Digest
 Authentication.
+
+%package mod_autoindex
+Summary:	Apache module - display index of files
+Summary(pl):	Modu³ apache do wy¶wietlania indeksu plików
+Group:		Networking/Daemons
+Requires(post,preun):	%{apxs}
+Requires:	%{name} = %{version}-%{release}
+Obsoletes:	Apache-Gallery
+
+%description mod_autoindex
+This package contains mod_autoindex module. It provides
+generation index of files.
+
+%description mod_autoindex -l pl
+Ten pakiet dostarcza modu³ autoindex, który generuje indeks plików.
 
 %package mod_cache
 Summary:	Content cache keyed to URIs
@@ -838,6 +854,7 @@ install %{SOURCE13} $CFG/45_mod_dav.conf
 install %{SOURCE14} $CFG/59_mod_dir.conf
 install %{SOURCE15} $CFG/13_mod_suexec.conf
 install %{SOURCE16} $CFG/58_mod_deflate.conf
+install %{SOURCE17} $CFG/57_mod_autoindex.conf
 
 echo "LoadModule ldap_module	%{_libexecdir}/mod_ldap.so" > $CFG/49_mod_ldap.conf
 echo "LoadModule actions_module	%{_libexecdir}/mod_actions.so" > $CFG/50_mod_actions.conf
@@ -958,6 +975,20 @@ else
 fi
 
 %preun mod_auth_dbm
+if [ "$1" = "0" ]; then
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2
+	fi
+fi
+
+%post mod_autoindex
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+fi
+
+%preun mod_autoindex
 if [ "$1" = "0" ]; then
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
@@ -1249,7 +1280,6 @@ fi
 %attr(755,root,root) %{_libexecdir}/mod_access.so
 %attr(755,root,root) %{_libexecdir}/mod_alias.so
 %attr(755,root,root) %{_libexecdir}/mod_asis.so
-%attr(755,root,root) %{_libexecdir}/mod_autoindex.so
 %attr(755,root,root) %{_libexecdir}/mod_cern_meta.so
 %attr(755,root,root) %{_libexecdir}/mod_cgi.so
 %attr(755,root,root) %{_libexecdir}/mod_env.so
@@ -1767,6 +1797,11 @@ fi
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_auth_digest.conf
 %attr(755,root,root) %{_libexecdir}/mod_auth_digest.so
+
+%files mod_autoindex
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_autoindex.conf
+%attr(755,root,root) %{_libexecdir}/mod_autoindex.so
 
 %files mod_cache
 %defattr(644,root,root,755)
