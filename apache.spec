@@ -1,7 +1,7 @@
 #
 # Conditional build:
 # mod_rewrite_ldap - enable ldap map supoort for mod_rewrite (alpha)
-# bcond_off_apache_ipv6 - disable IPv6 support
+# _without_apache_ipv6 - disable IPv6 support
 #
 %include	/usr/lib/rpm/macros.perl
 Summary:	The most widely used Web server on the Internet
@@ -498,7 +498,7 @@ wa¿no¶ci mo¿e byæ ustalana w zale¿no¶ci od czasu modyfikacji plików
 %patch6 -p0
 %patch7 -p1
 %patch8 -p1
-%{!?bcond_off_apache_ipv6:%patch9 -p1}
+%{!?_without_apache_ipv6:%patch9 -p1}
 %patch10 -p1
 %patch11 -p1
 %patch12 -p1
@@ -509,7 +509,7 @@ wa¿no¶ci mo¿e byæ ustalana w zale¿no¶ci od czasu modyfikacji plików
 %patch17 -p1
 %patch18 -p1
 %patch19 -p1
-%{?bcond_off_apache_ipv6:%patch20 -p1}
+%{?_without_apache_ipv6:%patch20 -p1}
 
 %build
 OPTIM="%{rpmcflags}" \
@@ -536,7 +536,7 @@ OPTIM="%{rpmcflags}" \
 	--suexec-docroot=%{_datadir} \
 	--disable-rule=WANTHSREGEX \
 	--enable-rule=EAPI \
-	%{!?bcond_off_apache_ipv6:--enable-rule=INET6}
+	%{!?_without_apache_ipv6:--enable-rule=INET6}
 
 %{__make} LIBS1="-lm -lcrypt -lmm -ldl"
 
