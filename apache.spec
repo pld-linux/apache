@@ -30,12 +30,12 @@ Summary(pt_BR):	Servidor HTTPD para prover serviços WWW
 Summary(ru):	óÁÍÙÊ ÐÏÐÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
-Version:	2.0.50
-Release:	7
+Version:	2.0.51
+Release:	0.1
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
-# Source0-md5:	8b251767212aebf41a13128bb70c0b41
+# Source0-md5:	ab93c56b88ca1b9ce71ba12e74bbc5de
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}-icons.tar.gz
@@ -69,7 +69,6 @@ Patch8:		httpd-2.0.45-encode.patch
 Patch9:		httpd-2.0.45-export.patch
 Patch10:	httpd-2.0.46-dav401dest.patch
 Patch11:	httpd-2.0.46-md5dig.patch
-Patch12:	httpd-2.0.46-shmcb.patch
 Patch13:	httpd-2.0.46-sslmutex.patch
 Patch14:	httpd-2.0.47-sslcleanup.patch
 Patch15:	httpd-2.0.48-corelimit.patch
@@ -81,7 +80,6 @@ Patch20:	%{name}-conffile-path.patch
 Patch21:	%{name}-apxs.patch
 # http://www.telana.com/peruser.php
 Patch22:	httpd-2.0.50-peruser-r3.patch
-Patch23:	%{name}-mod_ssl-secfix.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	automake
 BuildRequires:	apr-devel >= 1:0.9.5-6
@@ -675,7 +673,6 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 %patch9 -p1
 %patch10 -p1
 %patch11 -p1
-%patch12 -p1
 %patch13 -p1
 %patch14 -p1
 %patch15 -p1
@@ -686,7 +683,6 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 %patch20 -p1
 %patch21 -p1
 %patch22 -p1
-%patch23 -p1
 
 %{__perl} -pi -e "s@/usr/local/bin/perl@%{__perl}@" $(grep -rl "/usr/local/bin/perl" *)
 
