@@ -11,7 +11,7 @@ Group(pl):	Sieci/Demony
 Source0:	ftp://ftp.apache.org/apache/dist/%{name}_%{version}.tar.gz
 Source1:	apache.init
 Source2:	%{name}.logrotate
-Source3:	%{name}-extra.tar.bz2
+Source3:	%{name}-extra1.tar.bz2
 ########	http://stonecold.unity.ncsu.edu/software/mod_auth_kerb
 #Source5:	mod_auth_kerb-4.3.tar.gz
 Source6:	apache_1.3.6.tar.gz.asc
@@ -20,6 +20,7 @@ Source8:	apache.sysconfig
 Patch0:		%{name}-suexec.patch
 Patch1:		%{name}_1.3.6.ipv6.patch
 Patch2:		%{name}-htdocs.patch
+Patch3:		%{name}-release.patch
 Copyright:	BSD-like
 Obsoletes:	apache-extra
 Obsoletes:	apache6
@@ -99,12 +100,13 @@ Dokumentacja do Apache w formacie HTML
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 %build
 OPTIM=$RPM_OPT_FLAGS LDFLAGS=-s\
     ./configure \
 	--prefix=%{_prefix} \
-	--sysconfdir=/etc/httpd/conf \
+	--sysconfdir=/etc/httpd \
 	--datadir=/home/httpd \
 	--libexecdir=/usr/lib/apache \
 	--localstatedir=/var \
@@ -131,7 +133,7 @@ make install-quiet root="$RPM_BUILD_ROOT"
 
 mv $RPM_BUILD_ROOT/home/httpd/htdocs $RPM_BUILD_ROOT/home/httpd/html
 
-install -d $RPM_BUILD_ROOT/etc/{httpd/conf,logrotate.d,rc.d/init.d,sysconfig}
+install -d $RPM_BUILD_ROOT/etc/{httpd,logrotate.d,rc.d/init.d,sysconfig}
 install -d $RPM_BUILD_ROOT/home/httpd/{html/manual,icons,cgi-bin}
 install -d $RPM_BUILD_ROOT/{usr/{lib/apache,sbin,share,man/man{1,8}},var/log/httpd}
 
@@ -141,17 +143,19 @@ install %{SOURCE8} $RPM_BUILD_ROOT/etc/sysconfig/apache
 
 install -d $RPM_BUILD_ROOT%{_includedir}/apache
 
-rm -f $RPM_BUILD_ROOT/etc/httpd/conf/*
+rm -f $RPM_BUILD_ROOT/etc/httpd/*
 rm -f $RPM_BUILD_ROOT/home/httpd/html/manual/expand.pl
 
 touch $RPM_BUILD_ROOT/var/log/httpd/{access,error,agent,referer}_log
 
 cp -a apache-extra/errordocs	$RPM_BUILD_ROOT/home/httpd/
 cp -a apache-extra/icons/*	$RPM_BUILD_ROOT/home/httpd/icons
-cp -a apache-extra/*.conf	$RPM_BUILD_ROOT/etc/httpd/conf
-cp -a apache-extra/m*		$RPM_BUILD_ROOT/etc/httpd/conf
+cp -a apache-extra/*.conf	$RPM_BUILD_ROOT/etc/httpd
+cp -a apache-extra/m*		$RPM_BUILD_ROOT/etc/httpd
 
 mv $RPM_BUILD_ROOT/usr/man $RPM_BUILD_ROOT%{_mandir}
+
+strip $RPM_BUILD_ROOT/usr/lib/apache/*
 
 gzip -9nf $RPM_BUILD_ROOT%{_mandir}/{man{1,8}/*}
 gzip -9nf ABOUT_APACHE src/CHANGES KEYS README README.v6
@@ -179,8 +183,7 @@ fi
 %doc conf/mime.types README.v6.gz
 
 %attr(750,root,root) %dir /etc/httpd
-%attr(750,root,root) %dir /etc/httpd/conf
-%attr(640,root,root) %config %verify(not size mtime md5) /etc/httpd/conf/*
+%attr(640,root,root) %config %verify(not size mtime md5) /etc/httpd/*
 %attr(640,root,root) %config %verify(not size mtime md5) /etc/sysconfig/*
 %attr(640,root,root) %config /etc/logrotate.d/*
 
@@ -189,7 +192,7 @@ fi
 %config(noreplace) /home/httpd/html/index.html
 
 %attr(644,root,root) /home/httpd/html/*.gif
-%attr(755,root,root) %config %verify(not size mtime md5) /etc/rc.d/init.d/*
+%attr(755,root,root) /etc/rc.d/init.d/*
 
 %attr(755,root,root) /home/httpd/cgi-bin
 %attr(755,root,root) /usr/lib/apache
@@ -236,7 +239,17 @@ fi
   [1.3.6-2]
 - misc changes for correct build,
 - fixed apache.logrotate file,
-- apache-htdosc.patch.
+- apache-htdosc.patch,
+- added apache-release.patch,
+- changed confdir to /etc/httpd instead /etc/httpd/conf,
+- stripped modules & more changes,
+- added new apache-extras packet,
+
+  by Arek Mi¶kiewicz <misiek@pld.org.pl>
+  
+- added IPv6 support,
+- other fixes.  
+
 
 * Thu Feb 10 1999 Micha³ Kuratczyk <kurkens@polbox.com>
   [1.3.4-6d]
