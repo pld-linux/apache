@@ -32,7 +32,7 @@ Summary(ru):	óÁÍÙÊ ÐÏÐÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.0.48
-Release:	0.3.0
+Release:	0.4
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -63,37 +63,38 @@ Patch6:		%{name}-posix_syntax
 Patch7:		httpd-2.0.40-xfsz.patch
 Patch8: 	httpd-2.0.45-davetag.patch
 Patch9: 	httpd-2.0.45-davfs.patch
-Patch10:        httpd-2.0.45-encode.patch
-Patch11:        httpd-2.0.45-export.patch
-Patch12:        httpd-2.0.45-proxy.patch
-Patch13:        httpd-2.0.46-dav401dest.patch
-Patch14:        httpd-2.0.46-davbadfrag.patch
-Patch15:        httpd-2.0.46-execfail.patch
-Patch16:        httpd-2.0.46-graceful.patch
-Patch17:        httpd-2.0.46-logtimez.patch
-Patch18:        httpd-2.0.46-md5dig.patch
-Patch19:        httpd-2.0.46-metharray.patch
-Patch20:        httpd-2.0.46-rolog.patch
-Patch21:        httpd-2.0.46-shmcb.patch
-Patch22:        httpd-2.0.46-sslerr.patch
-Patch23:        httpd-2.0.46-sslio.patch
-Patch24:        httpd-2.0.46-sslmutex.patch
-Patch25:        httpd-2.0.47-ldapshm.patch
-Patch26:        httpd-2.0.47-sslcleanup.patch
-Patch27:        httpd-2.0.48-abench.patch
-Patch28:        httpd-2.0.48-autoindex.patch
-Patch29:        httpd-2.0.48-CAN-2003-0020.patch
-Patch30:        httpd-2.0.48-corelimit.patch
-Patch31:        httpd-2.0.48-debuglog.patch
-Patch32:        httpd-2.0.48-dynlimit.patch
-Patch33:        httpd-2.0.48-fdsetsize.patch
-Patch34:        httpd-2.0.48-include.patch
-Patch35:        httpd-2.0.48-proxy11.patch
-Patch36:        httpd-2.0.48-sslpphrase.patch
-Patch37:        httpd-2.0.48-sslvars.patch
-Patch38:        httpd-2.0.48-status.patch
-Patch39:        httpd-2.0.48-usertrack.patch
-Patch40:        httpd-2.0.48-worker.patch
+Patch10:	httpd-2.0.45-encode.patch
+Patch11:	httpd-2.0.45-export.patch
+Patch12:	httpd-2.0.45-proxy.patch
+Patch13:	httpd-2.0.46-dav401dest.patch
+Patch14:	httpd-2.0.46-davbadfrag.patch
+Patch15:	httpd-2.0.46-execfail.patch
+Patch16:	httpd-2.0.46-graceful.patch
+Patch17:	httpd-2.0.46-logtimez.patch
+Patch18:	httpd-2.0.46-md5dig.patch
+Patch19:	httpd-2.0.46-metharray.patch
+Patch20:	httpd-2.0.46-rolog.patch
+Patch21:	httpd-2.0.46-shmcb.patch
+Patch22:	httpd-2.0.46-sslerr.patch
+Patch23:	httpd-2.0.46-sslio.patch
+Patch24:	httpd-2.0.46-sslmutex.patch
+Patch25:	httpd-2.0.47-ldapshm.patch
+Patch26:	httpd-2.0.47-sslcleanup.patch
+Patch27:	httpd-2.0.48-abench.patch
+Patch28:	httpd-2.0.48-autoindex.patch
+Patch29:	httpd-2.0.48-CAN-2003-0020.patch
+Patch30:	httpd-2.0.48-corelimit.patch
+Patch31:	httpd-2.0.48-debuglog.patch
+Patch32:	httpd-2.0.48-dynlimit.patch
+Patch33:	httpd-2.0.48-fdsetsize.patch
+Patch34:	httpd-2.0.48-include.patch
+Patch35:	httpd-2.0.48-proxy11.patch
+Patch36:	httpd-2.0.48-sslpphrase.patch
+Patch37:	httpd-2.0.48-sslvars.patch
+Patch38:	httpd-2.0.48-status.patch
+Patch39:	httpd-2.0.48-usertrack.patch
+Patch40:	httpd-2.0.48-worker.patch
+Patch41:	%{name}-v6only-ENOPROTOOPT.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	automake
 BuildRequires:	apr-devel >= 1:0.9.4-1
@@ -679,6 +680,7 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 %patch38 -p1
 %patch39 -p1
 %patch40 -p1
+%patch41 -p1
 
 %build
 # sanity check
