@@ -18,9 +18,10 @@ Source6:	apache_1.3.6.tar.gz.asc
 Source7:	apache_1.3.6.tar.gz.md5
 Source8:	apache.sysconfig
 Patch0:		%{name}-suexec.patch
-Patch1:		%{name}_1.3.6.ipv6.patch
+Patch1:		apache-136-v6-19990616-PLD.diff
 Patch2:		%{name}-htdocs.patch
 Patch3:		%{name}-release.patch
+Patch4:		apache-ndbm.patch
 Copyright:	BSD-like
 Obsoletes:	apache-extra
 Obsoletes:	apache6
