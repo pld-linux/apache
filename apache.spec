@@ -471,7 +471,7 @@ if [ -n "`id -u http 2>/dev/null`" ]; then
 		exit 1
 	fi
 else
-	/usr/sbin/useradd -u 51 -r -m -d /home/httpd -s /bin/false -c "HTTP User" -g http http 1>&2
+	/usr/sbin/useradd -u 51 -r -d /home/httpd -s /bin/false -c "HTTP User" -g http http 1>&2
 	if [ -f /var/db/passwd.db ]; then
 		/usr/bin/update-db 1>&2
 	fi
