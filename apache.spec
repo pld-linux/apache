@@ -259,12 +259,15 @@ adresu pocztowego u¿ytkownika).
 
 %package mod_auth_ldap
 Summary:	Apache module with LDAP user access authentication
-Summary(pl):	Modu³ Apache'a oferuj±cy autoryzacjê u¿ytkownika LDAP
+Summary(pl):	Modu³ Apache'a oferuj±cy autoryzacjê u¿ytkowników poprzez LDAP
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}
 
 %description mod_auth_ldap
-Apache module with LDAP user access authentication
+Apache module with LDAP user access authentication.
+
+%description mod_auth_ldap -l pl
+Modu³ Apache'a oferuj±cy autoryzacjê u¿ytkowników poprzez LDAP
 
 %package mod_auth_dbm
 Summary:	Apache module with user authentication which uses DBM files
@@ -344,7 +347,7 @@ Translacja lub przekodowywanie znaków.
 
 %package mod_dav
 Summary:	Apache module - Distributed Authoring and Versioning
-Summary(pl):	Modu³ Apache'a - Rozproszone autorstwo i wersjonowanie
+Summary(pl):	Modu³ Apache'a - rozproszone autorstwo i wersjonowanie
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}
 
@@ -362,7 +365,7 @@ zdalnym serwerze WWW.
 
 %package mod_deflate
 Summary:	Apache module: Compress content before it is delivered to the client
-Summary(pl):	Modu³ kompresuj±cy dane przed przes³aniem ich do klienta
+Summary(pl):	Modu³ Apache'a kompresuj±cy dane przed przes³aniem ich do klienta
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}
 
@@ -374,7 +377,7 @@ Modu³ kompresuj±cy dane przed przes³aniem ich do klienta.
 
 %package mod_dir
 Summary:	Apache module for "trailing slash" redirects and serving directory index files
-Summary(pl):	Modu³ oferuj±cy przekierowania i udostêpnianie informacji o zawarto¶ci katalogu
+Summary(pl):	Modu³ Apache'a oferuj±cy przekierowania i udostêpnianie informacji o zawarto¶ci katalogu
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}
 
@@ -388,7 +391,7 @@ katalogu.
 
 %package mod_headers
 Summary:	Apache module allows for the customization of HTTP response headers
-Summary(pl):	Modu³ pozwalaj±cy na modyfikacjê nag³ówków HTTP
+Summary(pl):	Modu³ Apache'a pozwalaj±cy na modyfikacjê nag³ówków HTTP
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}
 
@@ -403,7 +406,7 @@ wysy³anych do przegl±darki.
 
 %package mod_imap
 Summary:	Apache module with imap-file handler
-Summary(pl):	Modu³ z obs³ug± imap-file
+Summary(pl):	Modu³ Apache'a z obs³ug± imap-file
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}
 
@@ -417,7 +420,7 @@ Modu³ umo¿liwiaj±cy obs³ugê plików .map (imap-file handler).
 
 %package mod_info
 Summary:	Apache module with comprehensive overview of the server configuration
-Summary(pl):	Modu³ udostêpniaj±cy informacje o serwerze
+Summary(pl):	Modu³ Apache'a udostêpniaj±cy informacje o serwerze
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}
 
@@ -432,15 +435,19 @@ zainstalowanych modu³ach itp.
 
 %package mod_ldap
 Summary:	Apache module to use LDAP connections
+Summary(pl):	Modu³ Apache'a umo¿liwiaj±cy korzystanie z po³±czeñ LDAP
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}
 
 %description mod_ldap
-Apache module to use LDAP connections
+Apache module to use LDAP connections.
+
+%description mod_ldap -l pl
+Modu³ Apache'a umo¿liwiaj±cy korzystanie z po³±czeñ LDAP.
 
 %package mod_proxy
 Summary:	Apache module with Web proxy
-Summary(pl):	Modu³ dodaj±cy obs³ugê serwera proxy
+Summary(pl):	Modu³ Apache'a dodaj±cy obs³ugê serwera proxy
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}
 
@@ -457,7 +464,7 @@ HTTP/1.0 i HTTP/1.1.
 
 %package mod_rewrite
 Summary:	Apache module with rule-based engine for rewrite requested URLs on the fly
-Summary(pl):	Modu³ do "przepisywania" adresów URL w locie
+Summary(pl):	Modu³ Apache'a do "przepisywania" adresów URL w locie
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}
 
@@ -491,8 +498,8 @@ Security).
 ÛÉÆÒÏ×ÁÎÉÑ ÓÒÅÄÓÔ×ÁÍÉ Secure Sockets Layer (SSL) É Transport Layer
 
 %package mod_status
-Summary:	Server status report module for apache
-Summary(pl):	Modu³ udostêpniaj±cy informacje statystyczne z serwera
+Summary:	Server status report module for Apache
+Summary(pl):	Modu³ udostêpniaj±cy informacje statystyczne z serwera Apache
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}
 
@@ -509,7 +516,7 @@ pracy serwera apache (w postaci strony HTML).
 
 %package mod_usertrack
 Summary:	Apache module for user tracking using cookies
-Summary(pl):	Modu³ s³u¿±cy do ¶ledzenia "ciasteczek"
+Summary(pl):	Modu³ Apache'a s³u¿±cy do ¶ledzenia "ciasteczek"
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}
 
@@ -523,7 +530,7 @@ Modu³ pozwalaj±cy na ¶ledzenie "ciasteczek".
 
 %package mod_vhost_alias
 Summary:	Apache module for dynamically configured mass virtual hosting
-Summary(pl):	Modu³ dodaj±cy obs³ugê hostów wirtualnych
+Summary(pl):	Modu³ Apache'a dodaj±cy obs³ugê hostów wirtualnych
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}
 
@@ -537,7 +544,7 @@ wirtualnych.
 
 %package mod_unique_id
 Summary:	Apache module which provides a magic token for each request
-Summary(pl):	Modu³ nadaj±cy ka¿demu zapytaniu unikalny token
+Summary(pl):	Modu³ Apache'a nadaj±cy ka¿demu zapytaniu unikalny token
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}
 
@@ -558,7 +565,7 @@ UNIQUE_ID.
 
 %package mod_expires
 Summary:	Apache module which generates Expires HTTP headers
-Summary(pl):	Modu³ generuj±cy nag³ówki HTTP Expires
+Summary(pl):	Modu³ Apache'a generuj±cy nag³ówki HTTP Expires
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}
 
@@ -574,8 +581,8 @@ wa¿no¶ci mo¿e byæ ustalana w zale¿no¶ci od czasu modyfikacji plików
 ¼ród³owych lub odwo³ania klienta.
 
 %package mod_file_cache
-Summary:	Apache module: Caches a static list of files in memory
-Summary(pl):	Modu³ cache'uj±cy statyczn± listê plików w pamiêci
+Summary:	Apache module: caches a static list of files in memory
+Summary(pl):	Modu³ Apache'a cache'uj±cy statyczn± listê plików w pamiêci
 Group:		Networking/Daemons
 Obsoletes:	%{name}-mmap_static
 Requires:	%{name} = %{version}
