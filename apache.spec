@@ -200,7 +200,7 @@ fi
 %attr(755,root,root) /usr/sbin/logresolve
 %attr(755,root,root) /usr/sbin/rotatelogs
 
-%attr(644,root, man) %{_mandir}/man[18]/*
+%{_mandir}/man[18]/*
 
 %attr(750,root,root) %dir /var/log/httpd
 %attr(640,root,root) %config %verify(not size mtime md5) /var/log/httpd/*
