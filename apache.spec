@@ -928,9 +928,9 @@ fi
 
 %triggerpostun  -- %{name} <= 2.0.50-6
 echo "WARNING!!!"
-echo "Since that version autoindex module has been separated to package apache-mod_autoindex"
+echo "Since that version autoindex module has been separated to package %{name}-mod_autoindex"
 echo "If you want to have the same functionality do:"
-echo "poldek --upgrade apache-mod_autoindex"
+echo "poldek --upgrade %{name}-mod_autoindex"
 echo
 
 %post mod_actions
