@@ -861,6 +861,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/manual/sourcereorg.html
 %{_datadir}/manual/suexec.html
 %{_datadir}/manual/upgrading_to_1_3.html
+%dir %{_datadir}/manual/mod
 %{_datadir}/manual/mod/core.html
 %{_datadir}/manual/mod/directive-dict.html
 %{_datadir}/manual/mod/directives.html
