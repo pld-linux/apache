@@ -27,7 +27,7 @@ Summary(uk):	îÁÊÐÏÐÕÌÑÒÎ¦ÛÉÊ Web-Server
 Summary(zh_CN):	Internet ÉÏÓ¦ÓÃ×î¹ã·ºµÄ Web ·þÎñ³ÌÐò¡£
 Name:		apache
 Version:	1.3.23
-Release:	2
+Release:	3
 License:	Apache Group License
 Group:		Networking/Daemons
 Group(cs):	Sí»ové/Démoni
@@ -480,6 +480,34 @@ available in Apache 1.1 and later.
 Ten pakiet zawiera modu³ mod_auth_db. Modu³ ten s³u¿y do autentykacji
 ale jako plików danych u¿ywa Berkeley DB.
 
+%package mod_auth_digest
+Summary:	Apache user authentication module using MD5 Digest Authentication 
+Summary(pl):	Modu³ apache do autoryzacji MD5
+Group:		Networking/Daemons
+Group(cs):	Sí»ové/Démoni
+Group(da):	Netværks/Dæmoner
+Group(de):	Netzwerkwesen/Server
+Group(es):	Red/Servidores
+Group(fr):	Réseau/Serveurs
+Group(it):	Rete/Demoni
+Group(no):	Nettverks/Daemoner
+Group(pl):	Sieciowe/Serwery
+Group(pt):	Rede/Servidores
+Group(ru):	óÅÔÅ×ÙÅ/äÅÍÏÎÙ
+Group(sv):	Nätverk/Demoner
+Prereq:		%{_sbindir}/apxs
+Prereq:		perl
+Requires:	%{name}(EAPI) = %{version}
+Obsoletes:	%{name}-mod_digest
+
+%description mod_auth_digest
+This package contains mod_digest module. It provides user
+authentication using MD5 Digest Authentication.
+
+%description mod_auth_digest -l pl
+Modu³ ten dostarcza metodê autoryzacji bazuj±c± na MD5 Digest
+Authentication.
+
 %package mod_define
 Summary:	Apache module - authentication variables for arbitrary directives
 Summary(pl):	Modu³ apache do definiowania zmiennych
@@ -510,8 +538,8 @@ variables which can be expanded on any(!) directive line.
 Modu³ ten umo¿liwia definicjê zmiennych i dyrektyw.
 
 %package mod_digest
-Summary:	Apache user authentication module using MD5 Digest Authentication
-Summary(pl):	Modu³ apache do autoryzacji MD5
+Summary:	Older version of apache user authentication module using MD5 Digest Authentication 
+Summary(pl):	Starsza wersja modu³u apache do autoryzacji MD5
 Group:		Networking/Daemons
 Group(cs):	Sí»ové/Démoni
 Group(da):	Netværks/Dæmoner
@@ -533,11 +561,17 @@ Requires:	%{name}(EAPI) = %{version}
 
 %description mod_digest
 This package contains mod_digest module. It provides user
-authentication using MD5 Digest Authentication.
+authentication using MD5 Digest Authentication. It implements an older
+version of the MD5 Digest Authentication specification which will probably
+not work with modern browsers. Please take a look at mod_auth_digest
+which implements the most recent version of the standard.
 
 %description mod_digest -l pl
 Modu³ ten dostarcza metodê autoryzacji bazuj±c± na MD5 Digest
-Authentication.
+Authentication. Implementuje on jedynie starsz± wersjê specyfikacji
+autentykacji MD5, i mo¿e nie dzia³aæ z nowoczesnymi przegl±darkami.
+Sprawd¼ mod_auth_digest je¶li potrzebujesz implementacji najnowszej
+wersji standardu.
 
 %package mod_dir
 Summary:	Apache module for "trailing slash" redirects and serving directory index files
@@ -957,6 +991,7 @@ OPTIM="%{rpmcflags}" \
 	--with-layout=PLD \
 	--without-confadjust \
 	--enable-module=all \
+	--enable-module=auth_digest \
 	--enable-shared=max \
 	--proxycachedir=/var/cache/apache \
 	--with-perl=%{_bindir}/perl \
@@ -1149,7 +1184,23 @@ if [ "$1" = "0" ]; then
 	fi
 fi
 
-%triggerpostun mod_auth_db -- apache-mod_auth_db <= 1.3.20-2
+%post mod_auth_digest
+%{_sbindir}/apxs -e -a -n auth_digest %{_libexecdir}/mod_auth_digest.so 1>&2
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+fi
+
+%preun mod_auth_digest
+if [ "$1" = "0" ]; then
+	%{_sbindir}/apxs -e -A -n auth_digest %{_libexecdir}/mod_auth_digest.so 1>&2
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2
+	fi
+fi
+
+%triggerpostun mod_auth_db -- apache-mod_auth_db <= 1.3.20-2 
 %{_sbindir}/apxs -e -A -n auth_dbm %{_libexecdir}/mod_auth_dbm.so 1>&2
 
 %post mod_define
@@ -1396,7 +1447,7 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc ABOUT_APACHE.gz src/CHANGES.gz KEYS.gz README.gz
+%doc ABOUT_APACHE.gz src/CHANGES.gz README.gz
 %doc conf/mime.types
 
 %attr(754,root,root) /etc/rc.d/init.d/httpd
@@ -1515,6 +1566,7 @@ fi
 %lang(en) %{_datadir}/manual/server-wide.html.en
 %lang(fr) %{_datadir}/manual/server-wide.html.fr
 %lang(ja) %{_datadir}/manual/server-wide.html.ja.jis
+%{_datadir}/manual/sitemap.html
 %{_datadir}/manual/sourcereorg.html
 %{_datadir}/manual/stopping.html.html
 %lang(en) %{_datadir}/manual/stopping.html.en
@@ -1557,6 +1609,7 @@ fi
 %{_datadir}/manual/mod/mod_asis.html
 %{_datadir}/manual/mod/mod_autoindex.html
 %{_datadir}/manual/mod/mod_cgi.html
+%{_datadir}/manual/mod/mod_cern_meta.html
 %{_datadir}/manual/mod/mod_env.html.html
 %lang(en) %{_datadir}/manual/mod/mod_env.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_env.html.ja.jis
@@ -1574,6 +1627,7 @@ fi
 %{_datadir}/manual/mod/mod_setenvif.html.html
 %lang(en) %{_datadir}/manual/mod/mod_setenvif.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_setenvif.html.ja.jis
+%{_datadir}/manual/mod/mod_so.html
 %{_datadir}/manual/mod/mod_speling.html
 %{_datadir}/manual/mod/mod_userdir.html
 %{_datadir}/manual/mod/module-dict.html.html
@@ -1689,6 +1743,11 @@ fi
 %{_datadir}/manual/mod/mod_auth_db.html
 %{_mandir}/man1/dbmmanage.1*
 %{_mandir}/man1/htpasswd.1*
+
+%files mod_auth_digest
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libexecdir}/mod_auth_digest.so
+%{_datadir}/manual/mod/mod_auth_digest.html
 
 %files mod_define
 %defattr(644,root,root,755)
