@@ -20,39 +20,43 @@
 [ -f /etc/sysconfig/apache ] && . /etc/sysconfig/apache
 
 # Check that networking is up.
-if is_no "${NETWORKING}"; then
-        # nls "ERROR: Networking is down. %s can't be run." <service>
-        msg_network_down httpd
-        exit 1
+if is_yes "${NETWORKING}"; then
+	if [ ! -f /var/lock/subsys/network ]; then
+		# nls "ERROR: Networking is down. %s can't be run." <service>
+		msg_network_down httpd
+		exit 1
+	fi
+else
+	exit 0
 fi
 
 if is_no "${IPV6_NETWORKING}"; then
-        HTTPD_OPTS="$HTTPD_OPTS -4"
+	HTTPD_OPTS="$HTTPD_OPTS -4"
 fi
 
 # See how we were called.
 case "$1" in
   start)
 	# Check if the service is already running?
-        if [ ! -f /var/lock/subsys/httpd ]; then
+	if [ ! -f /var/lock/subsys/httpd ]; then
 		msg_starting httpd
 		daemon httpd $HTTPD_OPTS
-	        RETVAL=$?
+		RETVAL=$?
     		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/httpd
 	else
-        	msg_already_running httpd
-	        exit 1
+		msg_already_running httpd
+		exit 1
 	fi
 	;;
   stop)
-        # Stop daemons.
+	# Stop daemons.
 	if [ -f /var/lock/subsys/httpd ]; then
-                msg_stopping httpd
-                killproc httpd
-                rm -f /var/lock/subsys/httpd /var/run/httpd.pid /var/run/httpd.loc* >/dev/null 2>&1
-        else
+		msg_stopping httpd
+		killproc httpd
+		rm -f /var/lock/subsys/httpd /var/run/httpd.pid /var/run/httpd.loc* >/dev/null 2>&1
+	else
 		msg_not_running httpd
-	        exit 1
+		exit 1
 	fi
 	;;
   status)
