@@ -17,7 +17,6 @@
 # Conditional build:
 %bcond_without	ssl		# build without SSL support
 %bcond_without	ldap		# build without LDAP support
-%bcond_without	metuxmpm	# don't build METUX MPM version
 #
 %include	/usr/lib/rpm/macros.perl
 # this is internal macro, don't change to %%apache_modules_api
@@ -79,6 +78,8 @@ Patch18:	httpd-2.0.48-sslpphrase.patch
 Patch19:	%{name}-v6only-ENOPROTOOPT.patch
 Patch20:	%{name}-conffile-path.patch
 Patch21:	%{name}-apxs.patch
+# http://www.telana.com/peruser.php
+Patch22:	httpd-2.0.50-peruser-r2.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	automake
 BuildRequires:	apr-devel >= 1:0.9.5-6
@@ -653,7 +654,7 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
-%{?with_metuxmpm:%patch5 -p1}
+%patch5 -p1
 %patch7 -p1
 %patch8 -p1
 %patch9 -p1
@@ -669,6 +670,7 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 %patch19 -p1
 %patch20 -p1
 %patch21 -p1
+%patch22 -p1
 
 %{__perl} -pi -e "s@/usr/local/bin/perl@%{__perl}@" $(grep -rl "/usr/local/bin/perl" *)
 
@@ -685,7 +687,7 @@ fi
 	support/apxs.in
 install /usr/share/automake/config.* build/
 CPPFLAGS="-DMAX_SERVER_LIMIT=200000 -DBIG_SECURITY_HOLE=1"
-for mpm in %{?with_metuxmpm:metuxmpm} perchild prefork worker; do
+for mpm in metuxmpm peruser perchild prefork worker; do
 install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
 ../%configure \
 	--prefix=%{_sysconfdir} \
@@ -759,7 +761,7 @@ find include -name '*.h' | xargs perl -pi -e "s#/httpd\.(.*?)\.conf#/etc/httpd/h
 cd ..
 done
 
-for mpm in %{?with_metuxmpm:metuxmpm} perchild worker; do
+for mpm in metuxmpm peruser perchild worker; do
 	if ! cmp -s buildmpm-prefork/modules-inside buildmpm-${mpm}/modules-inside; then
 		echo "List of compiled modules is different between prefork-MPM and ${mpm}-MPM!"
 		echo "Build failed."
@@ -787,7 +789,7 @@ install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig,monit} \
 	logdir=%{_var}/log/httpd \
 	proxycachedir=%{_var}/cache/httpd
 
-for mpm in %{?with_metuxmpm:metuxmpm} perchild worker; do
+for mpm in metuxmpm peruser perchild worker; do
 	install buildmpm-${mpm}/httpd.${mpm} $RPM_BUILD_ROOT%{_sbindir}/httpd.${mpm}
 	ln -s httpd.conf $RPM_BUILD_ROOT%{_sysconfdir}/httpd.${mpm}.conf
 done
