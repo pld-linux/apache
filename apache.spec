@@ -5,7 +5,7 @@ Summary(pl):	Serwer WWW (World Wide Web)
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	1.3.4
-Release:	5d
+Release:	6d
 Group:		Networking/Daemons
 Group(pl):	Sieci/Demony
 Source0:	ftp://ftp.apache.org/apache/dist/%{name}_%{version}.tar.gz
@@ -46,10 +46,10 @@ Apache serbest daðýtýlan ve çok kullanýlan yetenekli bir web sunucusudur.
 
 %package suexec
 Summary:	Apache suexec wrapper
+Summary(pl):	Suexec wrapper do serwera www Apache
 Group:		Networking/Development
 Group(pl):	Sieci/Programowanie
 Requires:	%{name} = %{version}
-Summary(pl):	Suexec wrapper do serwera www Apache
 
 %description suexec
 The suEXEC feature provides Apache users the ability to run CGI and SSI
@@ -64,24 +64,24 @@ jako taki sam u¿ytkownik jak serwer WWW.
 
 %package devel
 Summary:	Apache include files
+Summary(pl):	Pliki nag³ówkowe do serwera www Apache
 Group:		Networking/Development
 Group(pl):	Sieci/Programowanie
 Requires:	%{name} = %{version}
-Summary(pl):	Pliki nag³ówkowe do serwera www Apache
 
 %description devel
 Apache include files.
 
 %description -l pl devel
-Pliki nag³ówkowe do serwera www Apache.
+Pliki nag³ówkowe dla serwera WWW Apache.
 
 %package doc
 Summary:	Apache dokumentation
+Summary(pl):	Dokumentacja do Apache
 Group:		Documentation
 Group(pl):	Dokumentacja
 Requires:	%{name} = %{version}
 URL:		http://www.apache.org/
-Summary(pl):	Dokumentacja do Apache
 
 %description doc
 Documentation for apache in HTML format.
@@ -95,7 +95,7 @@ Dokumentacja do Apache w formacie HTML
 %patch1 -p1
 
 %build
-OPTIM=$RPM_OPT_FLAGS \
+OPTIM=$RPM_OPT_FLAGS LDFLAGS=-s\
     ./configure \
 	--prefix=/usr \
 	--sysconfdir=/etc/httpd/conf \
@@ -121,6 +121,7 @@ make
 
 %install
 rm -rf $RPM_BUILD_ROOT
+
 make install-quiet root="$RPM_BUILD_ROOT"
 
 mv $RPM_BUILD_ROOT/home/httpd/htdocs $RPM_BUILD_ROOT/home/httpd/html
@@ -144,8 +145,8 @@ cp -a apache-extra/icons/*	$RPM_BUILD_ROOT/home/httpd/icons
 cp -a apache-extra/*.conf	$RPM_BUILD_ROOT/etc/httpd/conf
 cp -a apache-extra/m*		$RPM_BUILD_ROOT/etc/httpd/conf
 
-bzip2 -9 $RPM_BUILD_ROOT/usr/man/{man1/*,man8/*}
-bzip2 -9 ABOUT_APACHE src/CHANGES KEYS README
+gzip -9nf $RPM_BUILD_ROOT/usr/man/{man1/*,man8/*}
+gzip -9nf ABOUT_APACHE src/CHANGES KEYS README
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -163,7 +164,7 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc ABOUT_APACHE.bz2 src/CHANGES.bz2 KEYS.bz2 README.bz2
+%doc ABOUT_APACHE.gz src/CHANGES.gz KEYS.gz README.gz
 %doc conf/mime.types
 
 %attr(750,root,root) %dir /etc/httpd
@@ -217,6 +218,12 @@ fi
 /home/httpd/html/manual
 
 %changelog
+* Thu Feb 10 1999 Micha³ Kuratczyk <kurkens@polbox.com>
+  [1.3.4-6d]
+- added LDFLAGS=-s
+- gzipping instead bzipping
+- cosmetic changes
+
 * Tue Jan 26 1999 Wojtek ¦lusarczyk <wojtek@shadow.eu.org>
   [1.3.4-5d]
 - rebuild against new kernel-2.2.0 ;)  
