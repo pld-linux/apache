@@ -20,6 +20,7 @@ Summary(es):	Servidor HTTPD para proveer servicios WWW
 Summary(fr):	Le serveur web le plus utilise sur Internet
 Summary(pl):	Serwer WWW (World Wide Web)
 Summary(pt_BR):	Servidor HTTPD para prover serviГos WWW
+Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.0.45
@@ -63,7 +64,7 @@ Requires(pre):	/usr/sbin/groupadd
 Requires(pre):	/usr/sbin/useradd
 Requires(post,preun):	/sbin/chkconfig
 Requires(post,postun):	/sbin/ldconfig
-Requires(post):	fileutils
+Requires(post):		fileutils
 Requires(postun):	/usr/sbin/userdel
 Requires(postun):	/usr/sbin/groupdel
 Requires:	mailcap
@@ -115,6 +116,10 @@ pode executar vАrias funГУes diferentes, incluindo funГУes de proxy e
 cache, e oferece caracterМsticas como monitor de status, conversЦo
 dinБmica de tipo, e mais.
 
+%description -l ru
+Apache - мощный, функциональный, высокопроизводительный и свободно
+распространяемый веб-сервер.
+
 %description -l tr
 Apache serbest daПЩtЩlan ve Гok kullanЩlan yetenekli bir web
 sunucusudur.
@@ -142,6 +147,7 @@ Summary(es):	Archivos de inclusiСn del Apache para desarrollo de mСdulos
 Summary(fr):	Les outils de developpement de modules pour le serveur web Apache
 Summary(pl):	Pliki nagЁСwkowe do tworzenia moduЁСw rozszerzeЯ do serwera WWW Apache
 Summary(pt_BR):	Arquivos de inclusЦo do Apache para desenvolvimento de mСdulos
+Summary(ru):	Средства разработки модулей для веб-сервера Apache
 Group:		Networking/Utilities
 Requires:	%{name} = %{version}
 Requires:	apr-devel = %{version}
@@ -161,7 +167,11 @@ Apache et le binaire APXS dont vous aurez besoin pour construire des
 Objets Dynamiques Partages (DSOs) pour Apache.
 
 %description devel -l pl
-Pliki nagЁСwkowe dla serwera WWW Apache.
+Pliki nagЁСwkowe i inne zasoby niezbdne przy budowaniu moduЁow DOS
+(Dynamic Shared Objects) dla apache.
+
+%description devel -l ru
+Средства разработки модулей для веб-сервера Apache.
 
 %description devel -l pt_BR
 Este pacote contem os arquivos de inclusЦo para o Apache, bem como o
@@ -429,17 +439,26 @@ rewrite requested URLs on the fly.
 ModuЁ oferuj╠cy mo©liwo╤Ф "przepisywania" adresСw URL w locie.
 
 %package mod_ssl
-Summary:	Apache module: Strong cryptography using the Secure Sockets Layer (SSL)
-Summary(pl):	ModuЁ Apache'a: Silna kryptografia z u©yciem SSL
+Summary:	SSL/TLS module for the Apache HTTP server
+Summary(pl):	ModuЁ SSL/TSL dla serwera serwera Apache
+Summary(ru):	Модуль SSL/TLS для веб-сервера Apache
 Group:		Networking/Daemons
 Epoch:		1
 Requires:	%{name} = %{version}
 
 %description mod_ssl
-Strong cryptography using the Secure Sockets Layer (SSL).
+The mod_ssl module provides strong cryptography for the Apache Web
+server via the Secure Sockets Layer (SSL) and Transport Layer Security
+(TLS) protocols.
 
 %description mod_ssl -l pl
-Silna kryptografia z u©yciem SSL.
+ModuЁ mod_ssl udostЙpnia wsparcie do silnej kryptografii dla serwera
+Apache poprzez protokoЁy SSL/TSL (Secure Sockets Layer/Transport Layer
+Security).
+
+%description mos_ssl -l ru
+Модуль mod_ssl обеспечивает поддержку в веб-сервере Apache надежного
+шифрования средствами Secure Sockets Layer (SSL) и Transport Layer
 
 %package mod_status
 Summary:	Server status report module for apache
@@ -1083,7 +1102,7 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc ABOUT_APACHE CHANGES README 
+%doc ABOUT_APACHE CHANGES README
 %doc docs/conf/mime.types
 
 %attr(754,root,root) /etc/rc.d/init.d/httpd
