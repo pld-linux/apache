@@ -29,7 +29,7 @@ Provides:	webserver
 Prereq:		/sbin/chkconfig
 Prereq:		/usr/sbin/useradd
 Prereq:		/usr/bin/getgid
-Prereq:		/usr/bin/id
+Prereq:		/usr/id
 Prereq:		sh-utils
 #BuildRequires:	mm-devel
 Requires:	rc-scripts
