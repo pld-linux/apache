@@ -9,7 +9,7 @@ Version:	1.3.12
 Release:	1
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
-Source0:	ftp://ftp.apache.org/apache/dist/%{name}_%{version}.tar.gz
+Source0:	ftp://ftp.apache.org/dist/%{name}_%{version}.tar.gz
 Source1:	apache.init
 Source2:	apache.logrotate
 Source3:	apache-icons.tar.gz
