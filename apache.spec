@@ -79,6 +79,7 @@ Patch19:	httpd-2.0.48-fdsetsize.patch
 Patch20:	httpd-2.0.48-sslpphrase.patch
 Patch21:	%{name}-v6only-ENOPROTOOPT.patch
 Patch22:	%{name}-conffile-path.patch
+Patch23:	%{name}-apxs.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	automake
 BuildRequires:	apr-devel >= 1:0.9.5-6
@@ -86,7 +87,7 @@ BuildRequires:	apr-util-devel >= 1:0.9.5-5
 BuildRequires:	db-devel
 BuildRequires:	expat-devel
 BuildRequires:	gdbm-devel >= 1.8.3
-BuildRequires:	libtool >= 1.5
+BuildRequires:	libtool >= 2:1.5
 %{?with_ldap:BuildRequires:	openldap-devel}
 %{?with_ssl:BuildRequires:	openssl-devel >= 0.9.7d}
 %{?with_ssl:BuildRequires:	openssl-tools >= 0.9.7d}
@@ -104,6 +105,7 @@ Requires(postun):	/usr/sbin/groupdel
 Requires(post,preun):	/sbin/chkconfig
 Requires(post,postun):	/sbin/ldconfig
 Requires(post):	fileutils
+Requires:	%{name}-apxs = %{version}-%{release}
 Requires:	apr-util >= 1:0.9.5-5
 Requires:	/etc/mime.types
 Requires:	mailcap
@@ -113,7 +115,6 @@ Provides:	webserver = %{version}
 Provides:	apache(modules-api) = %{_apache_modules_api}
 Obsoletes:	apache-extra
 Obsoletes:	apache6
-Obsoletes:	indexhtml
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_sysconfdir	/etc/httpd
@@ -184,6 +185,7 @@ Summary:	Apache index.html* files
 Summary(pl):	Pliki Apache index.html*
 Group:		Documentation
 Requires:	%{name} = %{version}-%{release}
+Obsoletes:	indexhtml
 
 %description index
 Apache index.html* files.
@@ -203,6 +205,17 @@ Apache manual.
 %description doc -l pl
 Podrêcznik Apache'a.
 
+%package apxs
+Summary:	APache eXtenSion tool
+Summary(pl):	Narzêdzie do rozszerzania Apache'a
+Group:		Development/Tools
+
+%description apxs
+APache eXtenSion tool.
+
+%description apxs -l pl
+Narzêdzie do rozszerzania Apache'a.
+ 
 %package devel
 Summary:	Module development tools for the Apache web server
 Summary(es):	Archivos de inclusión del Apache para desarrollo de módulos
@@ -211,7 +224,7 @@ Summary(pl):	Pliki nag³ówkowe do tworzenia modu³ów rozszerzeñ do serwera WWW Apa
 Summary(pt_BR):	Arquivos de inclusão do Apache para desenvolvimento de módulos
 Summary(ru):	óÒÅÄÓÔ×Á ÒÁÚÒÁÂÏÔËÉ ÍÏÄÕÌÅÊ ÄÌÑ ×ÅÂ-ÓÅÒ×ÅÒÁ Apache
 Group:		Networking/Utilities
-Requires:	%{name} = %{version}-%{release}
+Requires:	%{name}-apxs = %{version}-%{release}
 Requires:	apr-util-devel >= 1:0.9.5-5
 Requires:	libtool
 Obsoletes:	apache-static
@@ -655,6 +668,7 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 %patch20 -p1
 %patch21 -p1
 %patch22 -p1
+%patch23 -p1
 
 %build
 # sanity check
@@ -1218,7 +1232,6 @@ fi
 
 %attr(754,root,root) /etc/rc.d/init.d/httpd
 
-%attr(750,root,root) %dir %{_sysconfdir}
 %attr(750,root,root) %dir %{_sysconfdir}/httpd.conf
 %attr(750,root,root) %dir %{_sysconfdir}/modules
 %attr(750,root,root) %dir %{_sysconfdir}/run
@@ -1227,7 +1240,6 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/sysconfig/*
 %attr(640,root,root) %config(noreplace) /etc/logrotate.d/*
 
-%dir %{_libexecdir}
 %attr(755,root,root) %{_libexecdir}/mod_access.so
 %attr(755,root,root) %{_libexecdir}/mod_alias.so
 %attr(755,root,root) %{_libexecdir}/mod_asis.so
@@ -1259,18 +1271,20 @@ fi
 
 %attr(755,root,root) %{_sbindir}/ab
 %attr(755,root,root) %{_sbindir}/apachectl
-%attr(755,root,root) %{_sbindir}/apxs
 %attr(755,root,root) %{_sbindir}/checkgid
 %attr(755,root,root) %{_sbindir}/httpd
 %attr(755,root,root) %{_sbindir}/httpd.*
 %attr(755,root,root) %{_sbindir}/logresolve
 %attr(755,root,root) %{_sbindir}/rotatelogs
-%attr(755,root,root) %{_sbindir}/envvars*
 
 %dir %attr(770,root,http) /var/run/apache
 
 %{_mandir}/man1/htdigest.1*
-%{_mandir}/man8/*
+%{_mandir}/man8/ab.8*
+%{_mandir}/man8/apachectl.8*
+%{_mandir}/man8/httpd.8*
+%{_mandir}/man8/logresolve.8*
+%{_mandir}/man8/rotatelogs.8*
 
 %attr(750,root,root) %dir /var/log/httpd
 %attr(750,root,root) %dir /var/log/archiv/httpd
@@ -1365,12 +1379,21 @@ fi
 %attr(4755,root,root) %{_sbindir}/suexec
 %attr(755,root,root) %{_libexecdir}/mod_suexec.so
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_suexec.conf
+%{_mandir}/man8/suexec.8*
 
 %files index
 %defattr(644,root,root,755)
 %config(noreplace,missingok) %{_datadir}/html/index.html*
 %{_datadir}/html/*.gif
 %{_datadir}/html/*.png
+
+%files apxs
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_sbindir}/apxs
+%attr(755,root,root) %{_sbindir}/envvars*
+%attr(750,root,root) %dir %{_sysconfdir}
+%dir %{_libexecdir}
+%{_mandir}/man8/apxs.8*
 
 %files devel
 %defattr(644,root,root,755)
