@@ -146,7 +146,7 @@ cp -a apache-extra/icons/*	$RPM_BUILD_ROOT/home/httpd/icons
 cp -a apache-extra/*.conf	$RPM_BUILD_ROOT/etc/httpd/conf
 cp -a apache-extra/m*		$RPM_BUILD_ROOT/etc/httpd/conf
 
-gzip -9nf $RPM_BUILD_ROOT/usr/man/{man1/*,man8/*}
+gzip -9nf $RPM_BUILD_ROOT%{_mandir}/{man1/*,man8/*}
 gzip -9nf ABOUT_APACHE src/CHANGES KEYS README
 
 %clean
@@ -200,7 +200,7 @@ fi
 %attr(755,root,root) /usr/sbin/logresolve
 %attr(755,root,root) /usr/sbin/rotatelogs
 
-%attr(644,root, man) /usr/man/man[18]/*
+%attr(644,root, man) %{_mandir}/man[18]/*
 
 %attr(750,root,root) %dir /var/log/httpd
 %attr(640,root,root) %config %verify(not size mtime md5) /var/log/httpd/*
