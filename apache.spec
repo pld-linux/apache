@@ -102,6 +102,7 @@ Dokumentacja do Apache w formacie HTML
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 
 %build
 OPTIM="$RPM_OPT_FLAGS" LDFLAGS="-s"\
