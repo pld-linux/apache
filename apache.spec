@@ -716,7 +716,7 @@ if [ "$1" = "0" ]; then
 	fi
 fi
 
-%triggetpostun mod_auth_db --  apache-mod_auth_db <= 1.3.20-2 
+%triggerpostun mod_auth_db -- apache-mod_auth_db <= 1.3.20-2 
 %{_sbindir}/apxs -e -A -n auth_dbm %{_libexecdir}/mod_auth_dbm.so 1>&2
 
 %post mod_define
