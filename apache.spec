@@ -13,7 +13,7 @@ Summary(pt_BR):	Servidor HTTPD para prover serviços WWW
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	1.3.22
-Release:	1
+Release:	2
 License:	Apache Group License
 Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
@@ -131,7 +131,7 @@ SSI programs under user IDs different from the user ID of the calling
 web-server. Normally, when a CGI or SSI program executes, it runs as
 the same user who is running the web server.
 
-%description -l pl suexec
+%description suexec -l pl
 SuEXEC umo¿liwia serwerowi Apache uruchamianie programów CGI i SSI z
 innym UID ni¿ wywo³uj±cy je serwer. Normalnie programy CGI i SSI s±
 wykonywane jako taki sam u¿ytkownik jak serwer WWW.
@@ -153,21 +153,21 @@ Provides:	%{name}(EAPI)-devel
 %description devel
 The apache-devel package contains header files for Apache.
 
-%description -l fr devel
-Le package apache-devel contient le code source pour le serveur Web
-Apache et le binaire APXS dont vous aurez besoin pour construire des
-Objets Dynamiques Partages (DSOs) pour Apache.
-
-%description -l es devel
+%description devel -l es
 Este paquete contiene los archivos de inclusión para el Apache, bien
 como el utilitario apxs para la construcción de objetos compartidos
 dinámicos (DSOs). Ha ce falta instalar este paquete si deseas compilar
 o desarrollar módulos adicionales para Apache.
 
-%description -l pl devel
+%description devel -l fr
+Le package apache-devel contient le code source pour le serveur Web
+Apache et le binaire APXS dont vous aurez besoin pour construire des
+Objets Dynamiques Partages (DSOs) pour Apache.
+
+%description devel -l pl
 Pliki nag³ówkowe dla serwera WWW Apache.
 
-%description -l pt_BR devel
+%description devel -l pt_BR
 Este pacote contem os arquivos de inclusão para o Apache, bem como o
 utilitário apxs para a construção de objetos compartilhados dinâmicos
 (DSOs). Este pacote precisa ser instalado se você deseja compilar ou
@@ -188,7 +188,7 @@ This package contains mod_actions module. This module lets you run CGI
 scripts whenever a file of a certain type is requested. This makes it
 much easier to execute scripts that process files.
 
-%description -l pl mod_actions
+%description mod_actions -l pl
 Ten modu³ pozwala na uruchamianie skryptów w momencie gdy nadchodzi
 ¿±danie pobrania pliku okre¶lonego typu.
 
@@ -205,7 +205,7 @@ Requires:	%{name}(EAPI) = %{version}
 This package contains mod_auth module. It provides for user
 authentication using textual files.
 
-%description -l pl mod_auth
+%description mod_auth -l pl
 Ten pakiet zawiera modu³ mod_auth. S³u¿y on do autentykacji przy
 u¿yciu plików tekstowych.
 
@@ -231,7 +231,7 @@ users. One advantage of using Auth-based user tracking is that, unlike
 magic-cookies and funny URL pre/postfixes, it is completely browser
 independent and it allows users to share URLs.
 
-%description -l pl mod_auth_anon
+%description mod_auth_anon -l pl
 Ten modu³ oferuje anonimow± autoryzacjê u¿ytkownia podobnie do
 anonimowych serwerów ftp (u¿ytkownik ,,anonymous'' oraz has³o w
 postaci adresu pocztowego u¿ytkownika).
@@ -252,7 +252,7 @@ authentication using Berkeley DB files. It is an alternative to DBM
 files for those systems which support DB and not DBM. It is only
 available in Apache 1.1 and later.
 
-%description -l pl mod_auth_db
+%description mod_auth_db -l pl
 Ten pakiet zawiera modu³ mod_auth_db. Modu³ ten s³u¿y do autentykacji
 ale jako plików danych u¿ywa Berkeley DB.
 
@@ -270,7 +270,7 @@ Requires:	%{name}(EAPI) = %{version}
 It provides the definition variables for arbitrary directives, i.e.
 variables which can be expanded on any(!) directive line.
 
-%description -l pl mod_define
+%description mod_define -l pl
 Modu³ ten umo¿liwia definicjê zmiennych i dyrektyw.
 
 %package mod_digest
@@ -287,7 +287,7 @@ Requires:	%{name}(EAPI) = %{version}
 This package contains mod_digest module. It provides user
 authentication using MD5 Digest Authentication.
 
-%description -l pl mod_digest
+%description mod_digest -l pl
 Modu³ ten dostarcza metodê autoryzacji bazuj±c± na MD5 Digest
 Authentication.
 
@@ -305,7 +305,7 @@ Requires:	%{name}(EAPI) = %{version}
 This package contains mod_dir which provides "trailing slash"
 redirects and serving directory index files.
 
-%description -l pl mod_dir
+%description mod_dir -l pl
 Modu³ oferuj±cy przekierowania i serwowanie indeksu katalogu.
 
 %package mod_headers
@@ -323,7 +323,7 @@ This package contains mod_headers module. The module allows for the
 customization of HTTP response headers. Headers can be merged,
 replaced or removed.
 
-%description -l pl mod_headers
+%description mod_headers -l pl
 Modu³ pozwalaj±cy na ³±czenie, usuwania, zamianê nag³ówków HTTP
 wysy³anych do przegl±darki.
 
@@ -342,7 +342,7 @@ This package contains mod_mmap_static module. It provides mmap()ing of
 a statically configured list of frequently requested but not changed
 files.
 
-%description -l pl mod_mmap_static
+%description mod_mmap_static -l pl
 Modu³ umo¿liwia mmap()owanie statycznie skonfigurowanych plików
 (czêsto u¿ywanych ale nie ulegaj±cych zmianom).
 
@@ -361,7 +361,7 @@ This package contains mod_imap module. It provides for .map files,
 replacing the functionality of the imagemap CGI program. Any directory
 or document type configured to use the handler imap-file.
 
-%description -l pl mod_imap
+%description mod_imap -l pl
 Modu³ umozliwiaj±cy obs³ugê plików .map (imap-file handler)
 
 %package mod_info
@@ -379,7 +379,7 @@ This package contains mod_info module. It provides a comprehensive
 overview of the server configuration including all installed modules
 and directives in the configuration files.
 
-%description -l pl mod_info
+%description mod_info -l pl
 Modu³ dostarczaj±cy informacji o konfiguracji serwera, zainstalowanych
 modu³ach itp.
 
@@ -399,7 +399,7 @@ Apache. It implements proxying capability for FTP, CONNECT (for SSL),
 HTTP/0.9, and HTTP/1.0. The module can be configured to connect to
 other proxy modules for these and other protocols.
 
-%description -l pl mod_proxy
+%description mod_proxy -l pl
 Modu³ zawiera implementacjê serwera proxy/cache dla Apache.
 Iplementacja zawiera obs³ugê FTP, CONNECT (dla SSL), HTTP/0.9 i
 HTTP/1.0.
@@ -418,7 +418,7 @@ Requires:	%{name}(EAPI) = %{version}
 This package contains It provides a rule-based rewriting engine to
 rewrite requested URLs on the fly.
 
-%description -l pl mod_rewrite
+%description mod_rewrite -l pl
 Modu³ oferuj±cy mo¿liwo¶æ ,,przepisywania'' adresów URL w locie.
 
 %package mod_status
@@ -438,7 +438,7 @@ current server statistics in an easily readable form. If required this
 page can be made to automatically refresh (given a compatible
 browser).
 
-%description -l pl mod_status
+%description mod_status -l pl
 Modu³ pozwala administratorowi na przegl±danie statystyk dotycz±cych
 pracy serwera apache (w postaci strony HTML).
 
@@ -457,7 +457,7 @@ This package contains the user tracking module which did its own
 logging using CookieLog directory. This module allow multiple log
 files.
 
-%description -l pl mod_usertrack
+%description mod_usertrack -l pl
 Modu³ pozwalaj±cy na ¶ledzenie ,,ciasteczek''.
 
 %package mod_vhost_alias
@@ -474,7 +474,7 @@ Requires:	%{name}(EAPI) = %{version}
 This package contains the mod_vhost_alias. It provides support for
 dynamically configured mass virtual hosting.
 
-%description -l pl mod_vhost_alias
+%description mod_vhost_alias -l pl
 Modu³ umo¿liwia na dynamiczne konfigurowanie masowej ilo¶ci serwerów
 wirtualnych.
 
@@ -497,7 +497,7 @@ machines. The environment variable UNIQUE_ID is set to the identifier
 for each request. Unique identifiers are useful for various reasons
 which are beyond the scope of this document.
 
-%description -l pl mod_unique_id
+%description mod_unique_id -l pl
 Modu³ nadaje przy ka¿dym ¿±daniu token unikalny w ramach wszystkich
 ¿±dañ, nawet w ramach poprawnie skonfigurowanego klastra z wielu
 maszyn. Modu³ ustawia przy ka¿dym ¿±daniu zmienn± ¶rodowiskow±
@@ -519,7 +519,7 @@ responses. The expiration date can set to be relative to either the
 time the source file was last modified, or to the time of the client
 access.
 
-%description -l pl mod_expires
+%description mod_expires -l pl
 Modu³ kontroluje ustawianie nag³ówka HTTP Expires. Data wyga¶niêcia
 wa¿no¶ci mo¿e byæ ustalana w zale¿no¶ci od czasu modyfikacji plików
 ¼ród³owych lub odwo³ania klienta.
@@ -1070,7 +1070,11 @@ fi
 %attr(755,root,root) %{_datadir}/manual/search/manual-index.cgi
 %{_datadir}/manual/LICENSE
 %{_datadir}/manual/bind.html.html
+%lang(en) %{_datadir}/manual/bind.html.en
+%lang(fr) %{_datadir}/manual/bind.html.fr
 %{_datadir}/manual/cgi_path.html.html
+%lang(en) %{_datadir}/manual/cgi_path.html.en
+%lang(fr) %{_datadir}/manual/cgi_path.html.fr
 %{_datadir}/manual/configuring.html.html
 %lang(en) %{_datadir}/manual/configuring.html.en
 %lang(fr) %{_datadir}/manual/configuring.html.fr
@@ -1078,10 +1082,15 @@ fi
 %{_datadir}/manual/content-negotiation.html
 %{_datadir}/manual/custom-error.html.html
 %lang(en) %{_datadir}/manual/custom-error.html.en
+%lang(fr) %{_datadir}/manual/custom-error.html.fr
 %lang(ja) %{_datadir}/manual/custom-error.html.ja.jis
 %{_datadir}/manual/dns-caveats.html.html
+%lang(en) %{_datadir}/manual/dns-caveats.html.en
+%lang(fr) %{_datadir}/manual/dns-caveats.html.fr
 %{_datadir}/manual/dso.html
 %{_datadir}/manual/env.html.html
+%lang(en) %{_datadir}/manual/env.html.en
+%lang(ja) %{_datadir}/manual/env.html.ja.jis
 %{_datadir}/manual/footer.html
 %{_datadir}/manual/handler.html.html
 %lang(en) %{_datadir}/manual/handler.html.en
@@ -1097,9 +1106,13 @@ fi
 %lang(fr) %{_datadir}/manual/install.html.fr
 %lang(ja) %{_datadir}/manual/install.html.ja.jis
 %{_datadir}/manual/invoking.html.html
+%lang(en) %{_datadir}/manual/invoking.html.en
 %lang(fr) %{_datadir}/manual/invoking.html.fr
 %{_datadir}/manual/keepalive.html.html
+%lang(en) %{_datadir}/manual/keepalive.html.en
+%lang(ja) %{_datadir}/manual/keepalive.html.ja.jis
 %{_datadir}/manual/location.html
+%{_datadir}/manual/logs.html
 %{_datadir}/manual/multilogs.html
 %{_datadir}/manual/new_features_1_3.html.html
 %lang(en) %{_datadir}/manual/new_features_1_3.html.en
@@ -1112,11 +1125,13 @@ fi
 %lang(ja) %{_datadir}/manual/server-wide.html.ja.jis
 %{_datadir}/manual/sourcereorg.html
 %{_datadir}/manual/stopping.html.html
+%lang(en) %{_datadir}/manual/stopping.html.en
 %lang(fr) %{_datadir}/manual/stopping.html.fr
 %{_datadir}/manual/suexec.html.html
 %lang(en) %{_datadir}/manual/suexec.html.en
 %lang(ja) %{_datadir}/manual/suexec.html.ja.jis
 %{_datadir}/manual/upgrading_to_1_3.html
+%{_datadir}/manual/urlmapping.html
 %dir %{_datadir}/manual/howto
 %{_datadir}/manual/howto/cgi.html.html
 %lang(en) %{_datadir}/manual/howto/cgi.html.en
@@ -1128,15 +1143,26 @@ fi
 %lang(ja) %{_datadir}/manual/howto/ssi.html.ja.jis
 %dir %{_datadir}/manual/mod
 %{_datadir}/manual/mod/core.html.html
+%lang(en) %{_datadir}/manual/mod/core.html.en
+%lang(fr) %{_datadir}/manual/mod/core.html.fr
 %{_datadir}/manual/mod/directive-dict.html.html
 %lang(en) %{_datadir}/manual/mod/directive-dict.html.en
+%lang(fr) %{_datadir}/manual/mod/directive-dict.html.fr
 %lang(ja) %{_datadir}/manual/mod/directive-dict.html.ja.jis
+%{_datadir}/manual/mod/directives.html.html
+%lang(de) %{_datadir}/manual/mod/directives.html.de
+%lang(en) %{_datadir}/manual/mod/directives.html.en
+%lang(fr) %{_datadir}/manual/mod/directives.html.fr
+%lang(ja) %{_datadir}/manual/mod/directives.html.ja.jis
 %{_datadir}/manual/mod/footer.html
 %{_datadir}/manual/mod/header.html
 %{_datadir}/manual/mod/index-bytype.html.html
+%lang(en) %{_datadir}/manual/mod/index-bytype.html.en
 %lang(fr) %{_datadir}/manual/mod/index-bytype.html.fr
 %{_datadir}/manual/mod/index.html.html
+%lang(en) %{_datadir}/manual/mod/index.html.en
 %lang(fr) %{_datadir}/manual/mod/index.html.fr
+%lang(ja) %{_datadir}/manual/mod/index.html.ja.jis
 %{_datadir}/manual/mod/mod_access.html
 %{_datadir}/manual/mod/mod_alias.html
 %{_datadir}/manual/mod/mod_asis.html
@@ -1194,6 +1220,8 @@ fi
 %{_datadir}/manual/vhosts/ip-based.html
 %{_datadir}/manual/vhosts/mass.html
 %{_datadir}/manual/vhosts/name-based.html.html
+%lang(en) %{_datadir}/manual/vhosts/name-based.html.en
+%lang(ja) %{_datadir}/manual/vhosts/name-based.html.ja.jis
 %{_datadir}/manual/vhosts/vhosts-in-depth.html
 %{_datadir}/manual/vhosts/virtual-host.html
 
