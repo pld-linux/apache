@@ -103,7 +103,7 @@ Dokumentacja do Apache w formacie HTML
 %patch3 -p1
 
 %build
-OPTIM=$RPM_OPT_FLAGS LDFLAGS=-s\
+OPTIM="$RPM_OPT_FLAGS" LDFLAGS="-s"\
     ./configure \
 	--prefix=%{_prefix} \
 	--sysconfdir=/etc/httpd \
@@ -157,17 +157,19 @@ mv $RPM_BUILD_ROOT/usr/man $RPM_BUILD_ROOT%{_mandir}
 
 strip $RPM_BUILD_ROOT/usr/lib/apache/*
 
-gzip -9nf $RPM_BUILD_ROOT%{_mandir}/{man{1,8}/*}
-gzip -9nf ABOUT_APACHE src/CHANGES KEYS README README.v6
+gzip -9nf $RPM_BUILD_ROOT%{_mandir}/man*/* \
+	ABOUT_APACHE src/CHANGES KEYS README README.v6
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %post
 /sbin/chkconfig --add httpd
-   if [ -f /var/lock/subsys/httpd ]; then
-       /etc/rc.d/init.d/httpd restart >&2
-   fi
+umask 137
+touch /var/log/httpd/{access,error,agent,referer}_log
+if [ -f /var/lock/subsys/httpd ]; then
+   /etc/rc.d/init.d/httpd restart >&2
+fi
 
 %preun
 if [ $1 = 0 ]; then
@@ -219,7 +221,7 @@ fi
 %{_mandir}/man[18]/*
 
 %attr(750,root,root) %dir /var/log/httpd
-%attr(640,root,root) %config %verify(not size mtime md5) /var/log/httpd/*
+%attr(640,root,root) %ghost /var/log/httpd/*
 
 %files suexec
 %attr(4711,root,root) %{_sbindir}/suexec
