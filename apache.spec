@@ -25,7 +25,7 @@ Prereq:		/sbin/chkconfig
 Prereq:		/usr/sbin/useradd
 Prereq:		/usr/bin/getgid
 Prereq:		/usr/bin/id
-Prereq:		sh-utils >= 2.0
+Prereq:		sh-utils
 Requires:	rc-scripts
 URL:		http://www.apache.org/
 BuildRoot:	/tmp/%{name}-%{version}-root
