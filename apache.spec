@@ -1364,8 +1364,8 @@ fi
 %lang(es) %{_datadir}/manual/*.html.es
 %lang(es) %{_datadir}/manual/*.xml.es
 %lang(fr) %{_datadir}/manual/*.html.fr
-%lang(ja) %{_datadir}/manual/*.html.ja.jis
-%lang(ja) %{_datadir}/manual/*.xml.ja
+%lang(ja) %{_datadir}/manual/*.html.ja*
+%lang(ja) %{_datadir}/manual/*.xml.ja*
 %lang(ko) %{_datadir}/manual/*.html.ko.euc-kr
 %lang(ko) %{_datadir}/manual/*.xml.ko
 %lang(ru) %{_datadir}/manual/*.html.ru.koi8-r
@@ -1375,7 +1375,7 @@ fi
 %{_datadir}/manual/developer/*.xml
 %{_datadir}/manual/developer/*.xml.meta
 %{_datadir}/manual/developer/*.html.en
-%lang(ja) %{_datadir}/manual/developer/*.html.ja.jis
+%lang(ja) %{_datadir}/manual/developer/*.html.ja*
 %dir %{_datadir}/manual/faq
 %{_datadir}/manual/faq/*.html
 %{_datadir}/manual/faq/*.xml
@@ -1388,8 +1388,8 @@ fi
 %{_datadir}/manual/howto/*.xml
 %{_datadir}/manual/howto/*.xml.meta
 %{_datadir}/manual/howto/*.html.en
-%lang(ja) %{_datadir}/manual/howto/*.html.ja.jis
-%lang(ja) %{_datadir}/manual/howto/*.xml.ja
+%lang(ja) %{_datadir}/manual/howto/*.html.ja*
+%lang(ja) %{_datadir}/manual/howto/*.xml.ja*
 %lang(ko) %{_datadir}/manual/howto/*.html.ko.euc-kr
 %lang(ko) %{_datadir}/manual/howto/*.xml.ko
 %dir %{_datadir}/manual/images
@@ -1410,8 +1410,8 @@ fi
 %lang(de) %{_datadir}/manual/mod/[acdilpqtw]*.xml.de
 %lang(es) %{_datadir}/manual/mod/[cdfhilpqtw]*.html.es
 %lang(es) %{_datadir}/manual/mod/[acdilpqtw]*.xml.es
-%lang(ja) %{_datadir}/manual/mod/[cdfhilpqtw]*.html.ja.jis
-%lang(ja) %{_datadir}/manual/mod/[acdilpqtw]*.xml.ja
+%lang(ja) %{_datadir}/manual/mod/[cdfhilpqtw]*.html.ja*
+%lang(ja) %{_datadir}/manual/mod/[acdilpqtw]*.xml.ja*
 %lang(ko) %{_datadir}/manual/mod/[cdfhilpqtw]*.html.ko.euc-kr
 %lang(ko) %{_datadir}/manual/mod/[acdilpqtw]*.xml.ko
 %lang(ru) %{_datadir}/manual/mod/[cdfhilpqtw]*.html.ru.koi8-r
@@ -1420,8 +1420,8 @@ fi
 %{_datadir}/manual/mod/module-dict.xml
 %{_datadir}/manual/mod/module-dict.xml.meta
 %{_datadir}/manual/mod/module-dict.html.en
-%lang(ja) %{_datadir}/manual/mod/module-dict.html.ja.jis
-%lang(ja) %{_datadir}/manual/mod/module-dict.xml.ja
+%lang(ja) %{_datadir}/manual/mod/module-dict.html.ja*
+%lang(ja) %{_datadir}/manual/mod/module-dict.xml.ja*
 %lang(ko) %{_datadir}/manual/mod/module-dict.html.ko.euc-kr
 %lang(ko) %{_datadir}/manual/mod/module-dict.xml.ko
 %{_datadir}/manual/mod/mpm_common.html
@@ -1430,34 +1430,34 @@ fi
 %{_datadir}/manual/mod/mpm_common.html.en
 %lang(de) %{_datadir}/manual/mod/mpm_common.html.de
 %lang(de) %{_datadir}/manual/mod/mpm_common.xml.de
-%lang(ja) %{_datadir}/manual/mod/mpm_common.html.ja.jis
-%lang(ja) %{_datadir}/manual/mod/mpm_common.xml.ja
+%lang(ja) %{_datadir}/manual/mod/mpm_common.html.ja*
+%lang(ja) %{_datadir}/manual/mod/mpm_common.xml.ja*
 %{_datadir}/manual/mod/mod_access.html
 %{_datadir}/manual/mod/mod_access.xml
 %{_datadir}/manual/mod/mod_access.xml.meta
 %{_datadir}/manual/mod/mod_access.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_access.html.ja.jis
-%lang(ja) %{_datadir}/manual/mod/mod_access.xml.ja
+%lang(ja) %{_datadir}/manual/mod/mod_access.html.ja*
+%lang(ja) %{_datadir}/manual/mod/mod_access.xml.ja*
 %{_datadir}/manual/mod/mod_alias.html
 %{_datadir}/manual/mod/mod_alias.xml
 %{_datadir}/manual/mod/mod_alias.xml.meta
 %{_datadir}/manual/mod/mod_alias.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_alias.html.ja.jis
-%lang(ja) %{_datadir}/manual/mod/mod_alias.xml.ja
+%lang(ja) %{_datadir}/manual/mod/mod_alias.html.ja*
+%lang(ja) %{_datadir}/manual/mod/mod_alias.xml.ja*
 %{_datadir}/manual/mod/mod_asis.html
 %{_datadir}/manual/mod/mod_asis.xml
 %{_datadir}/manual/mod/mod_asis.xml.meta
 %{_datadir}/manual/mod/mod_asis.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_asis.html.ja.jis
-%lang(ja) %{_datadir}/manual/mod/mod_asis.xml.ja
+%lang(ja) %{_datadir}/manual/mod/mod_asis.html.ja*
+%lang(ja) %{_datadir}/manual/mod/mod_asis.xml.ja*
 %lang(ko) %{_datadir}/manual/mod/mod_asis.html.ko.euc-kr
 %lang(ko) %{_datadir}/manual/mod/mod_asis.xml.ko
 %{_datadir}/manual/mod/mod_autoindex.html
 %{_datadir}/manual/mod/mod_autoindex.xml
 %{_datadir}/manual/mod/mod_autoindex.xml.meta
 %{_datadir}/manual/mod/mod_autoindex.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_autoindex.html.ja.jis
-%lang(ja) %{_datadir}/manual/mod/mod_autoindex.xml.ja
+%lang(ja) %{_datadir}/manual/mod/mod_autoindex.html.ja*
+%lang(ja) %{_datadir}/manual/mod/mod_autoindex.xml.ja*
 %lang(ko) %{_datadir}/manual/mod/mod_autoindex.html.ko.euc-kr
 %lang(ko) %{_datadir}/manual/mod/mod_autoindex.xml.ko
 %{_datadir}/manual/mod/mod_cern_meta.html
@@ -1470,24 +1470,24 @@ fi
 %{_datadir}/manual/mod/mod_cgi.xml
 %{_datadir}/manual/mod/mod_cgi.xml.meta
 %{_datadir}/manual/mod/mod_cgi.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_cgi.html.ja.jis
-%lang(ja) %{_datadir}/manual/mod/mod_cgi.xml.ja
+%lang(ja) %{_datadir}/manual/mod/mod_cgi.html.ja*
+%lang(ja) %{_datadir}/manual/mod/mod_cgi.xml.ja*
 %lang(ko) %{_datadir}/manual/mod/mod_cgi.html.ko.euc-kr
 %lang(ko) %{_datadir}/manual/mod/mod_cgi.xml.ko
 %{_datadir}/manual/mod/mod_echo.html
 %{_datadir}/manual/mod/mod_echo.xml
 %{_datadir}/manual/mod/mod_echo.xml.meta
 %{_datadir}/manual/mod/mod_echo.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_echo.html.ja.jis
-%lang(ja) %{_datadir}/manual/mod/mod_echo.xml.ja
+%lang(ja) %{_datadir}/manual/mod/mod_echo.html.ja*
+%lang(ja) %{_datadir}/manual/mod/mod_echo.xml.ja*
 %lang(ko) %{_datadir}/manual/mod/mod_echo.html.ko.euc-kr
 %lang(ko) %{_datadir}/manual/mod/mod_echo.xml.ko
 %{_datadir}/manual/mod/mod_env.html
 %{_datadir}/manual/mod/mod_env.xml
 %{_datadir}/manual/mod/mod_env.xml.meta
 %{_datadir}/manual/mod/mod_env.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_env.html.ja.jis
-%lang(ja) %{_datadir}/manual/mod/mod_env.xml.ja
+%lang(ja) %{_datadir}/manual/mod/mod_env.html.ja*
+%lang(ja) %{_datadir}/manual/mod/mod_env.xml.ja*
 %lang(ko) %{_datadir}/manual/mod/mod_env.html.ko.euc-kr
 %lang(ko) %{_datadir}/manual/mod/mod_env.xml.ko
 %{_datadir}/manual/mod/mod_ext_filter.html
@@ -1500,8 +1500,8 @@ fi
 %{_datadir}/manual/mod/mod_include.xml
 %{_datadir}/manual/mod/mod_include.xml.meta
 %{_datadir}/manual/mod/mod_include.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_include.html.ja.jis
-%lang(ja) %{_datadir}/manual/mod/mod_include.xml.ja
+%lang(ja) %{_datadir}/manual/mod/mod_include.html.ja*
+%lang(ja) %{_datadir}/manual/mod/mod_include.xml.ja*
 %{_datadir}/manual/mod/mod_log_config.html
 %{_datadir}/manual/mod/mod_log_config.xml
 %{_datadir}/manual/mod/mod_log_config.xml.meta
@@ -1514,36 +1514,36 @@ fi
 %{_datadir}/manual/mod/mod_mime*.xml
 %{_datadir}/manual/mod/mod_mime*.xml.meta
 %{_datadir}/manual/mod/mod_mime*.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_mime*.html.ja.jis
-%lang(ja) %{_datadir}/manual/mod/mod_mime*.xml.ja
+%lang(ja) %{_datadir}/manual/mod/mod_mime*.html.ja*
+%lang(ja) %{_datadir}/manual/mod/mod_mime*.xml.ja*
 %{_datadir}/manual/mod/mod_negotiation.html
 %{_datadir}/manual/mod/mod_negotiation.xml
 %{_datadir}/manual/mod/mod_negotiation.xml.meta
 %{_datadir}/manual/mod/mod_negotiation.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_negotiation.html.ja.jis
-%lang(ja) %{_datadir}/manual/mod/mod_negotiation.xml.ja
+%lang(ja) %{_datadir}/manual/mod/mod_negotiation.html.ja*
+%lang(ja) %{_datadir}/manual/mod/mod_negotiation.xml.ja*
 %{_datadir}/manual/mod/mod_setenvif.html
 %{_datadir}/manual/mod/mod_setenvif.xml
 %{_datadir}/manual/mod/mod_setenvif.xml.meta
 %{_datadir}/manual/mod/mod_setenvif.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_setenvif.html.ja.jis
-%lang(ja) %{_datadir}/manual/mod/mod_setenvif.xml.ja
+%lang(ja) %{_datadir}/manual/mod/mod_setenvif.html.ja*
+%lang(ja) %{_datadir}/manual/mod/mod_setenvif.xml.ja*
 %lang(ko) %{_datadir}/manual/mod/mod_setenvif.html.ko.euc-kr
 %lang(ko) %{_datadir}/manual/mod/mod_setenvif.xml.ko
 %{_datadir}/manual/mod/mod_speling.html
 %{_datadir}/manual/mod/mod_speling.xml
 %{_datadir}/manual/mod/mod_speling.xml.meta
 %{_datadir}/manual/mod/mod_speling.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_speling.html.ja.jis
-%lang(ja) %{_datadir}/manual/mod/mod_speling.xml.ja
+%lang(ja) %{_datadir}/manual/mod/mod_speling.html.ja*
+%lang(ja) %{_datadir}/manual/mod/mod_speling.xml.ja*
 %lang(ko) %{_datadir}/manual/mod/mod_speling.html.ko.euc-kr
 %lang(ko) %{_datadir}/manual/mod/mod_speling.xml.ko
 %{_datadir}/manual/mod/mod_userdir.html
 %{_datadir}/manual/mod/mod_userdir.xml
 %{_datadir}/manual/mod/mod_userdir.xml.meta
 %{_datadir}/manual/mod/mod_userdir.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_userdir.html.ja.jis
-%lang(ja) %{_datadir}/manual/mod/mod_userdir.xml.ja
+%lang(ja) %{_datadir}/manual/mod/mod_userdir.html.ja*
+%lang(ja) %{_datadir}/manual/mod/mod_userdir.xml.ja*
 %lang(ko) %{_datadir}/manual/mod/mod_userdir.html.ko.euc-kr
 %lang(ko) %{_datadir}/manual/mod/mod_userdir.xml.ko
 %dir %{_datadir}/manual/programs
@@ -1563,24 +1563,24 @@ fi
 %{_datadir}/manual/mod/mod_suexec.xml
 %{_datadir}/manual/mod/mod_suexec.xml.meta
 %{_datadir}/manual/mod/mod_suexec.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_suexec.html.ja.jis
-%lang(ja) %{_datadir}/manual/mod/mod_suexec.xml.ja
+%lang(ja) %{_datadir}/manual/mod/mod_suexec.html.ja*
+%lang(ja) %{_datadir}/manual/mod/mod_suexec.xml.ja*
 %lang(ko) %{_datadir}/manual/mod/mod_suexec.html.ko.euc-kr
 %lang(ko) %{_datadir}/manual/mod/mod_suexec.xml.ko
 %{_datadir}/manual/mod/mod_actions.html
 %{_datadir}/manual/mod/mod_actions.xml
 %{_datadir}/manual/mod/mod_actions.xml.meta
 %{_datadir}/manual/mod/mod_actions.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_actions.html.ja.jis
-%lang(ja) %{_datadir}/manual/mod/mod_actions.xml.ja
+%lang(ja) %{_datadir}/manual/mod/mod_actions.html.ja*
+%lang(ja) %{_datadir}/manual/mod/mod_actions.xml.ja*
 %lang(ko) %{_datadir}/manual/mod/mod_actions.html.ko.euc-kr
 %lang(ko) %{_datadir}/manual/mod/mod_actions.xml.ko
 %{_datadir}/manual/mod/mod_auth.html
 %{_datadir}/manual/mod/mod_auth.xml
 %{_datadir}/manual/mod/mod_auth.xml.meta
 %{_datadir}/manual/mod/mod_auth.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_auth.html.ja.jis
-%lang(ja) %{_datadir}/manual/mod/mod_auth.xml.ja
+%lang(ja) %{_datadir}/manual/mod/mod_auth.html.ja*
+%lang(ja) %{_datadir}/manual/mod/mod_auth.xml.ja*
 %{_datadir}/manual/mod/mod_auth_anon.html
 %{_datadir}/manual/mod/mod_auth_anon.xml
 %{_datadir}/manual/mod/mod_auth_anon.xml.meta
@@ -1633,24 +1633,24 @@ fi
 %{_datadir}/manual/mod/mod_dav*.xml
 %{_datadir}/manual/mod/mod_dav*.xml.meta
 %{_datadir}/manual/mod/mod_dav*.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_dav*.html.ja.jis
-%lang(ja) %{_datadir}/manual/mod/mod_dav*.xml.ja
+%lang(ja) %{_datadir}/manual/mod/mod_dav*.html.ja*
+%lang(ja) %{_datadir}/manual/mod/mod_dav*.xml.ja*
 %lang(ko) %{_datadir}/manual/mod/mod_dav*.html.ko.euc-kr
 %lang(ko) %{_datadir}/manual/mod/mod_dav*.xml.ko
 %{_datadir}/manual/mod/mod_deflate.html
 %{_datadir}/manual/mod/mod_deflate.xml
 %{_datadir}/manual/mod/mod_deflate.xml.meta
 %{_datadir}/manual/mod/mod_deflate.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_deflate.html.ja.jis
-%lang(ja) %{_datadir}/manual/mod/mod_deflate.xml.ja
+%lang(ja) %{_datadir}/manual/mod/mod_deflate.html.ja*
+%lang(ja) %{_datadir}/manual/mod/mod_deflate.xml.ja*
 %lang(ko) %{_datadir}/manual/mod/mod_deflate.html.ko.euc-kr
 %lang(ko) %{_datadir}/manual/mod/mod_deflate.xml.ko
 %{_datadir}/manual/mod/mod_dir.html
 %{_datadir}/manual/mod/mod_dir.xml
 %{_datadir}/manual/mod/mod_dir.xml.meta
 %{_datadir}/manual/mod/mod_dir.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_dir.html.ja.jis
-%lang(ja) %{_datadir}/manual/mod/mod_dir.xml.ja
+%lang(ja) %{_datadir}/manual/mod/mod_dir.html.ja*
+%lang(ja) %{_datadir}/manual/mod/mod_dir.xml.ja*
 %lang(ko) %{_datadir}/manual/mod/mod_dir.html.ko.euc-kr
 %lang(ko) %{_datadir}/manual/mod/mod_dir.xml.ko
 %{_datadir}/manual/mod/mod_expires.html
@@ -1677,8 +1677,8 @@ fi
 %{_datadir}/manual/mod/mod_info.xml
 %{_datadir}/manual/mod/mod_info.xml.meta
 %{_datadir}/manual/mod/mod_info.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_info.html.ja.jis
-%lang(ja) %{_datadir}/manual/mod/mod_info.xml.ja
+%lang(ja) %{_datadir}/manual/mod/mod_info.html.ja*
+%lang(ja) %{_datadir}/manual/mod/mod_info.xml.ja*
 %{_datadir}/manual/mod/mod_proxy*.html
 %{_datadir}/manual/mod/mod_proxy*.xml
 %{_datadir}/manual/mod/mod_proxy*.xml.meta
@@ -1695,8 +1695,8 @@ fi
 %{_datadir}/manual/ssl/*.xml
 %{_datadir}/manual/ssl/*.xml.meta
 %{_datadir}/manual/ssl/*.html.en
-%lang(ja) %{_datadir}/manual/ssl/*.html.ja.jis
-%lang(ja) %{_datadir}/manual/ssl/*.xml.ja
+%lang(ja) %{_datadir}/manual/ssl/*.html.ja*
+%lang(ja) %{_datadir}/manual/ssl/*.xml.ja*
 %{_datadir}/manual/mod/mod_ssl.html
 %{_datadir}/manual/mod/mod_ssl.xml
 %{_datadir}/manual/mod/mod_ssl.xml.meta
@@ -1715,8 +1715,8 @@ fi
 %{_datadir}/manual/mod/mod_unique_id.xml
 %{_datadir}/manual/mod/mod_unique_id.xml.meta
 %{_datadir}/manual/mod/mod_unique_id.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_unique_id.html.ja.jis
-%lang(ja) %{_datadir}/manual/mod/mod_unique_id.xml.ja
+%lang(ja) %{_datadir}/manual/mod/mod_unique_id.html.ja*
+%lang(ja) %{_datadir}/manual/mod/mod_unique_id.xml.ja*
 %lang(ko) %{_datadir}/manual/mod/mod_unique_id.html.ko.euc-kr
 %lang(ko) %{_datadir}/manual/mod/mod_unique_id.xml.ko
 %{_datadir}/manual/mod/mod_vhost_alias.html
@@ -1732,8 +1732,8 @@ fi
 %lang(de) %{_datadir}/manual/vhosts/*.xml.de
 %lang(es) %{_datadir}/manual/vhosts/*.html.es
 %lang(es) %{_datadir}/manual/vhosts/*.xml.es
-%lang(ja) %{_datadir}/manual/vhosts/*.html.ja.jis
-%lang(ja) %{_datadir}/manual/vhosts/*.xml.ja
+%lang(ja) %{_datadir}/manual/vhosts/*.html.ja*
+%lang(ja) %{_datadir}/manual/vhosts/*.xml.ja*
 %lang(ko) %{_datadir}/manual/vhosts/*.html.ko.euc-kr
 %lang(ko) %{_datadir}/manual/vhosts/*.xml.ko
 %lang(ru) %{_datadir}/manual/vhosts/*.html.ru.koi8-r
