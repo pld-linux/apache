@@ -42,7 +42,7 @@ Requires:	mailcap
 Requires:	/etc/mime.types
 URL:		http://www.apache.org/
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
-Provides:	apache(EAPI)
+Provides:	%{name}(EAPI) = %{version}
 Obsoletes:	apache-extra
 Obsoletes:	apache6
 Obsoletes:	apache-doc
