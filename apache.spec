@@ -670,7 +670,7 @@ fi
 %{__perl} -pi -e "s:\@exp_installbuilddir\@:%{_libdir}/apache/build:g" \
 	support/apxs.in
 install /usr/share/automake/config.* build/
-CPPFLAGS="-DMAX_SERVER_LIMIT=200000"
+CPPFLAGS="-DMAX_SERVER_LIMIT=200000 -DBIG_SECURITY_HOLE=1"
 for mpm in %{?with_metuxmpm:metuxmpm} perchild prefork worker; do
 install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
 ../%configure \
