@@ -58,12 +58,17 @@ case "$1" in
 	/usr/sbin/httpd -S
 	exit $?
 	;;
-  restart|reload)
+  restart)
 	$0 stop
 	$0 start
 	;;
+   reload)
+   	msg_reloading httpd
+	killproc httpd -HUP
+	RETVAL=$?
+	;;
   *)
-	msg_usage "$0 {start|stop|restart|status}"
+	msg_usage "$0 {start|stop|restart|reload|status}"
 	exit 1
 	;;
 esac
