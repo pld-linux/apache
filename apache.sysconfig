@@ -7,7 +7,7 @@ SERVICE_RUN_NICE_LEVEL="+5"
 # config dir/file path
 HTTPD_CONF="/etc/httpd/httpd.conf"
 
-# other command-line options 
+# other command-line options
 HTTPD_OPTS=""
 
 # choose MPM
