@@ -27,11 +27,11 @@ Summary(uk):	îÁÊÐÏÐÕÌÑÒÎ¦ÛÉÊ Web-Server
 Summary(zh_CN):	Internet ÉÏÓ¦ÓÃ×î¹ã·ºµÄ Web ·þÎñ³ÌÐò¡£
 Name:		apache
 Version:	1.3.26
-Release:	4
+Release:	5
 License:	Apache Group 
 Group:		Networking/Daemons
 URL:		http://www.apache.org/
-Source0:	ftp://ftp.apache.org/dist/%{name}_%{version}.tar.gz
+Source0:	ftp://ftp.apache.org/dist/httpd/%{name}_%{version}.tar.gz
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}-icons.tar.gz
@@ -762,7 +762,9 @@ else
 fi
 
 %post
-/sbin/chkconfig --add httpd
+if [ $1 = 1 ]; then
+	/sbin/chkconfig --add httpd
+fi
 %{apxs} -e -a -n access %{_libexecdir}/mod_access.so 1>&2
 %{apxs} -e -a -n alias %{_libexecdir}/mod_alias.so 1>&2
 %{apxs} -e -a -n asis %{_libexecdir}/mod_asis.so 1>&2
@@ -1189,7 +1191,7 @@ fi
 %attr(755,root,root) %{_sbindir}/logresolve
 %attr(755,root,root) %{_sbindir}/rotatelogs
 
-%dir %attr(770,root,http) /var/run/apache
+%dir %attr(1773,root,http) /var/run/apache
 
 %{_mandir}/man1/htdigest.1*
 %{_mandir}/man8/*
