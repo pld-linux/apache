@@ -203,7 +203,7 @@ diff -Nru apache_1.3.12/src/Configuration.tmpl apache_1.3.12.new/src/Configurati
 +#   course.
 +
 +Rule EAPI=no
-+EAPI_MM=SYSTEM
++#EAPI_MM=SYSTEM
 +
 +################################################################
  # Dynamic Shared Object (DSO) support
