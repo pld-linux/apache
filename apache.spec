@@ -1211,9 +1211,11 @@ fi
 %{_datadir}/manual/bind.html.html
 %{_datadir}/manual/bind.html.en
 %lang(fr) %{_datadir}/manual/bind.html.fr
+%lang(ja) %{_datadir}/manual/bind.html.ja.jis
 %{_datadir}/manual/cgi_path.html.html
 %{_datadir}/manual/cgi_path.html.en
 %lang(fr) %{_datadir}/manual/cgi_path.html.fr
+%lang(ja) %{_datadir}/manual/cgi_path.html.ja.jis
 %{_datadir}/manual/configuring.html.html
 %{_datadir}/manual/configuring.html.en
 %lang(fr) %{_datadir}/manual/configuring.html.fr
@@ -1256,8 +1258,12 @@ fi
 %{_datadir}/manual/new_features_1_3.html.html
 %{_datadir}/manual/new_features_1_3.html.en
 %lang(ja) %{_datadir}/manual/new_features_1_3.html.ja.jis
-%{_datadir}/manual/process-model.html
-%{_datadir}/manual/sections.html
+%{_datadir}/manual/process-model.html.html
+%{_datadir}/manual/process-model.html.en
+%lang(ja) %{_datadir}/manual/process-model.html.ja.jis
+%{_datadir}/manual/sections.html.html
+%{_datadir}/manual/sections.html.en
+%lang(ja) %{_datadir}/manual/sections.html.ja.jis
 %{_datadir}/manual/server-wide.html.html
 %{_datadir}/manual/server-wide.html.en
 %lang(fr) %{_datadir}/manual/server-wide.html.fr
@@ -1296,16 +1302,23 @@ fi
 %{_datadir}/manual/mod/index-bytype.html.html
 %{_datadir}/manual/mod/index-bytype.html.en
 %lang(fr) %{_datadir}/manual/mod/index-bytype.html.fr
+%lang(ja) %{_datadir}/manual/mod/index-bytype.html.ja.jis
 %{_datadir}/manual/mod/index.html.html
 %{_datadir}/manual/mod/index.html.en
 %lang(fr) %{_datadir}/manual/mod/index.html.fr
 %lang(ja) %{_datadir}/manual/mod/index.html.ja.jis
-%{_datadir}/manual/mod/mod_access.html
+%{_datadir}/manual/mod/mod_access.html.html
+%{_datadir}/manual/mod/mod_access.html.en
+%lang(ja) %{_datadir}/manual/mod/mod_access.html.ja.jis
 %{_datadir}/manual/mod/mod_alias.html
-%{_datadir}/manual/mod/mod_asis.html
+%{_datadir}/manual/mod/mod_asis.html.html
+%{_datadir}/manual/mod/mod_asis.html.en
+%lang(ja) %{_datadir}/manual/mod/mod_asis.html.ja.jis
 %{_datadir}/manual/mod/mod_autoindex.html
-%{_datadir}/manual/mod/mod_cgi.html
 %{_datadir}/manual/mod/mod_cern_meta.html
+%{_datadir}/manual/mod/mod_cgi.html.html
+%{_datadir}/manual/mod/mod_cgi.html.en
+%lang(ja) %{_datadir}/manual/mod/mod_cgi.html.ja.jis
 %{_datadir}/manual/mod/mod_env.html.html
 %{_datadir}/manual/mod/mod_env.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_env.html.ja.jis
@@ -1323,22 +1336,34 @@ fi
 %{_datadir}/manual/mod/mod_setenvif.html.html
 %{_datadir}/manual/mod/mod_setenvif.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_setenvif.html.ja.jis
-%{_datadir}/manual/mod/mod_so.html
-%{_datadir}/manual/mod/mod_speling.html
-%{_datadir}/manual/mod/mod_userdir.html
+%{_datadir}/manual/mod/mod_so.html.html
+%{_datadir}/manual/mod/mod_so.html.en
+%lang(ja) %{_datadir}/manual/mod/mod_so.html.ja.jis
+%{_datadir}/manual/mod/mod_speling.html.html
+%{_datadir}/manual/mod/mod_speling.html.en
+%lang(ja) %{_datadir}/manual/mod/mod_speling.html.ja.jis
+%{_datadir}/manual/mod/mod_userdir.html.html
+%{_datadir}/manual/mod/mod_userdir.html.en
+%lang(ja) %{_datadir}/manual/mod/mod_userdir.html.ja.jis
 %{_datadir}/manual/mod/module-dict.html.html
 %{_datadir}/manual/mod/module-dict.html.en
 %lang(ja) %{_datadir}/manual/mod/module-dict.html.ja.jis
 %dir %{_datadir}/manual/programs
 %{_datadir}/manual/programs/ab.html
-%{_datadir}/manual/programs/apachectl.html
+%{_datadir}/manual/programs/apachectl.html.html
+%{_datadir}/manual/programs/apachectl.html.en
+%lang(ja) %{_datadir}/manual/programs/apachectl.html.ja.jis
 %{_datadir}/manual/programs/apxs.html
 %{_datadir}/manual/programs/dbmmanage.html
 %{_datadir}/manual/programs/footer.html
 %{_datadir}/manual/programs/header.html
 %{_datadir}/manual/programs/htdigest.html
-%{_datadir}/manual/programs/htpasswd.html
-%{_datadir}/manual/programs/httpd.html
+%{_datadir}/manual/programs/htpasswd.html.html
+%{_datadir}/manual/programs/htpasswd.html.en
+%lang(ja) %{_datadir}/manual/programs/htpasswd.html.ja.jis
+%{_datadir}/manual/programs/httpd.html.html
+%{_datadir}/manual/programs/httpd.html.en
+%lang(ja) %{_datadir}/manual/programs/httpd.html.ja.jis
 %{_datadir}/manual/programs/index.html.html
 %{_datadir}/manual/programs/index.html.en
 %lang(ja) %{_datadir}/manual/programs/index.html.ja.jis
@@ -1348,7 +1373,9 @@ fi
 %dir %{_datadir}/manual/vhosts
 %{_datadir}/manual/vhosts/details.html
 %{_datadir}/manual/vhosts/examples.html
-%{_datadir}/manual/vhosts/fd-limits.html
+%{_datadir}/manual/vhosts/fd-limits.html.html
+%{_datadir}/manual/vhosts/fd-limits.html.en
+%lang(ja) %{_datadir}/manual/vhosts/fd-limits.html.ja.jis
 %{_datadir}/manual/vhosts/footer.html
 %{_datadir}/manual/vhosts/header.html
 %{_datadir}/manual/vhosts/host.html
@@ -1379,7 +1406,7 @@ fi
 %lang(it) %{_datadir}/html/index.html.it
 %lang(ja) %{_datadir}/html/index.html.ja.jis
 %lang(ko) %{_datadir}/html/index.html.kr.iso-kr
-%lang(de_LU) %{_datadir}/html/index.html.lu
+%lang(de_LU) %{_datadir}/html/index.html.lb.utf8
 %lang(nl) %{_datadir}/html/index.html.nl
 %lang(nn) %{_datadir}/html/index.html.nn
 %lang(no) %{_datadir}/html/index.html.no
@@ -1394,7 +1421,7 @@ fi
 %lang(ru) %{_datadir}/html/index.html.ru.ucs4
 %lang(ru) %{_datadir}/html/index.html.ru.utf8
 %lang(sv) %{_datadir}/html/index.html.se
-%lang(zh_TW) %{_datadir}/html/index.html.zh.Big5
+%lang(zh_TW) %{_datadir}/html/index.html.zh
 
 %{_datadir}/html/*.gif
 %{_datadir}/errordocs
@@ -1410,7 +1437,9 @@ fi
 %{_datadir}/manual/suexec.html.html
 %{_datadir}/manual/suexec.html.en
 %lang(ja) %{_datadir}/manual/suexec.html.ja.jis
-%{_datadir}/manual/programs/suexec.html
+%{_datadir}/manual/programs/suexec.html.html
+%{_datadir}/manual/programs/suexec.html.en
+%lang(ja) %{_datadir}/manual/programs/suexec.html.ja.jis
 
 %files devel
 %defattr(644,root,root,755)
@@ -1419,7 +1448,9 @@ fi
 %files mod_actions
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_actions.so
-%{_datadir}/manual/mod/mod_actions.html
+%{_datadir}/manual/mod/mod_actions.html.html
+%{_datadir}/manual/mod/mod_actions.html.en
+%lang(ja) %{_datadir}/manual/mod/mod_actions.html.ja.jis
 
 %files mod_auth
 %defattr(644,root,root,755)
@@ -1485,7 +1516,9 @@ fi
 %files mod_info
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_info.so
-%{_datadir}/manual/mod/mod_info.html
+%{_datadir}/manual/mod/mod_info.html.html
+%{_datadir}/manual/mod/mod_info.html.en
+%lang(ja) %{_datadir}/manual/mod/mod_info.html.ja.jis
 
 %files mod_proxy
 %defattr(644,root,root,755)
@@ -1515,7 +1548,9 @@ fi
 %files mod_unique_id
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_unique_id.so
-%{_datadir}/manual/mod/mod_unique_id.html
+%{_datadir}/manual/mod/mod_unique_id.html.html
+%{_datadir}/manual/mod/mod_unique_id.html.en
+%lang(ja) %{_datadir}/manual/mod/mod_unique_id.html.ja.jis
 
 %files mod_vhost_alias
 %defattr(644,root,root,755)
