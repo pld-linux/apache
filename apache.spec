@@ -170,7 +170,7 @@ if [ -n "`getgid http`" ]; then
 		exit 1
 	fi
 else
-	/usr/sbin/groupadd -u 51 -r -f httpd
+	/usr/sbin/groupadd -g 51 -r -f httpd
 fi
 if [ -n "`id -u http`" ]; then
 	if [ "`id -u http`" != "51" ]; then
@@ -178,7 +178,7 @@ if [ -n "`id -u http`" ]; then
 		exit 1
 	fi
 else
-	/usr/sbin/useradd -u 51 -r -f httpd
+	/usr/sbin/useradd -u 51 -r -f -d /home/httpd -s /bin/false -c "HTTP User" -M httpd
 fi
 
 
