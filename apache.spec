@@ -603,7 +603,7 @@ USER=http; UID=51; HOMEDIR=/home/httpd; COMMENT="HTTP User"; %useradd
 %{_sbindir}/apxs -e -a -n userdir %{_libexecdir}/mod_userdir.so 1>&2
 umask 137
 touch /var/log/httpd/{access,error,agent,referer}_log
-NAME=httpd; DESC="apache http daemon"; %chkconfig_post
+NAME=httpd; DESC="apache http daemon"; %chkconfig_add
 
 %preun
 if [ "$1" = "0" ]; then
@@ -625,7 +625,7 @@ if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n speling %{_libexecdir}/mod_speling.so 1>&2
 	%{_sbindir}/apxs -e -A -n userdir %{_libexecdir}/mod_userdir.so 1>&2
 fi
-NAME=httpd; %chkconfig_preun
+NAME=httpd; %chkconfig_del
 
 %postun
 USER=http; %userdel
