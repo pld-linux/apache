@@ -103,7 +103,7 @@ OPTIM=$RPM_OPT_FLAGS LDFLAGS=-s\
 	--prefix=/usr \
 	--sysconfdir=/etc/httpd/conf \
 	--datadir=/home/httpd \
-	--libexecdir=/usr/libexec/apache \
+	--libexecdir=/usr/lib/apache \
 	--localstatedir=/var \
 	--runtimedir=/var/run \
 	--logfiledir=/var/log/httpd \
@@ -185,7 +185,7 @@ fi
 %attr(700,root,root) %config %verify(not size mtime md5) /etc/rc.d/init.d/*
 
 %attr(755,root,root) /home/httpd/cgi-bin
-%attr(755,root,root) /usr/libexec/apache
+%attr(755,root,root) /usr/lib/apache
 
 %attr(755,root,root) %dir /home/httpd/icons
 /home/httpd/icons/*.gif
