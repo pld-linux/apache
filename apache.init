@@ -7,7 +7,9 @@
 #		HTML files and CGI.
 # processname:	httpd
 # pidfile:	/var/run/httpd.pid
-# config:	/etc/httpd/httpd.conf
+# config:	/etc/httpd/conf/access.conf
+# config:	/etc/httpd/conf/httpd.conf
+# config:	/etc/httpd/conf/srm.conf
 
 
 # Source function library
@@ -24,10 +26,6 @@ if is_no "${NETWORKING}"; then
         # nls "ERROR: Networking is down. %s can't be run." <service>
         msg_network_down httpd
         exit 1
-fi
-
-if is_no "${IPV6_NETWORKING}"; then
-        HTTPD_OPTS="$HTTPD_OPTS -4"
 fi
 
 # See how we were called.
@@ -60,12 +58,17 @@ case "$1" in
 	/usr/sbin/httpd -S
 	exit $?
 	;;
-  restart|reload)
+  restart)
 	$0 stop
 	$0 start
 	;;
+   reload)
+   	msg_reloading httpd
+	killproc httpd -HUP
+	RETVAL=$?
+	;;
   *)
-	msg_usage "$0 {start|stop|restart|status}"
+	msg_usage "$0 {start|stop|restart|reload|status}"
 	exit 1
 	;;
 esac
