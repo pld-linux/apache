@@ -114,7 +114,7 @@ Provides:	apache(modules-api) = %{_apache_modules_api}
 Provides:	group(http)
 Provides:	httpd = %{version}
 Provides:	user(http)
-Provides:	webserver
+Provides:	webserver = apache
 Obsoletes:	apache-extra
 Obsoletes:	apache6
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
