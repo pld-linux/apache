@@ -686,6 +686,8 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 %patch23 -p1
 
 %{__perl} -pi -e "s@/usr/local/bin/perl@%{__perl}@" $(grep -rl "/usr/local/bin/perl" *)
+%{__perl} -pi -e "s@BUILD_SUBDIRS.*@BUILD_SUBDIRS =@g" srclib/Makefile.in
+%{__perl} -pi -e "s@CLEAN_SUBDIRS.*@CLEAN_SUBDIRS =@g" srclib/Makefile.in
 
 %build
 # sanity check
@@ -695,6 +697,7 @@ if [ "$MODULES_API" != "%_apache_modules_api" ]; then
 	exit 1
 fi
 ./buildconf
+rm -rf srclib/apr*
 # Before configure; fix location of build dir in generated apxs
 %{__perl} -pi -e "s:\@exp_installbuilddir\@:%{_libdir}/apache/build:g" \
 	support/apxs.in
