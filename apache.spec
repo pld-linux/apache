@@ -81,6 +81,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 Obsoletes:	apache-extra
 Obsoletes:	apache-doc
 Obsoletes:	apache6
+Obsoletes:	apache1
 Obsoletes:	indexhtml
 
 %define		_sysconfdir	/etc/httpd
