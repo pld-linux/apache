@@ -86,7 +86,6 @@ Patch21:	%{name}-apxs.patch
 Patch22:	httpd-2.0.50-peruser-r3.patch
 Patch23:	%{name}-apr1.patch
 Patch24:	%{name}-normalize-path.patch
-Patch25:	%{name}-CAN-2004-0942.patch
 # http://issues.apache.org/bugzilla/attachment.cgi?id=13377 external pcre
 Patch26:	%{name}2-pcre-patch.diff         
 URL:		http://httpd.apache.org/
@@ -697,7 +696,6 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 %patch22 -p1
 #%patch23 -p1
 %patch24 -p1
-#%patch25 -p1
 %{?with_external_pcre:%patch26 -p2}
 
 %{__perl} -pi -e "s@/usr/local/bin/perl@%{__perl}@" $(grep -rl "/usr/local/bin/perl" *)
