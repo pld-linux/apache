@@ -19,6 +19,8 @@
 ## tree which add the Extended API (EAPI) support.
 ##
 
+# updated for apache 1.3.27 on 04-Oct-2002
+
 +---------------------------------------------------------------------------
 | Add the EAPI and EAPI_MM configuration entries which triggers the EAPI
 | patches and configured the shared memory support via the MM library.
@@ -876,19 +878,19 @@ Index: src/main/alloc.c
      ap_unblock_alarms();
  
 @@ -877,6 +1076,11 @@
-     char *ptr;
- 
-     size = (char *)ps->vbuff.curpos - ps->base;
+     size = cur_len << 1;
+     if (size < AP_PSPRINTF_MIN_SIZE)
+         size = AP_PSPRINTF_MIN_SIZE;
 +#if defined(EAPI) && defined(EAPI_MM)
 +    if (ps->block->h.is_shm)
-+        ptr = ap_mm_realloc(ps->base, 2*size);
++        ptr = ap_mm_realloc(ps->base, size);
 +    else
 +#endif
-     ptr = realloc(ps->base, 2*size);
+     ptr = realloc(ps->base, size);
      if (ptr == NULL) {
  	fputs("Ouch!  Out of memory!\n", stderr);
 @@ -897,9 +1101,21 @@
-     cur_len = strp - blok->h.first_avail;
+         size = AP_PSPRINTF_MIN_SIZE;
  
      /* must try another blok */
 +#if defined(EAPI) && defined(EAPI_MM)
@@ -897,9 +899,9 @@ Index: src/main/alloc.c
 +#endif
      (void) ap_acquire_mutex(alloc_mutex);
 +#if defined(EAPI) && defined(EAPI_MM)
-+    nblok = new_block(2 * cur_len, blok->h.is_shm);
++    nblok = new_block(size, blok->h.is_shm);
 +#else
-     nblok = new_block(2 * cur_len);
+     nblok = new_block(size);
 +#endif
      (void) ap_release_mutex(alloc_mutex);
 +#if defined(EAPI) && defined(EAPI_MM)
