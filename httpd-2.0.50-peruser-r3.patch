@@ -1122,7 +1122,7 @@ diff -Nur httpd-2.0.50/server/mpm/experimental/peruser/peruser.c httpd-2.0.50-ne
 +    {
 +        if(CHILD_INFO_TABLE[i].uid == sconf->uid &&
 +           CHILD_INFO_TABLE[i].gid == sconf->gid &&
-+           !strcmp(CHILD_INFO_TABLE[i].chroot, sconf->chroot))
++           (!sconf->chroot || !strcmp(CHILD_INFO_TABLE[i].chroot, sconf->chroot)))
 +        {
 +            total++;
 +        }
@@ -1139,7 +1139,7 @@ diff -Nur httpd-2.0.50/server/mpm/experimental/peruser/peruser.c httpd-2.0.50-ne
 +    {
 +        if(CHILD_INFO_TABLE[i].uid == sconf->uid &&
 +           CHILD_INFO_TABLE[i].gid == sconf->gid &&
-+           !strcmp(CHILD_INFO_TABLE[i].chroot, sconf->chroot) &&
++           (!sconf->chroot || !strcmp(CHILD_INFO_TABLE[i].chroot, sconf->chroot)) &&
 +           ap_scoreboard_image->servers[i][0].status == SERVER_READY)
 +        {
 +            total++;
@@ -1178,7 +1178,7 @@ diff -Nur httpd-2.0.50/server/mpm/experimental/peruser/peruser.c httpd-2.0.50-ne
 +        if(CHILD_INFO_TABLE[i].type == CHILD_TYPE_PROCESSOR &&
 +           CHILD_INFO_TABLE[i].uid == sconf->uid &&
 +           CHILD_INFO_TABLE[i].gid == sconf->gid &&
-+           !strcmp(CHILD_INFO_TABLE[i].chroot, sconf->chroot) &&
++           (!sconf->chroot || !strcmp(CHILD_INFO_TABLE[i].chroot, sconf->chroot)) &&
 +           (CHILD_INFO_TABLE[i].status == CHILD_STATUS_STANDBY ||
 +           CHILD_INFO_TABLE[i].status == CHILD_STATUS_ACTIVE))
 +        {
