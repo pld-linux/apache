@@ -88,7 +88,7 @@ Patch22:	httpd-2.0.50-peruser-r3.patch
 Patch23:	%{name}-apr1.patch
 Patch24:	%{name}-normalize-path.patch
 # http://issues.apache.org/bugzilla/attachment.cgi?id=13377 external pcre
-Patch25:	%{name}2-pcre-patch.diff         
+Patch25:	%{name}2-pcre-patch.diff
 Patch26:	%{name}-bug_33382.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	automake
@@ -849,7 +849,8 @@ install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
 	--with-suexec-umask=077 \
 	--with-apr=%{_bindir}/apr-1-config \
 	--with-apr-util=%{_bindir}/apu-1-config \
-	%{?_with_external_pcre:--with-external-pcre}
+	%{?with_external_pcre:--with-external-pcre}
+
 %{__make}
 ./httpd.${mpm} -l | grep -v "${mpm}" > modules-inside
 
