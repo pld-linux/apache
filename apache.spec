@@ -14,8 +14,8 @@ Summary(pl):	Serwer WWW (World Wide Web)
 Summary(pt_BR):	Servidor HTTPD para prover serviços WWW
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
-Version:	2.0.35
-Release:	0.7
+Version:	2.0.36
+Release:	0.1
 License:	Apache Group License
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/
@@ -36,7 +36,6 @@ Source21:	%{name}-server.key
 Patch0:		%{name}-apxs.patch
 Patch1:		%{name}-configdir_skip_backups.patch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
-BuildRequires:	automake
 BuildRequires:	openssl-devel
 BuildRequires:	openssl-tools
 BuildRequires:	db4-devel
@@ -566,10 +565,7 @@ Statyczne biblioteki APR.
 %patch1 -p1
 
 %build
-cp -f %{_prefix}/share/automake/config.* srclib/pcre/
-cp -f %{_prefix}/share/automake/config.* srclib/apr/build/
-cp -f %{_prefix}/share/automake/config.* srclib/apr-util/xml/expat/conftools/
-%configure2_13 \
+%configure \
 	--enable-layout=PLD \
 	--enable-modules=all \
 	--enable-mods-shared=all \
