@@ -1275,6 +1275,8 @@ fi
 %{_datadir}/icons/small/*.gif
 %attr(755,root,root) %{_datadir}/cgi-bin
 
+%{_datadir}/error
+
 %files suexec
 %defattr(644,root,root,755)
 %attr(4755,root,root) %{_sbindir}/suexec
