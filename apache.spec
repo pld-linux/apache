@@ -32,7 +32,7 @@ Summary(ru):	óÁÍÙÊ ÐÏÐÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.0.52
-Release:	9
+Release:	10
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -85,6 +85,7 @@ Patch21:	%{name}-apxs.patch
 Patch22:	httpd-2.0.50-peruser-r3.patch
 Patch23:	%{name}-apr1.patch
 Patch24:	%{name}-normalize-path.patch
+Patch25:	%{name}-CAN-2004-0942.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	automake
 BuildRequires:	apr-devel >= 1:1.0.0
@@ -692,6 +693,7 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 %patch22 -p1
 %patch23 -p1
 %patch24 -p1
+%patch25 -p1
 
 %{__perl} -pi -e "s@/usr/local/bin/perl@%{__perl}@" $(grep -rl "/usr/local/bin/perl" *)
 %{__perl} -pi -e "s@BUILD_SUBDIRS.*@BUILD_SUBDIRS =@g" srclib/Makefile.in
