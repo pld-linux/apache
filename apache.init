@@ -86,6 +86,7 @@ case "$1" in
 	    	msg_not_running httpd >&2
 		RETVAL=7
 	fi
+	;;
   *)
 	msg_usage "$0 {start|stop|restart|reload|force-reload|graceful|status}"
 	exit 3

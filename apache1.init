@@ -78,8 +78,18 @@ case "$1" in
 		RETVAL=7
 	fi
 	;;
+  graceful)
+	if [ -f /var/lock/subsys/httpd ]; then
+		msg_reloading httpd
+		killproc httpd -USR1
+		RETVAL=$?
+        else
+		msg_not_running httpd >&2
+		RETVAL=7
+	fi
+	;;
   *)
-	msg_usage "$0 {start|stop|restart|reload|force-reload|status}"
+	msg_usage "$0 {start|stop|restart|reload|force-reload|graceful|status}"
 	exit 3
 	;;
 esac
