@@ -15,9 +15,9 @@
 # - check if all modules (*.so) are exactly the same for different MPMs
 #
 # Conditional build:
-%bcond_without	ssl	# don't build with SSL support
-%bcond_without	ldap	# don't build with LDAP support
-%bcond_without	metuxmpm	# use METUX MPM
+%bcond_without	ssl		# build without SSL support
+%bcond_without	ldap		# build without LDAP support
+%bcond_without	metuxmpm	# don't build METUX MPM version
 #
 %include	/usr/lib/rpm/macros.perl
 # this is internal macro, don't change to %%apache_modules_api
@@ -112,7 +112,6 @@ Provides:	httpd = %{version}
 Provides:	webserver = %{version}
 Provides:	apache(modules-api) = %{_apache_modules_api}
 Obsoletes:	apache-extra
-Obsoletes:	apache-doc
 Obsoletes:	apache6
 Obsoletes:	indexhtml
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -1284,10 +1283,10 @@ fi
 %attr(755,root,root) %{_datadir}/cgi-bin
 
 %{_datadir}/error
-%dir %{_datadir}/manual
 
 %files doc
 %defattr(644,root,root,755)
+%dir %{_datadir}/manual
 %{_datadir}/manual/LICENSE
 %{_datadir}/manual/*.xml
 %{_datadir}/manual/*.html.en
