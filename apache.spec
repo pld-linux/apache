@@ -6,7 +6,7 @@ Summary(pl):	Serwer WWW (World Wide Web)
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	1.3.12
-Release:	3
+Release:	4
 Copyright:	BSD-like
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
@@ -351,7 +351,7 @@ make
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig} \
 	$RPM_BUILD_ROOT%{_datadir}/errordocs \
-	$RPM_BUILD_ROOT/var/{log/{httpd,archiv/httpd},state/apache/mm}
+	$RPM_BUILD_ROOT/var/{log/{httpd,archiv/httpd},lib/apache/mm}
 
 make install-quiet root="$RPM_BUILD_ROOT"
 
@@ -883,7 +883,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_sbindir}/logresolve
 %attr(755,root,root) %{_sbindir}/rotatelogs
 
-%dir %attr(750,http,http) /var/state/apache
+%dir %attr(750,http,http) /var/lib/apache
 
 %{_mandir}/man[18]/*
 
