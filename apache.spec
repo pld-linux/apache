@@ -34,7 +34,7 @@ Summary(ru):	óÁÍÙÊ ÐÏÐÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.0.53
-Release:	2.1
+Release:	3
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -703,6 +703,8 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 Summary:	Apache2 htpasswd utility
 Group:		Networking/Utilities
 Provides:	htpasswd
+Obsoletes:	htpasswd-apache1
+Obsoletes:	htpasswd-thttpd
 
 %description -n htpasswd-%{name}
 htpasswd from Apache2
@@ -951,6 +953,7 @@ find $RPM_BUILD_ROOT%{_datadir}/manual -type f \
 
 # htpasswd goes to %{_bindir}
 mv $RPM_BUILD_ROOT%{_sbindir}/htpasswd $RPM_BUILD_ROOT%{_bindir}/
+ln -sf %{_bindir}/htpasswd $RPM_BUILD_ROOT%{_sbindir}/
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -1742,4 +1745,5 @@ fi
 %files -n htpasswd-%{name}
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/htpasswd
+%{_sbindir}/htpasswd
 %{_mandir}/man1/htpasswd.1*
