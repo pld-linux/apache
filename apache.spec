@@ -12,12 +12,17 @@ Summary(pl):	Serwer WWW (World Wide Web)
 Summary(pt_BR):	Servidor HTTPD para prover serviÁos WWW
 Summary(tr):	Lider WWW taray˝c˝
 Name:		apache
-Version:	1.3.22
-Release:	3
+Version:	1.3.23
+Release:	1
 License:	Apache Group License
 Group:		Networking/Daemons
+Group(cs):	SÌªovÈ/DÈmoni
 Group(de):	Netzwerkwesen/Server
+Group(es):	Red/Servidores
+Group(fr):	RÈseau/Serveurs
 Group(pl):	Sieciowe/Serwery
+Group(pt):	Rede/Servidores
+Group(ru):	Û≈‘≈◊Ÿ≈/‰≈ÕœŒŸ
 URL:		http://www.apache.org/
 Source0:	ftp://ftp.apache.org/dist/%{name}_%{version}.tar.gz
 Source1:	%{name}.init
@@ -91,10 +96,10 @@ erh‰ltlich und weit verbreitet ist.
 %description -l es
 El servidor web Apache es el mejor servidor gratuito disponible en el
 mundo UNIX hoy. Usa HTTP (HyperText Transfer Protocol) para permitir
-que browsers web vean documentos y sometan datos remotamente.
-Puede ejecutar varias funciones diferentes, incluyendo funciones de
-proxy y cachÈ, y nos ofrece caracterÌsticas como monitor de estado,
-conversiÛn din·mica de tipo, y otras m·s.
+que browsers web vean documentos y sometan datos remotamente. Puede
+ejecutar varias funciones diferentes, incluyendo funciones de proxy y
+cachÈ, y nos ofrece caracterÌsticas como monitor de estado, conversiÛn
+din·mica de tipo, y otras m·s.
 
 %description -l fr
 Apache est un serveur Web puissant, efficace, gratuit et complet.
@@ -120,9 +125,14 @@ sunucusudur.
 Summary:	Apache suexec wrapper
 Summary(pl):	Suexec wrapper do serwera www Apache
 Group:		Development/Tools
-Group(de):	Entwicklung/Werkzeuge
+Group(cs):	V˝vojovÈ prost¯edky/N·stroje
+Group(de):	Entwicklung/Tools
+Group(es):	Desarrollo/Herramientas
 Group(fr):	Development/Outils
+Group(ja):	≥´»Ø/•ƒ°º•Î
 Group(pl):	Programowanie/NarzÍdzia
+Group(pt):	Desenvolvimento/Ferramentas
+Group(ru):	Ú¡⁄“¡¬œ‘À¡/ÈŒ”‘“’Õ≈Œ‘Ÿ
 Requires:	%{name}(EAPI) = %{version}
 
 %description suexec
@@ -143,10 +153,14 @@ Summary(fr):	Les outils de developpement de modules pour le serveur web Apache
 Summary(pl):	Pliki nag≥Ûwkowe do tworzenai modu≥Ûw rozszerzeÒ do serwera www Apache
 Summary(pt_BR):	Arquivos de inclus„o do Apache para desenvolvimento de mÛdulos
 Group:		Networking/Utilities
-Group(de):	Netzwerkwesen/Werkzeuge
+Group(cs):	SÌªovÈ/Utility
+Group(de):	Netzwerkwesen/Dienstprogramme
 Group(es):	Red/Utilitarios
+Group(fr):	RÈseau/Utilitaires
 Group(pl):	Sieciowe/NarzÍdzia
 Group(pt_BR):	Rede/Utilit·rios
+Group(pt):	Rede/Utilidades
+Group(ru):	Û≈‘≈◊Ÿ≈/“…Ãœ÷≈Œ…—
 Requires:	%{name}(EAPI) = %{version}
 Provides:	%{name}(EAPI)-devel
 
@@ -177,8 +191,13 @@ desenvolver mÛdulos adicionais para o Apache.
 Summary:	Apache module for run CGI whenever a file of a certain type is requested
 Summary(pl):	Modu≥ dla apache do uruchamiania skryptÛw cgi
 Group:		Networking/Daemons
+Group(cs):	SÌªovÈ/DÈmoni
 Group(de):	Netzwerkwesen/Server
+Group(es):	Red/Servidores
+Group(fr):	RÈseau/Serveurs
 Group(pl):	Sieciowe/Serwery
+Group(pt):	Rede/Servidores
+Group(ru):	Û≈‘≈◊Ÿ≈/‰≈ÕœŒŸ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -195,8 +214,13 @@ Ten modu≥ pozwala na uruchamianie skryptÛw w momencie gdy nadchodzi
 %package mod_auth
 Summary:	Apache module with user authentication using textual files
 Group:		Networking/Daemons
+Group(cs):	SÌªovÈ/DÈmoni
 Group(de):	Netzwerkwesen/Server
+Group(es):	Red/Servidores
+Group(fr):	RÈseau/Serveurs
 Group(pl):	Sieciowe/Serwery
+Group(pt):	Rede/Servidores
+Group(ru):	Û≈‘≈◊Ÿ≈/‰≈ÕœŒŸ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -213,8 +237,13 @@ uøyciu plikÛw tekstowych.
 Summary:	Apache module with "anonymous" user access authentication
 Summary(pl):	Modu≥ apache oferuj±cy anonimow± autoryzacjÍ uøytkownia
 Group:		Networking/Daemons
+Group(cs):	SÌªovÈ/DÈmoni
 Group(de):	Netzwerkwesen/Server
+Group(es):	Red/Servidores
+Group(fr):	RÈseau/Serveurs
 Group(pl):	Sieciowe/Serwery
+Group(pt):	Rede/Servidores
+Group(ru):	Û≈‘≈◊Ÿ≈/‰≈ÕœŒŸ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -240,8 +269,13 @@ postaci adresu pocztowego uøytkownika).
 Summary:	Apache module with user authentication which uses Berkeley DB files
 Summary(pl):	Modu≥ apache z mechanizmem autentykacji uøywaj±cym plikÛw Berkeley DB
 Group:		Networking/Daemons
+Group(cs):	SÌªovÈ/DÈmoni
 Group(de):	Netzwerkwesen/Server
+Group(es):	Red/Servidores
+Group(fr):	RÈseau/Serveurs
 Group(pl):	Sieciowe/Serwery
+Group(pt):	Rede/Servidores
+Group(ru):	Û≈‘≈◊Ÿ≈/‰≈ÕœŒŸ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -260,8 +294,13 @@ ale jako plikÛw danych uøywa Berkeley DB.
 Summary:	Apache module - authentication variables for arbitrary directives
 Summary(pl):	Modu≥ apache do definiowania zmiennych
 Group:		Networking/Daemons
+Group(cs):	SÌªovÈ/DÈmoni
 Group(de):	Netzwerkwesen/Server
+Group(es):	Red/Servidores
+Group(fr):	RÈseau/Serveurs
 Group(pl):	Sieciowe/Serwery
+Group(pt):	Rede/Servidores
+Group(ru):	Û≈‘≈◊Ÿ≈/‰≈ÕœŒŸ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -277,8 +316,13 @@ Modu≥ ten umoøliwia definicjÍ zmiennych i dyrektyw.
 Summary:	Apache user authentication module using MD5 Digest Authentication 
 Summary(pl):	Modu≥ apache do autoryzacji MD5
 Group:		Networking/Daemons
+Group(cs):	SÌªovÈ/DÈmoni
 Group(de):	Netzwerkwesen/Server
+Group(es):	Red/Servidores
+Group(fr):	RÈseau/Serveurs
 Group(pl):	Sieciowe/Serwery
+Group(pt):	Rede/Servidores
+Group(ru):	Û≈‘≈◊Ÿ≈/‰≈ÕœŒŸ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -295,8 +339,13 @@ Authentication.
 Summary:	Apache module for "trailing slash" redirects and serving directory index files
 Summary(pl):	Modu≥ oferuj±cy przekierowania i serwowanie indeksu katalogu.
 Group:		Networking/Daemons
+Group(cs):	SÌªovÈ/DÈmoni
 Group(de):	Netzwerkwesen/Server
+Group(es):	Red/Servidores
+Group(fr):	RÈseau/Serveurs
 Group(pl):	Sieciowe/Serwery
+Group(pt):	Rede/Servidores
+Group(ru):	Û≈‘≈◊Ÿ≈/‰≈ÕœŒŸ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -312,8 +361,13 @@ Modu≥ oferuj±cy przekierowania i serwowanie indeksu katalogu.
 Summary:	Apache module allows for the customization of HTTP response headers
 Summary(pl):	Modu≥ pozwalaj±cy na modyfikacjÍ nag≥ÛwkÛw HTTP
 Group:		Networking/Daemons
+Group(cs):	SÌªovÈ/DÈmoni
 Group(de):	Netzwerkwesen/Server
+Group(es):	Red/Servidores
+Group(fr):	RÈseau/Serveurs
 Group(pl):	Sieciowe/Serwery
+Group(pt):	Rede/Servidores
+Group(ru):	Û≈‘≈◊Ÿ≈/‰≈ÕœŒŸ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -331,8 +385,13 @@ wysy≥anych do przegl±darki.
 Summary:	Apache module for mmap()ing statically configured list files
 Summary(pl):	Modu≥ s≥uø±cy do mmap()owania plikÛw.
 Group:		Networking/Daemons
+Group(cs):	SÌªovÈ/DÈmoni
 Group(de):	Netzwerkwesen/Server
+Group(es):	Red/Servidores
+Group(fr):	RÈseau/Serveurs
 Group(pl):	Sieciowe/Serwery
+Group(pt):	Rede/Servidores
+Group(ru):	Û≈‘≈◊Ÿ≈/‰≈ÕœŒŸ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -350,8 +409,13 @@ Modu≥ umoøliwia mmap()owanie statycznie skonfigurowanych plikÛw
 Summary:	Apache module with imap-file handler
 Summary(pl):	Modu≥ z obs≥ug± imap-file
 Group:		Networking/Daemons
+Group(cs):	SÌªovÈ/DÈmoni
 Group(de):	Netzwerkwesen/Server
+Group(es):	Red/Servidores
+Group(fr):	RÈseau/Serveurs
 Group(pl):	Sieciowe/Serwery
+Group(pt):	Rede/Servidores
+Group(ru):	Û≈‘≈◊Ÿ≈/‰≈ÕœŒŸ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -368,8 +432,13 @@ Modu≥ umozliwiaj±cy obs≥ugÍ plikÛw .map (imap-file handler)
 Summary:	Apache module with comprehensive overview of the server configuration
 Summary(pl):	Modu≥ dostarczaj±cy informacji na temat serwera.
 Group:		Networking/Daemons
+Group(cs):	SÌªovÈ/DÈmoni
 Group(de):	Netzwerkwesen/Server
+Group(es):	Red/Servidores
+Group(fr):	RÈseau/Serveurs
 Group(pl):	Sieciowe/Serwery
+Group(pt):	Rede/Servidores
+Group(ru):	Û≈‘≈◊Ÿ≈/‰≈ÕœŒŸ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -387,8 +456,13 @@ modu≥ach itp.
 Summary:	Apache module with Web proxy
 Summary(pl):	Modu≥ dodaj±cy obs≥ugÍ serwera proxy
 Group:		Networking/Daemons
+Group(cs):	SÌªovÈ/DÈmoni
 Group(de):	Netzwerkwesen/Server
+Group(es):	Red/Servidores
+Group(fr):	RÈseau/Serveurs
 Group(pl):	Sieciowe/Serwery
+Group(pt):	Rede/Servidores
+Group(ru):	Û≈‘≈◊Ÿ≈/‰≈ÕœŒŸ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -408,8 +482,13 @@ HTTP/1.0.
 Summary:	Apache module with rule-based engine for rewrite requested URLs on the fly
 Summary(pl):	Modu≥ do ,,przepisywania'' adresÛw URL w locie
 Group:		Networking/Daemons
+Group(cs):	SÌªovÈ/DÈmoni
 Group(de):	Netzwerkwesen/Server
+Group(es):	Red/Servidores
+Group(fr):	RÈseau/Serveurs
 Group(pl):	Sieciowe/Serwery
+Group(pt):	Rede/Servidores
+Group(ru):	Û≈‘≈◊Ÿ≈/‰≈ÕœŒŸ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -425,8 +504,13 @@ Modu≥ oferuj±cy moøliwo∂Ê ,,przepisywania'' adresÛw URL w locie.
 Summary:	Server status report module for apache
 Summary(pl):	Modu≥ dostarczaj±cy informacje statystyczne o serwerze.
 Group:		Networking/Daemons
+Group(cs):	SÌªovÈ/DÈmoni
 Group(de):	Netzwerkwesen/Server
+Group(es):	Red/Servidores
+Group(fr):	RÈseau/Serveurs
 Group(pl):	Sieciowe/Serwery
+Group(pt):	Rede/Servidores
+Group(ru):	Û≈‘≈◊Ÿ≈/‰≈ÕœŒŸ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -446,8 +530,13 @@ pracy serwera apache (w postaci strony HTML).
 Summary:	Apache module for user tracking using cookies
 Summary(pl):	Modu≥ s≥uø±cy do ∂ledzenia ,,ciasteczek''.
 Group:		Networking/Daemons
+Group(cs):	SÌªovÈ/DÈmoni
 Group(de):	Netzwerkwesen/Server
+Group(es):	Red/Servidores
+Group(fr):	RÈseau/Serveurs
 Group(pl):	Sieciowe/Serwery
+Group(pt):	Rede/Servidores
+Group(ru):	Û≈‘≈◊Ÿ≈/‰≈ÕœŒŸ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -464,8 +553,13 @@ Modu≥ pozwalaj±cy na ∂ledzenie ,,ciasteczek''.
 Summary:	Apache module for dynamically configured mass virtual hosting
 Summary(pl):	Modu≥ dodaj±cy obs≥ugÍ hostÛw wirtualnych.
 Group:		Networking/Daemons
+Group(cs):	SÌªovÈ/DÈmoni
 Group(de):	Netzwerkwesen/Server
+Group(es):	Red/Servidores
+Group(fr):	RÈseau/Serveurs
 Group(pl):	Sieciowe/Serwery
+Group(pt):	Rede/Servidores
+Group(ru):	Û≈‘≈◊Ÿ≈/‰≈ÕœŒŸ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -482,8 +576,13 @@ wirtualnych.
 Summary:	Apache module which provides a magic token for each request
 Summary(pl):	Modu≥ nadaj±cy kaødemu ø±daniu unikalny token
 Group:		Networking/Daemons
+Group(cs):	SÌªovÈ/DÈmoni
 Group(de):	Netzwerkwesen/Server
+Group(es):	Red/Servidores
+Group(fr):	RÈseau/Serveurs
 Group(pl):	Sieciowe/Serwery
+Group(pt):	Rede/Servidores
+Group(ru):	Û≈‘≈◊Ÿ≈/‰≈ÕœŒŸ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -507,8 +606,13 @@ UNIQUE_ID.
 Summary:	Apache module which generates Expires HTTP headers
 Summary(pl):	Modu≥ generuj±cy nag≥Ûwki HTTP Expires
 Group:		Networking/Daemons
+Group(cs):	SÌªovÈ/DÈmoni
 Group(de):	Netzwerkwesen/Server
+Group(es):	Red/Servidores
+Group(fr):	RÈseau/Serveurs
 Group(pl):	Sieciowe/Serwery
+Group(pt):	Rede/Servidores
+Group(ru):	Û≈‘≈◊Ÿ≈/‰≈ÕœŒŸ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -612,7 +716,7 @@ install %{SOURCE10} $RPM_BUILD_ROOT%{_sysconfdir}/mod_proxy.conf
 
 ln -sf index.html.en $RPM_BUILD_ROOT%{_datadir}/html/index.html
 
-gzip -9nf ABOUT_APACHE src/CHANGES KEYS README
+gzip -9nf ABOUT_APACHE src/CHANGES README
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -1127,9 +1231,6 @@ fi
 %{_datadir}/manual/stopping.html.html
 %lang(en) %{_datadir}/manual/stopping.html.en
 %lang(fr) %{_datadir}/manual/stopping.html.fr
-%{_datadir}/manual/suexec.html.html
-%lang(en) %{_datadir}/manual/suexec.html.en
-%lang(ja) %{_datadir}/manual/suexec.html.ja.jis
 %{_datadir}/manual/upgrading_to_1_3.html
 %{_datadir}/manual/urlmapping.html
 %dir %{_datadir}/manual/howto
@@ -1206,7 +1307,6 @@ fi
 %{_datadir}/manual/programs/logresolve.html
 %{_datadir}/manual/programs/other.html
 %{_datadir}/manual/programs/rotatelogs.html
-%{_datadir}/manual/programs/suexec.html
 %dir %{_datadir}/manual/vhosts
 %{_datadir}/manual/vhosts/details.html
 %{_datadir}/manual/vhosts/examples.html
@@ -1243,6 +1343,7 @@ fi
 %lang(ko) %{_datadir}/html/index.html.kr.iso-kr
 %lang(de_LU) %{_datadir}/html/index.html.lu
 %lang(nl) %{_datadir}/html/index.html.nl
+%lang(nn) %{_datadir}/html/index.html.nn
 %lang(no) %{_datadir}/html/index.html.no
 %lang(pl) %{_datadir}/html/index.html.po.iso-pl
 %lang(pt_PT) %{_datadir}/html/index.html.pt
@@ -1268,6 +1369,10 @@ fi
 %files suexec
 %defattr(644,root,root,755)
 %attr(4755,root,root) %{_sbindir}/suexec
+%{_datadir}/manual/suexec.html.html
+%lang(en) %{_datadir}/manual/suexec.html.en
+%lang(ja) %{_datadir}/manual/suexec.html.ja.jis
+%{_datadir}/manual/programs/suexec.html
 
 %files devel
 %defattr(644,root,root,755)
@@ -1310,7 +1415,9 @@ fi
 %files mod_dir
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_dir.so
-%{_datadir}/manual/mod/mod_dir.html
+%{_datadir}/manual/mod/mod_dir.html.html
+%lang(en) %{_datadir}/manual/mod/mod_dir.html.en
+%lang(ja) %{_datadir}/manual/mod/mod_dir.html.ja.jis
 
 %files mod_expires
 %defattr(644,root,root,755)
