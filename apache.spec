@@ -15,7 +15,7 @@ Summary(pt_BR):	Servidor HTTPD para prover serviços WWW
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.0.39
-Release:	0.2
+Release:	0.3
 License:	Apache Group License
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/
@@ -1115,8 +1115,6 @@ fi
 %attr(755,root,root) %{_sbindir}/logresolve
 %attr(755,root,root) %{_sbindir}/rotatelogs
 
-%attr(755,root,root) %{_libdir}/libaprutil.so.*
-
 %dir %attr(770,root,http) /var/run/apache
 
 %{_mandir}/man1/htdigest.1*
@@ -1186,13 +1184,9 @@ fi
 
 %files devel
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_bindir}/apu-config
 %{_includedir}
 %exclude %{_includedir}/apr*.h
-%{_libdir}/aprutil.exp
 %{_libexecdir}/*.exp
-%attr(755,root,root) %{_libdir}/libaprutil.so
-%attr(755,root,root) %{_libdir}/libaprutil.la
 
 %files static
 %defattr(644,root,root,755)
@@ -1350,16 +1344,17 @@ fi
 
 %files -n apr
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/libapr.so.*
+%attr(755,root,root) %{_libdir}/libapr*.so.*
 
 %files -n apr-devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/apr-config
+%attr(755,root,root) %{_bindir}/apu-config
 %{_includedir}/apr*.h
 %{_libdir}/APRVARS
-%{_libdir}/apr.exp
-%attr(755,root,root) %{_libdir}/libapr.so
-%attr(755,root,root) %{_libdir}/libapr.la
+%{_libdir}/apr*.exp
+%attr(755,root,root) %{_libdir}/libapr*.so
+%attr(755,root,root) %{_libdir}/libapr*.la
 
 %files -n apr-static
 %defattr(644,root,root,755)
