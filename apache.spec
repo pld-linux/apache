@@ -659,7 +659,7 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 # sanity check
 MODULES_API=`awk '/#define MODULE_MAGIC_NUMBER_MAJOR/ {print $3}' include/ap_mmn.h`
 if [ "$MODULES_API" != "%_apache_modules_api" ]; then
-	echo "Set %%_apache_modules_api to $MODILES_API and rerun."
+	echo "Set %%_apache_modules_api to $MODULES_API and rerun."
 	exit 1
 fi
 ./buildconf
