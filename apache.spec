@@ -772,6 +772,7 @@ install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig} \
 
 for mpm in %{?with_metuxmpm:metuxmpm} perchild worker; do
 	install buildmpm-${mpm}/httpd.${mpm} $RPM_BUILD_ROOT%{_sbindir}/httpd.${mpm}
+	ln -s httpd.conf $RPM_BUILD_ROOT%{_sysconfdir}/httpd.${mpm}
 done
 
 ln -s httpd.prefork $RPM_BUILD_ROOT%{_sbindir}/httpd
