@@ -33,7 +33,7 @@ Summary(ru):	óÁÍÙÊ ÐÏÐÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.0.53
-Release:	0.1
+Release:	0.2
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -87,7 +87,7 @@ Patch22:	httpd-2.0.50-peruser-r3.patch
 Patch23:	%{name}-apr1.patch
 Patch24:	%{name}-normalize-path.patch
 # http://issues.apache.org/bugzilla/attachment.cgi?id=13377 external pcre
-Patch26:	%{name}2-pcre-patch.diff         
+Patch25:	%{name}2-pcre-patch.diff         
 URL:		http://httpd.apache.org/
 BuildRequires:	automake
 BuildRequires:	apr-devel >= 1:1.0.0
@@ -681,7 +681,7 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 %patch5 -p1
 %patch7 -p1
 %patch8 -p1
-#%patch9 -p1
+%patch9 -p1
 %patch10 -p1
 %patch11 -p1
 %patch13 -p1
@@ -694,9 +694,9 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 %patch20 -p1
 %patch21 -p1
 %patch22 -p1
-#%patch23 -p1
+%patch23 -p1
 %patch24 -p1
-%{?with_external_pcre:%patch26 -p2}
+%{?with_external_pcre:%patch25 -p2}
 
 %{__perl} -pi -e "s@/usr/local/bin/perl@%{__perl}@" $(grep -rl "/usr/local/bin/perl" *)
 %{__perl} -pi -e "s@BUILD_SUBDIRS.*@BUILD_SUBDIRS =@g" srclib/Makefile.in
@@ -1492,8 +1492,6 @@ fi
 %{_datadir}/manual/mod/mod_rewrite.html.en
 %{_datadir}/manual/images/mod_rewrite*
 %dir %{_datadir}/manual/ssl
-%{_datadir}/manual/ssl/*.gif
-%{_datadir}/manual/ssl/*.png
 %{_datadir}/manual/ssl/*.html.en
 %lang(ja) %{_datadir}/manual/ssl/*.html.ja*
 %{_datadir}/manual/mod/mod_ssl.html.en
