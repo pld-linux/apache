@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 # Startup script for the Apache Web Server
 #
@@ -17,17 +17,21 @@
 # Check that networking is up.
 [ "${NETWORKING}" = "no" ] && exit0
 
+# Try set service nice level
+if [ -f /etc/sysconfig/apache ]; then
+    . /etc/sysconfig/apache
+fi    
 # See how we were called.
 case "$1" in
   start)
 	show Starting httpd
-	daemon +5 httpd 
+	daemon httpd 
 	touch /var/lock/subsys/httpd
 	;;
   stop)
 	show Shutting down httpd
 	killproc httpd  
-	rm -f /var/lock/subsys/httpd /var/run/httpd.pid
+	rm -f /var/lock/subsys/httpd /var/run/httpd.pid /var/run/httpd.loc*
 	;;
   status)
 	status httpd
@@ -43,6 +47,3 @@ case "$1" in
 esac
 
 exit 0
-
-
-
