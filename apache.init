@@ -62,7 +62,7 @@ case "$1" in
 		if [ ! $PID -eq 0 ]; then
 			show "Waiting for httpd to stop"
 			busy
-			while ps ax | grep -q $PID.\*httpd
+			while ps -o command $PID | grep -q ^httpd
 			do
 				sleep 1
 			done
