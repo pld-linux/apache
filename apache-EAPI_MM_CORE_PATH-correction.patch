@@ -6,7 +6,7 @@ diff -Nru apache_1.3.17/src/include/httpd.h apache_1.3.17.new/src/include/httpd.
  #ifdef EAPI
  #ifndef EAPI_MM_CORE_PATH
 -#define EAPI_MM_CORE_PATH "logs/mm"
-+#define EAPI_MM_CORE_PATH "/var/state/apache/mm"
++#define EAPI_MM_CORE_PATH "/var/run/apache/mm"
  #endif
  #ifndef EAPI_MM_CORE_MAXSIZE
  #define EAPI_MM_CORE_MAXSIZE 1024*1024*1 /* max. 1MB */
