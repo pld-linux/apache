@@ -24,7 +24,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.0.49
-Release:	3
+Release:	3.1
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -51,7 +51,6 @@ Patch1:		%{name}-layout.patch
 Patch2:		%{name}-suexec.patch
 Patch3:		%{name}-nolibs.patch
 Patch4:		%{name}-apr.patch
-Patch6:		httpd-2.0.40-xfsz.patch
 Patch7:		httpd-2.0.45-davetag.patch
 Patch8:		httpd-2.0.45-encode.patch
 Patch9:		httpd-2.0.45-export.patch
