@@ -1238,6 +1238,7 @@ fi
 %attr(755,root,root) %{_libexecdir}/mod_env.so
 %attr(755,root,root) %{_libexecdir}/mod_include.so
 %attr(755,root,root) %{_libexecdir}/mod_log_config.so
+%attr(755,root,root) %{_libexecdir}/mod_log_forensic.so
 %attr(755,root,root) %{_libexecdir}/mod_mime.so
 %attr(755,root,root) %{_libexecdir}/mod_mime_magic.so
 %attr(755,root,root) %{_libexecdir}/mod_negotiation.so
@@ -1320,6 +1321,7 @@ fi
 %{_datadir}/manual/mod/mod_env.html.en
 %{_datadir}/manual/mod/mod_include.html.en
 %{_datadir}/manual/mod/mod_log_config.html.en
+%{_datadir}/manual/mod/mod_log_forensic.html.en
 %{_datadir}/manual/mod/mod_mime*.html.en
 %{_datadir}/manual/mod/mod_negotiation.html.en
 %{_datadir}/manual/mod/mod_setenvif.html.en
