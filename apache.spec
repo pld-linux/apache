@@ -77,6 +77,7 @@ Patch18:	httpd-2.0.48-dynlimit.patch
 Patch19:	httpd-2.0.48-fdsetsize.patch
 Patch20:	httpd-2.0.48-sslpphrase.patch
 Patch21:	%{name}-v6only-ENOPROTOOPT.patch
+Patch22:	%{name}-conffile-path.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	automake
 BuildRequires:	apr-devel >= 1:0.9.4-1
@@ -653,6 +654,7 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 %patch19 -p1
 %patch20 -p1
 %patch21 -p1
+%patch22 -p1
 
 %build
 # sanity check
@@ -670,7 +672,7 @@ CPPFLAGS="-DMAX_SERVER_LIMIT=200000 -DBIG_SECURITY_HOLE=1"
 for mpm in %{?with_metuxmpm:metuxmpm} perchild prefork worker; do
 install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
 ../%configure \
-	--prefix=%{_sysconfdir}/ \
+	--prefix=%{_sysconfdir} \
 	--exec-prefix=%{_libexecdir} \
 	--with-installbuilddir=%{_libdir}/apache/build \
 	--enable-layout=PLD \
@@ -735,6 +737,9 @@ install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
 	--with-apr-util=%{_bindir}
 %{__make}
 ./httpd.${mpm} -l | grep -v "${mpm}" > modules-inside
+
+find include -name '*.h' | xargs perl -pi -e "s#/httpd\.(.*?)\.conf#/etc/httpd/httpd.conf#"
+
 cd ..
 done
 
