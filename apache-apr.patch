@@ -1,0 +1,12 @@
+diff -urN httpd-2.0.47.org/configure.in httpd-2.0.47/configure.in
+--- httpd-2.0.47.org/configure.in	2003-09-13 14:18:35.000000000 +0200
++++ httpd-2.0.47/configure.in	2003-09-13 14:18:50.000000000 +0200
+@@ -76,8 +76,6 @@
+   AP_CLEAN_SRCLIB_DIRS="$AP_CLEAN_SRCLIB_DIRS apr"
+ fi
+ 
+-APR_SETIFNULL(CC, `$apr_config --cc`)
+-APR_SETIFNULL(CPP, `$apr_config --cpp`)
+ APR_ADDTO(CFLAGS, `$apr_config --cflags`)
+ APR_ADDTO(CPPFLAGS, `$apr_config --cppflags`)
+ APR_ADDTO(LDFLAGS, `$apr_config --ldflags`)
