@@ -24,7 +24,7 @@ Summary(ru):	óÁÍÙÊ ÐÏÐÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.0.46
-Release:	0.1
+Release:	0.2
 License:	Apache Group License
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/
@@ -586,20 +586,20 @@ The includes and linker libraries for development with APR.
 %description -n apr-devel -l pl
 Pliki nag³ówkowe, biblioteki dla konsolidatora APR.
 
-%package -n apr-static
-Summary:	Static APR libraries
-Summary(pl):	Statyczne biblioteki APR
-Group:		Development/Libraries
-Requires:	apr-devel = %{version}
-Requires:	gdbm-static >= 1.8.3
-Requires:	db-static
-Requires:	expat-static
+#%package -n apr-static
+#Summary:	Static APR libraries
+#Summary(pl):	Statyczne biblioteki APR
+#Group:		Development/Libraries
+#Requires:	apr-devel = %{version}
+#Requires:	gdbm-static >= 1.8.3
+#Requires:	db-static
+#Requires:	expat-static
 
-%description -n apr-static
-Static APR libraries.
+#%description -n apr-static
+#Static APR libraries.
 
-%description -n apr-static -l pl
-Statyczne biblioteki APR.
+#%description -n apr-static -l pl
+#Statyczne biblioteki APR.
 
 %prep
 %setup -q -n httpd-%{version}
@@ -1176,7 +1176,6 @@ fi
 %dir %{_datadir}
 %dir %{_datadir}/manual
 %{_datadir}/manual/LICENSE
-%{_datadir}/manual/*.html
 %{_datadir}/manual/*.xml
 %{_datadir}/manual/*.html.en
 %lang(ja) %{_datadir}/manual/*.html.ja.jis
@@ -1188,13 +1187,11 @@ fi
 %{_datadir}/manual/faq
 %dir %{_datadir}/manual/howto
 %doc %{_datadir}/manual/howto/*.en
-%{_datadir}/manual/howto/*.html
 %lang(ja) %{_datadir}/manual/howto/*.ja.jis
 %dir %{_datadir}/manual/images
 %{_datadir}/manual/images/[achips]*
 %{_datadir}/manual/misc
 %dir %{_datadir}/manual/mod
-%{_datadir}/manual/mod/[fh]*.html
 %{_datadir}/manual/mod/[cdfhipw]*.html.en
 %{_datadir}/manual/mod/[acd]*.xml
 %lang(ja) %{_datadir}/manual/mod/[ad]*.xml.ja*
@@ -1417,6 +1414,6 @@ fi
 %attr(755,root,root) %{_libdir}/libapr*.so
 %{_libdir}/libapr*.la
 
-%files -n apr-static
-%defattr(644,root,root,755)
-%{_libdir}/libapr.a
+#%files -n apr-static
+#%defattr(644,root,root,755)
+#%{_libdir}/libapr.a
