@@ -110,7 +110,7 @@ OPTIM=$RPM_OPT_FLAGS LDFLAGS=-s\
 	--enable-shared=max \
 	--disable-module=auth_db \
 	--proxycachedir=/var/spool/proxy \
-	--with-perl=/usr/bin/perl \
+	--with-perl=%{_bindir}/perl \
 	--enable-suexec \
 	--suexec-caller=http \
 	--suexec-uidmin=500 \
@@ -189,9 +189,9 @@ fi
 %attr(755,root,root,755) %dir /home/httpd/errordocs
 /home/httpd/errordocs/*
 
-%attr(755,root,root) /usr/bin/dbmmanage 
-%attr(755,root,root) /usr/bin/htdigest
-%attr(755,root,root) /usr/bin/htpasswd
+%attr(755,root,root) %{_bindir}/dbmmanage 
+%attr(755,root,root) %{_bindir}/htdigest
+%attr(755,root,root) %{_bindir}/htpasswd
 
 %attr(755,root,root) /usr/sbin/ab
 %attr(755,root,root) /usr/sbin/apachectl
