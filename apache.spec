@@ -480,15 +480,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/html/manual/mod/mod_auth_anon.html
 %{_datadir}/html/manual/mod/mod_auth_db.html
 %{_datadir}/html/manual/mod/mod_auth_dbm.html
-%{_datadir}/html/manual/mod/mod_auth_digest.html
 %{_datadir}/html/manual/mod/mod_autoindex.html
-%{_datadir}/html/manual/mod/mod_browser.html
-%{_datadir}/html/manual/mod/mod_cern_meta.html
 %{_datadir}/html/manual/mod/mod_cgi.html
 %{_datadir}/html/manual/mod/mod_cookies.html
 %{_datadir}/html/manual/mod/mod_digest.html
 %{_datadir}/html/manual/mod/mod_dir.html
-%{_datadir}/html/manual/mod/mod_dld.html
 %{_datadir}/html/manual/mod/mod_env.html
 %{_datadir}/html/manual/mod/mod_example.html
 %{_datadir}/html/manual/mod/mod_expires.html
@@ -496,9 +492,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/html/manual/mod/mod_imap.html
 %{_datadir}/html/manual/mod/mod_include.html
 %{_datadir}/html/manual/mod/mod_info.html
-%{_datadir}/html/manual/mod/mod_isapi.html
 %{_datadir}/html/manual/mod/mod_log_agent.html
-%{_datadir}/html/manual/mod/mod_log_common.html
 %{_datadir}/html/manual/mod/mod_log_config.html
 %{_datadir}/html/manual/mod/mod_log_referer.html
 %{_datadir}/html/manual/mod/mod_mime.html
