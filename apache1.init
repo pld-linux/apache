@@ -65,7 +65,7 @@ case "$1" in
 	$0 start
 	;;
   *)
-	msg_usage "$0 {start|stop|restart|status}"
+	msg_usage "$0 {start|stop|restart|reload|status}"
 	exit 1
 	;;
 esac
