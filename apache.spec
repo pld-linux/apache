@@ -24,7 +24,7 @@ Patch2:		apache-htdocs.patch
 Patch3:		apache-errordocs.patch
 Patch4:		apache-apxs.patch
 Patch5:		apache-phhttpd.patch
-Patch6:		apache-EAPI.patc
+Patch6:		apache-EAPI.patch
 Copyright:	BSD-like
 Provides:	httpd
 Provides:	webserver
