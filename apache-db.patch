@@ -1,0 +1,11 @@
+--- httpd-2.0.43/srclib/apr-util/dbm/apr_dbm_berkeleydb.c~	Wed Mar 13 20:40:47 2002
++++ httpd-2.0.43/srclib/apr-util/dbm/apr_dbm_berkeleydb.c	Sun Oct 27 14:19:45 2002
+@@ -195,7 +195,7 @@
+ 
+ #if DB_VER == 3
+         if ((dberr = db_create(&file.bdb, NULL, 0)) == 0) {
+-            if ((dberr = (*file.bdb->open)(file.bdb, pathname, NULL, 
++            if ((dberr = (*file.bdb->open)(file.bdb, 0,  pathname, NULL, 
+                                            DB_HASH, dbmode, 
+                                            apr_posix_perms2mode(perm))) != 0) {
+                 /* close the DB handler */
