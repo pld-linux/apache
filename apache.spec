@@ -68,18 +68,16 @@ Patch8:		httpd-2.0.45-encode.patch
 Patch9:		httpd-2.0.45-export.patch
 Patch10:	httpd-2.0.46-dav401dest.patch
 Patch11:	httpd-2.0.46-md5dig.patch
-Patch12:	httpd-2.0.46-rolog.patch
-Patch13:	httpd-2.0.46-shmcb.patch
-Patch14:	httpd-2.0.46-sslmutex.patch
-Patch15:	httpd-2.0.47-sslcleanup.patch
-Patch16:	httpd-2.0.48-corelimit.patch
-Patch17:	httpd-2.0.48-debuglog.patch
-Patch18:	httpd-2.0.48-dynlimit.patch
-Patch19:	httpd-2.0.48-fdsetsize.patch
-Patch20:	httpd-2.0.48-sslpphrase.patch
-Patch21:	%{name}-v6only-ENOPROTOOPT.patch
-Patch22:	%{name}-conffile-path.patch
-Patch23:	%{name}-apxs.patch
+Patch12:	httpd-2.0.46-shmcb.patch
+Patch13:	httpd-2.0.46-sslmutex.patch
+Patch14:	httpd-2.0.47-sslcleanup.patch
+Patch15:	httpd-2.0.48-corelimit.patch
+Patch16:	httpd-2.0.48-debuglog.patch
+Patch17:	httpd-2.0.48-dynlimit.patch
+Patch18:	httpd-2.0.48-sslpphrase.patch
+Patch19:	%{name}-v6only-ENOPROTOOPT.patch
+Patch20:	%{name}-conffile-path.patch
+Patch21:	%{name}-apxs.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	automake
 BuildRequires:	apr-devel >= 1:0.9.5-6
@@ -657,18 +655,16 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 %patch9 -p1
 %patch10 -p1
 %patch11 -p1
-#%patch12 -p1
+%patch12 -p1
 %patch13 -p1
 %patch14 -p1
 %patch15 -p1
 %patch16 -p1
 %patch17 -p1
 %patch18 -p1
-#%patch19 -p1
+%patch19 -p1
 %patch20 -p1
 %patch21 -p1
-%patch22 -p1
-%patch23 -p1
 
 %build
 # sanity check
