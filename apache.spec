@@ -21,8 +21,8 @@ Summary(pl):	Serwer WWW (World Wide Web)
 Summary(pt_BR):	Servidor HTTPD para prover serviços WWW
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
-Version:	2.0.42
-Release:	0.6
+Version:	2.0.43
+Release:	0.1
 License:	Apache Group License
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/
