@@ -26,12 +26,12 @@ Summary(tr):	Lider WWW tarayýcý
 Summary(uk):	îÁÊÐÏÐÕÌÑÒÎ¦ÛÉÊ Web-Server
 Summary(zh_CN):	Internet ÉÏÓ¦ÓÃ×î¹ã·ºµÄ Web ·þÎñ³ÌÐò¡£
 Name:		apache
-Version:	1.3.28
+Version:	1.3.29
 Release:	1
 License:	Apache Group
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/%{name}_%{version}.tar.gz
-# Source0-md5:	2cdece7b4881d541e072de6a2b65db77
+# Source0-md5:	e97fe9bf51dc2c9c233d53f63b1347e3
 Source1:	%{name}1.init
 Source2:	%{name}.logrotate
 Source3:	%{name}-icons.tar.gz
@@ -1550,7 +1550,9 @@ fi
 %files mod_rewrite
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_rewrite.so
-%{_datadir}/manual/mod/mod_rewrite.html
+%{_datadir}/manual/mod/mod_rewrite.html.html
+%{_datadir}/manual/mod/mod_rewrite.html.en
+%lang(ja) %{_datadir}/manual/mod/mod_rewrite.html.ja.jis
 %{_datadir}/manual/images/mod_rewrite*
 
 %files mod_status
