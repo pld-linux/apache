@@ -22,7 +22,8 @@ Copyright:	BSD-like
 Provides:	httpd
 Provides:	webserver
 Prereq:		/sbin/chkconfig
-Prereq:		/usr/sbin/useradd
+Prereq:		%{_sbindir}/useradd
+Requires:	rc-scripts
 URL:		http://www.apache.org/
 BuildRoot:	/tmp/%{name}-%{version}-root
 Obsoletes:	apache-extra
