@@ -1486,10 +1486,10 @@ fi
 %{_mandir}/man1/dbmmanage.1*
 %{_mandir}/man1/htpasswd.1*
 
-#%files mod_define
-#%defattr(644,root,root,755)
-#%attr(755,root,root) %{_libexecdir}/mod_define.so
-#%{_datadir}/manual/mod/mod_define.html
+%files mod_define
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libexecdir}/mod_define.so
+%{_datadir}/manual/mod/mod_define.html
 
 %files mod_digest
 %defattr(644,root,root,755)
