@@ -27,7 +27,7 @@ Patch2:		apache-htdocs.patch
 Patch3:		apache-errordocs.patch
 Patch4:		apache-apxs.patch
 Patch5:		apache-EAPI.patch
-Patch6:		apache-v6-PLD-1.patch.gz
+Patch6:		apache-v6-PLD-2.patch.gz
 Patch7:		apache-mm_conf.patch
 Patch8:		apache-modules_symbols.patch
 Provides:	httpd
@@ -314,9 +314,9 @@ Requires:	%{name}(EAPI) = %{version}
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
-#%patch6 -p1
 %patch7 -p1
 %patch8 -p1
+%patch6 -p1
 
 %build
 
@@ -343,8 +343,8 @@ OPTIM="$RPM_OPT_FLAGS" \
 	--suexec-uidmin=500 \
 	--suexec-gidmin=500 \
 	--disable-rule=WANTHSREGEX \
-	--enable-rule=EAPI
-#	--enable-rule=INET6
+	--enable-rule=EAPI \
+	--enable-rule=INET6
 make
 
 %install
