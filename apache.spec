@@ -6,8 +6,10 @@
 %include	/usr/lib/rpm/macros.perl
 Summary:	The most widely used Web server on the Internet
 Summary(de):	Leading World Wide Web-Server
+Summary(es):	Servidor HTTPD para proveer servicios WWW
 Summary(fr):	Le serveur web le plus utilise sur Internet
 Summary(pl):	Serwer WWW (World Wide Web)
+Summary(pt_BR):	Servidor HTTPD para prover serviços WWW
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	1.3.22
@@ -50,7 +52,7 @@ Patch19:	%{name}-PLD-nov6.patch
 Patch20:	%{name}-configdir_skip_backups.patch
 Patch21:	%{name}-apxs-quiet.patch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
-BuildRequires:  db3-devel
+BuildRequires:	db3-devel
 BuildRequires:	mm-devel >= 1.1.3
 %{?mod_rewrite_ldap:BuildRequires: openldap-devel}
 Provides:	httpd
@@ -86,6 +88,14 @@ Internet.
 Apache ist ein voll funktionsfähiger Web-Server, der kostenlos
 erhältlich und weit verbreitet ist.
 
+%description -l es
+El servidor web Apache es el mejor servidor gratuito disponible en el
+mundo UNIX hoy. Usa HTTP (HyperText Transfer Protocol) para permitir
+que browsers web vean documentos y sometan datos remotamente.
+Puede ejecutar varias funciones diferentes, incluyendo funciones de
+proxy y caché, y nos ofrece características como monitor de estado,
+conversión dinámica de tipo, y otras más.
+
 %description -l fr
 Apache est un serveur Web puissant, efficace, gratuit et complet.
 Apache est aussi le serveur Web le plus populaire sur Internet.
@@ -93,6 +103,14 @@ Apache est aussi le serveur Web le plus populaire sur Internet.
 %description -l pl
 Apache jest serwerem WWW (World Wide Web). Instaluj±c ten pakiet
 bêdziesz móg³ prezentowaæ w³asne strony WWW w sieci internet.
+
+%description -l pt_BR
+O servidor web Apache é o melhor servidor gratuito disponível no mundo
+UNIX hoje. Ele usa HTTP (HyperText Transfer Protocol) para permitir
+que browsers web vejam documentos e submetam dados remotamente. Ele
+pode executar várias funções diferentes, incluindo funções de proxy e
+cache, e oferece características como monitor de status, conversão
+dinâmica de tipo, e mais.
 
 %description -l tr
 Apache serbest daðýtýlan ve çok kullanýlan yetenekli bir web
@@ -120,11 +138,15 @@ wykonywane jako taki sam u¿ytkownik jak serwer WWW.
 
 %package devel
 Summary:	Module development tools for the Apache web server
+Summary(es):	Archivos de inclusión del Apache para desarrollo de módulos
 Summary(fr):	Les outils de developpement de modules pour le serveur web Apache
 Summary(pl):	Pliki nag³ówkowe do tworzenai modu³ów rozszerzeñ do serwera www Apache
+Summary(pt_BR):	Arquivos de inclusão do Apache para desenvolvimento de módulos
 Group:		Networking/Utilities
 Group(de):	Netzwerkwesen/Werkzeuge
+Group(es):	Red/Utilitarios
 Group(pl):	Sieciowe/Narzêdzia
+Group(pt_BR):	Rede/Utilitários
 Requires:	%{name}(EAPI) = %{version}
 Provides:	%{name}(EAPI)-devel
 
@@ -136,8 +158,20 @@ Le package apache-devel contient le code source pour le serveur Web
 Apache et le binaire APXS dont vous aurez besoin pour construire des
 Objets Dynamiques Partages (DSOs) pour Apache.
 
+%description -l es devel
+Este paquete contiene los archivos de inclusión para el Apache, bien
+como el utilitario apxs para la construcción de objetos compartidos
+dinámicos (DSOs). Ha ce falta instalar este paquete si deseas compilar
+o desarrollar módulos adicionales para Apache.
+
 %description -l pl devel
 Pliki nag³ówkowe dla serwera WWW Apache.
+
+%description -l pt_BR devel
+Este pacote contem os arquivos de inclusão para o Apache, bem como o
+utilitário apxs para a construção de objetos compartilhados dinâmicos
+(DSOs). Este pacote precisa ser instalado se você deseja compilar ou
+desenvolver módulos adicionais para o Apache.
 
 %package mod_actions
 Summary:	Apache module for run CGI whenever a file of a certain type is requested
@@ -172,8 +206,8 @@ This package contains mod_auth module. It provides for user
 authentication using textual files.
 
 %description -l pl mod_auth
-Ten pakiet zawiera modu³ mod_auth. S³u¿y on do autentykacji przy u¿yciu
-plików tekstowych.
+Ten pakiet zawiera modu³ mod_auth. S³u¿y on do autentykacji przy
+u¿yciu plików tekstowych.
 
 %package mod_auth_anon
 Summary:	Apache module with "anonymous" user access authentication
@@ -481,8 +515,9 @@ Requires:	%{name}(EAPI) = %{version}
 
 %description mod_expires
 This module controls the setting of the Expires HTTP header in server
-responses. The expiration date can set to be relative to either the time
-the source file was last modified, or to the time of the client access.
+responses. The expiration date can set to be relative to either the
+time the source file was last modified, or to the time of the client
+access.
 
 %description -l pl mod_expires
 Modu³ kontroluje ustawianie nag³ówka HTTP Expires. Data wyga¶niêcia
@@ -1036,7 +1071,7 @@ fi
 %{_datadir}/manual/LICENSE
 %{_datadir}/manual/bind.html.html
 %{_datadir}/manual/cgi_path.html.html
-/home/httpd/manual/configuring.html.html
+%{_datadir}/manual/configuring.html.html
 %lang(en) %{_datadir}/manual/configuring.html.en
 %lang(fr) %{_datadir}/manual/configuring.html.fr
 %lang(ja) %{_datadir}/manual/configuring.html.ja.jis
