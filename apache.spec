@@ -5,7 +5,7 @@ Summary(pl):	Serwer WWW (World Wide Web) ze wsparciem dla IPv6
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	1.3.9
-Release:	4
+Release:	5
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Source0:	ftp://ftp.apache.org/apache/dist/%{name}_%{version}.tar.gz
@@ -14,10 +14,12 @@ Source2:	apache.logrotate
 Source3:	apache-extra1.tar.bz2
 Source8:	apache.sysconfig
 Patch0:		apache-suexec.patch
-Patch1:		apache-1.3.9-ipv6-23081999.patch.gz
-Patch2:		apache-htdocs.patch
-Patch3:		apache-release.patch
-Patch4:		apache-pld.patch
+Patch1:		ftp://ftp.kame.net/pub/kame/misc/apache-139-v6-19991013a.diff.gz
+Patch2:		ftp://ftp.nemoto.ecei.tohoku.ac.jp/pub/Net/IPv6/Patches/apache-139-v6-19991013a.new4.patch.gz
+Patch3:		ftp://ftp.nemoto.ecei.tohoku.ac.jp/pub/Net/IPv6/Patches/apache-139-v6-19991013a.new4_to_4.1.patch
+Patch4:		apache-htdocs.patch
+Patch5:		apache-release.patch
+Patch6:		apache-pld.patch
 Copyright:	BSD-like
 Provides:	httpd
 Provides:	webserver
@@ -108,6 +110,8 @@ Dokumentacja do Apache w formacie HTML.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
+%patch5 -p1
+%patch6 -p1
 
 %build
 OPTIM="$RPM_OPT_FLAGS" LDFLAGS="-s" \
