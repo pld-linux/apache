@@ -135,7 +135,7 @@ Documentation for apache in HTML format.
 Dokumentacja do Apache w formacie HTML.
 
 %prep 
-%setup -q -n apache_%{version}
+%setup -q -n apache_%{version} -a3
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
