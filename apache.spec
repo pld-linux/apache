@@ -417,7 +417,7 @@ OPTIM="$RPM_OPT_FLAGS" \
 	--disable-rule=WANTHSREGEX \
 	--enable-rule=EAPI \
 	--enable-rule=INET6
-make
+%{__make}
 
 %install
 rm -rf $RPM_BUILD_ROOT
