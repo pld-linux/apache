@@ -1,0 +1,1661 @@
+--- httpd-2.0.51/server/mpm/experimental/metuxmpm/metuxmpm.c.orig	2004-09-16 23:16:42.000000000 +0200
++++ httpd-2.0.51/server/mpm/experimental/metuxmpm/metuxmpm.c	2004-09-17 20:43:15.556836784 +0200
+@@ -819,7 +819,7 @@
+     if (workers_may_exit) return APR_SUCCESS;
+     
+     apr_thread_mutex_lock(pipe_of_death_mutex);
+-    ret = apr_recv(lr->sd, &pipe_read_char, &n);
++    ret = apr_socket_recv(lr->sd, &pipe_read_char, &n);
+     if (APR_STATUS_IS_EAGAIN(ret)) 
+     {
+             /* It lost the lottery. It must continue to suffer
+@@ -975,6 +975,7 @@
+     while (!workers_may_exit)
+     {
+         apr_int16_t event;
++	int ifd;
+ 
+ 	_DBG("loop. conn_id=%d req_max=%d req_remain=%d", 
+ 	    conn_id, ap_max_requests_per_child, requests_this_child);
+@@ -993,14 +994,18 @@
+ 
+         /* -- setup pollset -- */
+         /* NOTE: we do _not_ do this upwards anylonger */
+-        apr_poll_setup(&pollset, num_listensocks, tpool);
+-        apr_poll_setup(&pollset, num_listensocks, ptrans);
++	pollset = apr_pcalloc(ptrans, sizeof(apr_pollfd_t) * num_listensocks);
++	ifd = 0;
+         for(lr_walk = ap_listeners; lr_walk != NULL; lr_walk = lr_walk->next) 
+         {
+ 	    int fd;
+-    	    apr_poll_socket_add(pollset, lr_walk->sd, APR_POLLIN);
++	    pollset[ifd].p = ptrans;
++	    pollset[ifd].desc.s = lr_walk->sd;
++	    pollset[ifd].desc_type = APR_POLL_SOCKET;
++	    pollset[ifd].reqevents = APR_POLLIN;
+     	    apr_os_sock_get(&fd, lr_walk->sd);
+ 	    _DBG("adding fd %d to pollset", fd);
++	    ifd++;
+         }
+ 
+ 	if (workers_may_exit) goto worker_out;
+@@ -1032,10 +1037,13 @@
+         _DBG("looking for an listener",0);
+ 	for (lr_walk=ap_listeners; lr_walk!=NULL; lr_walk = lr_walk->next)
+ 	{
+-	    int fd_tmp;
++	    int fd_tmp, fdt;
+     	    apr_os_sock_get(&fd_tmp, lr_walk->sd);
+ 	    _DBG(" ... trying w/ fd=%d", fd_tmp);
+-    	    apr_poll_revents_get(&event, lr_walk->sd, pollset);
++	    for(fdt = 0; fdt < num_listensocks; fdt++)
++		    if(pollset[fdt].desc.s == lr_walk->sd)
++			    break;
++	    event = pollset[fdt].rtnevents;
+             if (event & (APR_POLLIN)) 
+ 	    {
+ 		THREAD_ACCEPT_UNLOCK;
+@@ -1588,7 +1596,7 @@
+                 }
+ #if APR_HAS_OTHER_CHILD
+             }
+-            else if (apr_proc_other_child_read(&pid, status) == 0) 
++            else if (apr_proc_other_child_alert(&pid, APR_OC_REASON_DEATH, status) == 0) 
+ 	    {
+             /* handled */
+ #endif
+--- httpd-2.0.51/server/config.c.orig	2004-09-16 23:16:42.000000000 +0200
++++ httpd-2.0.51/server/config.c	2004-09-17 19:34:28.992169968 +0200
+@@ -1546,7 +1546,7 @@
+         && !(strcmp(fname, ap_server_root_relative(p, SERVER_CONFIG_FILE)))) {
+         apr_finfo_t finfo;
+ 
+-        if (apr_lstat(&finfo, fname, APR_FINFO_TYPE, p) != APR_SUCCESS)
++        if (apr_stat(&finfo, fname, APR_FINFO_TYPE | APR_FINFO_LINK, p) != APR_SUCCESS)
+             return;
+     }
+ 
+@@ -1605,7 +1605,7 @@
+             if (strcmp(dirent.name, ".")
+                 && strcmp(dirent.name, "..")
+                 && (apr_fnmatch(pattern, dirent.name,
+-                                FNM_PERIOD) == APR_SUCCESS)) {
++                                APR_FNM_PERIOD) == APR_SUCCESS)) {
+                 fnew = (fnames *) apr_array_push(candidates);
+                 fnew->fname = ap_make_full_path(p, path, dirent.name);
+             }
+--- httpd-2.0.51/server/util_script.c.orig	2004-09-16 23:16:42.000000000 +0200
++++ httpd-2.0.51/server/util_script.c	2004-09-17 19:22:18.071286832 +0200
+@@ -236,7 +236,7 @@
+     apr_table_addn(e, "SERVER_ADMIN", s->server_admin);	/* Apache */
+     apr_table_addn(e, "SCRIPT_FILENAME", r->filename);	/* Apache */
+ 
+-    apr_sockaddr_port_get(&rport, c->remote_addr);
++    rport = c->remote_addr->port;
+     apr_table_addn(e, "REMOTE_PORT", apr_itoa(r->pool, rport));
+ 
+     if (r->user) {
+@@ -425,7 +425,7 @@
+ 	if ((*getsfunc) (w, MAX_STRING_LEN - 1, getsfunc_data) == 0) {
+ 	    ap_log_rerror(APLOG_MARK, APLOG_ERR|APLOG_TOCLIENT, 0, r,
+ 			  "Premature end of script headers: %s", 
+-                          apr_filename_of_pathname(r->filename));
++                          apr_filepath_name_get(r->filename));
+ 	    return HTTP_INTERNAL_SERVER_ERROR;
+ 	}
+ 
+@@ -518,7 +518,7 @@
+ 
+ 	    ap_log_rerror(APLOG_MARK, APLOG_ERR|APLOG_TOCLIENT, 0, r,
+ 			  "%s: %s", malformed, 
+-                          apr_filename_of_pathname(r->filename));
++                          apr_filepath_name_get(r->filename));
+ 	    return HTTP_INTERNAL_SERVER_ERROR;
+ 	}
+ 
+@@ -609,7 +609,7 @@
+ 
+         rv = apr_bucket_read(e, &bucket_data, &bucket_data_len,
+                              APR_BLOCK_READ);
+-        if (!APR_STATUS_IS_SUCCESS(rv) || (bucket_data_len == 0)) {
++        if ((rv != APR_SUCCESS) || (bucket_data_len == 0)) {
+             return 0;
+         }
+         src = bucket_data;
+--- httpd-2.0.51/server/main.c.orig	2004-09-16 23:16:42.000000000 +0200
++++ httpd-2.0.51/server/main.c	2004-09-17 19:27:17.868710696 +0200
+@@ -238,7 +238,7 @@
+     apr_pool_tag(process->pconf, "pconf");
+     process->argc = argc;
+     process->argv = argv;
+-    process->short_name = apr_filename_of_pathname(argv[0]);
++    process->short_name = apr_filepath_name_get(argv[0]);
+     return process;
+ }
+ 
+--- httpd-2.0.51/server/util_md5.c.orig	2004-09-16 23:16:42.000000000 +0200
++++ httpd-2.0.51/server/util_md5.c	2004-09-16 23:24:34.000000000 +0200
+@@ -53,8 +53,8 @@
+ {
+     const char *hex = "0123456789abcdef";
+     apr_md5_ctx_t my_md5;
+-    unsigned char hash[MD5_DIGESTSIZE];
+-    char *r, result[33]; /* (MD5_DIGESTSIZE * 2) + 1 */
++    unsigned char hash[APR_MD5_DIGESTSIZE];
++    char *r, result[33]; /* (APR_MD5_DIGESTSIZE * 2) + 1 */
+     int i;
+ 
+     /*
+@@ -68,13 +68,13 @@
+     apr_md5_update(&my_md5, buf, (unsigned int)length);
+     apr_md5_final(hash, &my_md5);
+ 
+-    for (i = 0, r = result; i < MD5_DIGESTSIZE; i++) {
++    for (i = 0, r = result; i < APR_MD5_DIGESTSIZE; i++) {
+ 	*r++ = hex[hash[i] >> 4];
+ 	*r++ = hex[hash[i] & 0xF];
+     }
+     *r = '\0';
+ 
+-    return apr_pstrndup(p, result, MD5_DIGESTSIZE*2);
++    return apr_pstrndup(p, result, APR_MD5_DIGESTSIZE*2);
+ }
+ 
+ AP_DECLARE(char *) ap_md5(apr_pool_t *p, const unsigned char *string)
+--- httpd-2.0.51/server/core.c.orig	2004-09-16 23:16:42.000000000 +0200
++++ httpd-2.0.51/server/core.c	2004-09-17 19:15:43.265306464 +0200
+@@ -2912,7 +2912,7 @@
+ 
+     /* XXX handle checking for non-blocking socket */
+     while (bytes_written != len) {
+-        rv = apr_sendv(s, vec + i, nvec - i, &n);
++        rv = apr_socket_sendv(s, vec + i, nvec - i, &n);
+         bytes_written += n;
+         if (rv != APR_SUCCESS)
+             return rv;
+@@ -2920,7 +2920,7 @@
+         *nbytes += n;
+ 
+         /* If the write did not complete, adjust the iovecs and issue
+-         * apr_sendv again
++         * apr_socket_sendv again
+          */
+         if (bytes_written < len) {
+             /* Skip over the vectors that have already been written */
+@@ -2975,7 +2975,7 @@
+     do {
+         apr_size_t tmplen = file_bytes_left;
+ 
+-        rv = apr_sendfile(c->client_socket, fd, hdtr, &file_offset, &tmplen,
++        rv = apr_socket_sendfile(c->client_socket, fd, hdtr, &file_offset, &tmplen,
+                           flags);
+         *bytes_sent += tmplen;
+         total_bytes_left -= tmplen;
+@@ -3086,7 +3086,7 @@
+         rv = apr_file_read(fd, buffer, &sendlen);
+         while (rv == APR_SUCCESS && sendlen) {
+             bytes_sent = sendlen;
+-            rv = apr_send(c->client_socket, &buffer[o], &bytes_sent);
++            rv = apr_socket_send(c->client_socket, &buffer[o], &bytes_sent);
+             if (rv == APR_SUCCESS) {
+                 sendlen -= bytes_sent; /* sendlen != bytes_sent ==> partial write */
+                 o += bytes_sent;       /* o is where we are in the buffer */
+@@ -3869,7 +3869,7 @@
+         }
+         else if (mode == AP_MODE_SPECULATIVE) {
+             apr_bucket *copy_bucket;
+-            APR_BRIGADE_FOREACH(e, ctx->b) {
++            for(e = APR_BRIGADE_FIRST(ctx->b); e != APR_BRIGADE_SENTINEL(ctx->b); e = APR_BUCKET_NEXT(e)) {
+                 rv = apr_bucket_copy(e, &copy_bucket);
+                 if (rv != APR_SUCCESS) {
+                     return rv;
+@@ -3944,7 +3944,7 @@
+         more = NULL;
+ 
+         /* Iterate over the brigade: collect iovecs and/or a file */
+-        APR_BRIGADE_FOREACH(e, b) {
++        for(e = APR_BRIGADE_FIRST(b); e != APR_BRIGADE_SENTINEL(b); e = APR_BUCKET_NEXT(e)) {
+             /* keep track of the last bucket processed */
+             last_e = e;
+             if (APR_BUCKET_IS_EOS(e) || AP_BUCKET_IS_EOC(e)) {
+@@ -4208,7 +4208,7 @@
+                                                        headers              */
+                                      &bytes_sent,   /* how many bytes were
+                                                        sent                 */
+-                                     flags);   /* apr_sendfile flags        */
++                                     flags);   /* apr_socket_sendfile flags        */
+ 
+                 if (logio_add_bytes_out && bytes_sent > 0)
+                     logio_add_bytes_out(c, bytes_sent);
+--- httpd-2.0.51/server/listen.c.orig	2004-09-16 23:16:42.000000000 +0200
++++ httpd-2.0.51/server/listen.c	2004-09-17 19:17:44.561866584 +0200
+@@ -122,7 +122,7 @@
+     ap_sock_disable_nagle(s);
+ #endif
+ 
+-    if ((stat = apr_bind(s, server->bind_addr)) != APR_SUCCESS) {
++    if ((stat = apr_socket_bind(s, server->bind_addr)) != APR_SUCCESS) {
+         ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_CRIT, stat, p,
+                       "make_sock: could not bind to address %pI",
+                       server->bind_addr);
+@@ -130,7 +130,7 @@
+         return stat;
+     }
+ 
+-    if ((stat = apr_listen(s, ap_listenbacklog)) != APR_SUCCESS) {
++    if ((stat = apr_socket_listen(s, ap_listenbacklog)) != APR_SUCCESS) {
+         ap_log_perror(APLOG_MARK, APLOG_STARTUP|APLOG_ERR, stat, p,
+                       "make_sock: unable to listen for connections "
+                       "on address %pI",
+@@ -213,10 +213,10 @@
+         apr_socket_t *tmp_sock;
+         apr_sockaddr_t *sa;
+ 
+-        if ((sock_rv = apr_socket_create(&tmp_sock, APR_INET6, SOCK_STREAM, p)) 
++        if ((sock_rv = apr_socket_create(&tmp_sock, APR_INET6, SOCK_STREAM, APR_PROTO_TCP, p)) 
+             == APR_SUCCESS &&
+             apr_sockaddr_info_get(&sa, NULL, APR_INET6, 0, 0, p) == APR_SUCCESS &&
+-            apr_bind(tmp_sock, sa) == APR_SUCCESS) { 
++            apr_socket_bind(tmp_sock, sa) == APR_SUCCESS) { 
+             default_family = APR_INET6;
+         }
+         else {
+@@ -261,7 +261,7 @@
+         sa = (*walk)->bind_addr;
+         /* Some listeners are not real so they will not have a bind_addr. */
+         if (sa) {
+-            apr_sockaddr_port_get(&oldport, sa);
++            oldport = sa->port;
+             if (!strcmp(sa->hostname, addr) && port == oldport) {
+                 /* re-use existing record */
+                 new = *walk;
+@@ -286,7 +286,7 @@
+     }
+     if ((status = apr_socket_create(&new->sd,
+                                     new->bind_addr->family,
+-                                    SOCK_STREAM, process->pool))
++                                    SOCK_STREAM, APR_PROTO_TCP, process->pool))
+         != APR_SUCCESS) {
+         ap_log_perror(APLOG_MARK, APLOG_CRIT, status, process->pool,
+                       "alloc_listener: failed to get a socket for %s", addr);
+--- httpd-2.0.51/server/util.c.orig	2004-09-15 13:50:43.000000000 +0200
++++ httpd-2.0.51/server/util.c	2004-09-17 19:25:40.187560488 +0200
+@@ -1920,7 +1920,7 @@
+ {
+     apr_finfo_t finfo;
+ 
+-    if (apr_lstat(&finfo, path, APR_FINFO_TYPE, p) != APR_SUCCESS)
++    if (apr_stat(&finfo, path, APR_FINFO_TYPE | APR_FINFO_LINK, p) != APR_SUCCESS)
+         return 0;                /* in error condition, just return no */
+ 
+     return (finfo.filetype == APR_DIR);
+--- httpd-2.0.51/server/rfc1413.c.orig	2004-02-09 21:59:46.000000000 +0100
++++ httpd-2.0.51/server/rfc1413.c	2004-09-17 19:01:05.997671416 +0200
+@@ -98,7 +98,7 @@
+ 
+     if ((rv = apr_socket_create(newsock, 
+                                 localsa->family, /* has to match */
+-                                SOCK_STREAM, conn->pool)) != APR_SUCCESS) {
++                                SOCK_STREAM, APR_PROTO_TCP, conn->pool)) != APR_SUCCESS) {
+ 	ap_log_error(APLOG_MARK, APLOG_CRIT, rv, srv,
+                      "rfc1413: error creating query socket");
+         return rv;
+@@ -121,7 +121,7 @@
+  * addresses from the query socket.
+  */
+ 
+-    if ((rv = apr_bind(*newsock, localsa)) != APR_SUCCESS) {
++    if ((rv = apr_socket_bind(*newsock, localsa)) != APR_SUCCESS) {
+ 	ap_log_error(APLOG_MARK, APLOG_CRIT, rv, srv,
+                      "rfc1413: Error binding query socket to local port");
+         apr_socket_close(*newsock);
+@@ -132,7 +132,7 @@
+  * errors from connect usually imply the remote machine doesn't support
+  * the service; don't log such an error
+  */
+-    if ((rv = apr_connect(*newsock, destsa)) != APR_SUCCESS) {
++    if ((rv = apr_socket_connect(*newsock, destsa)) != APR_SUCCESS) {
+         apr_socket_close(*newsock);
+         return rv;
+     }
+@@ -151,8 +151,8 @@
+     char user[RFC1413_USERLEN + 1];	/* XXX */
+     apr_size_t buflen;
+ 
+-    apr_sockaddr_port_get(&sav_our_port, conn->local_addr);
+-    apr_sockaddr_port_get(&sav_rmt_port, conn->remote_addr);
++    sav_our_port = conn->local_addr->port;
++    sav_rmt_port = conn->remote_addr->port;
+ 
+     /* send the data */
+     buflen = apr_snprintf(buffer, sizeof(buffer), "%hu,%hu\r\n", sav_rmt_port,
+@@ -164,7 +164,7 @@
+     while (i < buflen) {
+         apr_size_t j = strlen(buffer + i);
+         apr_status_t status;
+-	status  = apr_send(sock, buffer+i, &j);
++	status  = apr_socket_send(sock, buffer+i, &j);
+ 	if (status != APR_SUCCESS) {
+ 	    ap_log_error(APLOG_MARK, APLOG_CRIT, status, srv,
+ 		         "write: rfc1413: error sending request");
+@@ -190,7 +190,7 @@
+     while((cp = strchr(buffer, '\012')) == NULL && i < sizeof(buffer) - 1) {
+         apr_size_t j = sizeof(buffer) - 1 - i;
+         apr_status_t status;
+-	status = apr_recv(sock, buffer+i, &j);
++	status = apr_socket_recv(sock, buffer+i, &j);
+ 	if (status != APR_SUCCESS) {
+ 	    ap_log_error(APLOG_MARK, APLOG_CRIT, status, srv,
+ 			"read: rfc1413: error reading response");
+--- httpd-2.0.51/server/mpm_common.c.orig	2004-02-26 21:32:21.000000000 +0100
++++ httpd-2.0.51/server/mpm_common.c	2004-09-17 19:20:14.081136200 +0200
+@@ -150,7 +150,7 @@
+         }
+ 
+ #if APR_HAS_OTHER_CHILD
+-        apr_proc_other_child_check();
++        apr_proc_other_child_refresh_all(APR_OC_REASON_RESTART);
+ #endif
+ 
+         if (!not_dead_yet) {
+@@ -371,8 +371,8 @@
+                           APR_UNSPEC, ap_listeners->bind_addr->port, 0, p);
+ 
+     /* close these before exec. */
+-    apr_file_unset_inherit((*pod)->pod_in);
+-    apr_file_unset_inherit((*pod)->pod_out);
++    apr_file_inherit_unset((*pod)->pod_in);
++    apr_file_inherit_unset((*pod)->pod_out);
+ 
+     return APR_SUCCESS;
+ }
+@@ -445,7 +445,7 @@
+         return rv;
+     }
+ 
+-    rv = apr_socket_create(&sock, pod->sa->family, SOCK_STREAM, p);
++    rv = apr_socket_create(&sock, pod->sa->family, SOCK_STREAM, APR_PROTO_TCP, p);
+     if (rv != APR_SUCCESS) {
+         ap_log_error(APLOG_MARK, APLOG_WARNING, rv, ap_server_conf,
+                      "get socket to connect to listener");
+@@ -466,7 +466,7 @@
+         return rv;
+     }
+ 
+-    rv = apr_connect(sock, pod->sa);
++    rv = apr_socket_connect(sock, pod->sa);
+     if (rv != APR_SUCCESS) {
+         int log_level = APLOG_WARNING;
+ 
+--- httpd-2.0.51/server/protocol.c.orig	2004-09-15 12:47:56.000000000 +0200
++++ httpd-2.0.51/server/protocol.c	2004-09-17 19:16:31.574962280 +0200
+@@ -223,7 +223,7 @@
+         return APR_EGENERAL;
+     }
+ 
+-    APR_BRIGADE_FOREACH(e, bb) {
++    for(e = APR_BRIGADE_FIRST(bb); e != APR_BRIGADE_SENTINEL(bb); e = APR_BUCKET_NEXT(e)) {
+         const char *str;
+         apr_size_t len;
+ 
+--- httpd-2.0.51/server/util_xml.c.orig	2004-04-15 22:10:38.000000000 +0200
++++ httpd-2.0.51/server/util_xml.c	2004-09-16 23:39:55.000000000 +0200
+@@ -56,7 +56,7 @@
+             goto read_error;
+         }
+ 
+-        APR_BRIGADE_FOREACH(bucket, brigade) {
++        for(bucket = APR_BRIGADE_FIRST(brigade); bucket != APR_BRIGADE_SENTINEL(brigade); bucket = APR_BUCKET_NEXT(bucket)) {
+             const char *data;
+             apr_size_t len;
+ 
+--- httpd-2.0.51/server/util_filter.c.orig	2004-02-09 21:59:46.000000000 +0100
++++ httpd-2.0.51/server/util_filter.c	2004-09-16 23:43:10.000000000 +0200
+@@ -527,7 +527,7 @@
+         *saveto = apr_brigade_create(p, f->c->bucket_alloc);
+     }
+     
+-    APR_RING_FOREACH(e, &(*b)->list, apr_bucket, link) {
++    for(e = APR_RING_FIRST(&(*b)->list); e != APR_RING_SENTINEL(&(*b)->list, apr_bucket, link); e = APR_RING_NEXT(e, link)) {
+         rv = apr_bucket_setaside(e, p);
+         if (rv != APR_SUCCESS
+             /* ### this ENOTIMPL will go away once we implement setaside
+--- httpd-2.0.51/server/request.c.orig	2004-08-20 22:58:16.000000000 +0200
++++ httpd-2.0.51/server/request.c	2004-09-17 19:13:32.039255856 +0200
+@@ -375,7 +375,7 @@
+      * owner of the symlink, then get the info of the target.
+      */
+     if (!(lfi->valid & APR_FINFO_OWNER)) {
+-        if ((res = apr_lstat(&fi, d, lfi->valid | APR_FINFO_OWNER, p))
++        if ((res = apr_stat(&fi, d, lfi->valid | APR_FINFO_OWNER | APR_FINFO_LINK, p))
+             != APR_SUCCESS) {
+             return HTTP_FORBIDDEN;
+         }
+@@ -386,7 +386,7 @@
+         return HTTP_FORBIDDEN;
+     }
+ 
+-    if (apr_compare_users(fi.user, lfi->user) != APR_SUCCESS) {
++    if (apr_uid_compare(fi.user, lfi->user) != APR_SUCCESS) {
+         return HTTP_FORBIDDEN;
+     }
+ 
+@@ -763,7 +763,7 @@
+                     && ((entry_core->d_components < seg)
+                      || (entry_core->d_is_fnmatch
+                          ? (apr_fnmatch(entry_core->d, r->filename,
+-                                        FNM_PATHNAME) != APR_SUCCESS)
++                                        APR_FNM_PATHNAME) != APR_SUCCESS)
+                          : (strcmp(r->filename, entry_core->d) != 0)))) {
+                     continue;
+                 }
+@@ -939,8 +939,8 @@
+              * want the name of this 'link' object, not the name of its
+              * target, if we are fixing the filename case/resolving aliases.
+              */
+-            rv = apr_lstat(&thisinfo, r->filename,
+-                           APR_FINFO_MIN | APR_FINFO_NAME, r->pool);
++            rv = apr_stat(&thisinfo, r->filename,
++                           APR_FINFO_MIN | APR_FINFO_NAME | APR_FINFO_LINK, r->pool);
+ 
+             if (APR_STATUS_IS_ENOENT(rv)) {
+                 /* Nothing?  That could be nice.  But our directory
+@@ -1230,7 +1230,7 @@
+             if (entry_core->r
+                 ? ap_regexec(entry_core->r, r->uri, 0, NULL, 0)
+                 : (entry_core->d_is_fnmatch
+-                   ? apr_fnmatch(entry_core->d, cache->cached, FNM_PATHNAME)
++                   ? apr_fnmatch(entry_core->d, cache->cached, APR_FNM_PATHNAME)
+                    : (strncmp(entry_core->d, cache->cached, len)
+                       || (entry_core->d[len - 1] != '/'
+                           && cache->cached[len] != '/'
+@@ -1379,7 +1379,7 @@
+             if (entry_core->r
+                 ? ap_regexec(entry_core->r, cache->cached , 0, NULL, 0)
+                 : (entry_core->d_is_fnmatch
+-                   ? apr_fnmatch(entry_core->d, cache->cached, FNM_PATHNAME)
++                   ? apr_fnmatch(entry_core->d, cache->cached, APR_FNM_PATHNAME)
+                    : strcmp(entry_core->d, cache->cached))) {
+                 continue;
+             }
+@@ -1690,8 +1690,8 @@
+             }
+         }
+         else {
+-            if (((rv = apr_lstat(&rnew->finfo, rnew->filename,
+-                                 APR_FINFO_MIN, rnew->pool)) != APR_SUCCESS)
++            if (((rv = apr_stat(&rnew->finfo, rnew->filename,
++                                 APR_FINFO_MIN | APR_FINFO_LINK, rnew->pool)) != APR_SUCCESS)
+                 && (rv != APR_INCOMPLETE)) {
+                 rnew->finfo.filetype = 0;
+             }
+@@ -1795,8 +1795,8 @@
+             }
+         }
+         else {
+-            if (((rv = apr_lstat(&rnew->finfo, rnew->filename,
+-                                 APR_FINFO_MIN, rnew->pool)) != APR_SUCCESS)
++            if (((rv = apr_stat(&rnew->finfo, rnew->filename,
++                                 APR_FINFO_MIN | APR_FINFO_LINK, rnew->pool)) != APR_SUCCESS)
+                 && (rv != APR_INCOMPLETE)) {
+                 rnew->finfo.filetype = 0;
+             }
+--- httpd-2.0.51/server/connection.c.orig	2004-03-08 18:40:37.000000000 +0100
++++ httpd-2.0.51/server/connection.c	2004-09-17 19:21:09.886652472 +0200
+@@ -131,7 +131,7 @@
+     /* Shut down the socket for write, which will send a FIN
+      * to the peer.
+      */
+-    if (apr_shutdown(csd, APR_SHUTDOWN_WRITE) != APR_SUCCESS
++    if (apr_socket_shutdown(csd, APR_SHUTDOWN_WRITE) != APR_SUCCESS
+         || c->aborted) {
+         apr_socket_close(csd);
+         return;
+@@ -147,7 +147,7 @@
+     apr_socket_opt_set(csd, APR_INCOMPLETE_READ, 1);
+     while (1) {
+         nbytes = sizeof(dummybuf);
+-        rc = apr_recv(csd, dummybuf, &nbytes);
++        rc = apr_socket_recv(csd, dummybuf, &nbytes);
+         if (rc != APR_SUCCESS || nbytes == 0)
+             break;
+ 
+--- httpd-2.0.51/server/util_time.c.orig	2004-02-09 21:59:46.000000000 +0100
++++ httpd-2.0.51/server/util_time.c	2004-09-17 19:21:52.564164504 +0200
+@@ -118,7 +118,7 @@
+         else {
+             r = apr_time_exp_lt(xt, t);
+         }
+-        if (!APR_STATUS_IS_SUCCESS(r)) {
++        if (r != APR_SUCCESS) {
+             return r;
+         }
+         cache_element->t = seconds;
+--- httpd-2.0.51/server/vhost.c.orig	2004-06-11 21:39:11.000000000 +0200
++++ httpd-2.0.51/server/vhost.c	2004-09-17 19:26:29.824014600 +0200
+@@ -873,7 +873,7 @@
+ 
+     last_s = NULL;
+ 
+-    apr_sockaddr_port_get(&port, r->connection->local_addr);
++    port = r->connection->local_addr->port;
+ 
+     /* Recall that the name_chain is a list of server_addr_recs, some of
+      * whose ports may not match.  Also each server may appear more than
+@@ -929,7 +929,7 @@
+     name_chain *src;
+     apr_port_t port;
+ 
+-    apr_sockaddr_port_get(&port, r->connection->local_addr);
++    port = r->connection->local_addr->port;
+ 
+     /*
+      * This is in conjunction with the ServerPath code in http_core, so we
+@@ -1004,7 +1004,7 @@
+     /* maybe there's a default server or wildcard name-based vhost
+      * matching this port
+      */
+-    apr_sockaddr_port_get(&port, conn->local_addr);
++    port = conn->local_addr->port;
+ 
+     trav = find_default_server(port);
+     if (trav) {
+--- httpd-2.0.51/include/ap_compat.h.orig	2004-02-09 21:54:33.000000000 +0100
++++ httpd-2.0.51/include/ap_compat.h	2004-09-16 23:44:45.541104024 +0200
+@@ -17,7 +17,6 @@
+ #define AP_COMPAT_H
+ 
+ /* Drag in apu (and therefore apr) renamed symbols */
+-#include "apu_compat.h"
+ 
+ /* redefine 1.3.x symbols to the new symbol names */
+ 
+--- httpd-2.0.51/modules/http/http_core.c.orig	2004-02-09 21:53:18.000000000 +0100
++++ httpd-2.0.51/modules/http/http_core.c	2004-09-17 00:50:48.108702184 +0200
+@@ -115,7 +115,7 @@
+          */
+         char chunk_hdr[20]; /* enough space for the snprintf below */
+ 
+-        APR_BRIGADE_FOREACH(e, b) {
++        for(e = APR_BRIGADE_FIRST(b); e != APR_BRIGADE_SENTINEL(b); e = APR_BUCKET_NEXT(e)) {
+             if (APR_BUCKET_IS_EOS(e)) {
+                 /* there shouldn't be anything after the eos */
+                 eos = e;
+--- httpd-2.0.51/modules/http/http_protocol.c.orig	2004-02-09 21:53:18.000000000 +0100
++++ httpd-2.0.51/modules/http/http_protocol.c	2004-09-17 00:53:06.214706880 +0200
+@@ -1534,7 +1534,7 @@
+         }
+     }
+ 
+-    APR_BRIGADE_FOREACH(e, b) {
++    for(e = APR_BRIGADE_FIRST(b); e != APR_BRIGADE_SENTINEL(b); e = APR_BUCKET_NEXT(e)) {
+         if (e->type == &ap_bucket_type_error) {
+             ap_bucket_error *eb = e->data;
+ 
+@@ -1976,7 +1976,7 @@
+             }
+         }
+ 
+-        APR_BRIGADE_FOREACH(bucket, bb) {
++        for(bucket = APR_BRIGADE_FIRST(bb); bucket != APR_BRIGADE_SENTINEL(bb); bucket = APR_BUCKET_NEXT(bucket)) {
+             const char *data;
+             apr_size_t len;
+ 
+--- httpd-2.0.51/support/Makefile.in.orig	2004-09-16 23:16:42.000000000 +0200
++++ httpd-2.0.51/support/Makefile.in	2004-09-17 01:05:48.764781648 +0200
+@@ -51,7 +51,7 @@
+ 
+ ab_OBJECTS = ab.lo
+ ab: $(ab_OBJECTS)
+-	$(LINK) $(ab_LTFLAGS) $(ab_OBJECTS) $(PROGRAM_LDADD)
++	$(LINK) $(ab_LTFLAGS) $(ab_OBJECTS) $(PROGRAM_LDADD) -lm
+ 
+ checkgid_OBJECTS = checkgid.lo
+ checkgid: $(checkgid_OBJECTS)
+--- httpd-2.0.51/support/ab.c.orig	2004-08-28 18:20:08.000000000 +0200
++++ httpd-2.0.51/support/ab.c	2004-09-17 01:03:59.000000000 +0200
+@@ -721,7 +721,7 @@
+         }
+         else
+ #endif
+-	e = apr_send(c->aprsock, request + c->rwrote, &l);
++	e = apr_socket_send(c->aprsock, request + c->rwrote, &l);
+ 
+ 	/*
+ 	 * Bail early on the most common case
+@@ -1204,7 +1204,7 @@
+     apr_pool_create(&c->ctx, cntxt);
+ 
+     if ((rv = apr_socket_create(&c->aprsock, destsa->family,
+-				SOCK_STREAM, c->ctx)) != APR_SUCCESS) {
++				SOCK_STREAM, APR_PROTO_TCP, c->ctx)) != APR_SUCCESS) {
+ 	apr_err("socket", rv);
+     }
+     if ((rv = apr_socket_opt_set(c->aprsock, APR_SO_NONBLOCK, 1))
+@@ -1212,7 +1212,7 @@
+         apr_err("socket nonblock", rv);
+     }
+     c->start = apr_time_now();
+-    if ((rv = apr_connect(c->aprsock, destsa)) != APR_SUCCESS) {
++    if ((rv = apr_socket_connect(c->aprsock, destsa)) != APR_SUCCESS) {
+ 	if (APR_STATUS_IS_EINPROGRESS(rv)) {
+             apr_pollfd_t new_pollfd;
+ 	    c->state = STATE_CONNECTING;
+@@ -1234,7 +1234,7 @@
+ 	    if (bad++ > 10) {
+ 		fprintf(stderr,
+ 			"\nTest aborted after 10 failures\n\n");
+-		apr_err("apr_connect()", rv);
++		apr_err("apr_socket_connect()", rv);
+ 	    }
+ 	    c->state = STATE_UNCONNECTED;
+ 	    start_connect(c);
+@@ -1334,7 +1334,7 @@
+     }
+     else {
+ #endif
+-    status = apr_recv(c->aprsock, buffer, &r);
++    status = apr_socket_recv(c->aprsock, buffer, &r);
+     if (APR_STATUS_IS_EAGAIN(status))
+ 	return;
+     else if (r == 0 && APR_STATUS_IS_EOF(status)) {
+@@ -1342,12 +1342,12 @@
+ 	close_connection(c);
+ 	return;
+     }
+-    /* catch legitimate fatal apr_recv errors */
++    /* catch legitimate fatal apr_socket_recv errors */
+     else if (status != APR_SUCCESS) {
+         err_except++; /* XXX: is this the right error counter? */
+         /* XXX: Should errors here be fatal, or should we allow a
+          * certain number of them before completely failing? -aaron */
+-        apr_err("apr_recv", status);
++        apr_err("apr_socket_recv", status);
+     }
+ #ifdef USE_SSL
+     }
+@@ -1708,7 +1708,7 @@
+ 	    if (rv & APR_POLLOUT) {
+                 if (c->state == STATE_CONNECTING) {
+                     apr_pollfd_t remove_pollfd;
+-                    rv = apr_connect(c->aprsock, destsa);
++                    rv = apr_socket_connect(c->aprsock, destsa);
+                     remove_pollfd.desc_type = APR_POLL_SOCKET;
+                     remove_pollfd.desc.s = c->aprsock;
+                     apr_pollset_remove(readbits, &remove_pollfd);
+@@ -1718,7 +1718,7 @@
+                         if (bad++ > 10) {
+                             fprintf(stderr,
+                                     "\nTest aborted after 10 failures\n\n");
+-                            apr_err("apr_connect()", rv);
++                            apr_err("apr_socket_connect()", rv);
+                         }
+                         c->state = STATE_UNCONNECTED;
+                         start_connect(c);
+--- httpd-2.0.51/os/unix/unixd.c.orig	2004-08-27 11:03:24.000000000 +0200
++++ httpd-2.0.51/os/unix/unixd.c	2004-09-17 20:49:41.038234704 +0200
+@@ -464,7 +464,7 @@
+     apr_status_t status;
+ 
+     *accepted = NULL;
+-    status = apr_accept(&csd, lr->sd, ptrans);
++    status = apr_socket_accept(&csd, lr->sd, ptrans);
+     if (status == APR_SUCCESS) { 
+         *accepted = csd;
+         return APR_SUCCESS;
+--- httpd-2.0.51/modules/aaa/mod_auth_digest.c.orig	2004-07-10 09:47:22.000000000 +0200
++++ httpd-2.0.51/modules/aaa/mod_auth_digest.c	2004-09-17 20:51:16.000000000 +0200
+@@ -119,7 +119,7 @@
+     unsigned long      key;                     /* the key for this entry    */
+     struct hash_entry *next;                    /* next entry in the bucket  */
+     unsigned long      nonce_count;             /* for nonce-count checking  */
+-    char               ha1[2*MD5_DIGESTSIZE+1]; /* for algorithm=MD5-sess    */
++    char               ha1[2*APR_MD5_DIGESTSIZE+1]; /* for algorithm=MD5-sess    */
+     char               last_nonce[NONCE_LEN+1]; /* for one-time nonce's      */
+ } client_entry;
+ 
+--- httpd-2.0.51/modules/dav/fs/repos.c.orig	2004-06-07 12:41:01.000000000 +0200
++++ httpd-2.0.51/modules/dav/fs/repos.c	2004-09-17 22:59:16.000000000 +0200
+@@ -1453,8 +1453,8 @@
+ 
+ 
+         /* ### Optimize me, dirent can give us what we need! */
+-        status = apr_lstat(&fsctx->info1.finfo, fsctx->path1.buf, 
+-                           APR_FINFO_NORM, pool);
++        status = apr_stat(&fsctx->info1.finfo, fsctx->path1.buf, 
++                           APR_FINFO_NORM | APR_FINFO_LINK, pool);
+         if (status != APR_SUCCESS && status != APR_INCOMPLETE) {
+             /* woah! where'd it go? */
+             /* ### should have a better error here */
+--- httpd-2.0.51/modules/dav/fs/lock.c.orig	2004-09-15 10:26:48.000000000 +0200
++++ httpd-2.0.51/modules/dav/fs/lock.c	2004-09-17 23:00:21.000000000 +0200
+@@ -632,7 +632,7 @@
+                     apr_status_t rv;
+ 
+ 		    /* if we don't see the file, then it's a locknull */
+-                    rv = apr_lstat(&finfo, fname, APR_FINFO_MIN, p);
++                    rv = apr_stat(&finfo, fname, APR_FINFO_MIN | APR_FINFO_LINK, p);
+ 		    if (rv != APR_SUCCESS && rv != APR_INCOMPLETE) {
+ 			if ((err = dav_fs_remove_locknull_member(p, fname, &buf)) != NULL) {
+                             /* ### push a higher-level description? */
+--- httpd-2.0.51/modules/dav/main/util.c.orig	2004-09-16 23:16:42.000000000 +0200
++++ httpd-2.0.51/modules/dav/main/util.c	2004-09-17 23:01:53.000000000 +0200
+@@ -213,7 +213,7 @@
+         /* now, verify that the URI uses the same scheme as the current.
+            request. the port must match our port.
+         */
+-        apr_sockaddr_port_get(&port, r->connection->local_addr);
++        port = r->connection->local_addr->port;
+         if (strcasecmp(comp.scheme, scheme) != 0
+ #ifdef APACHE_PORT_HANDLING_IS_BUSTED
+             || comp.port != port
+--- httpd-2.0.51/modules/ssl/mod_ssl.c.orig	2004-08-23 17:18:54.000000000 +0200
++++ httpd-2.0.51/modules/ssl/mod_ssl.c	2004-09-17 22:22:01.000000000 +0200
+@@ -333,7 +333,7 @@
+                               sc->vhost_id_len);
+ 
+     if (!SSL_set_session_id_context(ssl, (unsigned char *)vhost_md5,
+-                                    MD5_DIGESTSIZE*2))
++                                    APR_MD5_DIGESTSIZE*2))
+     {
+         ap_log_error(APLOG_MARK, APLOG_ERR, 0, c->base_server,
+                      "Unable to set session id context to `%s'", vhost_md5);
+--- httpd-2.0.51/modules/ssl/ssl_engine_init.c.orig	2004-06-07 12:18:37.000000000 +0200
++++ httpd-2.0.51/modules/ssl/ssl_engine_init.c	2004-09-17 22:29:48.000000000 +0200
+@@ -823,11 +823,11 @@
+     }
+ 
+     if (SSL_X509_getCN(ptemp, cert, &cn)) {
+-        int fnm_flags = FNM_PERIOD|FNM_CASE_BLIND;
++        int fnm_flags = APR_FNM_PERIOD|APR_FNM_CASE_BLIND;
+ 
+         if (apr_fnmatch_test(cn) &&
+             (apr_fnmatch(cn, s->server_hostname,
+-                         fnm_flags) == FNM_NOMATCH))
++                         fnm_flags) == APR_FNM_NOMATCH))
+         {
+             ap_log_error(APLOG_MARK, APLOG_WARNING, 0, s,
+                          "%s server certificate wildcard CommonName (CN) `%s' "
+--- httpd-2.0.51/modules/ssl/ssl_scache_dbm.c.orig	2004-02-09 21:53:20.000000000 +0100
++++ httpd-2.0.51/modules/ssl/ssl_scache_dbm.c	2004-09-18 02:50:11.275938752 +0200
+@@ -84,7 +84,7 @@
+     SSLModConfigRec *mc = myModConfig(s);
+     apr_pool_t *p;
+ 
+-    apr_pool_sub_make(&p, mc->pPool, NULL);
++    apr_pool_create_ex(&p, mc->pPool, NULL, NULL);
+     if (p != NULL) {
+         /* the correct way */
+         unlink(apr_pstrcat(p, mc->szSessionCacheDataFile, SSL_DBM_FILE_SUFFIX_DIR, NULL));
+@@ -331,7 +331,7 @@
+     ssl_mutex_on(s);
+     for (;;) {
+         /* allocate the key array in a memory sub pool */
+-        apr_pool_sub_make(&p, mc->pPool, NULL);
++        apr_pool_create_ex(&p, mc->pPool, NULL, NULL);
+         if (p == NULL)
+             break;
+         if ((keylist = apr_palloc(p, sizeof(dbmkey)*KEYMAX)) == NULL) {
+--- httpd-2.0.51/modules/cache/mod_file_cache.c.orig	2004-02-09 21:53:15.000000000 +0100
++++ httpd-2.0.51/modules/cache/mod_file_cache.c	2004-09-17 20:52:53.000000000 +0200
+@@ -275,7 +275,7 @@
+     apr_mmap_t *mm;
+     apr_bucket_brigade *bb = apr_brigade_create(r->pool, c->bucket_alloc);
+ 
+-    apr_mmap_dup(&mm, file->mm, r->pool, 0);
++    apr_mmap_dup(&mm, file->mm, r->pool);
+     b = apr_bucket_mmap_create(mm, 0, (apr_size_t)file->finfo.size,
+                                c->bucket_alloc);
+     APR_BRIGADE_INSERT_TAIL(bb, b);
+--- httpd-2.0.51/modules/proxy/proxy_util.c.orig	2004-05-26 14:00:58.000000000 +0200
++++ httpd-2.0.51/modules/proxy/proxy_util.c	2004-09-18 02:35:53.943273128 +0200
+@@ -1102,7 +1102,7 @@
+     
+     while (backend_addr && !connected) {
+         if ((rv = apr_socket_create(newsock, backend_addr->family,
+-                                    SOCK_STREAM, p)) != APR_SUCCESS) {
++                                    SOCK_STREAM, APR_PROTO_TCP, p)) != APR_SUCCESS) {
+             loglevel = backend_addr->next ? APLOG_DEBUG : APLOG_ERR;
+             ap_log_error(APLOG_MARK, loglevel, rv, s,
+                          "proxy: %s: error creating fam %d socket for target %s",
+@@ -1140,7 +1140,7 @@
+                      proxy_function, backend_addr->family, backend_name);
+ 
+         /* make the connection out of the socket */
+-        rv = apr_connect(*newsock, backend_addr);
++        rv = apr_socket_connect(*newsock, backend_addr);
+ 
+         /* if an error occurred, loop round and try again */
+         if (rv != APR_SUCCESS) {
+--- httpd-2.0.51/modules/proxy/proxy_ftp.c.orig	2004-07-03 14:48:01.000000000 +0200
++++ httpd-2.0.51/modules/proxy/proxy_ftp.c	2004-09-18 02:37:43.990543400 +0200
+@@ -931,7 +931,7 @@
+         int failed = 1;
+         while (connect_addr) {
+ 
+-	    if ((rv = apr_socket_create(&sock, connect_addr->family, SOCK_STREAM, r->pool)) != APR_SUCCESS) {
++	    if ((rv = apr_socket_create(&sock, connect_addr->family, SOCK_STREAM, APR_PROTO_TCP, r->pool)) != APR_SUCCESS) {
+ 		ap_log_rerror(APLOG_MARK, APLOG_ERR, rv, r,
+ 			      "proxy: FTP: error creating socket");
+                 connect_addr = connect_addr->next;
+@@ -970,7 +970,7 @@
+                          connect_addr->family, connect_addr, connectname);
+ 
+             /* make the connection out of the socket */
+-            rv = apr_connect(sock, connect_addr);
++            rv = apr_socket_connect(sock, connect_addr);
+ 
+             /* if an error occurred, loop round and try again */
+             if (rv != APR_SUCCESS) {
+@@ -1249,7 +1249,7 @@
+                        "proxy: FTP: EPSV contacting remote host on port %d",
+                              data_port);
+ 
+-                if ((rv = apr_socket_create(&data_sock, connect_addr->family, SOCK_STREAM, r->pool)) != APR_SUCCESS) {
++                if ((rv = apr_socket_create(&data_sock, connect_addr->family, SOCK_STREAM, APR_PROTO_TCP, r->pool)) != APR_SUCCESS) {
+                     ap_log_rerror(APLOG_MARK, APLOG_ERR, rv, r,
+                                   "proxy: FTP: error creating EPSV socket");
+                     return HTTP_INTERNAL_SERVER_ERROR;
+@@ -1268,7 +1268,7 @@
+                 apr_socket_addr_get(&data_addr, APR_REMOTE, sock);
+                 apr_sockaddr_ip_get(&data_ip, data_addr);
+                 apr_sockaddr_info_get(&epsv_addr, data_ip, connect_addr->family, data_port, 0, p);
+-                rv = apr_connect(data_sock, epsv_addr);
++                rv = apr_socket_connect(data_sock, epsv_addr);
+                 if (rv != APR_SUCCESS) {
+                     ap_log_error(APLOG_MARK, APLOG_ERR, rv, r->server,
+                                  "proxy: FTP: EPSV attempt to connect to %pI failed - Firewall/NAT?", epsv_addr);
+@@ -1336,7 +1336,7 @@
+                           "proxy: FTP: PASV contacting host %d.%d.%d.%d:%d",
+                              h3, h2, h1, h0, pasvport);
+ 
+-                if ((rv = apr_socket_create(&data_sock, connect_addr->family, SOCK_STREAM, r->pool)) != APR_SUCCESS) {
++                if ((rv = apr_socket_create(&data_sock, connect_addr->family, SOCK_STREAM, APR_PROTO_TCP, r->pool)) != APR_SUCCESS) {
+                     ap_log_rerror(APLOG_MARK, APLOG_ERR, rv, r,
+                                   "proxy: error creating PASV socket");
+                     return HTTP_INTERNAL_SERVER_ERROR;
+@@ -1353,7 +1353,7 @@
+ 
+                 /* make the connection */
+                 apr_sockaddr_info_get(&pasv_addr, apr_psprintf(p, "%d.%d.%d.%d", h3, h2, h1, h0), connect_addr->family, pasvport, 0, p);
+-                rv = apr_connect(data_sock, pasv_addr);
++                rv = apr_socket_connect(data_sock, pasv_addr);
+                 if (rv != APR_SUCCESS) {
+                     ap_log_error(APLOG_MARK, APLOG_ERR, rv, r->server,
+                                  "proxy: FTP: PASV attempt to connect to %pI failed - Firewall/NAT?", pasv_addr);
+@@ -1379,13 +1379,13 @@
+         apr_port_t local_port;
+         unsigned int h0, h1, h2, h3, p0, p1;
+ 
+-        if ((rv = apr_socket_create(&local_sock, connect_addr->family, SOCK_STREAM, r->pool)) != APR_SUCCESS) {
++        if ((rv = apr_socket_create(&local_sock, connect_addr->family, SOCK_STREAM, APR_PROTO_TCP, r->pool)) != APR_SUCCESS) {
+             ap_log_rerror(APLOG_MARK, APLOG_ERR, rv, r,
+                           "proxy: FTP: error creating local socket");
+             return HTTP_INTERNAL_SERVER_ERROR;
+         }
+         apr_socket_addr_get(&local_addr, APR_LOCAL, sock);
+-        apr_sockaddr_port_get(&local_port, local_addr);
++        local_port = local_addr->port;
+         apr_sockaddr_ip_get(&local_ip, local_addr);
+ 
+         if ((rv = apr_socket_opt_set(local_sock, APR_SO_REUSEADDR, one)) 
+@@ -1399,14 +1399,14 @@
+ 
+         apr_sockaddr_info_get(&local_addr, local_ip, APR_UNSPEC, local_port, 0, r->pool);
+ 
+-        if ((rv = apr_bind(local_sock, local_addr)) != APR_SUCCESS) {
++        if ((rv = apr_socket_bind(local_sock, local_addr)) != APR_SUCCESS) {
+             ap_log_rerror(APLOG_MARK, APLOG_ERR, rv, r,
+             "proxy: FTP: error binding to ftp data socket %pI", local_addr);
+             return HTTP_INTERNAL_SERVER_ERROR;
+         }
+ 
+         /* only need a short queue */
+-        if ((rv = apr_listen(local_sock, 2)) != APR_SUCCESS) {
++        if ((rv = apr_socket_listen(local_sock, 2)) != APR_SUCCESS) {
+             ap_log_rerror(APLOG_MARK, APLOG_ERR, rv, r,
+                           "proxy: FTP: error listening to ftp data socket %pI", local_addr);
+             return HTTP_INTERNAL_SERVER_ERROR;
+@@ -1743,7 +1743,7 @@
+     /* wait for connection */
+     if (use_port) {
+         for (;;) {
+-            rv = apr_accept(&data_sock, local_sock, r->pool);
++            rv = apr_socket_accept(&data_sock, local_sock, r->pool);
+             if (rv == APR_EINTR) {
+                 continue;
+             }
+--- httpd-2.0.51/modules/proxy/proxy_http.c.orig	2004-07-14 22:22:05.000000000 +0200
++++ httpd-2.0.51/modules/proxy/proxy_http.c	2004-09-18 02:38:25.139287840 +0200
+@@ -294,7 +294,7 @@
+         apr_socket_timeout_get(p_conn->sock, &current_timeout);
+         /* set no timeout */
+         apr_socket_timeout_set(p_conn->sock, 0);
+-        socket_status = apr_recv(p_conn->sock, test_buffer, &buffer_len);
++        socket_status = apr_socket_recv(p_conn->sock, test_buffer, &buffer_len);
+         /* put back old timeout */
+         apr_socket_timeout_set(p_conn->sock, current_timeout);
+         if ( APR_STATUS_IS_EOF(socket_status) ) {
+--- httpd-2.0.51/modules/proxy/proxy_connect.c.orig	2004-02-09 21:53:19.000000000 +0100
++++ httpd-2.0.51/modules/proxy/proxy_connect.c	2004-09-18 02:45:22.927774336 +0200
+@@ -224,10 +224,10 @@
+ 		     "proxy: CONNECT: sending the CONNECT request to the remote proxy");
+         nbytes = apr_snprintf(buffer, sizeof(buffer),
+ 			      "CONNECT %s HTTP/1.0" CRLF, r->uri);
+-        apr_send(sock, buffer, &nbytes);
++        apr_socket_send(sock, buffer, &nbytes);
+         nbytes = apr_snprintf(buffer, sizeof(buffer),
+ 			      "Proxy-agent: %s" CRLF CRLF, ap_get_server_version());
+-        apr_send(sock, buffer, &nbytes);
++        apr_socket_send(sock, buffer, &nbytes);
+     }
+     else {
+         ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, r->server,
+@@ -235,11 +235,11 @@
+         nbytes = apr_snprintf(buffer, sizeof(buffer),
+ 			      "HTTP/1.0 200 Connection Established" CRLF);
+         ap_xlate_proto_to_ascii(buffer, nbytes);
+-        apr_send(client_socket, buffer, &nbytes);
++        apr_socket_send(client_socket, buffer, &nbytes);
+         nbytes = apr_snprintf(buffer, sizeof(buffer),
+ 			      "Proxy-agent: %s" CRLF CRLF, ap_get_server_version());
+         ap_xlate_proto_to_ascii(buffer, nbytes);
+-        apr_send(client_socket, buffer, &nbytes);
++        apr_socket_send(client_socket, buffer, &nbytes);
+ #if 0
+         /* This is safer code, but it doesn't work yet.  I'm leaving it 
+          * here so that I can fix it later.
+@@ -262,7 +262,7 @@
+ 
+ /*    r->sent_bodyct = 1;*/
+ 
+-    if((rv = apr_poll_setup(&pollfd, 2, r->pool)) != APR_SUCCESS)
++    if((pollfd = apr_pcalloc(r->pool, sizeof(apr_pollfd_t) * 2)) == NULL)
+     {
+ 	apr_socket_close(sock);
+         ap_log_rerror(APLOG_MARK, APLOG_ERR, rv, r,
+@@ -271,10 +271,16 @@
+     }
+ 
+     /* Add client side to the poll */
+-    apr_poll_socket_add(pollfd, client_socket, APR_POLLIN);
++    pollfd[0].p = r->pool;
++    pollfd[0].desc.s = client_socket;
++    pollfd[0].desc_type = APR_POLL_SOCKET;
++    pollfd[0].reqevents = APR_POLLIN;
+ 
+     /* Add the server side to the poll */
+-    apr_poll_socket_add(pollfd, sock, APR_POLLIN);
++    pollfd[1].p = r->pool;
++    pollfd[1].desc.s = sock;
++    pollfd[1].desc_type = APR_POLL_SOCKET;
++    pollfd[1].reqevents = APR_POLLIN;
+ 
+     while (1) { /* Infinite loop until error (one side closes the connection) */
+ /*	ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, r->server, "proxy: CONNECT: going to sleep (poll)");*/
+@@ -288,12 +294,12 @@
+                      "proxy: CONNECT: woke from select(), i=%d", pollcnt);*/
+ 
+         if (pollcnt) {
+-	    apr_poll_revents_get(&pollevent, sock, pollfd);
++	    pollevent = pollfd[1].rtnevents;
+             if (pollevent & APR_POLLIN) {
+ /*		ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, r->server,
+                              "proxy: CONNECT: sock was set");*/
+                 nbytes = sizeof(buffer);
+-                if (apr_recv(sock, buffer, &nbytes) == APR_SUCCESS) {
++                if (apr_socket_recv(sock, buffer, &nbytes) == APR_SUCCESS) {
+                     o = 0;
+                     i = nbytes;
+                     while(i > 0)
+@@ -305,7 +311,7 @@
+      * if ((nbytes = ap_rwrite(buffer + o, nbytes, r)) < 0)
+      * rbb
+      */
+-                        if (apr_send(client_socket, buffer + o, &nbytes) != APR_SUCCESS)
++                        if (apr_socket_send(client_socket, buffer + o, &nbytes) != APR_SUCCESS)
+ 			    break;
+                         o += nbytes;
+                         i -= nbytes;
+@@ -318,18 +324,18 @@
+ 		break;
+ 
+ 
+-            apr_poll_revents_get(&pollevent, client_socket, pollfd);
++            pollevent = pollfd[0].rtnevents;
+             if (pollevent & APR_POLLIN) {
+ /*		ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, r->server,
+                              "proxy: CONNECT: client was set");*/
+                 nbytes = sizeof(buffer);
+-                if (apr_recv(client_socket, buffer, &nbytes) == APR_SUCCESS) {
++                if (apr_socket_recv(client_socket, buffer, &nbytes) == APR_SUCCESS) {
+                     o = 0;
+                     i = nbytes;
+                     while(i > 0)
+                     {
+ 			nbytes = i;
+-			if (apr_send(sock, buffer + o, &nbytes) != APR_SUCCESS)
++			if (apr_socket_send(sock, buffer + o, &nbytes) != APR_SUCCESS)
+ 			    break;
+                         o += nbytes;
+                         i -= nbytes;
+--- httpd-2.0.51/modules/mappers/mod_negotiation.c.orig	2004-02-09 21:53:18.000000000 +0100
++++ httpd-2.0.51/modules/mappers/mod_negotiation.c	2004-09-18 02:19:31.551619360 +0200
+@@ -959,7 +959,7 @@
+                      break;
+                 }
+                 mime_info.bytes = len;
+-                mime_info.file_name = apr_filename_of_pathname(rr->filename);
++                mime_info.file_name = apr_filepath_name_get(rr->filename);
+             }
+         }
+         else {
+--- httpd-2.0.51/modules/mappers/mod_rewrite.c.orig	2004-08-27 21:23:26.000000000 +0200
++++ httpd-2.0.51/modules/mappers/mod_rewrite.c	2004-09-18 02:26:55.886070256 +0200
+@@ -2323,7 +2323,7 @@
+     }
+     else if (strcmp(p->pattern, "-l") == 0) {
+ #if !defined(OS2)
+-        if (apr_lstat(&sb, input, APR_FINFO_MIN, r->pool) == APR_SUCCESS) {
++        if (apr_stat(&sb, input, APR_FINFO_MIN | APR_FINFO_LINK, r->pool) == APR_SUCCESS) {
+             if (sb.filetype == APR_LNK) {
+                 rc = 1;
+             }
+@@ -2949,7 +2949,7 @@
+         user[j] = '\0';
+ 
+         /* lookup username in systems passwd file */
+-        if (apr_get_home_directory(&homedir, user, r->pool) == APR_SUCCESS) {
++        if (apr_uid_homepath_get(&homedir, user, r->pool) == APR_SUCCESS) {
+             /* ok, user was found, so expand the ~user string */
+             if (uri[i] != '\0') {
+                 /* ~user/anything...  has to be expanded */
+@@ -3962,13 +3962,13 @@
+     else if (strcasecmp(var, "SCRIPT_USER") == 0) {
+         result = "<unknown>";
+         if (r->finfo.valid & APR_FINFO_USER) {
+-            apr_get_username((char **)&result, r->finfo.user, r->pool);
++            apr_uid_name_get((char **)&result, r->finfo.user, r->pool);
+         }
+     }
+     else if (strcasecmp(var, "SCRIPT_GROUP") == 0) {
+         result = "<unknown>";
+         if (r->finfo.valid & APR_FINFO_GROUP) {
+-            apr_group_name_get((char **)&result, r->finfo.group, r->pool);
++            apr_gid_name_get((char **)&result, r->finfo.group, r->pool);
+         }
+     } else if (strcasecmp(var, "HTTPS") == 0) {
+         int flag = rewrite_is_https && rewrite_is_https(r->connection);
+--- httpd-2.0.51/modules/mappers/mod_userdir.c.orig	2004-08-23 16:50:27.000000000 +0200
++++ httpd-2.0.51/modules/mappers/mod_userdir.c	2004-09-18 02:31:44.429205032 +0200
+@@ -282,7 +282,7 @@
+ #if APR_HAS_USER
+             char *homedir;
+ 
+-            if (apr_get_home_directory(&homedir, w, r->pool) == APR_SUCCESS) {
++            if (apr_uid_homepath_get(&homedir, w, r->pool) == APR_SUCCESS) {
+                 filename = apr_pstrcat(r->pool, homedir, "/", userdir, NULL);
+             }
+ #else
+@@ -333,7 +333,7 @@
+         return NULL;
+     }
+ 
+-    if (apr_get_userid(&ugid->uid, &ugid->gid, username, r->pool) != APR_SUCCESS) {
++    if (apr_uid_get(&ugid->uid, &ugid->gid, username, r->pool) != APR_SUCCESS) {
+         return NULL;
+     }
+ 
+--- httpd-2.0.51/modules/filters/mod_ext_filter.c.orig	2004-02-09 21:53:17.000000000 +0100
++++ httpd-2.0.51/modules/filters/mod_ext_filter.c	2004-09-18 02:09:59.207628872 +0200
+@@ -487,18 +487,15 @@
+ 
+ #if APR_FILES_AS_SOCKETS
+     {
+-        apr_socket_t *newsock;
+-
+-        rc = apr_poll_setup(&ctx->pollset, 2, ctx->p);
+-        ap_assert(rc == APR_SUCCESS);
+-        rc = apr_socket_from_file(&newsock, ctx->proc->in);
+-        ap_assert(rc == APR_SUCCESS);
+-        rc = apr_poll_socket_add(ctx->pollset, newsock, APR_POLLOUT);
+-        ap_assert(rc == APR_SUCCESS);
+-        rc = apr_socket_from_file(&newsock, ctx->proc->out);
+-        ap_assert(rc == APR_SUCCESS);
+-        rc = apr_poll_socket_add(ctx->pollset, newsock, APR_POLLIN);
+-        ap_assert(rc == APR_SUCCESS);
++	ctx->pollset = apr_pcalloc(ctx->p, sizeof(apr_pollfd_t) * 2);
++	ctx->pollset[0].p = ctx->p;
++	ctx->pollset[0].desc.f = ctx->proc->in;
++	ctx->pollset[0].desc_type = APR_POLL_FILE;
++	ctx->pollset[0].reqevents = APR_POLLOUT;
++	ctx->pollset[1].p = ctx->p;
++	ctx->pollset[1].desc.f = ctx->proc->out;
++	ctx->pollset[1].desc_type = APR_POLL_FILE;
++	ctx->pollset[1].reqevents = APR_POLLIN;
+     }
+ #endif
+ 
+@@ -744,7 +741,7 @@
+     }
+     dc = ctx->dc;
+ 
+-    APR_BRIGADE_FOREACH(b, bb) {
++    for(b = APR_BRIGADE_FIRST(bb); b != APR_BRIGADE_SENTINEL(bb); b = APR_BUCKET_NEXT(b)) {
+ 
+         if (APR_BUCKET_IS_EOS(b)) {
+             eos = b;
+--- httpd-2.0.51/modules/filters/mod_deflate.c.orig	2004-06-07 12:31:52.000000000 +0200
++++ httpd-2.0.51/modules/filters/mod_deflate.c	2004-09-17 22:04:52.000000000 +0200
+@@ -694,7 +694,7 @@
+             return rv;
+         }
+ 
+-        APR_BRIGADE_FOREACH(bkt, ctx->bb) {
++        for(bkt = APR_BRIGADE_FIRST(ctx->bb); bkt != APR_BRIGADE_SENTINEL(ctx->bb); bkt = APR_BUCKET_NEXT(bkt)) {
+             const char *data;
+             apr_size_t len;
+ 
+--- httpd-2.0.51/modules/filters/mod_include.c.orig	2004-08-27 21:41:22.000000000 +0200
++++ httpd-2.0.51/modules/filters/mod_include.c	2004-09-17 23:18:12.000000000 +0200
+@@ -209,7 +209,7 @@
+         val = ap_ht_time(r->pool, r->finfo.mtime, conf->default_time_fmt, 0);
+     }
+     else if (!strcasecmp(var, "USER_NAME")) {
+-        if (apr_get_username(&val, r->finfo.user, r->pool) != APR_SUCCESS) {
++        if (apr_uid_name_get(&val, r->finfo.user, r->pool) != APR_SUCCESS) {
+             val = "<unknown>";
+         }
+     }
+@@ -3004,7 +3004,7 @@
+ 
+             if (!APR_BRIGADE_EMPTY(pass_bb)) {
+                 rv = ap_pass_brigade(f->next, pass_bb);
+-                if (!APR_STATUS_IS_SUCCESS(rv)) {
++                if (rv != APR_SUCCESS) {
+                     apr_brigade_destroy(pass_bb);
+                     return rv;
+                 }
+@@ -3025,11 +3025,11 @@
+                 }
+             }
+ 
+-            if (!len || !APR_STATUS_IS_SUCCESS(rv)) {
++            if (!len || (rv != APR_SUCCESS)) {
+                 rv = apr_bucket_read(b, &data, &len, APR_BLOCK_READ);
+             }
+ 
+-            if (!APR_STATUS_IS_SUCCESS(rv)) {
++            if (rv != APR_SUCCESS) {
+                 apr_brigade_destroy(pass_bb);
+                 return rv;
+             }
+--- httpd-2.0.51/modules/experimental/mod_cache.h.orig	2004-08-26 20:35:13.000000000 +0200
++++ httpd-2.0.51/modules/experimental/mod_cache.h	2004-09-17 20:58:10.000000000 +0200
+@@ -172,7 +172,7 @@
+     void *vobj;         /* Opaque portion (specific to the cache implementation) of the cache object */
+     apr_size_t count;   /* Number of body bytes written to the cache so far */
+     int complete;
+-    apr_atomic_t refcount;
++    apr_uint32_t refcount;
+     apr_size_t cleanup;
+ };
+ 
+--- httpd-2.0.51/modules/experimental/mod_case_filter.c.orig	2004-02-09 21:53:16.000000000 +0100
++++ httpd-2.0.51/modules/experimental/mod_case_filter.c	2004-09-17 21:00:31.000000000 +0200
+@@ -60,7 +60,7 @@
+     apr_bucket_brigade *pbbOut;
+ 
+     pbbOut=apr_brigade_create(r->pool, c->bucket_alloc);
+-    APR_BRIGADE_FOREACH(pbktIn,pbbIn)
++    for(pbktIn = APR_BRIGADE_FIRST(pbbIn); pbktIn != APR_BRIGADE_SENTINEL(pbbIn); pbktIn = APR_BUCKET_NEXT(pbktIn))
+ 	{
+ 	const char *data;
+ 	apr_size_t len;
+--- httpd-2.0.51/modules/experimental/util_ldap.c.orig	2004-08-27 00:21:33.000000000 +0200
++++ httpd-2.0.51/modules/experimental/util_ldap.c	2004-09-17 21:05:18.000000000 +0200
+@@ -38,7 +38,7 @@
+ #include <unistd.h>
+ #endif
+ 
+-#ifndef APU_HAS_LDAP
++#ifndef APR_HAS_LDAP
+ #error mod_ldap requires APR-util to have LDAP support built in
+ #endif
+ 
+--- httpd-2.0.51/modules/experimental/util_ldap_cache.h.orig	2004-08-04 23:04:16.000000000 +0200
++++ httpd-2.0.51/modules/experimental/util_ldap_cache.h	2004-09-17 21:08:23.000000000 +0200
+@@ -21,7 +21,7 @@
+  */
+ 
+ /* this whole thing disappears if LDAP is not enabled */
+-#ifdef APU_HAS_LDAP
++#ifdef APR_HAS_LDAP
+ 
+ 
+ /*
+--- httpd-2.0.51/modules/experimental/mod_auth_ldap.c.orig	2004-05-22 01:39:41.000000000 +0200
++++ httpd-2.0.51/modules/experimental/mod_auth_ldap.c	2004-09-17 23:08:00.000000000 +0200
+@@ -42,7 +42,7 @@
+ #include "http_request.h"
+ #include "util_ldap.h"
+ 
+-#ifndef APU_HAS_LDAP
++#ifndef APR_HAS_LDAP
+ #error mod_auth_ldap requires APR-util to have LDAP support built in
+ #endif
+ 
+@@ -695,6 +695,7 @@
+ {
+     int result;
+     apr_ldap_url_desc_t *urld;
++    apr_ldap_err_t *reserr;
+ 
+     mod_auth_ldap_config_t *sec = config;
+ 
+@@ -702,16 +703,14 @@
+ 	         cmd->server, "[%d] auth_ldap url parse: `%s'", 
+ 	         getpid(), url);
+ 
+-    result = apr_ldap_url_parse(url, &(urld));
++    result = apr_ldap_url_parse(cmd->pool, url, &(urld), &reserr);
+     if (result != LDAP_SUCCESS) {
+         switch (result) {
+-        case LDAP_URL_ERR_NOTLDAP:
++        case APR_LDAP_URL_ERR_BADSCHEME:
+             return "LDAP URL does not begin with ldap://";
+-        case LDAP_URL_ERR_NODN:
+-            return "LDAP URL does not have a DN";
+-        case LDAP_URL_ERR_BADSCOPE:
++        case APR_LDAP_URL_ERR_BADSCOPE:
+             return "LDAP URL has an invalid scope";
+-        case LDAP_URL_ERR_MEM:
++        case APR_LDAP_URL_ERR_MEM:
+             return "Out of memory parsing LDAP URL";
+         default:
+             return "Could not parse LDAP URL";
+@@ -802,7 +801,6 @@
+     }
+ 
+     sec->have_ldap_url = 1;
+-    apr_ldap_free_urldesc(urld);
+     return NULL;
+ }
+ 
+--- httpd-2.0.51/modules/experimental/mod_mem_cache.c.orig	2004-08-26 18:59:44.000000000 +0200
++++ httpd-2.0.51/modules/experimental/mod_mem_cache.c	2004-09-17 23:15:13.000000000 +0200
+@@ -119,14 +119,14 @@
+     cache_object_t *obj = (cache_object_t *)a;
+     mem_cache_object_t *mobj = obj->vobj;
+ 
+-    apr_atomic_set(&mobj->pos, pos);
++    apr_atomic_set32(&mobj->pos, pos);
+ }
+ static apr_ssize_t memcache_get_pos(void *a)
+ {
+     cache_object_t *obj = (cache_object_t *)a;
+     mem_cache_object_t *mobj = obj->vobj;
+ 
+-    return apr_atomic_read(&mobj->pos);
++    return apr_atomic_read32(&mobj->pos);
+ }
+ 
+ static apr_size_t memcache_cache_get_size(void*a)
+@@ -156,11 +156,11 @@
+      * now. Increment the refcount before setting cleanup to avoid a race 
+      * condition. A similar pattern is used in remove_url()
+      */
+-    apr_atomic_inc(&obj->refcount);
++    apr_atomic_inc32(&obj->refcount);
+ 
+     obj->cleanup = 1;
+ 
+-    if (!apr_atomic_dec(&obj->refcount)) {
++    if (!apr_atomic_dec32(&obj->refcount)) {
+         cleanup_cache_object(obj);
+     }
+ }
+@@ -288,7 +288,7 @@
+     }
+ 
+     /* Cleanup the cache object */
+-    if (!apr_atomic_dec(&obj->refcount)) {
++    if (!apr_atomic_dec32(&obj->refcount)) {
+         if (obj->cleanup) {
+             cleanup_cache_object(obj);
+         }
+@@ -314,9 +314,9 @@
+     while (obj) {         
+     /* Iterate over the cache and clean up each entry */  
+     /* Free the object if the recount == 0 */
+-        apr_atomic_inc(&obj->refcount);
++        apr_atomic_inc32(&obj->refcount);
+         obj->cleanup = 1;
+-        if (!apr_atomic_dec(&obj->refcount)) {
++        if (!apr_atomic_dec32(&obj->refcount)) {
+             cleanup_cache_object(obj);
+         }
+         obj = cache_pop(co->cache_cache);
+@@ -412,7 +412,7 @@
+     }
+ 
+     /* Finish initing the cache object */
+-    apr_atomic_set(&obj->refcount, 1);
++    apr_atomic_set32(&obj->refcount, 1);
+     mobj->total_refs = 1;
+     obj->complete = 0;
+     obj->cleanup = 0;
+@@ -487,7 +487,7 @@
+     if (obj) {
+         if (obj->complete) {
+             request_rec *rmain=r, *rtmp;
+-            apr_atomic_inc(&obj->refcount);
++            apr_atomic_inc32(&obj->refcount);
+             /* cache is worried about overall counts, not 'open' ones */
+             cache_update(sconf->cache_cache, obj);
+ 
+@@ -633,7 +633,7 @@
+         /* Refcount increment in this case MUST be made under 
+          * protection of the lock 
+          */
+-        apr_atomic_inc(&obj->refcount);
++        apr_atomic_inc32(&obj->refcount);
+         if (obj) {
+             obj->cleanup = 1;
+         }
+@@ -642,7 +642,7 @@
+         apr_thread_mutex_unlock(sconf->lock);
+     }
+     if (obj) {
+-        if (!apr_atomic_dec(&obj->refcount)) {
++        if (!apr_atomic_dec32(&obj->refcount)) {
+             cleanup_cache_object(obj);
+         }
+     }
+--- httpd-2.0.51/modules/generators/mod_autoindex.c.orig	2004-08-26 15:01:21.000000000 +0200
++++ httpd-2.0.51/modules/generators/mod_autoindex.c	2004-09-17 22:39:44.000000000 +0200
+@@ -773,7 +773,7 @@
+  */
+ 
+ #ifdef CASE_BLIND_FILESYSTEM
+-#define MATCH_FLAGS FNM_CASE_BLIND
++#define MATCH_FLAGS APR_FNM_CASE_BLIND
+ #else
+ #define MATCH_FLAGS 0
+ #endif
+@@ -1259,7 +1259,7 @@
+ 
+ #ifndef CASE_BLIND_FILESYSTEM
+     if (pattern && (apr_fnmatch(pattern, dirent->name,
+-                                FNM_NOESCAPE | FNM_PERIOD)
++                                APR_FNM_NOESCAPE | APR_FNM_PERIOD)
+                         != APR_SUCCESS))
+         return (NULL);
+ #else  /* !CASE_BLIND_FILESYSTEM */
+@@ -1269,7 +1269,7 @@
+          * reliably - so we have to granularise at the OS level.
+          */
+     if (pattern && (apr_fnmatch(pattern, dirent->name,
+-                                FNM_NOESCAPE | FNM_PERIOD | FNM_CASE_BLIND)
++                                APR_FNM_NOESCAPE | APR_FNM_PERIOD | APR_FNM_CASE_BLIND)
+                         != APR_SUCCESS))
+         return (NULL);
+ #endif /* !CASE_BLIND_FILESYSTEM */
+--- httpd-2.0.51/modules/generators/mod_cgi.c.orig	2004-09-03 00:06:22.000000000 +0200
++++ httpd-2.0.51/modules/generators/mod_cgi.c	2004-09-18 02:11:23.151867408 +0200
+@@ -274,7 +274,7 @@
+         apr_file_printf(f, "%s\n", sbuf);
+ 
+     first = 1;
+-    APR_BRIGADE_FOREACH(e, bb) {
++    for(e = APR_BRIGADE_FIRST(bb); e != APR_BRIGADE_SENTINEL(bb); e = APR_BUCKET_NEXT(e)) {
+         if (APR_BUCKET_IS_EOS(e)) {
+             break;
+         }
+@@ -458,7 +458,7 @@
+             /* Bad things happened. Everyone should have cleaned up. */
+             ap_log_rerror(APLOG_MARK, APLOG_ERR|APLOG_TOCLIENT, rc, r,
+                           "couldn't create child process: %d: %s", rc,
+-                          apr_filename_of_pathname(r->filename));
++                          apr_filepath_name_get(r->filename));
+         }
+         else {
+             apr_pool_note_subprocess(p, procnew, APR_KILL_AFTER_TIMEOUT);
+@@ -540,7 +540,7 @@
+     const char *buf;
+     apr_size_t len;
+     apr_status_t rv;
+-    APR_BRIGADE_FOREACH(e, bb) {
++    for(e = APR_BRIGADE_FIRST(bb); e != APR_BRIGADE_SENTINEL(bb); e = APR_BUCKET_NEXT(e)) {
+         if (APR_BUCKET_IS_EOS(e)) {
+             break;
+         }
+@@ -750,7 +750,7 @@
+         return DECLINED;
+     }
+ 
+-    argv0 = apr_filename_of_pathname(r->filename);
++    argv0 = apr_filepath_name_get(r->filename);
+     nph = !(strncmp(argv0, "nph-", 4));
+     conf = ap_get_module_config(r->server->module_config, &cgi_module);
+ 
+@@ -833,7 +833,7 @@
+             return rv;
+         }
+ 
+-        APR_BRIGADE_FOREACH(bucket, bb) {
++        for(bucket = APR_BRIGADE_FIRST(bb); bucket != APR_BRIGADE_SENTINEL(bb); bucket = APR_BUCKET_NEXT(bucket)) {
+             const char *data;
+             apr_size_t len;
+ 
+--- httpd-2.0.51/modules/generators/mod_cgid.c.orig	2004-09-03 00:06:22.000000000 +0200
++++ httpd-2.0.51/modules/generators/mod_cgid.c	2004-09-18 02:16:42.329345056 +0200
+@@ -748,7 +748,7 @@
+                  */
+                 ap_log_error(APLOG_MARK, APLOG_ERR, rc, r->server,
+                              "couldn't create child process: %d: %s", rc, 
+-                             apr_filename_of_pathname(r->filename));
++                             apr_filepath_name_get(r->filename));
+             }
+             else {
+                 /* We don't want to leak storage for the key, so only allocate
+@@ -1030,12 +1030,12 @@
+         apr_file_printf(f, "%s\n", sbuf); 
+ 
+     first = 1;
+-    APR_BRIGADE_FOREACH(e, bb) {
++    for(e = APR_BRIGADE_FIRST(bb); e != APR_BRIGADE_SENTINEL(bb); e = APR_BUCKET_NEXT(e)) {
+         if (APR_BUCKET_IS_EOS(e)) {
+             break;
+         }
+         rv = apr_bucket_read(e, &buf, &len, APR_BLOCK_READ);
+-        if (!APR_STATUS_IS_SUCCESS(rv) || (len == 0)) {
++        if ((rv != APR_SUCCESS) || (len == 0)) {
+             break;
+         }
+         if (first) {
+@@ -1131,12 +1131,12 @@
+     const char *buf;
+     apr_size_t len;
+     apr_status_t rv;
+-    APR_BRIGADE_FOREACH(e, bb) {
++    for(e = APR_BRIGADE_FIRST(bb); e != APR_BRIGADE_SENTINEL(bb); e = APR_BUCKET_NEXT(e)) {
+         if (APR_BUCKET_IS_EOS(e)) {
+             break;
+         }
+         rv = apr_bucket_read(e, &buf, &len, APR_BLOCK_READ);
+-        if (!APR_STATUS_IS_SUCCESS(rv)) {
++        if (rv != APR_SUCCESS) {
+             break;
+         }
+     }
+@@ -1370,7 +1370,7 @@
+             return rv;
+         }
+  
+-        APR_BRIGADE_FOREACH(bucket, bb) {
++        for(bucket = APR_BRIGADE_FIRST(bb); bucket != APR_BRIGADE_SENTINEL(bb); bucket = APR_BUCKET_NEXT(bucket)) {
+             const char *data;
+             apr_size_t len;
+ 
+--- httpd-2.0.51/include/util_ldap.h.orig	2004-08-04 23:04:16.000000000 +0200
++++ httpd-2.0.51/include/util_ldap.h	2004-09-18 03:00:55.237041784 +0200
+@@ -19,7 +19,7 @@
+ #include <apr_ldap.h>
+ 
+ /* this whole thing disappears if LDAP is not enabled */
+-#ifdef APU_HAS_LDAP
++#ifdef APR_HAS_LDAP
+ 
+ /* APR header files */
+ #include <apr_thread_mutex.h>
+--- httpd-2.0.51/server/mpm/experimental/peruser/peruser.c.orig	2004-09-18 03:01:24.925528000 +0200
++++ httpd-2.0.51/server/mpm/experimental/peruser/peruser.c	2004-09-18 03:17:35.021051512 +0200
+@@ -625,7 +625,7 @@
+     if (die_now) return APR_SUCCESS;
+ 
+     /* apr_thread_mutex_lock(pipe_of_death_mutex); */
+-    ret = apr_recv(lr->sd, &pipe_read_char, &n);
++    ret = apr_socket_recv(lr->sd, &pipe_read_char, &n);
+     if (APR_STATUS_IS_EAGAIN(ret))
+     {
+             /* It lost the lottery. It must continue to suffer
+@@ -1985,7 +1985,7 @@
+ 		}
+ #if APR_HAS_OTHER_CHILD
+ 	    }
+-	    else if (apr_proc_other_child_read(&pid, status) == 0) {
++	    else if (apr_proc_other_child_alert(&pid, APR_OC_REASON_DEATH, status) == 0) {
+                 _DBG("APR_HAS_OTHER_CHILD, apparently", 0);
+ 		/* handled */
+ #endif
+--- httpd-2.0.51/server/mpm/experimental/perchild/perchild.c.orig	2004-05-26 14:22:16.000000000 +0200
++++ httpd-2.0.51/server/mpm/experimental/perchild/perchild.c	2004-09-18 13:24:25.401832280 +0200
+@@ -552,7 +552,7 @@
+         char pipe_read_char;
+         apr_size_t n = 1;
+ 
+-        ret = apr_recv(lr->sd, &pipe_read_char, &n);
++        ret = apr_socket_recv(lr->sd, &pipe_read_char, &n);
+         if (APR_STATUS_IS_EAGAIN(ret)) {
+             /* It lost the lottery. It must continue to suffer
+              * through a life of servitude. */
+@@ -643,7 +643,7 @@
+     apr_pollfd_t *pollset;
+     apr_status_t rv;
+     ap_listen_rec *lr, *last_lr = ap_listeners;
+-    int n;
++    int n, ifd;
+     apr_bucket_alloc_t *bucket_alloc;
+ 
+     apr_thread_mutex_lock(thread_pool_parent_mutex);
+@@ -657,10 +657,15 @@
+ 
+     bucket_alloc = apr_bucket_alloc_create(apr_thread_pool_get(thd));
+ 
+-    apr_poll_setup(&pollset, num_listensocks, tpool);
++    pollset = apr_pcalloc(tpool, sizeof(apr_pollfd_t) * num_listensocks);
++    ifd = 0;
+     for(lr = ap_listeners; lr != NULL; lr = lr->next) {
+         int fd;
+-        apr_poll_socket_add(pollset, lr->sd, APR_POLLIN);
++	pollset[ifd].p = tpool;
++	pollset[ifd].desc.s = lr->sd;
++	pollset[ifd].desc_type = APR_POLL_SOCKET;
++	pollset[ifd].reqevents = APR_POLLIN;
++	ifd++;
+ 
+         apr_os_sock_get(&fd, lr->sd);
+     }
+@@ -726,7 +731,10 @@
+                     lr = ap_listeners;
+                 }
+                 /* XXX: Should we check for POLLERR? */
+-                apr_poll_revents_get(&event, lr->sd, pollset);
++		for(ifd = 0; ifd < num_listensocks; ifd++)
++			if(pollset[ifd].desc.s == lr->sd)
++				break;
++		event = pollset[ifd].rtnevents;
+                 if (event & (APR_POLLIN)) {
+                     last_lr = lr;
+                     goto got_fd;
+@@ -1170,7 +1178,7 @@
+                 }
+ #if APR_HAS_OTHER_CHILD
+             }
+-            else if (apr_proc_other_child_read(&pid, status) == 0) {
++            else if (apr_proc_other_child_alert(&pid, APR_OC_REASON_DEATH, status) == 0) {
+             /* handled */
+ #endif
+             }
+--- httpd-2.0.51/server/mpm/prefork/prefork.c.orig	2004-02-26 21:32:21.000000000 +0100
++++ httpd-2.0.51/server/mpm/prefork/prefork.c	2004-09-18 18:45:00.774611136 +0200
+@@ -1002,7 +1002,7 @@
+ 		}
+ #if APR_HAS_OTHER_CHILD
+ 	    }
+-	    else if (apr_proc_other_child_read(&pid, status) == 0) {
++	    else if (apr_proc_other_child_alert(&pid, APR_OC_REASON_DEATH, status) == 0) {
+ 		/* handled */
+ #endif
+ 	    }
+--- httpd-2.0.51/server/mpm/worker/pod.c.orig	2004-02-09 21:59:48.000000000 +0100
++++ httpd-2.0.51/server/mpm/worker/pod.c	2004-09-18 21:34:03.264718272 +0200
+@@ -34,8 +34,8 @@
+     (*pod)->p = p;
+     
+     /* close these before exec. */
+-    apr_file_unset_inherit((*pod)->pod_in);
+-    apr_file_unset_inherit((*pod)->pod_out);
++    apr_file_inherit_unset((*pod)->pod_in);
++    apr_file_inherit_unset((*pod)->pod_out);
+ 
+     return APR_SUCCESS;
+ }
+--- httpd-2.0.51/server/mpm/worker/worker.c.orig	2004-05-26 14:22:16.000000000 +0200
++++ httpd-2.0.51/server/mpm/worker/worker.c	2004-09-18 21:54:50.625090672 +0200
+@@ -578,13 +578,19 @@
+     apr_pollfd_t *pollset;
+     apr_status_t rv;
+     ap_listen_rec *lr, *last_lr = ap_listeners;
+-    int have_idle_worker = 0;
++    int have_idle_worker = 0, ifd;
+ 
+     free(ti);
+ 
+-    apr_poll_setup(&pollset, num_listensocks, tpool);
+-    for(lr = ap_listeners ; lr != NULL ; lr = lr->next)
+-        apr_poll_socket_add(pollset, lr->sd, APR_POLLIN);
++    pollset = apr_pcalloc(tpool, sizeof(apr_pollfd_t) * num_listensocks);
++    ifd = 0;
++    for(lr = ap_listeners ; lr != NULL ; lr = lr->next) {
++	pollset[ifd].p = tpool;
++	pollset[ifd].desc.s = lr->sd;
++	pollset[ifd].desc_type = APR_POLL_SOCKET;
++	pollset[ifd].reqevents = APR_POLLIN;
++	ifd++;
++    }
+ 
+     /* Unblock the signal used to wake this thread up, and set a handler for
+      * it.
+@@ -670,7 +676,10 @@
+                         lr = ap_listeners;
+                     }
+                     /* XXX: Should we check for POLLERR? */
+-                    apr_poll_revents_get(&event, lr->sd, pollset);
++		    for(ifd = 0; ifd < num_listensocks; ifd++)
++			    if(pollset[ifd].desc.s == lr->sd)
++				    break;
++		    event = pollset[ifd].rtnevents;
+                     if (event & APR_POLLIN) {
+                         last_lr = lr;
+                         goto got_fd;
+@@ -1500,7 +1509,7 @@
+                 }
+ #if APR_HAS_OTHER_CHILD
+             }
+-            else if (apr_proc_other_child_read(&pid, status) == 0) {
++            else if (apr_proc_other_child_alert(&pid, APR_OC_REASON_DEATH, status) == 0) {
+                 /* handled */
+ #endif
+             }
