@@ -939,7 +939,7 @@ if [ "$1" = "0" ]; then
 	%groupremove http
 fi
 
-%triggerpostun  -- %{name} <= 2.0.50-6
+%triggerpostun -- %{name} <= 2.0.50-6
 echo "WARNING!!!"
 echo "Since that version autoindex module has been separated to package %{name}-mod_autoindex"
 echo "If you want to have the same functionality do:"
