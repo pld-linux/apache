@@ -51,6 +51,7 @@ Source12:	%{name}-mod_ssl.conf
 Source13:	%{name}-mod_dav.conf
 Source14:	%{name}-mod_dir.conf
 Source15:	%{name}-mod_suexec.conf
+Source16:	%{name}-mod_deflate.conf
 Source20:	%{name}-server.crt
 Source21:	%{name}-server.key
 Patch0:		%{name}-configdir_skip_backups.patch
@@ -818,6 +819,7 @@ install %{SOURCE12} $CFG/40_mod_ssl.conf
 install %{SOURCE13} $CFG/45_mod_dav.conf
 install %{SOURCE14} $CFG/59_mod_dir.conf
 install %{SOURCE15} $CFG/13_mod_suexec.conf
+install %{SOURCE16} $CFG/58_mod_deflate.conf
 
 echo "LoadModule ldap_module	%{_libexecdir}/mod_ldap.so" > $CFG/49_mod_ldap.conf
 echo "LoadModule actions_module	%{_libexecdir}/mod_actions.so" > $CFG/50_mod_actions.conf
@@ -830,7 +832,6 @@ LoadModule mem_cache_module	%{_libexecdir}/mod_mem_cache.so
 LoadModule disk_cache_module	%{_libexecdir}/mod_disk_cache.so" > $CFG/55_mod_cache.conf
 echo "LoadModule cgid_module	%{_libexecdir}/mod_cgid.so" > $CFG/56_mod_cgid.conf
 echo "LoadModule charset_lite_module	%{_libexecdir}/mod_charset_lite.so" > $CFG/57_mod_charset_lite.conf
-echo "LoadModule deflate_module	%{_libexecdir}/mod_deflate.so" > $CFG/58_mod_deflate.conf
 echo "LoadModule auth_ldap_module	%{_libexecdir}/mod_auth_ldap.so" > $CFG/59_mod_auth_ldap.conf
 echo "LoadModule expires_module	%{_libexecdir}/mod_expires.so" > $CFG/60_mod_expires.conf
 echo "LoadModule file_cache_module	%{_libexecdir}/mod_file_cache.so" > $CFG/61_mod_file_cache.conf
