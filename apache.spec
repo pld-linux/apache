@@ -682,7 +682,7 @@ wa¿no¶ci mo¿e byæ ustalana w zale¿no¶ci od czasu modyfikacji plików
 %patch23 -p0
 
 %build
-OPTIM="%{rpmcflags} -DHARD_SERVER_LIMIT=2048" \
+OPTIM="%{rpmcflags} -DHARD_SERVER_LIMIT=2048 -DBIG_SECURITY_HOLE=1" \
 ./configure \
 	--prefix=%{_prefix} \
 	--sysconfdir=%{_sysconfdir} \
