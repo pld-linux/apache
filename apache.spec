@@ -5,12 +5,26 @@
 #
 %include	/usr/lib/rpm/macros.perl
 Summary:	The most widely used Web server on the Internet
-Summary(de):	Leading World Wide Web-Server
-Summary(es):	Servidor HTTPD para proveer servicios WWW
-Summary(fr):	Le serveur web le plus utilise sur Internet
+Summary(cs):	Nejroz¹íøenìj¹í WWW server v Internetu
+Summary(da):	Den mest brugte web-tjener på Internet
+Summary(de):	Der am häufigsten verwendete Web-Server im Internet
+Summary(es):	El servidor web más conocido y usado en Internet
+Summary(fr):	Le serveur Web le plus utilisé sur Internet
+Summary(id):	Web server yang paling banyak digunakan di Internet
+Summary(is):	Vinsælasti vefşjónninn á Netinu
+Summary(it):	Il web server più diffuso su Internet
+Summary(ja):	¥¤¥ó¥¿¡¼¥Í¥Ã¥È¾å¤ÇºÇ¤â°ìÈÌÅª¤Ë»ÈÍÑ¤µ¤ì¤Æ¤¤¤ë Web ¥µ¡¼¥Ğ¡¼
+Summary(no):	Den mest utbredte web-tjeneren på Internett
 Summary(pl):	Serwer WWW (World Wide Web)
+Summary(pt):	O servidor Web mais largamente utilizado em toda a Internet
 Summary(pt_BR):	Servidor HTTPD para prover serviços WWW
+Summary(ru):	óÁÍÙÊ ĞÏĞÕÌÑÒÎÙÊ Web-Server
+Summary(sk):	Najviac pou¾ívanı Web server na Internete
+Summary(sl):	Najbolj uporabljani spletni stre¾nik interneta
+Summary(sv):	Den mest använda webbservern på Internet
 Summary(tr):	Lider WWW tarayıcı
+Summary(uk):	îÁÊĞÏĞÕÌÑÒÎ¦ÛÉÊ Web-Server
+Summary(zh_CN):	Internet ÉÏÓ¦ÓÃ×î¹ã·ºµÄ Web ·şÎñ³ÌĞò¡£
 Name:		apache
 Version:	1.3.23
 Release:	1
@@ -21,12 +35,15 @@ Group(da):	Netværks/Dæmoner
 Group(de):	Netzwerkwesen/Server
 Group(es):	Red/Servidores
 Group(fr):	Réseau/Serveurs
+Group(is):	Net/Púkar
 Group(it):	Rete/Demoni
 Group(no):	Nettverks/Daemoner
 Group(pl):	Sieciowe/Serwery
 Group(pt):	Rede/Servidores
-Group(ru):	óÅÔÅ×ÙÅ/äÅÍÏÎÙ
+Group(ru):	óÅÔØ/äÅÍÏÎÙ
+Group(sl):	Omre¾ni/Stre¾niki
 Group(sv):	Nätverk/Demoner
+Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 URL:		http://www.apache.org/
 Source0:	ftp://ftp.apache.org/dist/%{name}_%{version}.tar.gz
 Source1:	%{name}.init
@@ -93,9 +110,18 @@ Apache is a powerful, full-featured, efficient and freely-available
 Web server. Apache is also the most popular Web server on the
 Internet.
 
+%description -l cs
+Apache je vıkonnı plnì funkèní efektivní a volnì dostupnı WWW server.
+Je to nejpopulárnìj¹í WWW server v Internetu.
+
+%description -l da
+Apache er en stærk, funktionsrig, effektiv og frit tilgængelig
+web-tjener. Apache er også den mest populære web-tjener på Internet.
+
 %description -l de
-Apache ist ein voll funktionsfähiger Web-Server, der kostenlos
-erhältlich und weit verbreitet ist.
+Apache ist ein leistungsfähiger, frei verfügbarer und effizienter
+Web-Server mit umfassenden Funktionen. Apache ist zudem der populärste
+Web-Server im Internet.
 
 %description -l es
 El servidor web Apache es el mejor servidor gratuito disponible en el
@@ -109,9 +135,37 @@ dinámica de tipo, y otras más.
 Apache est un serveur Web puissant, efficace, gratuit et complet.
 Apache est aussi le serveur Web le plus populaire sur Internet.
 
+%description -l id
+Apache adalah Web server yang powerful, efisien, kaya akan feature,
+dan tersedia dengan free. Apache juga merupakan Web server yang paling
+populer di Internet.
+
+%description -l is
+Apache er mjög öflugur og háşróağur vefşjónn sem er ókeypis. Apache er
+einnig mest notaği vefşjónninn á Internetinu.
+
+%description -l it
+Apache è un Web server potente, dotato di tutte le caratteristiche,
+efficiente e gratuito. Ed è anche il web server più diffuso su
+Internet.
+
+%description -l ja
+Apache ¤Ï¶¯ÎÏ¤Ç½¼¼Â¤·¤¿µ¡Ç½¤ò»ı¤ÄÌµ½ş¤Î Web ¥µ¡¼¥Ğ¡¼
+¤Ç¤¹¡£¤Ş¤¿¡¢apache ¤Ï¥¤¥ó¥¿¡¼¥Í¥Ã¥È¾å¤ÇºÇ¤â°ìÈÌÅª¤Ë»ÈÍÑ ¤µ¤ì¤Æ¤¤¤ë Web
+¥µ¡¼¥Ğ¡¼¤Ç¤¹¡£
+
+%description -l no
+Apache er en kraftig, funksjonsrik, effektiv og fritt tilgjengelig
+web-tjener. Apache er også den mest populære web-tjeneren på Internet.
+
 %description -l pl
 Apache jest serwerem WWW (World Wide Web). Instaluj±c ten pakiet
 bêdziesz móg³ prezentowaæ w³asne strony WWW w sieci internet.
+
+%description -l pt
+O Apache é um servidor de Web poderoso, cheio de potencialidades,
+eficiente e gratuito. O Apache é também o servidor Web mais conhecido
+na Internet.
 
 %description -l pt_BR
 O servidor web Apache é o melhor servidor gratuito disponível no mundo
@@ -121,26 +175,51 @@ pode executar várias funções diferentes, incluindo funções de proxy e
 cache, e oferece características como monitor de status, conversão
 dinâmica de tipo, e mais.
 
+%description -l ru
+Apache - ÜÔÏ ÍÏİÎÙÊ, ĞÏÌÎÏÆÕÎËÃÉÏÎÁÌØÎÙÊ, ÜÆÆÅËÔÉ×ÎÙÊ, Ó×ÏÂÏÄÎÏ
+ÒÁÓĞÒÏÓÔÒÁÎÑÅÍÙÊ É ÓÁÍÙÊ ĞÏĞÕÌÑÒÎÙÊ × Internet WWW-ÓÅÒ×ÅÒ.
+
+%description -l sk
+Apache je vıkonnı, efektívny a voµne dostupnı Web server, bohatı na
+funkcie. Apache je tie¾ najpopulárnej¹ím Web serverom na Internete.
+
+%description -l sv
+Apache är en kraftfull, finessrik, effektiv och fritt tillgänglig
+webbserver. Apache är också den populäraste webbservern på Internet.
+
 %description -l tr
 Apache serbest dağıtılan ve çok kullanılan yetenekli bir web
 sunucusudur.
 
+%description -l uk
+
+%description -l zh_CN
+Apache ÊÇ¹¦ÄÜÇ¿¾¢ÆëÈ«¡¢¸ßĞ§ÇÒÃâ·ÑÌá¹©µÄ Web ·şÎñ³ÌĞò£¬ Í¬Ê±Ò²ÊÇ
+Internet ÉÏ×îÁ÷ĞĞµÄ Web ·şÎñ³ÌĞò¡£
+
+Èç¹ûÄúĞèÒª Web ·şÎñ³ÌĞò£¬Çë°²×° apache Èí¼ş°ü¡£
+
 %package suexec
 Summary:	Apache suexec wrapper
 Summary(pl):	Suexec wrapper do serwera www Apache
+Summary(ru):	Apache suEXEC CGI wrapper
+Summary(uk):	Apache suEXEC CGI wrapper
 Group:		Development/Tools
 Group(cs):	Vıvojové prostøedky/Nástroje
 Group(da):	Udvikling/Værktøj
 Group(de):	Entwicklung/Tools
 Group(es):	Desarrollo/Herramientas
 Group(fr):	Development/Outils
+Group(is):	Şróunartól/Tól
 Group(it):	Sviluppo/Tool
 Group(ja):	³«È¯/¥Ä¡¼¥ë
 Group(no):	Utvikling/Verktøy
 Group(pl):	Programowanie/Narzêdzia
 Group(pt):	Desenvolvimento/Ferramentas
 Group(ru):	òÁÚÒÁÂÏÔËÁ/éÎÓÔÒÕÍÅÎÔÙ
+Group(sl):	Razvoj/Orodja
 Group(sv):	Utveckling/Verktyg
+Group(uk):	òÏÚÒÏÂËÁ/¶ÎÓÔÒÕÍÅÎÔÉ
 Requires:	%{name}(EAPI) = %{version}
 
 %description suexec
@@ -154,50 +233,120 @@ SuEXEC umo¿liwia serwerowi Apache uruchamianie programów CGI i SSI z
 innym UID ni¿ wywo³uj±cy je serwer. Normalnie programy CGI i SSI s±
 wykonywane jako taki sam u¿ytkownik jak serwer WWW.
 
+%description suexec -l ru
+ğÁËÅÔ suEXEC ĞÏÚ×ÏÌÑÅÔ ÚÁĞÕÓËÁÔØ CGI-ĞÒÏÇÒÁÍÍÙ ĞÏÄ user-id, ÏÔÌÉŞÎÙÍÉ
+ÏÔ ÔÏÇÏ, ĞÏÄ ËÏÔÏÒÙÍ ÒÁÂÏÔÁÅÔ ×ÙÚÙ×ÁÀİÉÊ ÉÈ web-ÓÅÒ×ÅÒ. âÕÄÕŞÉ
+ĞÒÁ×ÉÌØÎÏ ÉÓĞÏÌØÚÏ×ÁÎÎÙÍ, ÜÔÏÔ ĞÁËÅÔ ĞÏÚ×ÏÌÑÅÔ ÚÁÍÅÔÎÏ ÓÎÉÚÉÔØ ÒÉÓË
+ÎÁÒÕÛÅÎÉÑ ÓÉÓÔÅÍÎÏÊ ÂÅÚÏĞÁÓÎÏÓÔÉ, ×ÙÚ×ÁÎÎÙÊ ÒÁÚÒÅÛÅÎÉÅÍ ÚÁĞÕÓËÁ
+ĞÏÌØÚÏ×ÁÔÅÌÑÍ CGI-ĞÒÏÇÒÁÍÍ. ÷ÍÅÓÔÅ Ó ÔÅÍ, ÂÕÄÕŞÉ ÎÅĞÒÁ×ÉÌØÎÏ
+ÓËÏÎÆÉÇÕÒÉÒÏ×ÁÎÎÙÍ, ÜÔÏÔ ĞÁËÅÔ ÍÏÖÅÔ ÒÁÚÒÕÛÉÔØ ×ÁÛÕ ÓÉÓÔÅÍÕ, ÓÖÅŞØ ×ÁÛ
+ÄÏÍ É ÕËÒÁÓÔØ ÄÅÎØÇÉ ÉÚ ×ÁÛÅÇÏ ĞÅÎÓÉÏÎÎÏÇÏ ÆÏÎÄÁ :)). åÓÌÉ ×Ù ÎÅ
+ÉÍÅÅÔÅ ÏĞÙÔÁ ÒÁÂÏÔÙ Ó setuid root ĞÒÏÇÒÁÍÍÁÍÉ É ĞÒÏÂÌÅÍÁÍÉ ÓÉÓÔÅÍÎÏÊ
+ÂÅÚÏĞÁÓÎÏÓÔÉ, ĞÏÒÏÖÄÅÎÎÙÍÉ ÉÈ ĞÒÉÍÅÎÅÎÉÅÍ, ÎÁÓÔÏÑÔÅÌØÎÏ ÒÅËÏÍÅÎÄÕÅÍ ÎÅ
+ÉÓĞÏÌØÚÏ×ÁÔØ ÜÔÏÇÏ ĞÁËÅÔÁ...
+
+%description suexec -l uk
+ğÁËÅÔ suEXEC ÄÏÚ×ÏÌÑ¤ ÚÁĞÕÓËÁÔÉ CGI-ĞÒÏÇÒÁÍÉ Ğ¦Ä user-id, ×¦ÄÍ¦ÎÎÉÍ
+×¦Ä ÔÏÇÏ, Ğ¦Ä ÑËÉÍ ĞÒÁÃÀ¤ ÓÅÒ×ÅÒ. ğÒÉ ĞÒÁ×ÉÌØÎÏÍÕ ×ÉËÏÒÉÓÔÁÎÎ¦, ÃÅÊ
+ĞÁËÅÔ ÄÏÚ×ÏÌÑ¤ ĞÏÍ¦ÔÎÏ ÚÎÉÚÉÔÉ ÒÉÚÉË ĞÏÒÕÛÅÎÎÑ ÓÉÓÔÅÍÎÏ§ ÂÅÚĞÅËÉ,
+×ÉËÌÉËÁÎÉÊ ÄÏÚ×ÏÌÏÍ ÚÁĞÕÓËÕ ËÏÒÉÓÔÕ×ÁŞÁÍÉ CGI-ĞÒÏÇÒÁÍ. òÁÚÏÍ Ú ÔÉÍ,
+ĞÒÉ ÎÅ×¦ÒÎÏÍÕ ËÏÎÆ¦ÇÕÒÕ×ÁÎÎ¦, ÃÅÊ ĞÁËÅÔ ÍÏÖÅ ÚÒÕÊÎÕ×ÁÔÉ ×ÁÛÉ ÓÉÓÔÅÍÕ,
+ÓĞÁÌÉÔÉ ×ÁÛ Ä¦Í ¦ ×ËÒÁÓÔÉ ÇÒÏÛ¦ Ú ×ÁÛÏÇÏ ĞÅÎÓ¦ÊÎÏÇÏ ÆÏÎÄÕ :)). ñËİÏ ×É
+ÎÅ ÍÁ¤ÔÅ ÄÏÓ×¦ÄÕ ÒÏÂÏÔÉ Ú setuid root ĞÒÏÇÒÁÍÁÍÉ ÔÁ ĞÒÏÂÌÅÍÁÍÉ
+ÓÉÓÔÅÍÎÏ§ ÂÅÚĞÅËÉ, ËÏÔÒ¦ ĞÏÒÏÄÖÅÎ¦ ×ÉËÏÒÉÓÔÁÎÎÑÍ ÔÁËÉÈ ĞÒÏÇÒÁÍ,
+ÎÁÓÔ¦ÊÌÉ×Ï ÒÁÄÉÍÏ ÎÅ ×ÉËÏÒÉÓÔÏ×Õ×ÁÔÉ ÃØÏÇÏ ĞÁËÅÔÕ...
+
 %package devel
 Summary:	Module development tools for the Apache web server
+Summary(cs):	Hlavièkové soubory pro Apache Web server
+Summary(da):	Header-filer for Apache webserveren
+Summary(de):	Include-Dateien für den Apache Web-Server
 Summary(es):	Archivos de inclusión del Apache para desarrollo de módulos
-Summary(fr):	Les outils de developpement de modules pour le serveur web Apache
+Summary(fr):	Fichiers à inclure pour le serveur Web Apache
+Summary(id):	File header untuk Apache Web server
+Summary(is):	Hausaskrár meğ Apache vefşjóninum
+Summary(it):	File include per il web server Apache
+Summary(ja):	Apache Web ¥µ¡¼¥Ğ¡¼ÍÑ¤Î³«È¯¥Ä¡¼¥ë
+Summary(no):	Headerfiler for webtjeneren Apache
 Summary(pl):	Pliki nag³ówkowe do tworzenai modu³ów rozszerzeñ do serwera www Apache
+Summary(pt):	Ficheiros de inclusão para o servidor Web Apache
 Summary(pt_BR):	Arquivos de inclusão do Apache para desenvolvimento de módulos
+Summary(ru):	æÁÊÌÙ ÚÁÇÏÌÏ×ËÏ× ÄÌÑ web server'Á Apache
+Summary(sk):	Hlavièkové súbory pre Apache Web server
+Summary(sl):	Glave za spletni stre¾nik Apache
+Summary(sv):	Huvudfiler för webbservern Apache
+Summary(uk):	úÁÓÏÂÉ ÓÔ×ÏÒÅÎÎÑ ÍÏÄÕÌ¦× ÄÌÑ web server'Õ Apache
+Summary(zh_CN):	ÓÃÓÚ Apache Web ·şÎñ³ÌĞòµÄ¿ª·¢¹¤¾ß¡£
 Group:		Networking/Utilities
 Group(cs):	Sí»ové/Utility
 Group(da):	Netværks/Værktøj
 Group(de):	Netzwerkwesen/Dienstprogramme
 Group(es):	Red/Utilitarios
 Group(fr):	Réseau/Utilitaires
+Group(is):	Net/Tól
 Group(it):	Rete/Utility
 Group(no):	Nettverks/Verktøy
 Group(pl):	Sieciowe/Narzêdzia
 Group(pt_BR):	Rede/Utilitários
 Group(pt):	Rede/Utilidades
-Group(ru):	óÅÔÅ×ÙÅ/ğÒÉÌÏÖÅÎÉÑ
+Group(ru):	óÅÔØ/õÔÉÌÉÔÙ
+Group(sl):	Omre¾ni/Pripomoèki
 Group(sv):	Nätverk/Verktyg
+Group(uk):	íÅÒÅÖÁ/õÔÉÌ¦ÔÉ
 Requires:	%{name}(EAPI) = %{version}
 Provides:	%{name}(EAPI)-devel
 
 %description devel
 The apache-devel package contains header files for Apache.
 
+%description devel -l cs
+Balíèek apache-devel obsahuje hlavièkové soubory pro Apache.
+
+%description devel -l da
+Apache-devel pakken indeholder headerfiler for Apache.
+
+%description devel -l de
+Das Paket apache-devel enthält Header-Dateien für Apache.
+
 %description devel -l es
-Este paquete contiene los archivos de inclusión para el Apache, bien
-como el utilitario apxs para la construcción de objetos compartidos
-dinámicos (DSOs). Ha ce falta instalar este paquete si deseas compilar
-o desarrollar módulos adicionales para Apache.
+Este paquete contiene los archivos de inclusión para el Apache.
 
 %description devel -l fr
 Le package apache-devel contient le code source pour le serveur Web
-Apache et le binaire APXS dont vous aurez besoin pour construire des
-Objets Dynamiques Partages (DSOs) pour Apache.
+Apache.
+
+%description devel -l id
+Package apache-devel berisi source code dari Apache Web server.
+
+%description devel -l is
+Apache-devel pakkinn inniheldur frumkóğa Apache vefşjónsins.
+
+%description devel -l it
+Il pacchetto apache-devel contiene i file header per Apache.
+
+%description devel -l no
+Apache-devel pakken inneholder headerfiler for Apache.
 
 %description devel -l pl
 Pliki nag³ówkowe dla serwera WWW Apache.
 
+%description devel -l pt
+O pacote apache-devel contém outros ficheiros para o Apache.
+
 %description devel -l pt_BR
-Este pacote contem os arquivos de inclusão para o Apache, bem como o
-utilitário apxs para a construção de objetos compartilhados dinâmicos
-(DSOs). Este pacote precisa ser instalado se você deseja compilar ou
-desenvolver módulos adicionais para o Apache.
+Este pacote contem os arquivos de inclusão para o Apache.
+
+%description devel -l ru
+ğÁËÅÔ apache-devel ÓÏÄÅÒÖÉÔ ÈÅÄÅÒÙ ÄÌÑ Web Server'Á.
+
+%description devel -l sk
+Balík apache-devel obsahuje zdrojovı kód Apache Web servera.
+
+%description devel -l sv
+Paketet apache-devel innehåller huvudfilerna för Apache.
+
+%description devel -l uk
+ğÁËÅÔ apache-devel Í¦ÓÔÉÔØ ÈÅÄÅÒÉ ÄÌÑ Web Server'Á.
 
 %package mod_actions
 Summary:	Apache module for run CGI whenever a file of a certain type is requested
@@ -208,12 +357,15 @@ Group(da):	Netværks/Dæmoner
 Group(de):	Netzwerkwesen/Server
 Group(es):	Red/Servidores
 Group(fr):	Réseau/Serveurs
+Group(is):	Net/Púkar
 Group(it):	Rete/Demoni
 Group(no):	Nettverks/Daemoner
 Group(pl):	Sieciowe/Serwery
 Group(pt):	Rede/Servidores
-Group(ru):	óÅÔÅ×ÙÅ/äÅÍÏÎÙ
+Group(ru):	óÅÔØ/äÅÍÏÎÙ
+Group(sl):	Omre¾ni/Stre¾niki
 Group(sv):	Nätverk/Demoner
+Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -229,18 +381,22 @@ Ten modu³ pozwala na uruchamianie skryptów w momencie gdy nadchodzi
 
 %package mod_auth
 Summary:	Apache module with user authentication using textual files
+Summary(pl):	Modu³ autentykacji u¿ytkownika przy u¿yciu plików tekstowych dla Apache
 Group:		Networking/Daemons
 Group(cs):	Sí»ové/Démoni
 Group(da):	Netværks/Dæmoner
 Group(de):	Netzwerkwesen/Server
 Group(es):	Red/Servidores
 Group(fr):	Réseau/Serveurs
+Group(is):	Net/Púkar
 Group(it):	Rete/Demoni
 Group(no):	Nettverks/Daemoner
 Group(pl):	Sieciowe/Serwery
 Group(pt):	Rede/Servidores
-Group(ru):	óÅÔÅ×ÙÅ/äÅÍÏÎÙ
+Group(ru):	óÅÔØ/äÅÍÏÎÙ
+Group(sl):	Omre¾ni/Stre¾niki
 Group(sv):	Nätverk/Demoner
+Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -262,12 +418,15 @@ Group(da):	Netværks/Dæmoner
 Group(de):	Netzwerkwesen/Server
 Group(es):	Red/Servidores
 Group(fr):	Réseau/Serveurs
+Group(is):	Net/Púkar
 Group(it):	Rete/Demoni
 Group(no):	Nettverks/Daemoner
 Group(pl):	Sieciowe/Serwery
 Group(pt):	Rede/Servidores
-Group(ru):	óÅÔÅ×ÙÅ/äÅÍÏÎÙ
+Group(ru):	óÅÔØ/äÅÍÏÎÙ
+Group(sl):	Omre¾ni/Stre¾niki
 Group(sv):	Nätverk/Demoner
+Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -298,12 +457,15 @@ Group(da):	Netværks/Dæmoner
 Group(de):	Netzwerkwesen/Server
 Group(es):	Red/Servidores
 Group(fr):	Réseau/Serveurs
+Group(is):	Net/Púkar
 Group(it):	Rete/Demoni
 Group(no):	Nettverks/Daemoner
 Group(pl):	Sieciowe/Serwery
 Group(pt):	Rede/Servidores
-Group(ru):	óÅÔÅ×ÙÅ/äÅÍÏÎÙ
+Group(ru):	óÅÔØ/äÅÍÏÎÙ
+Group(sl):	Omre¾ni/Stre¾niki
 Group(sv):	Nätverk/Demoner
+Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -327,12 +489,15 @@ Group(da):	Netværks/Dæmoner
 Group(de):	Netzwerkwesen/Server
 Group(es):	Red/Servidores
 Group(fr):	Réseau/Serveurs
+Group(is):	Net/Púkar
 Group(it):	Rete/Demoni
 Group(no):	Nettverks/Daemoner
 Group(pl):	Sieciowe/Serwery
 Group(pt):	Rede/Servidores
-Group(ru):	óÅÔÅ×ÙÅ/äÅÍÏÎÙ
+Group(ru):	óÅÔØ/äÅÍÏÎÙ
+Group(sl):	Omre¾ni/Stre¾niki
 Group(sv):	Nätverk/Demoner
+Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -345,7 +510,7 @@ variables which can be expanded on any(!) directive line.
 Modu³ ten umo¿liwia definicjê zmiennych i dyrektyw.
 
 %package mod_digest
-Summary:	Apache user authentication module using MD5 Digest Authentication 
+Summary:	Apache user authentication module using MD5 Digest Authentication
 Summary(pl):	Modu³ apache do autoryzacji MD5
 Group:		Networking/Daemons
 Group(cs):	Sí»ové/Démoni
@@ -353,12 +518,15 @@ Group(da):	Netværks/Dæmoner
 Group(de):	Netzwerkwesen/Server
 Group(es):	Red/Servidores
 Group(fr):	Réseau/Serveurs
+Group(is):	Net/Púkar
 Group(it):	Rete/Demoni
 Group(no):	Nettverks/Daemoner
 Group(pl):	Sieciowe/Serwery
 Group(pt):	Rede/Servidores
-Group(ru):	óÅÔÅ×ÙÅ/äÅÍÏÎÙ
+Group(ru):	óÅÔØ/äÅÍÏÎÙ
+Group(sl):	Omre¾ni/Stre¾niki
 Group(sv):	Nätverk/Demoner
+Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -380,12 +548,15 @@ Group(da):	Netværks/Dæmoner
 Group(de):	Netzwerkwesen/Server
 Group(es):	Red/Servidores
 Group(fr):	Réseau/Serveurs
+Group(is):	Net/Púkar
 Group(it):	Rete/Demoni
 Group(no):	Nettverks/Daemoner
 Group(pl):	Sieciowe/Serwery
 Group(pt):	Rede/Servidores
-Group(ru):	óÅÔÅ×ÙÅ/äÅÍÏÎÙ
+Group(ru):	óÅÔØ/äÅÍÏÎÙ
+Group(sl):	Omre¾ni/Stre¾niki
 Group(sv):	Nätverk/Demoner
+Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -406,12 +577,15 @@ Group(da):	Netværks/Dæmoner
 Group(de):	Netzwerkwesen/Server
 Group(es):	Red/Servidores
 Group(fr):	Réseau/Serveurs
+Group(is):	Net/Púkar
 Group(it):	Rete/Demoni
 Group(no):	Nettverks/Daemoner
 Group(pl):	Sieciowe/Serwery
 Group(pt):	Rede/Servidores
-Group(ru):	óÅÔÅ×ÙÅ/äÅÍÏÎÙ
+Group(ru):	óÅÔØ/äÅÍÏÎÙ
+Group(sl):	Omre¾ni/Stre¾niki
 Group(sv):	Nätverk/Demoner
+Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -434,12 +608,15 @@ Group(da):	Netværks/Dæmoner
 Group(de):	Netzwerkwesen/Server
 Group(es):	Red/Servidores
 Group(fr):	Réseau/Serveurs
+Group(is):	Net/Púkar
 Group(it):	Rete/Demoni
 Group(no):	Nettverks/Daemoner
 Group(pl):	Sieciowe/Serwery
 Group(pt):	Rede/Servidores
-Group(ru):	óÅÔÅ×ÙÅ/äÅÍÏÎÙ
+Group(ru):	óÅÔØ/äÅÍÏÎÙ
+Group(sl):	Omre¾ni/Stre¾niki
 Group(sv):	Nätverk/Demoner
+Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -462,12 +639,15 @@ Group(da):	Netværks/Dæmoner
 Group(de):	Netzwerkwesen/Server
 Group(es):	Red/Servidores
 Group(fr):	Réseau/Serveurs
+Group(is):	Net/Púkar
 Group(it):	Rete/Demoni
 Group(no):	Nettverks/Daemoner
 Group(pl):	Sieciowe/Serwery
 Group(pt):	Rede/Servidores
-Group(ru):	óÅÔÅ×ÙÅ/äÅÍÏÎÙ
+Group(ru):	óÅÔØ/äÅÍÏÎÙ
+Group(sl):	Omre¾ni/Stre¾niki
 Group(sv):	Nätverk/Demoner
+Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -489,12 +669,15 @@ Group(da):	Netværks/Dæmoner
 Group(de):	Netzwerkwesen/Server
 Group(es):	Red/Servidores
 Group(fr):	Réseau/Serveurs
+Group(is):	Net/Púkar
 Group(it):	Rete/Demoni
 Group(no):	Nettverks/Daemoner
 Group(pl):	Sieciowe/Serwery
 Group(pt):	Rede/Servidores
-Group(ru):	óÅÔÅ×ÙÅ/äÅÍÏÎÙ
+Group(ru):	óÅÔØ/äÅÍÏÎÙ
+Group(sl):	Omre¾ni/Stre¾niki
 Group(sv):	Nätverk/Demoner
+Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -517,12 +700,15 @@ Group(da):	Netværks/Dæmoner
 Group(de):	Netzwerkwesen/Server
 Group(es):	Red/Servidores
 Group(fr):	Réseau/Serveurs
+Group(is):	Net/Púkar
 Group(it):	Rete/Demoni
 Group(no):	Nettverks/Daemoner
 Group(pl):	Sieciowe/Serwery
 Group(pt):	Rede/Servidores
-Group(ru):	óÅÔÅ×ÙÅ/äÅÍÏÎÙ
+Group(ru):	óÅÔØ/äÅÍÏÎÙ
+Group(sl):	Omre¾ni/Stre¾niki
 Group(sv):	Nätverk/Demoner
+Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -547,12 +733,15 @@ Group(da):	Netværks/Dæmoner
 Group(de):	Netzwerkwesen/Server
 Group(es):	Red/Servidores
 Group(fr):	Réseau/Serveurs
+Group(is):	Net/Púkar
 Group(it):	Rete/Demoni
 Group(no):	Nettverks/Daemoner
 Group(pl):	Sieciowe/Serwery
 Group(pt):	Rede/Servidores
-Group(ru):	óÅÔÅ×ÙÅ/äÅÍÏÎÙ
+Group(ru):	óÅÔØ/äÅÍÏÎÙ
+Group(sl):	Omre¾ni/Stre¾niki
 Group(sv):	Nätverk/Demoner
+Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -573,12 +762,15 @@ Group(da):	Netværks/Dæmoner
 Group(de):	Netzwerkwesen/Server
 Group(es):	Red/Servidores
 Group(fr):	Réseau/Serveurs
+Group(is):	Net/Púkar
 Group(it):	Rete/Demoni
 Group(no):	Nettverks/Daemoner
 Group(pl):	Sieciowe/Serwery
 Group(pt):	Rede/Servidores
-Group(ru):	óÅÔÅ×ÙÅ/äÅÍÏÎÙ
+Group(ru):	óÅÔØ/äÅÍÏÎÙ
+Group(sl):	Omre¾ni/Stre¾niki
 Group(sv):	Nätverk/Demoner
+Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -603,12 +795,15 @@ Group(da):	Netværks/Dæmoner
 Group(de):	Netzwerkwesen/Server
 Group(es):	Red/Servidores
 Group(fr):	Réseau/Serveurs
+Group(is):	Net/Púkar
 Group(it):	Rete/Demoni
 Group(no):	Nettverks/Daemoner
 Group(pl):	Sieciowe/Serwery
 Group(pt):	Rede/Servidores
-Group(ru):	óÅÔÅ×ÙÅ/äÅÍÏÎÙ
+Group(ru):	óÅÔØ/äÅÍÏÎÙ
+Group(sl):	Omre¾ni/Stre¾niki
 Group(sv):	Nätverk/Demoner
+Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -630,12 +825,15 @@ Group(da):	Netværks/Dæmoner
 Group(de):	Netzwerkwesen/Server
 Group(es):	Red/Servidores
 Group(fr):	Réseau/Serveurs
+Group(is):	Net/Púkar
 Group(it):	Rete/Demoni
 Group(no):	Nettverks/Daemoner
 Group(pl):	Sieciowe/Serwery
 Group(pt):	Rede/Servidores
-Group(ru):	óÅÔÅ×ÙÅ/äÅÍÏÎÙ
+Group(ru):	óÅÔØ/äÅÍÏÎÙ
+Group(sl):	Omre¾ni/Stre¾niki
 Group(sv):	Nätverk/Demoner
+Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -657,12 +855,15 @@ Group(da):	Netværks/Dæmoner
 Group(de):	Netzwerkwesen/Server
 Group(es):	Red/Servidores
 Group(fr):	Réseau/Serveurs
+Group(is):	Net/Púkar
 Group(it):	Rete/Demoni
 Group(no):	Nettverks/Daemoner
 Group(pl):	Sieciowe/Serwery
 Group(pt):	Rede/Servidores
-Group(ru):	óÅÔÅ×ÙÅ/äÅÍÏÎÙ
+Group(ru):	óÅÔØ/äÅÍÏÎÙ
+Group(sl):	Omre¾ni/Stre¾niki
 Group(sv):	Nätverk/Demoner
+Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -691,12 +892,15 @@ Group(da):	Netværks/Dæmoner
 Group(de):	Netzwerkwesen/Server
 Group(es):	Red/Servidores
 Group(fr):	Réseau/Serveurs
+Group(is):	Net/Púkar
 Group(it):	Rete/Demoni
 Group(no):	Nettverks/Daemoner
 Group(pl):	Sieciowe/Serwery
 Group(pt):	Rede/Servidores
-Group(ru):	óÅÔÅ×ÙÅ/äÅÍÏÎÙ
+Group(ru):	óÅÔØ/äÅÍÏÎÙ
+Group(sl):	Omre¾ni/Stre¾niki
 Group(sv):	Nätverk/Demoner
+Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -712,7 +916,7 @@ Modu³ kontroluje ustawianie nag³ówka HTTP Expires. Data wyga¶niêcia
 wa¿no¶ci mo¿e byæ ustalana w zale¿no¶ci od czasu modyfikacji plików
 ¼ród³owych lub odwo³ania klienta.
 
-%prep 
+%prep
 %setup -q -n apache_%{version} -a3
 %patch0 -p1
 %patch1 -p1
@@ -945,7 +1149,7 @@ if [ "$1" = "0" ]; then
 	fi
 fi
 
-%triggerpostun mod_auth_db -- apache-mod_auth_db <= 1.3.20-2 
+%triggerpostun mod_auth_db -- apache-mod_auth_db <= 1.3.20-2
 %{_sbindir}/apxs -e -A -n auth_dbm %{_libexecdir}/mod_auth_dbm.so 1>&2
 
 %post mod_define
@@ -1247,12 +1451,12 @@ fi
 %dir %{_datadir}
 %dir %{_datadir}/manual
 %dir %{_datadir}/manual/images/
-%{_datadir}/manual/images/apache_header.gif 
-%{_datadir}/manual/images/custom_errordocs.gif 
-%{_datadir}/manual/images/home.gif 
+%{_datadir}/manual/images/apache_header.gif
+%{_datadir}/manual/images/custom_errordocs.gif
+%{_datadir}/manual/images/home.gif
 %{_datadir}/manual/images/index.gif
-%{_datadir}/manual/images/pixel.gif 
-%{_datadir}/manual/images/sub.gif 
+%{_datadir}/manual/images/pixel.gif
+%{_datadir}/manual/images/sub.gif
 %{_datadir}/manual/misc
 %dir %{_datadir}/manual/search
 %attr(755,root,root) %{_datadir}/manual/search/manual-index.cgi
@@ -1481,7 +1685,7 @@ fi
 %files mod_auth_db
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_auth_db.so
-%attr(755,root,root) %{_bindir}/dbmmanage 
+%attr(755,root,root) %{_bindir}/dbmmanage
 %{_datadir}/manual/mod/mod_auth_db.html
 %{_mandir}/man1/dbmmanage.1*
 %{_mandir}/man1/htpasswd.1*
