@@ -32,7 +32,7 @@ License:	Apache Group
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/%{name}_%{version}.tar.gz
 # Source0-md5:	bd548a06ac48dda496b4e613572bb020
-Source1:	%{name}1.init
+Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}-icons.tar.gz
 Source4:	%{name}.sysconfig
