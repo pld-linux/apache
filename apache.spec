@@ -1,10 +1,5 @@
 # TODO:
-# - mod_case_filter
-# - mod_case_filter_in
-# - mod_optional_fn_{export,import}
-# - mod_optional_hook_{export,import}
 # - mod_ext_filter
-# - mod_echo
 # - config examples for mod_*
 # - check if all modules are (de)registered in %%post/%%postun
 # - find smart way to deregister module if its moved from main package to subpackage (maybe test -f ?)
@@ -17,7 +12,6 @@
 # Conditional build:
 %bcond_without	ssl	# don't build with SSL support
 %bcond_without	ldap	# don't build with LDAP support
-%bcond_without	metuxmpm	# use METUX MPM
 #
 %include	/usr/lib/rpm/macros.perl
 # this is internal macro, don't change to %%apache_modules_api
@@ -59,9 +53,6 @@ Patch1:		%{name}-layout.patch
 Patch2:		%{name}-suexec.patch
 Patch3:		%{name}-nolibs.patch
 Patch4:		%{name}-apr.patch
-# project homepage http://www.metux.de/mpm/en/?patpage=index
-# http://www.sannes.org/metuxmpm/
-Patch5:		httpd-2.0.47-metuxmpm-r7.diff
 Patch6:		httpd-2.0.40-xfsz.patch
 Patch7:		httpd-2.0.45-davetag.patch
 Patch8:		httpd-2.0.45-encode.patch
@@ -635,7 +626,6 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
-%{?with_metuxmpm:%patch5 -p1}
 %patch7 -p1
 %patch8 -p1
 %patch9 -p1
@@ -654,6 +644,7 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 %patch22 -p1
 
 %build
+{,srclib/{apr,apr-util}} %{__libtoolize}
 # sanity check
 MODULES_API=`awk '/#define MODULE_MAGIC_NUMBER_MAJOR/ {print $3}' include/ap_mmn.h`
 if [ "$MODULES_API" != "%_apache_modules_api" ]; then
@@ -665,8 +656,8 @@ fi
 %{__perl} -pi -e "s:\@exp_installbuilddir\@:%{_libdir}/apache/build:g" \
 	support/apxs.in
 install /usr/share/automake/config.* build/
-CPPFLAGS="-DMAX_SERVER_LIMIT=200000 -DBIG_SECURITY_HOLE=1"
-./configure \
+CPPFLAGS="-DMAX_SERVER_LIMIT=20000 -DBIG_SECURITY_HOLE=1"
+%configure \
 	--prefix=%{_sysconfdir} \
 	--exec-prefix=%{_libexecdir} \
 	--with-installbuilddir=%{_libdir}/apache/build \
@@ -709,6 +700,7 @@ CPPFLAGS="-DMAX_SERVER_LIMIT=200000 -DBIG_SECURITY_HOLE=1"
 	--enable-so \
 	--with-program-name=httpd \
 	--with-mpm=worker \
+	--enable-threads \
 	--with-suexec-bin=%{_sbindir}/suexec \
 	--with-suexec-caller=http \
 	--with-suexec-docroot=%{_datadir} \
@@ -725,7 +717,7 @@ install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig} \
 	$RPM_BUILD_ROOT%{_var}/{log/{httpd,archiv/httpd},{run,cache}/apache}
 
 # prefork is default one
-%{__make} -C buildmpm-prefork install \
+%{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT \
 	installbuilddir=%{_sysconfdir}/build \
 	prefix=%{_sysconfdir}/httpd \
@@ -739,12 +731,7 @@ install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig} \
 	logdir=%{_var}/log/httpd \
 	proxycachedir=%{_var}/cache/httpd
 
-for mpm in %{?with_metuxmpm:metuxmpm} perchild worker; do
-	install buildmpm-${mpm}/httpd.${mpm} $RPM_BUILD_ROOT%{_sbindir}/httpd.${mpm}
-	ln -s httpd.conf $RPM_BUILD_ROOT%{_sysconfdir}/httpd.${mpm}.conf
-done
-
-ln -s httpd.prefork $RPM_BUILD_ROOT%{_sbindir}/httpd
+install -D httpd $RPM_BUILD_ROOT%{_sbindir}/httpd
 
 ln -s %{_libdir}/apache $RPM_BUILD_ROOT%{_sysconfdir}/modules
 ln -s %{_localstatedir}/run/apache $RPM_BUILD_ROOT%{_sysconfdir}/run
@@ -1195,6 +1182,8 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/sysconfig/*
 %attr(640,root,root) %config(noreplace) /etc/logrotate.d/*
 
+%attr(755,root,root) %{_libdir}/lib*.so.*.*.*
+
 %dir %{_libexecdir}
 %attr(755,root,root) %{_libexecdir}/mod_access.so
 %attr(755,root,root) %{_libexecdir}/mod_alias.so
@@ -1213,26 +1202,17 @@ fi
 %attr(755,root,root) %{_libexecdir}/mod_userdir.so
 
 # look at TODO on top
-%attr(755,root,root) %{_libexecdir}/mod_case_filter.so
-%attr(755,root,root) %{_libexecdir}/mod_case_filter_in.so
-%attr(755,root,root) %{_libexecdir}/mod_echo.so
 %attr(755,root,root) %{_libexecdir}/mod_ext_filter.so
-%attr(755,root,root) %{_libexecdir}/mod_optional_fn_export.so
-%attr(755,root,root) %{_libexecdir}/mod_optional_fn_import.so
-%attr(755,root,root) %{_libexecdir}/mod_optional_hook_export.so
-%attr(755,root,root) %{_libexecdir}/mod_optional_hook_import.so
-
-%attr(755,root,root) %{_sbindir}/htdigest
 
 %attr(755,root,root) %{_sbindir}/ab
 %attr(755,root,root) %{_sbindir}/apachectl
 %attr(755,root,root) %{_sbindir}/apxs
 %attr(755,root,root) %{_sbindir}/checkgid
+%attr(755,root,root) %{_sbindir}/envvars*
+%attr(755,root,root) %{_sbindir}/htdigest
 %attr(755,root,root) %{_sbindir}/httpd
-%attr(755,root,root) %{_sbindir}/httpd.*
 %attr(755,root,root) %{_sbindir}/logresolve
 %attr(755,root,root) %{_sbindir}/rotatelogs
-%attr(755,root,root) %{_sbindir}/envvars*
 
 %dir %attr(770,root,http) /var/run/apache
 
@@ -1326,6 +1306,21 @@ fi
 %{_datadir}/manual/mod/mod_vhost_alias.html.en
 %{_datadir}/manual/vhosts
 
+%files devel
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_bindir}/ap*
+%{_includedir}
+%attr(644,root,root) %{_libdir}/lib*.so
+%{_libdir}/lib*.la
+%{_libdir}/lib*.a
+%{_libdir}/apr*.exp
+%{_libexecdir}/*.exp
+%attr(750,root,root) %dir %{_sysconfdir}/build
+%attr(755,root,root) %dir %{_libexecdir}/build
+%attr(644,root,root) %{_libexecdir}/build/*.mk
+%attr(755,root,root) %{_libexecdir}/build/*.sh
+%attr(755,root,root) %{_libexecdir}/build/libtool
+
 %files suexec
 %defattr(644,root,root,755)
 %attr(4755,root,root) %{_sbindir}/suexec
@@ -1338,15 +1333,6 @@ fi
 %{_datadir}/html/*.gif
 %{_datadir}/html/*.png
 
-%files devel
-%defattr(644,root,root,755)
-%{_includedir}
-%{_libexecdir}/*.exp
-%attr(750,root,root) %dir %{_sysconfdir}/build
-%attr(755,root,root) %dir %{_libexecdir}/build
-%attr(644,root,root) %{_libexecdir}/build/*.mk
-%attr(755,root,root) %{_libexecdir}/build/*.sh
-%attr(755,root,root) %{_libexecdir}/build/libtool
 
 %files mod_actions
 %defattr(644,root,root,755)
