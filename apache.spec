@@ -10,8 +10,8 @@ Summary(fr):	Le serveur web le plus utilise sur Internet
 Summary(pl):	Serwer WWW (World Wide Web)
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
-Version:	1.3.20
-Release:	16
+Version:	1.3.22
+Release:	1
 License:	Apache Group License
 Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
@@ -522,6 +522,7 @@ OPTIM="%{rpmcflags}" \
 	--sbindir=%{_sbindir} \
 	--libexecdir=%{_libexecdir} \
 	--datadir=%{_datadir} \
+	--manualdir=%{_datadir}/html/manual \
 	--localstatedir=/var \
 	--runtimedir=/var/run \
 	--logfiledir=/var/log/httpd \
@@ -1028,8 +1029,8 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_datadir}/manual/search
 %attr(755,root,root) %{_datadir}/manual/search/manual-index.cgi
 %{_datadir}/manual/LICENSE
-%{_datadir}/manual/bind.html
-%{_datadir}/manual/cgi_path.html
+%{_datadir}/manual/bind.html.html
+%{_datadir}/manual/cgi_path.html.html
 %lang(en) /home/httpd/manual/configuring.html.html
 %lang(en) %{_datadir}/manual/configuring.html.en
 %lang(fr) %{_datadir}/manual/configuring.html.fr
@@ -1038,9 +1039,9 @@ rm -rf $RPM_BUILD_ROOT
 %lang(en) %{_datadir}/manual/custom-error.html.en
 %lang(en) %{_datadir}/manual/custom-error.html.html
 %lang(ja) %{_datadir}/manual/custom-error.html.ja.jis
-%{_datadir}/manual/dns-caveats.html
+%{_datadir}/manual/dns-caveats.html.html
 %{_datadir}/manual/dso.html
-%{_datadir}/manual/env.html
+%{_datadir}/manual/env.html.html
 %{_datadir}/manual/footer.html
 %lang(en) %{_datadir}/manual/handler.html.en
 %lang(en) %{_datadir}/manual/handler.html.html
@@ -1055,10 +1056,9 @@ rm -rf $RPM_BUILD_ROOT
 %lang(fr) %{_datadir}/manual/install.html.fr
 %lang(en) %{_datadir}/manual/install.html.html
 %lang(ja) %{_datadir}/manual/install.html.ja.jis
-%lang(en) %{_datadir}/manual/invoking.html
 %lang(fr) %{_datadir}/manual/invoking.html.fr
 %lang(en) %{_datadir}/manual/invoking.html.html
-%{_datadir}/manual/keepalive.html
+%{_datadir}/manual/keepalive.html.html
 %{_datadir}/manual/location.html
 %{_datadir}/manual/multilogs.html
 %lang(en) %{_datadir}/manual/new_features_1_3.html.en
@@ -1071,7 +1071,6 @@ rm -rf $RPM_BUILD_ROOT
 %lang(en) %{_datadir}/manual/server-wide.html.html
 %lang(ja) %{_datadir}/manual/server-wide.html.ja.jis
 %{_datadir}/manual/sourcereorg.html
-%lang(en) %{_datadir}/manual/stopping.html
 %lang(fr) %{_datadir}/manual/stopping.html.fr
 %lang(en) %{_datadir}/manual/stopping.html.html
 %lang(en) %{_datadir}/manual/suexec.html.en
@@ -1088,16 +1087,15 @@ rm -rf $RPM_BUILD_ROOT
 %lang(en) %{_datadir}/manual/howto/ssi.html.html
 %lang(ja) %{_datadir}/manual/howto/ssi.html.ja.jis
 %dir %{_datadir}/manual/mod
-%{_datadir}/manual/mod/core.html
+%{_datadir}/manual/mod/core.html.html
 %lang(en) %{_datadir}/manual/mod/directive-dict.html.en
 %lang(en) %{_datadir}/manual/mod/directive-dict.html.html
 %lang(ja) %{_datadir}/manual/mod/directive-dict.html.ja.jis
-%{_datadir}/manual/mod/directives.html
 %{_datadir}/manual/mod/footer.html
 %{_datadir}/manual/mod/header.html
-%lang(en) %{_datadir}/manual/mod/index-bytype.html
+%lang(en) %{_datadir}/manual/mod/index-bytype.html.html
 %lang(fr) %{_datadir}/manual/mod/index-bytype.html.fr
-%lang(en) %{_datadir}/manual/mod/index.html
+%lang(en) %{_datadir}/manual/mod/index.html.html
 %lang(en) %{_datadir}/manual/mod/index.html.fr
 %{_datadir}/manual/mod/mod_access.html
 %{_datadir}/manual/mod/mod_alias.html
@@ -1155,7 +1153,7 @@ rm -rf $RPM_BUILD_ROOT
 %lang(ja) %{_datadir}/manual/vhosts/index.html.ja.jis
 %{_datadir}/manual/vhosts/ip-based.html
 %{_datadir}/manual/vhosts/mass.html
-%{_datadir}/manual/vhosts/name-based.html
+%{_datadir}/manual/vhosts/name-based.html.html
 %{_datadir}/manual/vhosts/vhosts-in-depth.html
 %{_datadir}/manual/vhosts/virtual-host.html
 
@@ -1231,10 +1229,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/dbmmanage.1*
 %{_mandir}/man1/htpasswd.1*
 
-%files mod_define
-%defattr(644,root,root,755)
-%attr(755,root,root) %{_libexecdir}/mod_define.so
-%{_datadir}/manual/mod/mod_define.html
+#%files mod_define
+#%defattr(644,root,root,755)
+#%attr(755,root,root) %{_libexecdir}/mod_define.so
+#%{_datadir}/manual/mod/mod_define.html
 
 %files mod_digest
 %defattr(644,root,root,755)
