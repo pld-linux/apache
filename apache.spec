@@ -81,8 +81,6 @@ Patch21:	%{name}-v6only-ENOPROTOOPT.patch
 Patch22:	%{name}-conffile-path.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	automake
-BuildRequires:	apr-devel >= 1:0.9.4-1
-BuildRequires:	apr-util-devel >= 1:0.9.5-0.3
 BuildRequires:	db-devel
 BuildRequires:	expat-devel
 BuildRequires:	gdbm-devel >= 1.8.3
@@ -104,7 +102,6 @@ Requires(postun):	/usr/sbin/groupdel
 Requires(post,preun):	/sbin/chkconfig
 Requires(post,postun):	/sbin/ldconfig
 Requires(post):	fileutils
-Requires:	apr-util >= 1:0.9.4-1
 Requires:	/etc/mime.types
 Requires:	mailcap
 Requires:	psmisc >= 20.1
@@ -213,7 +210,6 @@ Summary(pt_BR):	Arquivos de inclusЦo do Apache para desenvolvimento de mСdulos
 Summary(ru):	Средства разработки модулей для веб-сервера Apache
 Group:		Networking/Utilities
 Requires:	%{name} = %{version}-%{release}
-Requires:	apr-util-devel >= 1:0.9.4
 Requires:	libtool
 Obsoletes:	apache-static
 
@@ -670,9 +666,7 @@ fi
 	support/apxs.in
 install /usr/share/automake/config.* build/
 CPPFLAGS="-DMAX_SERVER_LIMIT=200000 -DBIG_SECURITY_HOLE=1"
-for mpm in %{?with_metuxmpm:metuxmpm} perchild prefork worker; do
-install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
-../%configure \
+./configure \
 	--prefix=%{_sysconfdir} \
 	--exec-prefix=%{_libexecdir} \
 	--with-installbuilddir=%{_libdir}/apache/build \
@@ -683,14 +677,11 @@ install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
 	--enable-auth-dbm \
 	--enable-auth-digest \
 	--enable-file-cache \
-	--enable-echo \
 	--enable-cache \
 	--enable-charset-lite \
 	--enable-mem-cache \
 	--enable-disk-cache \
 	--enable-ext-filter \
-	--enable-case-filter \
-	--enable-case-filter-in \
 	--enable-deflate \
 	--with-z=%{_prefix} \
 	--enable-mime-magic \
@@ -704,10 +695,6 @@ install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
 	--enable-proxy-ftp \
 	--enable-proxy-http \
 	%{?with_ssl:--enable-ssl} \
-	--enable-optional-hook-export \
-	--enable-optional-hook-import \
-	--enable-optional-fn-import \
-	--enable-optional-fn-export \
 	%{?with_ldap:--enable-ldap} \
 	%{?with_ldap:--enable-auth-ldap} \
 	--enable-dav \
@@ -720,37 +707,17 @@ install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
 	--enable-speling \
 	--enable-rewrite \
 	--enable-so \
-	--with-program-name=httpd.${mpm} \
-	--with-mpm=${mpm} \
-%ifarch %{ix86}
-%ifnarch i386 i486
-	$( [ "${mpm}" = "leader" ] && echo "--enable-nonportable-atomics=yes" ) \
-%endif
-%endif
+	--with-program-name=httpd \
+	--with-mpm=worker \
 	--with-suexec-bin=%{_sbindir}/suexec \
 	--with-suexec-caller=http \
 	--with-suexec-docroot=%{_datadir} \
 	--with-suexec-logfile=/var/log/httpd/suexec_log \
 	--with-suexec-uidmin=500 \
 	--with-suexec-gidmin=500 \
-	--with-suexec-umask=077 \
-	--with-apr=%{_bindir} \
-	--with-apr-util=%{_bindir}
+	--with-suexec-umask=077
 %{__make}
-./httpd.${mpm} -l | grep -v "${mpm}" > modules-inside
-
 find include -name '*.h' | xargs perl -pi -e "s#/httpd\.(.*?)\.conf#/etc/httpd/httpd.conf#"
-
-cd ..
-done
-
-for mpm in %{?with_metuxmpm:metuxmpm} perchild worker; do
-	if ! cmp -s buildmpm-prefork/modules-inside buildmpm-${mpm}/modules-inside; then
-		echo "List of compiled modules is different between prefork-MPM and ${mpm}-MPM!"
-		echo "Build failed."
-		exit 1
-	fi
-done
 
 %install
 rm -rf $RPM_BUILD_ROOT
