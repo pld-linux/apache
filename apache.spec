@@ -182,7 +182,7 @@ fi
 %doc ABOUT_APACHE.gz src/CHANGES.gz KEYS.gz README.gz
 %doc conf/mime.types README.v6.gz
 
-%attr(750,root,root) %dir /etc/httpd
+%attr(751,root,root) %dir /etc/httpd
 %attr(640,root,root) %config %verify(not size mtime md5) /etc/httpd/*
 %attr(640,root,root) %config %verify(not size mtime md5) /etc/sysconfig/*
 %attr(640,root,root) %config /etc/logrotate.d/*
