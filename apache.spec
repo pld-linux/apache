@@ -457,6 +457,7 @@ Summary:	Apache module with Web proxy
 Summary(pl):	Modu³ Apache'a dodaj±cy obs³ugê serwera proxy
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}
+Requires:	%{name}-mod_cache = %{version}
 
 %description mod_proxy
 This package contains module with implementation a proxy/cache for
