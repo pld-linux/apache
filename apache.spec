@@ -425,7 +425,7 @@ install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig} \
 	$RPM_BUILD_ROOT%{_datadir}/errordocs \
 	$RPM_BUILD_ROOT/var/{log/{httpd,archiv/httpd},lib/apache/mm}
 
-make install-quiet root="$RPM_BUILD_ROOT"
+%{__make} install-quiet root="$RPM_BUILD_ROOT"
 
 mv $RPM_BUILD_ROOT%{_datadir}/html/manual $RPM_BUILD_ROOT%{_datadir}
 
