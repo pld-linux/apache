@@ -5,7 +5,7 @@ Summary(pl):	Serwer WWW (World Wide Web) ze wsparciem dla IPv6
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	1.3.9
-Release:	3
+Release:	4
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Source0:	ftp://ftp.apache.org/apache/dist/%{name}_%{version}.tar.gz
@@ -177,7 +177,7 @@ else
 fi
 if [ -n "`id -u http 2>/dev/null`" ]; then
 	if [ "`id -u http`" != "51" ]; then
-		echo "Warning: user http haven't gid=51. Corect this before install apache" 1>&2
+		echo "Warning: user http haven't uid=51. Corect this before install apache" 1>&2
 		exit 1
 	fi
 else
