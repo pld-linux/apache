@@ -118,7 +118,6 @@ Provides:	user(http)
 Provides:	webserver = apache
 Obsoletes:	apache-extra
 Obsoletes:	apache6
-Conflicts:	php < 5.0.2
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_sysconfdir	/etc/httpd
