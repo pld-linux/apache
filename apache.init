@@ -54,6 +54,8 @@ case "$1" in
 		msg_stopping httpd.${HTTPD_MPM}
 		daemon httpd.${HTTPD_MPM} -f /etc/httpd/httpd.conf -k stop
 		rm -f /var/lock/subsys/httpd /var/run/httpd.pid /var/run/httpd.loc* >/dev/null 2>&1
+		# Wait for the process to end. Int prevents "unable to bind socket error"
+		sleep 3
 	else
 		msg_not_running httpd.${HTTPD_MPM}
 	fi
