@@ -46,9 +46,9 @@ Patch15:	%{name}-fpic.patch
 Patch16:	%{name}-buff.patch
 Patch17:	%{name}-mkstemp.patch
 Patch18:	%{name}-EAPI-missing_files.patch
-Patch19:	%{name}-mod_include-segv.patch
-Patch20:	%{name}-PLD-nov6.patch
-Patch21:	%{name}-configdir_skip_backups.patch
+Patch19:	%{name}-PLD-nov6.patch
+Patch20:	%{name}-configdir_skip_backups.patch
+Patch21:	%{name}-apxs-quiet.patch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 BuildRequires:  db3-devel
 BuildRequires:	mm-devel >= 1.1.3
@@ -510,8 +510,8 @@ wa¿no¶ci mo¿e byæ ustalana w zale¿no¶ci od czasu modyfikacji plików
 %patch16 -p1
 %patch17 -p1
 %patch18 -p1
-%patch19 -p1
-%{?_without_apache_ipv6:%patch20 -p1}
+%{?_without_apache_ipv6:%patch19 -p1}
+%patch20 -p1
 %patch21 -p1
 
 %build
@@ -578,6 +578,9 @@ install %{SOURCE10} $RPM_BUILD_ROOT%{_sysconfdir}/mod_proxy.conf
 ln -sf index.html.en $RPM_BUILD_ROOT%{_datadir}/html/index.html
 
 gzip -9nf ABOUT_APACHE src/CHANGES KEYS README
+
+%clean
+rm -rf $RPM_BUILD_ROOT
 
 %pre
 if [ -n "`getgid http`" ]; then
@@ -964,9 +967,6 @@ if [ "$1" = "0" ]; then
 	fi
 fi
 
-%clean
-rm -rf $RPM_BUILD_ROOT
-
 %files
 %defattr(644,root,root,755)
 %doc ABOUT_APACHE.gz src/CHANGES.gz KEYS.gz README.gz
@@ -1036,98 +1036,98 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/manual/LICENSE
 %{_datadir}/manual/bind.html.html
 %{_datadir}/manual/cgi_path.html.html
-%lang(en) /home/httpd/manual/configuring.html.html
+/home/httpd/manual/configuring.html.html
 %lang(en) %{_datadir}/manual/configuring.html.en
 %lang(fr) %{_datadir}/manual/configuring.html.fr
 %lang(ja) %{_datadir}/manual/configuring.html.ja.jis
 %{_datadir}/manual/content-negotiation.html
+%{_datadir}/manual/custom-error.html.html
 %lang(en) %{_datadir}/manual/custom-error.html.en
-%lang(en) %{_datadir}/manual/custom-error.html.html
 %lang(ja) %{_datadir}/manual/custom-error.html.ja.jis
 %{_datadir}/manual/dns-caveats.html.html
 %{_datadir}/manual/dso.html
 %{_datadir}/manual/env.html.html
 %{_datadir}/manual/footer.html
+%{_datadir}/manual/handler.html.html
 %lang(en) %{_datadir}/manual/handler.html.en
-%lang(en) %{_datadir}/manual/handler.html.html
 %lang(ja) %{_datadir}/manual/handler.html.ja.jis
 %{_datadir}/manual/header.html
+%{_datadir}/manual/index.html.html
 %lang(en) %{_datadir}/manual/index.html.en
 %lang(fr) %{_datadir}/manual/index.html.fr
-%lang(en) %{_datadir}/manual/index.html.html
 %lang(ja) %{_datadir}/manual/index.html.ja.jis
+%{_datadir}/manual/install.html.html
 %lang(en) %{_datadir}/manual/install.html.en
 %lang(es) %{_datadir}/manual/install.html.es
 %lang(fr) %{_datadir}/manual/install.html.fr
-%lang(en) %{_datadir}/manual/install.html.html
 %lang(ja) %{_datadir}/manual/install.html.ja.jis
+%{_datadir}/manual/invoking.html.html
 %lang(fr) %{_datadir}/manual/invoking.html.fr
-%lang(en) %{_datadir}/manual/invoking.html.html
 %{_datadir}/manual/keepalive.html.html
 %{_datadir}/manual/location.html
 %{_datadir}/manual/multilogs.html
+%{_datadir}/manual/new_features_1_3.html.html
 %lang(en) %{_datadir}/manual/new_features_1_3.html.en
-%lang(en) %{_datadir}/manual/new_features_1_3.html.html
 %lang(ja) %{_datadir}/manual/new_features_1_3.html.ja.jis
 %{_datadir}/manual/process-model.html
 %{_datadir}/manual/sections.html
+%{_datadir}/manual/server-wide.html.html
 %lang(en) %{_datadir}/manual/server-wide.html.en
 %lang(fr) %{_datadir}/manual/server-wide.html.fr
-%lang(en) %{_datadir}/manual/server-wide.html.html
 %lang(ja) %{_datadir}/manual/server-wide.html.ja.jis
 %{_datadir}/manual/sourcereorg.html
+%{_datadir}/manual/stopping.html.html
 %lang(fr) %{_datadir}/manual/stopping.html.fr
-%lang(en) %{_datadir}/manual/stopping.html.html
+%{_datadir}/manual/suexec.html.html
 %lang(en) %{_datadir}/manual/suexec.html.en
-%lang(en) %{_datadir}/manual/suexec.html.html
-%lang(j1) %{_datadir}/manual/suexec.html.ja.jis
+%lang(ja) %{_datadir}/manual/suexec.html.ja.jis
 %{_datadir}/manual/upgrading_to_1_3.html
 %dir %{_datadir}/manual/howto
+%{_datadir}/manual/howto/cgi.html.html
 %lang(en) %{_datadir}/manual/howto/cgi.html.en
-%lang(en) %{_datadir}/manual/howto/cgi.html.html
 %lang(ja) %{_datadir}/manual/howto/cgi.html.ja.jis
 %{_datadir}/manual/howto/footer.html
 %{_datadir}/manual/howto/header.html
+%{_datadir}/manual/howto/ssi.html.html
 %lang(en) %{_datadir}/manual/howto/ssi.html.en
-%lang(en) %{_datadir}/manual/howto/ssi.html.html
 %lang(ja) %{_datadir}/manual/howto/ssi.html.ja.jis
 %dir %{_datadir}/manual/mod
 %{_datadir}/manual/mod/core.html.html
+%{_datadir}/manual/mod/directive-dict.html.html
 %lang(en) %{_datadir}/manual/mod/directive-dict.html.en
-%lang(en) %{_datadir}/manual/mod/directive-dict.html.html
 %lang(ja) %{_datadir}/manual/mod/directive-dict.html.ja.jis
 %{_datadir}/manual/mod/footer.html
 %{_datadir}/manual/mod/header.html
-%lang(en) %{_datadir}/manual/mod/index-bytype.html.html
+%{_datadir}/manual/mod/index-bytype.html.html
 %lang(fr) %{_datadir}/manual/mod/index-bytype.html.fr
-%lang(en) %{_datadir}/manual/mod/index.html.html
-%lang(en) %{_datadir}/manual/mod/index.html.fr
+%{_datadir}/manual/mod/index.html.html
+%lang(fr) %{_datadir}/manual/mod/index.html.fr
 %{_datadir}/manual/mod/mod_access.html
 %{_datadir}/manual/mod/mod_alias.html
 %{_datadir}/manual/mod/mod_asis.html
 %{_datadir}/manual/mod/mod_autoindex.html
 %{_datadir}/manual/mod/mod_cgi.html
+%{_datadir}/manual/mod/mod_env.html.html
 %lang(en) %{_datadir}/manual/mod/mod_env.html.en
-%lang(en) %{_datadir}/manual/mod/mod_env.html.html
-%lang(en) %{_datadir}/manual/mod/mod_env.html.ja.jis
+%lang(ja) %{_datadir}/manual/mod/mod_env.html.ja.jis
 %{_datadir}/manual/mod/mod_include.html
 %{_datadir}/manual/mod/mod_log_agent.html
 %{_datadir}/manual/mod/mod_log_config.html
 %{_datadir}/manual/mod/mod_log_referer.html
+%{_datadir}/manual/mod/mod_mime.html.html
 %lang(en) %{_datadir}/manual/mod/mod_mime.html.en
-%lang(en) %{_datadir}/manual/mod/mod_mime.html.html
 %lang(ja) %{_datadir}/manual/mod/mod_mime.html.ja.jis
 %{_datadir}/manual/mod/mod_mime_magic.html
+%{_datadir}/manual/mod/mod_negotiation.html.html
 %lang(en) %{_datadir}/manual/mod/mod_negotiation.html.en
-%lang(en) %{_datadir}/manual/mod/mod_negotiation.html.html
 %lang(ja) %{_datadir}/manual/mod/mod_negotiation.html.ja.jis
+%{_datadir}/manual/mod/mod_setenvif.html.html
 %lang(en) %{_datadir}/manual/mod/mod_setenvif.html.en
-%lang(en) %{_datadir}/manual/mod/mod_setenvif.html.html
 %lang(ja) %{_datadir}/manual/mod/mod_setenvif.html.ja.jis
 %{_datadir}/manual/mod/mod_speling.html
 %{_datadir}/manual/mod/mod_userdir.html
+%{_datadir}/manual/mod/module-dict.html.html
 %lang(en) %{_datadir}/manual/mod/module-dict.html.en
-%lang(en) %{_datadir}/manual/mod/module-dict.html.html
 %lang(ja) %{_datadir}/manual/mod/module-dict.html.ja.jis
 %dir %{_datadir}/manual/programs
 %{_datadir}/manual/programs/ab.html
@@ -1139,8 +1139,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/manual/programs/htdigest.html
 %{_datadir}/manual/programs/htpasswd.html
 %{_datadir}/manual/programs/httpd.html
+%{_datadir}/manual/programs/index.html.html
 %lang(en) %{_datadir}/manual/programs/index.html.en
-%lang(en) %{_datadir}/manual/programs/index.html.html
 %lang(ja) %{_datadir}/manual/programs/index.html.ja.jis
 %{_datadir}/manual/programs/logresolve.html
 %{_datadir}/manual/programs/other.html
@@ -1153,8 +1153,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/manual/vhosts/footer.html
 %{_datadir}/manual/vhosts/header.html
 %{_datadir}/manual/vhosts/host.html
+%{_datadir}/manual/vhosts/index.html.html
 %lang(en) %{_datadir}/manual/vhosts/index.html.en
-%lang(en) %{_datadir}/manual/vhosts/index.html.html
 %lang(ja) %{_datadir}/manual/vhosts/index.html.ja.jis
 %{_datadir}/manual/vhosts/ip-based.html
 %{_datadir}/manual/vhosts/mass.html
@@ -1171,7 +1171,7 @@ rm -rf $RPM_BUILD_ROOT
 %lang(da) %{_datadir}/html/index.html.dk
 %lang(et) %{_datadir}/html/index.html.ee
 %lang(el) %{_datadir}/html/index.html.el
-%lang(en) %{_datadir}/html/index.html.en
+%{_datadir}/html/index.html.en
 %lang(es) %{_datadir}/html/index.html.es
 %lang(fr) %{_datadir}/html/index.html.fr
 %lang(he) %{_datadir}/html/index.html.he.iso8859-8
