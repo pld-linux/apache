@@ -579,7 +579,7 @@ gzip -9nf ABOUT_APACHE src/CHANGES KEYS README
 %pre
 if [ -n "`getgid http`" ]; then
 	if [ "`getgid http`" != "51" ]; then
-		echo "Warning: group http haven't gid=51. Correct this before install apache" 1>&2
+		echo "Warning: group http haven't gid=51. Correct this before installing apache" 1>&2
 		exit 1
 	fi
 else
@@ -587,7 +587,7 @@ else
 fi
 if [ -n "`id -u http 2>/dev/null`" ]; then
 	if [ "`id -u http`" != "51" ]; then
-		echo "Warning: user http haven't uid=51. Correct this before install apache" 1>&2
+		echo "Warning: user http haven't uid=51. Correct this before installing apache" 1>&2
 		exit 1
 	fi
 else
@@ -1061,7 +1061,8 @@ rm -rf $RPM_BUILD_ROOT
 %lang(ja) %{_datadir}/manual/howto/cgi.html.ja.jis
 %{_datadir}/manual/howto/footer.html
 %{_datadir}/manual/howto/header.html
-%{_datadir}/manual/howto/ssi.html
+%lang(en) %{_datadir}/manual/howto/ssi.html.en
+%lang(ja) %{_datadir}/manual/howto/ssi.html.ja.jis
 %dir %{_datadir}/manual/mod
 %{_datadir}/manual/mod/core.html
 %lang(en) %{_datadir}/manual/mod/directive-dict.html.en
@@ -1109,7 +1110,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/manual/vhosts/virtual-host.html
 
 %attr(755,root,root) %dir %{_datadir}/html
-%config(noreplace) %{_datadir}/html/index.html
+%config(noreplace,missingok) %{_datadir}/html/index.html
 # note: html extensions are not the same as (g)libc locale names
 %lang(ca) %{_datadir}/html/index.html.ca
 %lang(cs) %{_datadir}/html/index.html.cz
