@@ -43,6 +43,7 @@ Patch14:	%{name}-man.patch
 Patch15:	%{name}-fpic.patch
 Patch16:	%{name}-buff.patch
 Patch17:	%{name}-mkstemp.patch
+Patch18:	%{name}-EAPI-missing_files.patch
 Provides:	httpd
 Provides:	webserver
 Prereq:		/sbin/chkconfig
@@ -484,6 +485,7 @@ Requires:	%{name}(EAPI) = %{version}
 %patch15 -p1
 %patch16 -p1
 %patch17 -p1
+%patch18 -p1
 
 %build
 OPTIM="%{?debug:-O0 -g}%{!?debug:$RPM_OPT_FLAGS}" \
