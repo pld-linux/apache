@@ -7,7 +7,7 @@ Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	1.3.12
 Release:	4
-Copyright:	BSD-like
+License:	BSD-like
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Source0:	ftp://ftp.apache.org/dist/%{name}_%{version}.tar.gz
@@ -54,60 +54,63 @@ Obsoletes:	apache-doc
 %define		_libexecdir	%{_prefix}/lib/apache
 
 %description
-Apache is a powerful, full-featured, efficient and freely-available Web
-server. Apache is also the most popular Web server on the Internet.
+Apache is a powerful, full-featured, efficient and freely-available
+Web server. Apache is also the most popular Web server on the
+Internet.
 
 %description -l de
 Apache ist ein voll funktionsfähiger Web-Server, der kostenlos
 erhältlich und weit verbreitet ist.
 
 %description -l fr
-Apache est un serveur Web puissant, efficace, gratuit et complet. Apache est
-aussi le serveur Web le plus populaire sur Internet.
+Apache est un serveur Web puissant, efficace, gratuit et complet.
+Apache est aussi le serveur Web le plus populaire sur Internet.
 
 %description -l pl
-Apache jest serwerem WWW (World Wide Web). Instaluj±c ten pakiet bêdziesz 
-móg³ prezentowaæ w³asne strony WWW w sieci internet.
+Apache jest serwerem WWW (World Wide Web). Instaluj±c ten pakiet
+bêdziesz móg³ prezentowaæ w³asne strony WWW w sieci internet.
 
 %description -l tr
-Apache serbest daðýtýlan ve çok kullanýlan yetenekli bir web sunucusudur.
+Apache serbest daðýtýlan ve çok kullanýlan yetenekli bir web
+sunucusudur.
 
 %package suexec
 Summary:	Apache suexec wrapper
 Summary(pl):	Suexec wrapper do serwera www Apache
 Group:		Networking/Development
+######		Unknown group!
 Group(pl):	Sieciowe/Programowanie
 Requires:	%{name}(EAPI) = %{version}
 
 %description suexec
-The suEXEC feature provides Apache users the ability to run CGI and SSI
-programs under user IDs different from the user ID of the calling web-server.
-Normally, when a CGI or SSI program executes, it runs as the same user 
-who is running the web server. 
+The suEXEC feature provides Apache users the ability to run CGI and
+SSI programs under user IDs different from the user ID of the calling
+web-server. Normally, when a CGI or SSI program executes, it runs as
+the same user who is running the web server.
 
 %description -l pl suexec
-SuEXEC umo¿liwia serwerowi Apache uruchamianie programów CGI i SSI z innym
-UID ni¿ wywo³uj±cy je serwer. Normalnie programy CGI i SSI s± wykonywane
-jako taki sam u¿ytkownik jak serwer WWW.
+SuEXEC umo¿liwia serwerowi Apache uruchamianie programów CGI i SSI z
+innym UID ni¿ wywo³uj±cy je serwer. Normalnie programy CGI i SSI s±
+wykonywane jako taki sam u¿ytkownik jak serwer WWW.
 
 %package devel
 Summary:	Module development tools for the Apache web server
 Summary(fr):	Les outils de developpement de modules pour le serveur web Apache
 Summary(pl):	Pliki nag³ówkowe do tworzenai modu³ów rozszerzeñ do serwera www Apache
-Group:		Networking/Development
-Group(pl):	Sieciowe/Programowanie
+Group:		Networking/Utilities
+Group(pl):	Sieciowe/Narzêdzia
 Requires:	%{name}(EAPI) = %{version}
 Provides:	%{name}(EAPI)-devel
 
 %description devel
-The apache-devel package contains the source code for the Apache Web server
-and the APXS binary you'll need to build Dynamic Shared Objects (DSOs) for
-Apache.
+The apache-devel package contains the source code for the Apache Web
+server and the APXS binary you'll need to build Dynamic Shared Objects
+(DSOs) for Apache.
 
 %description -l fr devel
-Le package apache-devel contient le code source pour le serveur Web Apache
-et le binaire APXS dont vous aurez besoin pour construire des Objets
-Dynamiques Partages (DSOs) pour Apache.
+Le package apache-devel contient le code source pour le serveur Web
+Apache et le binaire APXS dont vous aurez besoin pour construire des
+Objets Dynamiques Partages (DSOs) pour Apache.
 
 %description -l pl devel
 Pliki nag³ówkowe dla serwera WWW Apache.
@@ -122,8 +125,8 @@ Requires:	%{name}(EAPI) = %{version}
 
 %description mod_actions
 This package contains mod_actions module. This module lets you run CGI
-scripts whenever a file of a certain type is requested. This makes it much
-easier to execute scripts that process files.
+scripts whenever a file of a certain type is requested. This makes it
+much easier to execute scripts that process files.
 
 %description -l pl mod_actions
 Ten modu³ pozwala na uruchamianie skryptów w momencie gdy nadchodzi
@@ -139,19 +142,20 @@ Requires:	%{name}(EAPI) = %{version}
 
 %description mod_auth_anon
 This package contains mod_auth_anon module. It allows "anonymous" user
-access to authenticated areas. It does access control in a manner similar to
-anonymous-ftp sites; i.e. have a 'magic' user id 'anonymous' and the email
-address as a password. These email addresses can be logged. Combined with
-other (database) access control methods, this allows for effective user
-tracking and customization according to a user profile while still keeping
-the site open for 'unregistered' users. One advantage of using Auth-based
-user tracking is that, unlike magic-cookies and funny URL pre/postfixes, it
-is completely browser independent and it allows users to share URLs.
+access to authenticated areas. It does access control in a manner
+similar to anonymous-ftp sites; i.e. have a 'magic' user id
+'anonymous' and the email address as a password. These email addresses
+can be logged. Combined with other (database) access control methods,
+this allows for effective user tracking and customization according to
+a user profile while still keeping the site open for 'unregistered'
+users. One advantage of using Auth-based user tracking is that, unlike
+magic-cookies and funny URL pre/postfixes, it is completely browser
+independent and it allows users to share URLs.
 
 %description -l pl mod_auth_anon
-Ten modu³ oferuje anonimow± autoryzacjê u¿ytkownia podobnie do anonimowych
-serwerów ftp (u¿ytkownik ,,anonymous'' oraz has³o w postaci adresu pocztowego
-u¿ytkownika).
+Ten modu³ oferuje anonimow± autoryzacjê u¿ytkownia podobnie do
+anonimowych serwerów ftp (u¿ytkownik ,,anonymous'' oraz has³o w
+postaci adresu pocztowego u¿ytkownika).
 
 %package mod_define
 Summary:	Apache module - authentication variables for arbitrary directives
@@ -177,11 +181,12 @@ Prereq:		%{_sbindir}/apxs
 Requires:	%{name}(EAPI) = %{version}
 
 %description mod_digest
-This package contains mod_digest module. It provides user authentication using
-MD5 Digest Authentication.
+This package contains mod_digest module. It provides user
+authentication using MD5 Digest Authentication.
 
 %description -l pl mod_digest
-Modu³ ten dostarcza metodê autoryzacji bazuj±c± na MD5 Digest Authentication.
+Modu³ ten dostarcza metodê autoryzacji bazuj±c± na MD5 Digest
+Authentication.
 
 %package mod_dir
 Summary:	Apache module for "trailing slash" redirects and serving directory index files
@@ -192,8 +197,8 @@ Prereq:		%{_sbindir}/apxs
 Requires:	%{name}(EAPI) = %{version}
 
 %description mod_dir
-This package contains mod_dir which provides "trailing slash" redirects and
-serving directory index files.
+This package contains mod_dir which provides "trailing slash"
+redirects and serving directory index files.
 
 %description -l pl mod_dir
 Modu³ oferuj±cy przekierowania i serwowanie indeksu katalogu.
@@ -208,11 +213,11 @@ Requires:	%{name}(EAPI) = %{version}
 
 %description mod_headers
 This package contains mod_headers module. The module allows for the
-customization of HTTP response headers. Headers can be merged, replaced or
-removed.
+customization of HTTP response headers. Headers can be merged,
+replaced or removed.
 
 %description -l pl mod_headers
-Modu³ pozwalaj±cy na ³±czenie, usuwania, zamianê nag³ówków HTTP 
+Modu³ pozwalaj±cy na ³±czenie, usuwania, zamianê nag³ówków HTTP
 wysy³anych do przegl±darki.
 
 %package mod_mmap_static
@@ -224,11 +229,12 @@ Prereq:		%{_sbindir}/apxs
 Requires:	%{name}(EAPI) = %{version}
 
 %description mod_mmap_static
-This package contains mod_mmap_static module. It provides mmap()ing of a
-statically configured list of frequently requested but not changed files.
+This package contains mod_mmap_static module. It provides mmap()ing of
+a statically configured list of frequently requested but not changed
+files.
 
 %description -l pl mod_mmap_static
-Modu³ umo¿liwia mmap()owanie statycznie skonfigurowanych plików 
+Modu³ umo¿liwia mmap()owanie statycznie skonfigurowanych plików
 (czêsto u¿ywanych ale nie ulegaj±cych zmianom).
 
 %package mod_imap
@@ -240,9 +246,9 @@ Prereq:		%{_sbindir}/apxs
 Requires:	%{name}(EAPI) = %{version}
 
 %description mod_imap
-This package contains mod_imap module. It provides for .map files, replacing
-the functionality of the imagemap CGI program. Any directory or document
-type configured to use the handler imap-file.
+This package contains mod_imap module. It provides for .map files,
+replacing the functionality of the imagemap CGI program. Any directory
+or document type configured to use the handler imap-file.
 
 %description -l pl mod_imap
 Modu³ umozliwiaj±cy obs³ugê plików .map (imap-file handler)
@@ -257,8 +263,8 @@ Requires:	%{name}(EAPI) = %{version}
 
 %description mod_info
 This package contains mod_info module. It provides a comprehensive
-overview of the server configuration including all installed modules and
-directives in the configuration files.
+overview of the server configuration including all installed modules
+and directives in the configuration files.
 
 %description -l pl mod_info
 Modu³ dostarczaj±cy informacji o konfiguracji serwera, zainstalowanych
@@ -273,14 +279,15 @@ Prereq:		%{_sbindir}/apxs
 Requires:	%{name}(EAPI) = %{version}
 
 %description mod_proxy
-This package contains module with implementation a proxy/cache for Apache.
-It implements proxying capability for FTP, CONNECT (for SSL), HTTP/0.9, and
-HTTP/1.0. The module can be configured to connect to other proxy modules for
-these and other protocols.
+This package contains module with implementation a proxy/cache for
+Apache. It implements proxying capability for FTP, CONNECT (for SSL),
+HTTP/0.9, and HTTP/1.0. The module can be configured to connect to
+other proxy modules for these and other protocols.
 
 %description -l pl mod_proxy
-Modu³ zawiera implementacjê serwera proxy/cache dla Apache. Iplementacja
-zawiera obs³ugê FTP, CONNECT (dla SSL), HTTP/0.9 i HTTP/1.0.
+Modu³ zawiera implementacjê serwera proxy/cache dla Apache.
+Iplementacja zawiera obs³ugê FTP, CONNECT (dla SSL), HTTP/0.9 i
+HTTP/1.0.
 
 %package mod_rewrite
 Summary:	Apache module with rule-based engine for rewrite requested URLs on the fly
@@ -291,8 +298,8 @@ Prereq:		%{_sbindir}/apxs
 Requires:	%{name}(EAPI) = %{version}
 
 %description mod_rewrite
-This package contains It provides a rule-based rewriting engine to rewrite
-requested URLs on the fly.
+This package contains It provides a rule-based rewriting engine to
+rewrite requested URLs on the fly.
 
 %description -l pl mod_rewrite
 Modu³ oferuj±cy mo¿liwo¶æ ,,przepisywania'' adresów URL w locie.
@@ -306,10 +313,11 @@ Prereq:		%{_sbindir}/apxs
 Requires:	%{name}(EAPI) = %{version}
 
 %description mod_status
-The Status module allows a server administrator to find out how well their
-server is performing. A HTML page is presented that gives the current server
-statistics in an easily readable form. If required this page can be made to
-automatically refresh (given a compatible browser).
+The Status module allows a server administrator to find out how well
+their server is performing. A HTML page is presented that gives the
+current server statistics in an easily readable form. If required this
+page can be made to automatically refresh (given a compatible
+browser).
 
 %description -l pl mod_status
 Modu³ pozwala administratorowi na przegl±danie statystyk dotycz±cych
@@ -324,8 +332,9 @@ Prereq:		%{_sbindir}/apxs
 Requires:	%{name}(EAPI) = %{version}
 
 %description mod_usertrack
-This package contains the user tracking module which did its own logging
-using CookieLog directory. This module allow multiple log files.
+This package contains the user tracking module which did its own
+logging using CookieLog directory. This module allow multiple log
+files.
 
 %description -l pl mod_usertrack
 Modu³ pozwalaj±cy na ¶ledzenie ,,ciasteczek''.
@@ -354,13 +363,13 @@ Prereq:		%{_sbindir}/apxs
 Requires:	%{name}(EAPI) = %{version}
 
 %description mod_unique_id
-This package contains the mod_unique_id. This module provides a magic token
-for each request which is guaranteed to be unique across "all" requests
-under very specific conditions. The unique identifier is even unique across
-multiple machines in a properly configured cluster of machines. The
-environment variable UNIQUE_ID is set to the identifier for each request.
-Unique identifiers are useful for various reasons which are beyond the scope
-of this document.
+This package contains the mod_unique_id. This module provides a magic
+token for each request which is guaranteed to be unique across "all"
+requests under very specific conditions. The unique identifier is even
+unique across multiple machines in a properly configured cluster of
+machines. The environment variable UNIQUE_ID is set to the identifier
+for each request. Unique identifiers are useful for various reasons
+which are beyond the scope of this document.
 
 %package mod_expires
 Summary:	Apache module which provides .... 
@@ -438,7 +447,7 @@ install %{SOURCE8}  $RPM_BUILD_ROOT%{_sysconfdir}/mod_vhost_alias.conf
 install %{SOURCE9}  $RPM_BUILD_ROOT%{_sysconfdir}/mod_status.conf
 install %{SOURCE10} $RPM_BUILD_ROOT%{_sysconfdir}/mod_proxy.conf
 
-ln -sf index.html.en $RPM_BUILD_ROOT/home/httpd/html/index.html
+ln -sf index.html.en $RPM_BUILD_ROOT%{_datadir}/html/index.html
 
 strip --strip-unneeded $RPM_BUILD_ROOT%{_libexecdir}/*.so
 
@@ -957,77 +966,93 @@ rm -rf $RPM_BUILD_ROOT
 %attr(640,root,root) %ghost /var/log/httpd/*
 
 %files suexec
+%defattr(644,root,root,755)
 %attr(4755,root,root) %{_sbindir}/suexec
 
 %files devel
-%defattr(644,root,root,755) 
-
+%defattr(644,root,root,755)
 %{_includedir}
 
 %files mod_actions
+%defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_actions.so
-%attr(644,root,root) %{_datadir}/manual/mod/mod_actions.html
+%{_datadir}/manual/mod/mod_actions.html
 
 %files mod_auth_anon
+%defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_auth_anon.so
-%attr(644,root,root) %{_datadir}/manual/mod/mod_auth_anon.html
+%{_datadir}/manual/mod/mod_auth_anon.html
 
 %files mod_define
+%defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_define.so
-%attr(644,root,root) %{_datadir}/manual/mod/mod_define.html
+%{_datadir}/manual/mod/mod_define.html
 
 %files mod_digest
+%defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_digest.so
-%attr(644,root,root) %{_datadir}/manual/mod/mod_digest.html
+%{_datadir}/manual/mod/mod_digest.html
 
 %files mod_dir
+%defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_dir.so
-%attr(644,root,root) %{_datadir}/manual/mod/mod_dir.html
+%{_datadir}/manual/mod/mod_dir.html
 
 %files mod_expires
+%defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_expires.so
-%attr(644,root,root) %{_datadir}/manual/mod/mod_expires.html
+%{_datadir}/manual/mod/mod_expires.html
 
 %files mod_headers
+%defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_headers.so
-%attr(644,root,root) %{_datadir}/manual/mod/mod_headers.html
+%{_datadir}/manual/mod/mod_headers.html
 
 %files mod_mmap_static
+%defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_mmap_static.so
-%attr(644,root,root) %{_datadir}/manual/mod/mod_mmap_static.html
+%{_datadir}/manual/mod/mod_mmap_static.html
 
 %files mod_imap
+%defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_imap.so
-%attr(644,root,root) %{_datadir}/manual/mod/mod_imap.html
+%{_datadir}/manual/mod/mod_imap.html
 
 %files mod_info
+%defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_info.so
-%attr(644,root,root) %{_datadir}/manual/mod/mod_info.html
+%{_datadir}/manual/mod/mod_info.html
 
 %files mod_proxy
+%defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/mod_proxy.conf
 %attr(755,root,root) %{_libexecdir}/libproxy.so
-%attr(644,root,root) %{_datadir}/manual/mod/mod_proxy.html
+%{_datadir}/manual/mod/mod_proxy.html
 %dir %attr(750,http,http) /var/cache/apache
 
 %files mod_rewrite
+%defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_rewrite.so
-%attr(644,root,root) %{_datadir}/manual/mod/mod_rewrite.html
+%{_datadir}/manual/mod/mod_rewrite.html
 
 %files mod_status
+%defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/mod_status.conf
 %attr(755,root,root) %{_libexecdir}/mod_status.so
-%attr(644,root,root) %{_datadir}/manual/mod/mod_status.html
+%{_datadir}/manual/mod/mod_status.html
 
 %files mod_usertrack
+%defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_usertrack.so
-%attr(644,root,root) %{_datadir}/manual/mod/mod_usertrack.html
+%{_datadir}/manual/mod/mod_usertrack.html
 
 %files mod_unique_id
+%defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_unique_id.so
-%attr(644,root,root) %{_datadir}/manual/mod/mod_unique_id.html
+%{_datadir}/manual/mod/mod_unique_id.html
 
 %files mod_vhost_alias
+%defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_vhost_alias.so
-%attr(644,root,root) %{_datadir}/manual/mod/mod_vhost_alias.html
+%{_datadir}/manual/mod/mod_vhost_alias.html
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/mod_vhost_alias.conf
