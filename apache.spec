@@ -1066,6 +1066,7 @@ rm -rf $RPM_BUILD_ROOT
 %files mod_auth
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_auth.so
+%attr(755,root,root) %{_bindir}/htpasswd
 %{_datadir}/manual/mod/mod_auth.html
 
 %files mod_auth_anon
@@ -1078,7 +1079,6 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libexecdir}/mod_auth_db.so
 %attr(755,root,root) %{_libexecdir}/mod_auth_dbm.so
 %attr(755,root,root) %{_bindir}/dbmmanage 
-%attr(755,root,root) %{_bindir}/htpasswd
 %{_datadir}/manual/mod/mod_auth_db.html
 %{_datadir}/manual/mod/mod_auth_dbm.html
 %{_mandir}/man1/dbmmanage.1*
