@@ -706,6 +706,7 @@ Group:		Networking/Utilities
 Provides:	htpasswd
 Obsoletes:	htpasswd-apache1
 Obsoletes:	htpasswd-thttpd
+Obsoletes:      htpasswd-mini_httpd
 
 %description -n htpasswd-%{name}
 htpasswd from Apache2
