@@ -211,7 +211,7 @@ Summary(pl):	Modu³ apache z mechanizmem autentykacji u¿ywaj±cym plików DBM
 Group:		Networking/Daemons
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
-Obsoletes:	apache-mod_auth_db
+Obsoletes:	%{name}-mod_auth_db
 Requires:	%{name}(EAPI) = %{version}
 
 %description mod_auth_dbm
@@ -277,6 +277,20 @@ Execution of CGI scripts using an external CGI daemon.
 %description mod_cgid -l pl
 Uruchamianie zewnêtrznych skryptów CGI za pomoc± daemona CGI
 
+%package mod_charset_lite
+Summary:	Specify character set translation or recoding
+Summary(pl):	Translacja lub przekodowywanie znaków
+Group:		Networking/Daemons
+Prereq:		%{_sbindir}/apxs
+Prereq:		perl
+Requires:	%{name}(EAPI) = %{version}
+
+%description mod_charset_lite
+Specify character set translation or recoding.
+
+%description mod_charset_lite -l pl
+Translacja lub przekodowywanie znaków.
+
 %package mod_dav
 Summary:	Apache module - Distributed Authoring and Versioning
 Summary(pl):	Modu³ apache - Rozdzielone Autorstwo i Wersjonowanie
@@ -296,21 +310,6 @@ Modu³ dostarcza klasê 1 oraz klasê 2 WebDAV (Bazuj±cy na WWWW
 Rozdzielone Autorstwo i Wersjonowanie). To rozszerzenie HTTP pozwala
 na tworzenie, przesuwanie, kopiowanie oraz kasowanie zasobów na
 zdalnym serwerze www.
-
-%package mod_define
-Summary:	Apache module - authentication variables for arbitrary directives
-Summary(pl):	Modu³ apache do definiowania zmiennych
-Group:		Networking/Daemons
-Prereq:		%{_sbindir}/apxs
-Prereq:		perl
-Requires:	%{name}(EAPI) = %{version}
-
-%description mod_define
-It provides the definition variables for arbitrary directives, i.e.
-variables which can be expanded on any(!) directive line.
-
-%description mod_define -l pl
-Modu³ ten umo¿liwia definicjê zmiennych i dyrektyw.
 
 %package mod_deflate
 Summary:	Apache module: Compress content before it is delivered to the client
@@ -357,23 +356,6 @@ replaced or removed.
 %description mod_headers -l pl
 Modu³ pozwalaj±cy na ³±czenie, usuwania, zamianê nag³ówków HTTP
 wysy³anych do przegl±darki.
-
-%package mod_mmap_static
-Summary:	Apache module for mmap()ing statically configured list files
-Summary(pl):	Modu³ s³u¿±cy do mmap()owania plików.
-Group:		Networking/Daemons
-Prereq:		%{_sbindir}/apxs
-Prereq:		perl
-Requires:	%{name}(EAPI) = %{version}
-
-%description mod_mmap_static
-This package contains mod_mmap_static module. It provides mmap()ing of
-a statically configured list of frequently requested but not changed
-files.
-
-%description mod_mmap_static -l pl
-Modu³ umo¿liwia mmap()owanie statycznie skonfigurowanych plików
-(czêsto u¿ywanych ale nie ulegaj±cych zmianom).
 
 %package mod_imap
 Summary:	Apache module with imap-file handler
@@ -556,7 +538,7 @@ Summary(pl):	Modu³ cacheuj±cy statyczn± listê plików w pamiêci
 Group:		Networking/Daemons
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
-Obsoletes:	apache-mod_mmap_static
+Obsoletes:	%{name}-mmap_static
 Requires:	%{name}(EAPI) = %{version}
 
 %description mod_file_cache
@@ -582,6 +564,7 @@ cp -f %{_prefix}/share/automake/config.* srclib/apr-util/xml/expat/conftools/
 	--enable-file-cache \
 	--enable-echo \
 	--enable-cache \
+	--enable-charset-lite \
 	--enable-mem-cache \
 	--enable-disk-cache \
 	--enable-ext-filter \
@@ -627,7 +610,8 @@ cp -f %{_prefix}/share/automake/config.* srclib/apr-util/xml/expat/conftools/
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig}
-install -d $RPM_BUILD_ROOT%{_var}/log/httpd
+install -d $RPM_BUILD_ROOT%{_var}/log/{httpd,archiv/httpd}
+install -d $RPM_BUILD_ROOT%{_var}/{run,cache}/apache
 
 %{makeinstall} \
 	prefix=%{_sysconfdir}/httpd \
@@ -636,7 +620,7 @@ install -d $RPM_BUILD_ROOT%{_var}/log/httpd
 	installbuilddir=$RPM_BUILD_ROOT%{_sysconfdir}/build \
 	libexecdir=$RPM_BUILD_ROOT%{_libdir}/%{name} \
 	mandir=$RPM_BUILD_ROOT%{_mandir} \
-	sysconfdir=$RPM_BUILD_ROOT%{_sysconfdir}/conf \
+	sysconfdir=$RPM_BUILD_ROOT%{_sysconfdir} \
 	datadir=$RPM_BUILD_ROOT%{_datadir} \
 	iconsdir=$RPM_BUILD_ROOT%{_datadir}/icons \
 	errordir=$RPM_BUILD_ROOT%{_datadir}/error \
@@ -795,9 +779,9 @@ else
 	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
 fi
 
-%preun mod_auth_db
+%preun mod_auth_dbm
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n auth_db %{_libexecdir}/mod_auth_db.so 1>&2
+	%{_sbindir}/apxs -e -A -n auth_dbm %{_libexecdir}/mod_auth_dbm.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
@@ -839,6 +823,22 @@ if [ "$1" = "0" ]; then
 	fi
 fi
 
+%post mod_charset_lite
+%{_sbindir}/apxs -e -a -n charset_lite %{_libexecdir}/mod_charset_lite.so 1>&2
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+fi
+
+%preun mod_charset_lite
+if [ "$1" = "0" ]; then
+	%{_sbindir}/apxs -e -A -n charset_lite %{_libexecdir}/mod_charset_lite.so 1>&2
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2
+	fi
+fi
+
 %post mod_dav
 %{_sbindir}/apxs -e -a -n dev %{_libexecdir}/mod_dav.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
@@ -850,22 +850,6 @@ fi
 %preun mod_dav
 if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n dav %{_libexecdir}/mod_dav.so 1>&2
-	if [ -f /var/lock/subsys/httpd ]; then
-		/etc/rc.d/init.d/httpd restart 1>&2
-	fi
-fi
-
-%post mod_define
-%{_sbindir}/apxs -e -a -n define %{_libexecdir}/mod_define.so 1>&2
-if [ -f /var/lock/subsys/httpd ]; then
-	/etc/rc.d/init.d/httpd restart 1>&2
-else
-	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
-fi
-
-%preun mod_define
-if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n define %{_libexecdir}/mod_define.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
@@ -962,22 +946,6 @@ fi
 %preun mod_headers
 if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n headers %{_libexecdir}/mod_headers.so 1>&2
-	if [ -f /var/lock/subsys/httpd ]; then
-		/etc/rc.d/init.d/httpd restart 1>&2
-	fi
-fi
-
-%post mod_mmap_static
-%{_sbindir}/apxs -e -a -n mmap_static %{_libexecdir}/mod_mmap_static.so 1>&2
-if [ -f /var/lock/subsys/httpd ]; then
-	/etc/rc.d/init.d/httpd restart 1>&2
-else
-	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
-fi
-
-%preun mod_mmap_static
-if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n mmap_static %{_libexecdir}/mod_mmap_static.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
@@ -1153,8 +1121,8 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc ABOUT_APACHE.gz src/CHANGES.gz KEYS.gz README.gz
-%doc conf/mime.types
+%doc *.gz
+%doc docs/conf/mime.types
 
 %attr(754,root,root) /etc/rc.d/init.d/httpd
 
@@ -1195,9 +1163,6 @@ fi
 
 %{_mandir}/man1/htdigest.1*
 %{_mandir}/man8/*
-%lang(hu) %{_mandir}/hu/man8/*
-%lang(ko) %{_mandir}/ko/man8/*
-%lang(pl) %{_mandir}/pl/man8/*
 
 %attr(750,root,root) %dir /var/log/httpd
 %attr(750,root,root) %dir /var/log/archiv/httpd
@@ -1205,207 +1170,48 @@ fi
 
 %dir %{_datadir}
 %dir %{_datadir}/manual
-%dir %{_datadir}/manual/images/
-%{_datadir}/manual/images/apache_header.gif
-%{_datadir}/manual/images/custom_errordocs.gif
-%{_datadir}/manual/images/home.gif
-%{_datadir}/manual/images/index.gif
-%{_datadir}/manual/images/pixel.gif
-%{_datadir}/manual/images/sub.gif
-%{_datadir}/manual/misc
-%dir %{_datadir}/manual/search
-%attr(755,root,root) %{_datadir}/manual/search/manual-index.cgi
-%{_datadir}/manual/LICENSE
-%{_datadir}/manual/bind.html.html
-%lang(en) %{_datadir}/manual/bind.html.en
-%lang(fr) %{_datadir}/manual/bind.html.fr
-%{_datadir}/manual/cgi_path.html.html
-%lang(en) %{_datadir}/manual/cgi_path.html.en
-%lang(fr) %{_datadir}/manual/cgi_path.html.fr
-%{_datadir}/manual/configuring.html.html
-%lang(en) %{_datadir}/manual/configuring.html.en
-%lang(fr) %{_datadir}/manual/configuring.html.fr
-%lang(ja) %{_datadir}/manual/configuring.html.ja.jis
-%{_datadir}/manual/content-negotiation.html
-%{_datadir}/manual/custom-error.html.html
-%lang(en) %{_datadir}/manual/custom-error.html.en
-%lang(fr) %{_datadir}/manual/custom-error.html.fr
-%lang(ja) %{_datadir}/manual/custom-error.html.ja.jis
-%{_datadir}/manual/dns-caveats.html.html
-%lang(en) %{_datadir}/manual/dns-caveats.html.en
-%lang(fr) %{_datadir}/manual/dns-caveats.html.fr
-%{_datadir}/manual/dso.html
-%{_datadir}/manual/env.html.html
-%lang(en) %{_datadir}/manual/env.html.en
-%lang(ja) %{_datadir}/manual/env.html.ja.jis
-%{_datadir}/manual/footer.html
-%{_datadir}/manual/handler.html.html
-%lang(en) %{_datadir}/manual/handler.html.en
-%lang(ja) %{_datadir}/manual/handler.html.ja.jis
-%{_datadir}/manual/header.html
-%{_datadir}/manual/index.html.html
-%lang(en) %{_datadir}/manual/index.html.en
-%lang(fr) %{_datadir}/manual/index.html.fr
-%lang(ja) %{_datadir}/manual/index.html.ja.jis
-%{_datadir}/manual/install.html.html
-%lang(en) %{_datadir}/manual/install.html.en
-%lang(es) %{_datadir}/manual/install.html.es
-%lang(fr) %{_datadir}/manual/install.html.fr
-%lang(ja) %{_datadir}/manual/install.html.ja.jis
-%{_datadir}/manual/invoking.html.html
-%lang(en) %{_datadir}/manual/invoking.html.en
-%lang(fr) %{_datadir}/manual/invoking.html.fr
-%{_datadir}/manual/keepalive.html.html
-%lang(en) %{_datadir}/manual/keepalive.html.en
-%lang(ja) %{_datadir}/manual/keepalive.html.ja.jis
-%{_datadir}/manual/location.html
-%{_datadir}/manual/logs.html
-%{_datadir}/manual/multilogs.html
-%{_datadir}/manual/new_features_1_3.html.html
-%lang(en) %{_datadir}/manual/new_features_1_3.html.en
-%lang(ja) %{_datadir}/manual/new_features_1_3.html.ja.jis
-%{_datadir}/manual/process-model.html
-%{_datadir}/manual/sections.html
-%{_datadir}/manual/server-wide.html.html
-%lang(en) %{_datadir}/manual/server-wide.html.en
-%lang(fr) %{_datadir}/manual/server-wide.html.fr
-%lang(ja) %{_datadir}/manual/server-wide.html.ja.jis
-%{_datadir}/manual/sourcereorg.html
-%{_datadir}/manual/stopping.html.html
-%lang(en) %{_datadir}/manual/stopping.html.en
-%lang(fr) %{_datadir}/manual/stopping.html.fr
-%{_datadir}/manual/suexec.html.html
-%lang(en) %{_datadir}/manual/suexec.html.en
-%lang(ja) %{_datadir}/manual/suexec.html.ja.jis
-%{_datadir}/manual/upgrading_to_1_3.html
-%{_datadir}/manual/urlmapping.html
+%{_datadir}/manual/*.html
+%{_datadir}/manual/*.html.en
+%lang(ja) %{_datadir}/manual/*.html.ja.jis
+%lang(de) %{_datadir}/manual/*.html.de
+%lang(fr) %{_datadir}/manual/*.html.fr
+%{_datadir}/manual/developer
+%{_datadir}/manual/faq
 %dir %{_datadir}/manual/howto
-%{_datadir}/manual/howto/cgi.html.html
-%lang(en) %{_datadir}/manual/howto/cgi.html.en
-%lang(ja) %{_datadir}/manual/howto/cgi.html.ja.jis
-%{_datadir}/manual/howto/footer.html
-%{_datadir}/manual/howto/header.html
-%{_datadir}/manual/howto/ssi.html.html
-%lang(en) %{_datadir}/manual/howto/ssi.html.en
-%lang(ja) %{_datadir}/manual/howto/ssi.html.ja.jis
+%doc %{_datadir}/manual/howto/*.en
+%{_datadir}/manual/howto/*.html
+%lang(ja) %{_datadir}/manual/howto/*.ja.jis
+%dir %{_datadir}/manual/images
+%{_datadir}/manual/images/[achips]*
+%{_datadir}/manual/misc
 %dir %{_datadir}/manual/mod
-%{_datadir}/manual/mod/core.html.html
-%lang(en) %{_datadir}/manual/mod/core.html.en
-%lang(fr) %{_datadir}/manual/mod/core.html.fr
-%{_datadir}/manual/mod/directive-dict.html.html
-%lang(en) %{_datadir}/manual/mod/directive-dict.html.en
-%lang(fr) %{_datadir}/manual/mod/directive-dict.html.fr
-%lang(ja) %{_datadir}/manual/mod/directive-dict.html.ja.jis
-%{_datadir}/manual/mod/directives.html.html
-%lang(de) %{_datadir}/manual/mod/directives.html.de
-%lang(en) %{_datadir}/manual/mod/directives.html.en
-%lang(fr) %{_datadir}/manual/mod/directives.html.fr
-%lang(ja) %{_datadir}/manual/mod/directives.html.ja.jis
-%{_datadir}/manual/mod/footer.html
-%{_datadir}/manual/mod/header.html
-%{_datadir}/manual/mod/index-bytype.html.html
-%lang(en) %{_datadir}/manual/mod/index-bytype.html.en
-%lang(fr) %{_datadir}/manual/mod/index-bytype.html.fr
-%{_datadir}/manual/mod/index.html.html
-%lang(en) %{_datadir}/manual/mod/index.html.en
-%lang(fr) %{_datadir}/manual/mod/index.html.fr
-%lang(ja) %{_datadir}/manual/mod/index.html.ja.jis
+%{_datadir}/manual/mod/[cdfhipw]*.html
+%{_datadir}/manual/mod/mpm*.html
 %{_datadir}/manual/mod/mod_access.html
 %{_datadir}/manual/mod/mod_alias.html
 %{_datadir}/manual/mod/mod_asis.html
 %{_datadir}/manual/mod/mod_autoindex.html
+%{_datadir}/manual/mod/mod_cern_meta.html
 %{_datadir}/manual/mod/mod_cgi.html
-%{_datadir}/manual/mod/mod_env.html.html
-%lang(en) %{_datadir}/manual/mod/mod_env.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_env.html.ja.jis
+%{_datadir}/manual/mod/mod_env.html
 %{_datadir}/manual/mod/mod_include.html
-%{_datadir}/manual/mod/mod_log_agent.html
 %{_datadir}/manual/mod/mod_log_config.html
-%{_datadir}/manual/mod/mod_log_referer.html
-%{_datadir}/manual/mod/mod_mime.html.html
-%lang(en) %{_datadir}/manual/mod/mod_mime.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_mime.html.ja.jis
-%{_datadir}/manual/mod/mod_mime_magic.html
-%{_datadir}/manual/mod/mod_negotiation.html.html
-%lang(en) %{_datadir}/manual/mod/mod_negotiation.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_negotiation.html.ja.jis
-%{_datadir}/manual/mod/mod_setenvif.html.html
-%lang(en) %{_datadir}/manual/mod/mod_setenvif.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_setenvif.html.ja.jis
+%{_datadir}/manual/mod/mod_mime*.html
+%{_datadir}/manual/mod/mod_negotiation.html
+%{_datadir}/manual/mod/mod_setenvif.html
 %{_datadir}/manual/mod/mod_speling.html
 %{_datadir}/manual/mod/mod_userdir.html
-%{_datadir}/manual/mod/module-dict.html.html
-%lang(en) %{_datadir}/manual/mod/module-dict.html.en
-%lang(ja) %{_datadir}/manual/mod/module-dict.html.ja.jis
-%dir %{_datadir}/manual/programs
-%{_datadir}/manual/programs/ab.html
-%{_datadir}/manual/programs/apachectl.html
-%{_datadir}/manual/programs/apxs.html
-%{_datadir}/manual/programs/dbmmanage.html
-%{_datadir}/manual/programs/footer.html
-%{_datadir}/manual/programs/header.html
-%{_datadir}/manual/programs/htdigest.html
-%{_datadir}/manual/programs/htpasswd.html
-%{_datadir}/manual/programs/httpd.html
-%{_datadir}/manual/programs/index.html.html
-%lang(en) %{_datadir}/manual/programs/index.html.en
-%lang(ja) %{_datadir}/manual/programs/index.html.ja.jis
-%{_datadir}/manual/programs/logresolve.html
-%{_datadir}/manual/programs/other.html
-%{_datadir}/manual/programs/rotatelogs.html
-%{_datadir}/manual/programs/suexec.html
-%dir %{_datadir}/manual/vhosts
-%{_datadir}/manual/vhosts/details.html
-%{_datadir}/manual/vhosts/examples.html
-%{_datadir}/manual/vhosts/fd-limits.html
-%{_datadir}/manual/vhosts/footer.html
-%{_datadir}/manual/vhosts/header.html
-%{_datadir}/manual/vhosts/host.html
-%{_datadir}/manual/vhosts/index.html.html
-%lang(en) %{_datadir}/manual/vhosts/index.html.en
-%lang(ja) %{_datadir}/manual/vhosts/index.html.ja.jis
-%{_datadir}/manual/vhosts/ip-based.html
-%{_datadir}/manual/vhosts/mass.html
-%{_datadir}/manual/vhosts/name-based.html.html
-%lang(en) %{_datadir}/manual/vhosts/name-based.html.en
-%lang(ja) %{_datadir}/manual/vhosts/name-based.html.ja.jis
-%{_datadir}/manual/vhosts/vhosts-in-depth.html
-%{_datadir}/manual/vhosts/virtual-host.html
+%{_datadir}/manual/platform
+%{_datadir}/manual/programs
+%dir %{_datadir}/manual/search
+%doc%attr(755,root,root) %{_datadir}/manual/search/manual-index.cgi
+%{_datadir}/manual/style
 
+# Having all index.html.LANG files here is very bad idea.
 %attr(755,root,root) %dir %{_datadir}/html
 %config(noreplace,missingok) %{_datadir}/html/index.html
-# note: html extensions are not the same as (g)libc locale names
-%lang(ca) %{_datadir}/html/index.html.ca
-%lang(cs) %{_datadir}/html/index.html.cz
-%lang(de) %{_datadir}/html/index.html.de
-%lang(da) %{_datadir}/html/index.html.dk
-%lang(et) %{_datadir}/html/index.html.ee
-%lang(el) %{_datadir}/html/index.html.el
-%{_datadir}/html/index.html.en
-%lang(es) %{_datadir}/html/index.html.es
-%lang(fr) %{_datadir}/html/index.html.fr
-%lang(he) %{_datadir}/html/index.html.he.iso8859-8
-%lang(it) %{_datadir}/html/index.html.it
-%lang(ja) %{_datadir}/html/index.html.ja.jis
-%lang(ko) %{_datadir}/html/index.html.kr.iso-kr
-%lang(de_LU) %{_datadir}/html/index.html.lu
-%lang(nl) %{_datadir}/html/index.html.nl
-%lang(no) %{_datadir}/html/index.html.no
-%lang(pl) %{_datadir}/html/index.html.po.iso-pl
-%lang(pt_PT) %{_datadir}/html/index.html.pt
-%lang(pt_BR) %{_datadir}/html/index.html.pt-br
-%lang(ru) %{_datadir}/html/index.html.ru.cp-1251
-%lang(ru) %{_datadir}/html/index.html.ru.cp866
-%lang(ru) %{_datadir}/html/index.html.ru.iso-ru
-%lang(ru) %{_datadir}/html/index.html.ru.koi8-r
-%lang(ru) %{_datadir}/html/index.html.ru.ucs2
-%lang(ru) %{_datadir}/html/index.html.ru.ucs4
-%lang(ru) %{_datadir}/html/index.html.ru.utf8
-%lang(se) %{_datadir}/html/index.html.se
-%lang(zh_TW) %{_datadir}/html/index.html.zh.Big5
-
+%config(noreplace,missingok) %{_datadir}/html/index.html.en
 %{_datadir}/html/*.gif
-%{_datadir}/errordocs
 %dir %{_datadir}/icons
 %{_datadir}/icons/*.gif
 %dir %{_datadir}/icons/small
@@ -1457,18 +1263,16 @@ fi
 %attr(755,root,root) %{_libexecdir}/mod_disk_cache.so
 %attr(755,root,root) %{_libexecdir}/mod_mem_cache.so
 %{_datadir}/manual/mod/mod_cache.html
-%{_datadir}/manual/mod/mod_disk_cache.html
-%{_datadir}/manual/mod/mod_mem_cache.html
 
 %files mod_cgid
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_cgid.so
 %{_datadir}/manual/mod/mod_cgid.html
 
-#%files mod_define
-#%defattr(644,root,root,755)
-#%attr(755,root,root) %{_libexecdir}/mod_define.so
-#%{_datadir}/manual/mod/mod_define.html
+%files mod_charset_lite
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libexecdir}/mod_charset_lite.so
+%{_datadir}/manual/mod/mod_charset_lite.html
 
 %files mod_dav
 %defattr(644,root,root,755)
@@ -1495,11 +1299,6 @@ fi
 %attr(755,root,root) %{_libexecdir}/mod_headers.so
 %{_datadir}/manual/mod/mod_headers.html
 
-%files mod_mmap_static
-%defattr(644,root,root,755)
-%attr(755,root,root) %{_libexecdir}/mod_mmap_static.so
-%{_datadir}/manual/mod/mod_mmap_static.html
-
 %files mod_imap
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_imap.so
@@ -1514,8 +1313,8 @@ fi
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/mod_proxy.conf
 %attr(755,root,root) %{_libexecdir}/mod_proxy*.so
-%{_datadir}/manual/mod/mod_proxy*.html
-%dir %attr(770,root,http) /var/cache/apache
+%doc %{_datadir}/manual/mod/mod_proxy*.html
+%attr(770,root,http) /var/cache/apache
 
 %files mod_rewrite
 %defattr(644,root,root,755)
@@ -1526,6 +1325,7 @@ fi
 %files mod_ssl
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_ssl.so
+%{_datadir}/manual/ssl
 %{_datadir}/manual/mod/mod_ssl.html
 
 %files mod_status
@@ -1537,7 +1337,6 @@ fi
 %files mod_usertrack
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_usertrack.so
-%{_datadir}/manual/mod/mod_cookies.html
 %{_datadir}/manual/mod/mod_usertrack.html
 
 %files mod_unique_id
@@ -1549,4 +1348,5 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_vhost_alias.so
 %{_datadir}/manual/mod/mod_vhost_alias.html
+%{_datadir}/manual/vhosts
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/mod_vhost_alias.conf
