@@ -20,11 +20,11 @@ diff -urN httpd-2.0.35.org/server/config.c httpd-2.0.35/server/config.c
 -                fnew = (fnames *) apr_array_push(candidates);
 -                fnew->fname = ap_make_full_path(p, fname, dirent.name);
 +                && strcmp(dirent.name, "..")
-+		&& (dirent.d_name)[slen-1] != '~') {
-+		if (slen < 8 || strcmp((dirent.d_name + slen - 7), ".rpmnew")) {
++		&& (dirent.name)[slen-1] != '~') {
++		if (slen < 8 || strcmp((dirent.name + slen - 7), ".rpmnew")) {
 +		    if (slen < 9 || 
-+			    strcmp((dirent.d_name + slen - 8), ".rpmorig") && 
-+			    strcmp((dirent.d_name + slen - 8), ".rpmsave")) {
++			    strcmp((dirent.name + slen - 8), ".rpmorig") && 
++			    strcmp((dirent.name + slen - 8), ".rpmsave")) {
 +	                fnew = (fnames *) apr_array_push(candidates);
 +        	        fnew->fname = ap_make_full_path(p, fname, dirent.name);
 +		    }
