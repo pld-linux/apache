@@ -3765,7 +3765,7 @@ diff -Nur apache_1.3.28.orig/src/modules/proxy/proxy_util.c apache_1.3.28/src/mo
      ap_kill_timeout(r);
  
 --- apache_1.3.31/src/modules/standard/mod_access.c.orig	Sun Mar  7 22:47:14 2004
-+++ apache_1.3.31/src/modules/standard/mod_access.c	Wed May 12 14:38:21 2004
++++ apache_1.3.31/src/modules/standard/mod_access.c	Fri May 14 21:42:47 2004
 @@ -31,7 +31,10 @@
      T_ALL,
      T_IP,
@@ -3791,7 +3791,7 @@ diff -Nur apache_1.3.28.orig/src/modules/proxy/proxy_util.c apache_1.3.28/src/mo
      } x;
      enum allowdeny_type type;
  } allowdeny;
-@@ -124,94 +133,223 @@
+@@ -124,94 +133,231 @@
  
      }
      else if ((s = strchr(where, '/'))) {
@@ -3809,18 +3809,14 @@ diff -Nur apache_1.3.28.orig/src/modules/proxy/proxy_util.c apache_1.3.28/src/mo
  
 -	if (!is_ip(where)
 -	    || (a->x.ip.net.s_addr = ap_inet_addr(where)) == INADDR_NONE) {
--	    a->type = T_FAIL;
--	    return "syntax error in network portion of network/netmask";
 +	justdigits = 0;
 +	for (p = s; *p; p++) {
 +	    if (!isdigit(*p))
 +		break;
- 	}
++	}
 +	if (!*p)
 +	    justdigits++;
- 
--	/* is_ip just tests if it matches [\d.]+ */
--	if (!is_ip(s)) {
++
 +	memset(&hints, 0, sizeof(hints));
 +	hints.ai_family = PF_UNSPEC;
 +	hints.ai_socktype = SOCK_STREAM;	/*dummy*/
@@ -3833,8 +3829,16 @@ diff -Nur apache_1.3.28.orig/src/modules/proxy/proxy_util.c apache_1.3.28/src/mo
 +	    if (resnet)
 +		freeaddrinfo(resnet);
  	    a->type = T_FAIL;
+ 	    return "syntax error in network portion of network/netmask";
+ 	}
+-
+-	/* is_ip just tests if it matches [\d.]+ */
+-	if (!is_ip(s)) {
++	if (resnet->ai_next) {
++	    freeaddrinfo(resnet);
+ 	    a->type = T_FAIL;
 -	    return "syntax error in mask portion of network/netmask";
-+	    return "syntax error in network portion of network/netmask";
++	    return "network/netmask resolved to multiple addresses";
  	}
 -	/* is it in /a.b.c.d form? */
 -	if (strchr(s, '.')) {
@@ -3843,6 +3847,9 @@ diff -Nur apache_1.3.28.orig/src/modules/proxy/proxy_util.c apache_1.3.28/src/mo
 -		a->type = T_FAIL;
 -		return "syntax error in mask portion of network/netmask";
 -	    }
++	memcpy(&net, resnet->ai_addr, resnet->ai_addrlen);
++	freeaddrinfo(resnet);
++
 +	switch (net.ss_family) {
 +	case AF_INET:
 +	    a->type = T_IP;
@@ -3879,7 +3886,8 @@ diff -Nur apache_1.3.28.orig/src/modules/proxy/proxy_util.c apache_1.3.28/src/mo
 +		    freeaddrinfo(resmask);
  		a->type = T_FAIL;
 -		return "invalid mask in network/netmask";
--	    }
++		return "syntax error in mask portion of network/netmask";
+ 	    }
 -	    mask.s_addr = 0xFFFFFFFFUL << (32 - i);
 -	    mask.s_addr = htonl(mask.s_addr);
 -	}
@@ -3901,8 +3909,6 @@ diff -Nur apache_1.3.28.orig/src/modules/proxy/proxy_util.c apache_1.3.28/src/mo
 -	while (*s) {
 -	    t = s;
 -	    if (!ap_isdigit(*t)) {
-+		return "syntax error in mask portion of network/netmask";
-+	    }
 +	    if (resmask->ai_next) {
 +		freeaddrinfo(resmask);
  		a->type = T_FAIL;
@@ -4083,7 +4089,7 @@ diff -Nur apache_1.3.28.orig/src/modules/proxy/proxy_util.c apache_1.3.28/src/mo
  
      return NULL;
  }
-@@ -275,13 +413,63 @@
+@@ -275,13 +421,63 @@
  	    return 1;
  
  	case T_IP:
