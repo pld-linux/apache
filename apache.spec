@@ -1,7 +1,7 @@
 #
 # Conditional build:
-# mod_rewrite_ldap - enable ldap map supoort for mod_rewrite (alpha)
-# _without_apache_ipv6 - disable IPv6 support
+# mod_rewrite_ldap	- enable ldap map supoort for mod_rewrite (alpha)
+# _without_ipv6		- disable IPv6 support
 #
 %include	/usr/lib/rpm/macros.perl
 Summary:	The most widely used Web server on the Internet
@@ -26,8 +26,8 @@ Summary(tr):	Lider WWW tarayıcı
 Summary(uk):	îÁÊĞÏĞÕÌÑÒÎ¦ÛÉÊ Web-Server
 Summary(zh_CN):	Internet ÉÏÓ¦ÓÃ×î¹ã·ºµÄ Web ·şÎñ³ÌĞò¡£
 Name:		apache
-Version:	1.3.23
-Release:	5
+Version:	1.3.24
+Release:	0.1
 License:	Apache Group License
 Group:		Networking/Daemons
 URL:		http://www.apache.org/
@@ -250,7 +250,7 @@ Summary(uk):	úÁÓÏÂÉ ÓÔ×ÏÒÅÎÎÑ ÍÏÄÕÌ¦× ÄÌÑ web server'Õ Apache
 Summary(zh_CN):	ÓÃÓÚ Apache Web ·şÎñ³ÌĞòµÄ¿ª·¢¹¤¾ß¡£
 Group:		Networking/Utilities
 Requires:	%{name}(EAPI) = %{version}
-Provides:	%{name}(EAPI)-devel
+Provides:	%{name}(EAPI)-devel = %{version}
 
 %description devel
 The apache-devel package contains header files for Apache.
@@ -655,7 +655,7 @@ wa¿no¶ci mo¿e byæ ustalana w zale¿no¶ci od czasu modyfikacji plików
 %patch6 -p0
 %patch7 -p1
 %patch8 -p1
-%{!?_without_apache_ipv6:%patch9 -p1}
+%{!?_without_ipv6:%patch9 -p1}
 %patch10 -p1
 %patch11 -p1
 %patch12 -p1
@@ -665,7 +665,7 @@ wa¿no¶ci mo¿e byæ ustalana w zale¿no¶ci od czasu modyfikacji plików
 %patch16 -p1
 %patch17 -p1
 %patch18 -p1
-%{?_without_apache_ipv6:%patch19 -p1}
+%{?_without_ipv6:%patch19 -p1}
 %patch20 -p1
 %patch21 -p1
 
@@ -696,7 +696,7 @@ OPTIM="%{rpmcflags}" \
 	--suexec-docroot=%{_datadir} \
 	--disable-rule=WANTHSREGEX \
 	--enable-rule=EAPI \
-	%{!?_without_apache_ipv6:--enable-rule=INET6}
+	%{!?_without_ipv6:--enable-rule=INET6}
 
 %{__make} LIBS1="-lm -lcrypt -lmm -ldl"
 
