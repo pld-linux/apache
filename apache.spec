@@ -18,7 +18,7 @@ Source4:	apache.sysconfig
 Source5:	apache-access.conf
 Source6:	apache-httpd.conf
 Source7:	apache-srm.conf
-Source8:	apache-virtual-host.conf
+Source8:	apache-mod_vhost_alias.conf
 Source9:	apache-mod_status.conf
 Source10:	apache-mod_proxy.conf
 Patch0:		apache-PLD.patch
@@ -368,8 +368,8 @@ install errordocs/* $RPM_BUILD_ROOT%{_datadir}/errordocs
 install %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/access.conf
 install %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
 install %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/srm.conf
-install %{SOURCE8} $RPM_BUILD_ROOT%{_sysconfdir}/virtual-host.conf
 
+install %{SOURCE8}  $RPM_BUILD_ROOT%{_sysconfdir}/mod_vhost_alias.conf
 install %{SOURCE9}  $RPM_BUILD_ROOT%{_sysconfdir}/mod_status.conf
 install %{SOURCE10} $RPM_BUILD_ROOT%{_sysconfdir}/mod_proxy.conf
 
@@ -636,6 +636,9 @@ fi
 
 %post mod_proxy
 %{_sbindir}/apxs -e -a -n proxy %{_libexecdir}/libproxy.so 1>&2
+if [ -f /etc/httpd/httpd.conf ] && ! grep -q "^Include.*mod_proxy.conf" /etc/httpd/httpd.conf; then
+	echo "Include mod_proxy.conf" >> /etc/httpd/httpd.conf
+fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -645,6 +648,9 @@ fi
 %preun mod_proxy
 if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n proxy %{_libexecdir}/libproxy.so 1>&2
+	grep -v -q "^Include.*mod_proxy.conf" /etc/httpd/httpd.conf > \
+		/etc/httpd/httpd.conf.tmp
+	mv /etc/httpd/httpd.conf.tmp /etc/httpd/httpd.conf
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
@@ -668,6 +674,9 @@ fi
 
 %post mod_status
 %{_sbindir}/apxs -e -a -n status %{_libexecdir}/mod_status.so 1>&2
+if [ -f /etc/httpd/httpd.conf ] && ! grep -q "^Include.*mod_status.conf" /etc/httpd/httpd.conf; then
+	echo "Include mod_status.conf" >> /etc/httpd/httpd.conf
+fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -677,6 +686,9 @@ fi
 %preun mod_status
 if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n status %{_libexecdir}/mod_status.so 1>&2
+	grep -v -q "^Include.*mod_status.conf" /etc/httpd/httpd.conf > \
+		/etc/httpd/httpd.conf.tmp
+	mv /etc/httpd/httpd.conf.tmp /etc/httpd/httpd.conf
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
@@ -716,6 +728,9 @@ fi
 
 %post mod_vhost_alias
 %{_sbindir}/apxs -e -a -n vhost_alias %{_libexecdir}/mod_vhost_alias.so 1>&2
+if [ -f /etc/httpd/httpd.conf ] && ! grep -q "^Include.*mod_vhost_alias.conf" /etc/httpd/httpd.conf; then
+	echo "Include mod_vhost_alias.conf" >> /etc/httpd/httpd.conf
+fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -725,6 +740,9 @@ fi
 %preun mod_vhost_alias
 if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n vhost_alias %{_libexecdir}/mod_vhost_alias.so 1>&2
+	grep -v -q "^Include.*mod_vhost_alias.conf" /etc/httpd/httpd.conf > \
+		/etc/httpd/httpd.conf.tmp
+	mv /etc/httpd/httpd.conf.tmp /etc/httpd/httpd.conf
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
@@ -923,7 +941,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files mod_proxy
 %config(noreplace) %{_sysconfdir}/mod_proxy.conf
-%attr(640,root,root) %{_sysconfdir}/mod_proxy.conf
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/mod_proxy.conf
 %attr(755,root,root) %{_libexecdir}/libproxy.so
 %attr(644,root,root) %{_datadir}/manual/mod/mod_proxy.html
 %dir %attr(750,http,http) /var/cache/apache
@@ -934,7 +952,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files mod_status
 %config(noreplace) %{_sysconfdir}/mod_status.conf
-%attr(640,root,root) %{_sysconfdir}/mod_status.conf
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/mod_status.conf
 %attr(755,root,root) %{_libexecdir}/mod_status.so
 %attr(644,root,root) %{_datadir}/manual/mod/mod_status.html
 
@@ -949,4 +967,4 @@ rm -rf $RPM_BUILD_ROOT
 %files mod_vhost_alias
 %attr(755,root,root) %{_libexecdir}/mod_vhost_alias.so
 %attr(644,root,root) %{_datadir}/manual/mod/mod_vhost_alias.html
-%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/virtual-host.conf
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/mod_vhost_alias.conf
