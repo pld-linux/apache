@@ -179,7 +179,7 @@ sunucusudur.
 %package suexec
 Summary:	Apache suexec wrapper
 Summary(pl):	Wrapper suexec do serwera WWW Apache
-Group:		Development/Tools
+Group:		Networking/Daemons
 Requires:	%{name} = %{version}-%{release}
 
 %description suexec
