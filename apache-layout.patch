@@ -1,0 +1,31 @@
+--- httpd-2.0.40/config.layout.wiget	Mon Aug 12 19:33:25 2002
++++ httpd-2.0.40/config.layout	Mon Aug 12 19:46:26 2002
+@@ -298,3 +298,28 @@
+     installbuilddir: ${prefix}/etc/apache2/build
+     errordir:      ${datadir}/error
+ </Layout>
++
++# PLD layout
++<Layout PLD>
++    prefix:        /usr
++    exec_prefix:   ${prefix}
++    bindir:        ${exec_prefix}/bin
++    sbindir:       ${exec_prefix}/sbin
++    libdir:        ${exec_prefix}/lib
++    libexecdir:    ${exec_prefix}/lib/apache/modules
++    mandir:        /usr/share/man
++    infodir:       /usr/share/info
++    sysconfdir:    /etc/httpd
++    datadir:       ${exec_prefix}/share/apache
++    iconsdir:      /home/services/httpd/icons
++    htdocsdir:     /home/services/httpd/html
++    manualdir:     /home/services/httpd/manual
++    errordir:      /home/services/httpd/error
++    cgidir:        /home/services/httpd/cgi-bin
++    includedir:    ${exec_prefix}/include/apache
++    localstatedir: /var/lib/httpd
++    runtimedir:    /var/run
++    logfiledir:    /var/log/httpd
++    proxycachedir: /var/cache/apache
++    installbuilddir: ${exec_prefix}/lib/apache/build
++</Layout>
