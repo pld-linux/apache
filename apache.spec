@@ -170,7 +170,7 @@ else
 	/usr/sbin/groupadd -u 51 -r -f httpd
 fi
 if [ -n `id -u http` ]; then
-	if [ "`id -g http`" != "51" ]; then
+	if [ "`id -u http`" != "51" ]; then
 		echo "Warning: user http haven't gid=51. Corect this before install apache"
 		exit 1
 	fi
