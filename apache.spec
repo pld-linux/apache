@@ -31,7 +31,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.0.52
-Release:	5
+Release:	6
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -118,6 +118,7 @@ Provides:	user(http)
 Provides:	webserver = apache
 Obsoletes:	apache-extra
 Obsoletes:	apache6
+Conflicts:	php < 5.0.2
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_sysconfdir	/etc/httpd
