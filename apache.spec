@@ -1,3 +1,10 @@
+# TODO:
+# - mod_case_filter
+# - mod_case_filter_in
+# - mod_optional_fn_{export,import}
+# - mod_optional_hook_{export,import}
+# - devel subpackage, apr maybe?
+# - config examples for mod_*
 %include	/usr/lib/rpm/macros.perl
 Summary:	The most widely used Web server on the Internet
 Summary(de):	Leading World Wide Web-Server
@@ -13,21 +20,22 @@ License:	Apache Group License
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
-#Source1:	%{name}.init
-#Source2:	%{name}.logrotate
-#Source3:	%{name}-icons.tar.gz
-#Source4:	%{name}.sysconfig
+Source1:	%{name}.init
+Source2:	%{name}.logrotate
+Source3:	%{name}-icons.tar.gz
+Source4:	%{name}.sysconfig
+Source6:	%{name}-httpd.conf
+Source8:	%{name}-mod_vhost_alias.conf
+Source9:	%{name}-mod_status.conf
+Source10:	%{name}-mod_proxy.conf
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 BuildRequires:	automake
 BuildRequires:	openssl-devel
 BuildRequires:	db3-devel
-# FIXME
-BuildRequires:	db1-devel
 BuildRequires:	zlib-devel
-BuildRequires:	gdbm-devel
-BuildRequires:	expat-devel
 BuildRequires:	expat-static
 BuildRequires:	perl-devel >= 5.004
+BuildRequires:	gdbm-devel
 Provides:	httpd = %{version}
 Provides:	webserver = %{version}
 Provides:	%{name}(EAPI) = %{version}
@@ -197,23 +205,96 @@ Ten modu³ oferuje anonimow± autoryzacjê u¿ytkownia podobnie do
 anonimowych serwerów ftp (u¿ytkownik ,,anonymous'' oraz has³o w
 postaci adresu pocztowego u¿ytkownika).
 
-%package mod_auth_db
-Summary:	Apache module with user authentication which uses Berkeley DB files
-Summary(pl):	Modu³ apache z mechanizmem autentykacji u¿ywaj±cym plików Berkeley DB
+%package mod_auth_dbm
+Summary:	Apache module with user authentication which uses DBM files
+Summary(pl):	Modu³ apache z mechanizmem autentykacji u¿ywaj±cym plików DBM
 Group:		Networking/Daemons
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
 
-%description mod_auth_db
-This package contains mod_auth_db module. It provides for user
-authentication using Berkeley DB files. It is an alternative to DBM
-files for those systems which support DB and not DBM. It is only
-available in Apache 1.1 and later.
+%description mod_auth_dbm
+This module provides for HTTP Basic Authentication, where the
+usernames and passwords are stored in DBM type database files. It is
+an alternative to the plain text password files provided by mod_auth.
 
-%description mod_auth_db -l pl
-Ten pakiet zawiera modu³ mod_auth_db. Modu³ ten s³u¿y do autentykacji
-ale jako plików danych u¿ywa Berkeley DB.
+%description mod_auth_dbm -l pl
+Ten modu³ dostarcza Pros± Autoryzacjê HTTP gdzie u¿ytkownicy oraz ich
+has³a s± trzymane w plikach bazy typu DBM.
+
+%package mod_auth_digest
+Summary:	Apache user authentication module using MD5 Digest Authentication
+Summary(pl):	Modu³ apache do autoryzacji MD5
+Group:		Networking/Daemons
+Prereq:		%{_sbindir}/apxs
+Prereq:		perl
+Obsoletes:	apache-mod_digest
+Requires:	%{name}(EAPI) = %{version}
+
+%description mod_auth_digest
+This package contains mod_digest module. It provides user
+authentication using MD5 Digest Authentication.
+
+%description mod_auth_digest -l pl
+Modu³ ten dostarcza metodê autoryzacji bazuj±c± na MD5 Digest
+Authentication.
+
+%package mod_cache
+Summary:	Content cache keyed to URIs
+Summary(pl):	Pamiêæ podrêczna wg klucza URI
+Group:		Networking/Daemons
+Prereq:		%{_sbindir}/apxs
+Prereq:		perl
+Requires:	%{name}(EAPI) = %{version}
+
+%description mod_cache
+mod_cache implements an RFC 2616 compliant HTTP content cache that can
+be used to cache either local or proxied content. Two storage
+management modules are included in the base Apache distribution:
+mod_disk_cache implements a disk based storage manager (generally used
+for proxy caching) and mod_mem_cache implements an in-memory based
+storage manager (primarily useful for caching local content).
+
+%description mod_cache -l pl
+Implementacja zgodnej z RFC 2616 pamiêci podrêcznej, która mo¿e byæ
+u¿ywana do zapamiêtywania zawarto¶ci lokalnej lub dostêpnej przez
+proxy. Do³±czono dwa modu³y pozwalaj±ce magazynowaæ dane w pamiêci
+(g³ównie u¿yteczne przy cacheowaniu lokalnej zawarto¶ci) oraz na dysku
+(u¿ywane do cacheowania proxy).
+
+%package mod_cgid
+Summary:	Execution of CGI scripts using an external CGI daemon
+Summary(pl):	Uruchamianie zewnêtrznych skryptów CGI za pomoc± daemona CGI
+Group:		Networking/Daemons
+Prereq:		%{_sbindir}/apxs
+Prereq:		perl
+Requires:	%{name}(EAPI) = %{version}
+
+%description mod_cgid
+Execution of CGI scripts using an external CGI daemon.
+
+%description mod_cgid -l pl
+Uruchamianie zewnêtrznych skryptów CGI za pomoc± daemona CGI
+
+%package mod_dav
+Summary:	Apache module - Distributed Authoring and Versioning
+Summary(pl):	Modu³ apache - Rozdzielone Autorstwo i Wersjonowanie
+Group:		Networking/Daemons
+Prereq:		%{_sbindir}/apxs
+Prereq:		perl
+Requires:	%{name}(EAPI) = %{version}
+
+%description mod_dav
+This module provides class 1 and class 2 WebDAV ('Web-based
+Distributed Authoring and Versioning') functionality for Apache. This
+extension to the HTTP protocol allows creating, moving, copying, and
+deleting resources and collections on a remote web server.
+
+%description mod_dav -l pl
+Modu³ dostarcza klasê 1 oraz klasê 2 WebDAV (Bazuj±cy na WWWW
+Rozdzielone Autorstwo i Wersjonowanie). To rozszerzenie HTTP pozwala
+na tworzenie, przesuwanie, kopiowanie oraz kasowanie zasobów na
+zdalnym serwerze www.
 
 %package mod_define
 Summary:	Apache module - authentication variables for arbitrary directives
@@ -230,21 +311,19 @@ variables which can be expanded on any(!) directive line.
 %description mod_define -l pl
 Modu³ ten umo¿liwia definicjê zmiennych i dyrektyw.
 
-%package mod_digest
-Summary:	Apache user authentication module using MD5 Digest Authentication
-Summary(pl):	Modu³ apache do autoryzacji MD5
+%package mod_deflate
+Summary:	Apache module: Compress content before it is delivered to the client
+Summary(pl):	Modu³ kompresuj±cy dane przed przes³aniem ich do klienta
 Group:		Networking/Daemons
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
 
-%description mod_digest
-This package contains mod_digest module. It provides user
-authentication using MD5 Digest Authentication.
+%description mod_deflate
+Compress content before it is delivered to the client.
 
-%description mod_digest -l pl
-Modu³ ten dostarcza metodê autoryzacji bazuj±c± na MD5 Digest
-Authentication.
+%description mod_deflate -l pl
+Modu³ kompresuj±cy dane przed przes³aniem ich do klienta.
 
 %package mod_dir
 Summary:	Apache module for "trailing slash" redirects and serving directory index files
@@ -337,15 +416,16 @@ Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
 
 %description mod_proxy
+
 This package contains module with implementation a proxy/cache for
 Apache. It implements proxying capability for FTP, CONNECT (for SSL),
-HTTP/0.9, and HTTP/1.0. The module can be configured to connect to
-other proxy modules for these and other protocols.
+HTTP/0.9, HTTP/1.0 and HTTP/1.1. The module can be configured to
+connect to other proxy modules for these and other protocols.
 
 %description mod_proxy -l pl
 Modu³ zawiera implementacjê serwera proxy/cache dla Apache.
-Iplementacja zawiera obs³ugê FTP, CONNECT (dla SSL), HTTP/0.9 i
-HTTP/1.0.
+Iplementacja zawiera obs³ugê FTP, CONNECT (dla SSL), HTTP/0.9,
+HTTP/1.0 i HTTP/1.1.
 
 %package mod_rewrite
 Summary:	Apache module with rule-based engine for rewrite requested URLs on the fly
@@ -361,6 +441,20 @@ rewrite requested URLs on the fly.
 
 %description mod_rewrite -l pl
 Modu³ oferuj±cy mo¿liwo¶æ ,,przepisywania'' adresów URL w locie.
+
+%package mod_ssl
+Summary:	Apache module: Strong cryptography using the Secure Sockets Layer (SSL)
+Summary(pl):	Modu³ apache: Silna kryptografia z u¿yciem SSL
+Group:		Networking/Daemons
+Prereq:		%{_sbindir}/apxs
+Prereq:		perl
+Requires:	%{name}(EAPI) = %{version}
+
+%description mod_ssl
+Strong cryptography using the Secure Sockets Layer (SSL).
+
+%description mod_ssl -l pl
+Silna kryptografia z u¿yciem SSL.
 
 %package mod_status
 Summary:	Server status report module for apache
@@ -455,17 +549,31 @@ Modu³ kontroluje ustawianie nag³ówka HTTP Expires. Data wyga¶niêcia
 wa¿no¶ci mo¿e byæ ustalana w zale¿no¶ci od czasu modyfikacji plików
 ¼ród³owych lub odwo³ania klienta.
 
+%package mod_file_cache
+Summary:	Apache module: Caches a static list of files in memory
+Summary(pl):	Modu³ cacheuj±cy statyczn± listê plików w pamiêci
+Group:		Networking/Daemons
+Prereq:		%{_sbindir}/apxs
+Prereq:		perl
+Requires:	%{name}(EAPI) = %{version}
+
+%description mod_file_cache
+Caches a static list of files in memory.
+
+%description mod_file_cache -l pl
+Modu³ cacheuj±cy statyczn± listê plików w pamiêci.
+
 %prep
 %setup -q -n httpd-%{version}
 
 %build
-cp -f /usr/share/automake/config.* srclib/pcre/
-cp -f /usr/share/automake/config.* srclib/apr/build/
-cp -f /usr/share/automake/config.* srclib/apr-util/xml/expat/conftools/
+cp -f %{_prefix}/share/automake/config.* srclib/pcre/
+cp -f %{_prefix}/share/automake/config.* srclib/apr/build/
+cp -f %{_prefix}/share/automake/config.* srclib/apr-util/xml/expat/conftools/
 %configure2_13 \
 	--enable-layout=PLD \
 	--enable-modules=all \
-	--enable-mods-shared=max \
+	--enable-mods-shared=all \
 	--enable-auth-anon	 \
 	--enable-auth-dbm \
 	--enable-auth-digest \
@@ -473,6 +581,7 @@ cp -f /usr/share/automake/config.* srclib/apr-util/xml/expat/conftools/
 	--enable-echo \
 	--enable-cache \
 	--enable-mem-cache \
+	--enable-disk-cache \
 	--enable-ext-filter \
 	--enable-case-filter \
 	--enable-case-filter-in \
@@ -493,7 +602,6 @@ cp -f /usr/share/automake/config.* srclib/apr-util/xml/expat/conftools/
 	--enable-optional-hook-import \
 	--enable-optional-fn-import \
 	--enable-optional-fn-export \
-	--enable-http \
 	--enable-dav \
 	--enable-info \
 	--enable-suexec \
@@ -516,6 +624,8 @@ cp -f /usr/share/automake/config.* srclib/apr-util/xml/expat/conftools/
 
 %install
 rm -rf $RPM_BUILD_ROOT
+install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig}
+install -d $RPM_BUILD_ROOT%{_var}/log/httpd
 
 %{makeinstall} \
 	prefix=%{_sysconfdir}/httpd \
@@ -537,26 +647,20 @@ rm -rf $RPM_BUILD_ROOT
 	logdir=$RPM_BUILD_ROOT%{_var}/log/httpd \
 	proxycachedir=$RPM_BUILD_ROOT%{_var}/cache/httpd
 
-mv -f $RPM_BUILD_ROOT%{_datadir}/html/manual $RPM_BUILD_ROOT%{_datadir}
-
-install %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/apache
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
+install %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/apache
 install %{SOURCE4} $RPM_BUILD_ROOT/etc/sysconfig/apache
-bzip2 -dc %{SOURCE5} | tar xf - -C $RPM_BUILD_ROOT%{_mandir}
 
 touch $RPM_BUILD_ROOT/var/log/httpd/{access,error,agent,referer}_log
 
-install errordocs/* $RPM_BUILD_ROOT%{_datadir}/errordocs
-
 install %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
-
 install %{SOURCE8}  $RPM_BUILD_ROOT%{_sysconfdir}/mod_vhost_alias.conf
 install %{SOURCE9}  $RPM_BUILD_ROOT%{_sysconfdir}/mod_status.conf
 install %{SOURCE10} $RPM_BUILD_ROOT%{_sysconfdir}/mod_proxy.conf
 
 ln -sf index.html.en $RPM_BUILD_ROOT%{_datadir}/html/index.html
 
-gzip -9nf ABOUT_APACHE src/CHANGES KEYS README
+gzip -9nf ABOUT_APACHE CHANGES README ROADMAP
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -589,9 +693,7 @@ fi
 %{_sbindir}/apxs -e -a -n cgi %{_libexecdir}/mod_cgi.so 1>&2
 %{_sbindir}/apxs -e -a -n env %{_libexecdir}/mod_env.so 1>&2
 %{_sbindir}/apxs -e -a -n include %{_libexecdir}/mod_include.so 1>&2
-%{_sbindir}/apxs -e -a -n log_agent %{_libexecdir}/mod_log_agent.so 1>&2
 %{_sbindir}/apxs -e -a -n log_config %{_libexecdir}/mod_log_config.so 1>&2
-%{_sbindir}/apxs -e -a -n log_referer %{_libexecdir}/mod_log_referer.so 1>&2
 %{_sbindir}/apxs -e -a -n mime_magic %{_libexecdir}/mod_mime_magic.so 1>&2
 %{_sbindir}/apxs -e -a -n mime %{_libexecdir}/mod_mime.so 1>&2
 %{_sbindir}/apxs -e -a -n negotiation %{_libexecdir}/mod_negotiation.so 1>&2
@@ -616,9 +718,7 @@ if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n cgi %{_libexecdir}/mod_cgi.so 1>&2
 	%{_sbindir}/apxs -e -A -n env %{_libexecdir}/mod_env.so 1>&2
 	%{_sbindir}/apxs -e -A -n include %{_libexecdir}/mod_include.so 1>&2
-	%{_sbindir}/apxs -e -A -n log_agent %{_libexecdir}/mod_log_agent.so 1>&2
 	%{_sbindir}/apxs -e -A -n log_config %{_libexecdir}/mod_log_config.so 1>&2
-	%{_sbindir}/apxs -e -A -n log_referer %{_libexecdir}/mod_log_referer.so 1>&2
 	%{_sbindir}/apxs -e -A -n mime %{_libexecdir}/mod_mime.so 1>&2
 	%{_sbindir}/apxs -e -A -n mime_magic %{_libexecdir}/mod_mime_magic.so 1>&2
 	%{_sbindir}/apxs -e -A -n negotiation %{_libexecdir}/mod_negotiation.so 1>&2
@@ -685,8 +785,8 @@ if [ "$1" = "0" ]; then
 	fi
 fi
 
-%post mod_auth_db
-%{_sbindir}/apxs -e -a -n auth_db %{_libexecdir}/mod_auth_db.so 1>&2
+%post mod_auth_dbm
+%{_sbindir}/apxs -e -a -n auth_dbm %{_libexecdir}/mod_auth_dbm.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -701,8 +801,57 @@ if [ "$1" = "0" ]; then
 	fi
 fi
 
-%triggerpostun mod_auth_db -- apache-mod_auth_db <= 1.3.20-2
-%{_sbindir}/apxs -e -A -n auth_dbm %{_libexecdir}/mod_auth_dbm.so 1>&2
+%post mod_cache
+%{_sbindir}/apxs -e -a -n mem_cache %{_libexecdir}/mod_mem_cache.so 1>&2
+%{_sbindir}/apxs -e -a -n disk_cache %{_libexecdir}/mod_disk_cache.so 1>&2
+%{_sbindir}/apxs -e -a -n cache %{_libexecdir}/mod_cache.so 1>&2
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+fi
+
+%preun mod_cache
+if [ "$1" = "0" ]; then
+	%{_sbindir}/apxs -e -A -n cache %{_libexecdir}/mod_cache.so 1>&2
+	%{_sbindir}/apxs -e -A -n disk_cache %{_libexecdir}/mod_disk_cache.so 1>&2
+	%{_sbindir}/apxs -e -A -n mem_cache %{_libexecdir}/mod_mem_cache.so 1>&2
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2
+	fi
+fi
+
+%post mod_cgid
+%{_sbindir}/apxs -e -a -n cgid %{_libexecdir}/mod_cgid.so 1>&2
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+fi
+
+%preun mod_cgid
+if [ "$1" = "0" ]; then
+	%{_sbindir}/apxs -e -A -n cgid %{_libexecdir}/mod_cgid.so 1>&2
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2
+	fi
+fi
+
+%post mod_dav
+%{_sbindir}/apxs -e -a -n dev %{_libexecdir}/mod_dav.so 1>&2
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+fi
+
+%preun mod_dav
+if [ "$1" = "0" ]; then
+	%{_sbindir}/apxs -e -A -n dav %{_libexecdir}/mod_dav.so 1>&2
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2
+	fi
+fi
 
 %post mod_define
 %{_sbindir}/apxs -e -a -n define %{_libexecdir}/mod_define.so 1>&2
@@ -720,17 +869,33 @@ if [ "$1" = "0" ]; then
 	fi
 fi
 
-%post mod_digest
-%{_sbindir}/apxs -e -a -n digest %{_libexecdir}/mod_digest.so 1>&2
+%post mod_auth_digest
+%{_sbindir}/apxs -e -a -n auth_digest %{_libexecdir}/mod_auth_digest.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
 	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
 fi
 
-%preun mod_digest
+%preun mod_auth_digest
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n digest %{_libexecdir}/mod_digest.so 1>&2
+	%{_sbindir}/apxs -e -A -n auth_digest %{_libexecdir}/mod_auth_digest.so 1>&2
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2
+	fi
+fi
+
+%post mod_deflate
+%{_sbindir}/apxs -e -a -n deflate %{_libexecdir}/mod_deflate.so 1>&2
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+fi
+
+%preun mod_deflate
+if [ "$1" = "0" ]; then
+	%{_sbindir}/apxs -e -A -n deflate %{_libexecdir}/mod_deflate.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
@@ -763,6 +928,22 @@ fi
 %preun mod_expires
 if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n expires %{_libexecdir}/mod_expires.so 1>&2
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2
+	fi
+fi
+
+%post mod_file_cache
+%{_sbindir}/apxs -e -a -n file_cache %{_libexecdir}/mod_file_cache.so 1>&2
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+fi
+
+%preun mod_file_cache
+if [ "$1" = "0" ]; then
+	%{_sbindir}/apxs -e -A -n file_cache %{_libexecdir}/mod_file_cache.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
@@ -833,7 +1014,10 @@ if [ "$1" = "0" ]; then
 fi
 
 %post mod_proxy
-%{_sbindir}/apxs -e -a -n proxy %{_libexecdir}/libproxy.so 1>&2
+%{_sbindir}/apxs -e -a -n proxy %{_libexecdir}/mod_proxy.so 1>&2
+%{_sbindir}/apxs -e -a -n proxy_connect %{_libexecdir}/mod_proxy_connect.so 1>&2
+%{_sbindir}/apxs -e -a -n proxy_ftp %{_libexecdir}/mod_proxy_ftp.so 1>&2
+%{_sbindir}/apxs -e -a -n proxy_http %{_libexecdir}/mod_proxy_http.so 1>&2
 if [ -f /etc/httpd/httpd.conf ] && ! grep -q "^Include.*mod_proxy.conf" /etc/httpd/httpd.conf; then
 	echo "Include /etc/httpd/mod_proxy.conf" >> /etc/httpd/httpd.conf
 fi
@@ -845,7 +1029,10 @@ fi
 
 %preun mod_proxy
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n proxy %{_libexecdir}/libproxy.so 1>&2
+	%{_sbindir}/apxs -e -A -n proxy_http %{_libexecdir}/mod_proxy_http.so 1>&2
+	%{_sbindir}/apxs -e -A -n proxy_ftp %{_libexecdir}/mod_proxy_ftp.so 1>&2
+	%{_sbindir}/apxs -e -A -n proxy_connect %{_libexecdir}/mod_proxy_connect.so 1>&2
+	%{_sbindir}/apxs -e -A -n proxy %{_libexecdir}/mod_proxy.so 1>&2
 	grep -v "^Include.*mod_proxy.conf" /etc/httpd/httpd.conf > \
 		/etc/httpd/httpd.conf.tmp
 	mv -f /etc/httpd/httpd.conf.tmp /etc/httpd/httpd.conf
@@ -865,6 +1052,22 @@ fi
 %preun mod_rewrite
 if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n rewrite %{_libexecdir}/mod_rewrite.so 1>&2
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2
+	fi
+fi
+
+%post mod_ssl
+%{_sbindir}/apxs -e -a -n ssl %{_libexecdir}/mod_ssl.so 1>&2
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+fi
+
+%preun mod_ssl
+if [ "$1" = "0" ]; then
+	%{_sbindir}/apxs -e -A -n ssl %{_libexecdir}/mod_ssl.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
@@ -969,9 +1172,7 @@ fi
 %attr(755,root,root) %{_libexecdir}/mod_cgi.so
 %attr(755,root,root) %{_libexecdir}/mod_env.so
 %attr(755,root,root) %{_libexecdir}/mod_include.so
-%attr(755,root,root) %{_libexecdir}/mod_log_agent.so
 %attr(755,root,root) %{_libexecdir}/mod_log_config.so
-%attr(755,root,root) %{_libexecdir}/mod_log_referer.so
 %attr(755,root,root) %{_libexecdir}/mod_mime.so
 %attr(755,root,root) %{_libexecdir}/mod_mime_magic.so
 %attr(755,root,root) %{_libexecdir}/mod_negotiation.so
@@ -1212,6 +1413,8 @@ fi
 %files suexec
 %defattr(644,root,root,755)
 %attr(4755,root,root) %{_sbindir}/suexec
+%attr(755,root,root) %{_libexecdir}/mod_suexec.so
+%{_datadir}/manual/mod/mod_suexec.html
 
 %files devel
 %defattr(644,root,root,755)
@@ -1227,29 +1430,48 @@ fi
 %attr(755,root,root) %{_libexecdir}/mod_auth.so
 %attr(755,root,root) %{_bindir}/htpasswd
 %{_datadir}/manual/mod/mod_auth.html
+%{_mandir}/man1/htpasswd.1*
 
 %files mod_auth_anon
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_auth_anon.so
 %{_datadir}/manual/mod/mod_auth_anon.html
 
-%files mod_auth_db
+%files mod_auth_dbm
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libexecdir}/mod_auth_db.so
+%attr(755,root,root) %{_libexecdir}/mod_auth_dbm.so
 %attr(755,root,root) %{_bindir}/dbmmanage
-%{_datadir}/manual/mod/mod_auth_db.html
+%{_datadir}/manual/mod/mod_auth_dbm.html
 %{_mandir}/man1/dbmmanage.1*
-%{_mandir}/man1/htpasswd.1*
+
+%files mod_auth_digest
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libexecdir}/mod_auth_digest.so
+%{_datadir}/manual/mod/mod_auth_digest.html
+
+%files mod_cache
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libexecdir}/mod_cache.so
+%attr(755,root,root) %{_libexecdir}/mod_disk_cache.so
+%attr(755,root,root) %{_libexecdir}/mod_mem_cache.so
+%{_datadir}/manual/mod/mod_cache.html
+%{_datadir}/manual/mod/mod_disk_cache.html
+%{_datadir}/manual/mod/mod_mem_cache.html
+
+%files mod_cgid
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libexecdir}/mod_cgid.so
+%{_datadir}/manual/mod/mod_cgid.html
 
 #%files mod_define
 #%defattr(644,root,root,755)
 #%attr(755,root,root) %{_libexecdir}/mod_define.so
 #%{_datadir}/manual/mod/mod_define.html
 
-%files mod_digest
+%files mod_dav
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libexecdir}/mod_digest.so
-%{_datadir}/manual/mod/mod_digest.html
+%attr(755,root,root) %{_libexecdir}/mod_dav*.so
+%{_datadir}/manual/mod/mod_dav*.html
 
 %files mod_dir
 %defattr(644,root,root,755)
@@ -1260,6 +1482,11 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_expires.so
 %{_datadir}/manual/mod/mod_expires.html
+
+%files mod_file_cache
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libexecdir}/mod_file_cache.so
+%{_datadir}/manual/mod/mod_file_cache.html
 
 %files mod_headers
 %defattr(644,root,root,755)
@@ -1284,8 +1511,8 @@ fi
 %files mod_proxy
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/mod_proxy.conf
-%attr(755,root,root) %{_libexecdir}/libproxy.so
-%{_datadir}/manual/mod/mod_proxy.html
+%attr(755,root,root) %{_libexecdir}/mod_proxy*.so
+%{_datadir}/manual/mod/mod_proxy*.html
 %dir %attr(770,root,http) /var/cache/apache
 
 %files mod_rewrite
@@ -1293,6 +1520,11 @@ fi
 %attr(755,root,root) %{_libexecdir}/mod_rewrite.so
 %{_datadir}/manual/mod/mod_rewrite.html
 %{_datadir}/manual/images/mod_rewrite*
+
+%files mod_ssl
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libexecdir}/mod_ssl.so
+%{_datadir}/manual/mod/mod_ssl.html
 
 %files mod_status
 %defattr(644,root,root,755)
