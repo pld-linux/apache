@@ -55,7 +55,7 @@ case "$1" in
 	;;
   status)
 	status httpd
-	/usr/sbin/httpd -S
+	/usr/sbin/httpd -t -D DUMP_VHOSTS
 	exit $?
 	;;
   restart)
