@@ -4,22 +4,23 @@ Summary(fr):	Serveur Web leader du marché
 Summary(pl):	Serwer WWW (World Wide Web) ze wsparciem dla IPv6
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
-Version:	1.3.6
-Release:	2.3
+Version:	1.3.9
+Release:	0.1
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Source0:	ftp://ftp.apache.org/apache/dist/%{name}_%{version}.tar.gz
 Source1:	apache.init
-Source2:	%{name}.logrotate
-Source3:	%{name}-extra1.tar.bz2
-Source6:	apache_1.3.6.tar.gz.asc
-Source7:	apache_1.3.6.tar.gz.md5
+Source2:	apache.logrotate
+Source3:	apache-extra1.tar.bz2
+#Source6:	apache_1.3.6.tar.gz.asc
+#Source7:	apache_1.3.6.tar.gz.md5
 Source8:	apache.sysconfig
-Patch0:		%{name}-suexec.patch
-Patch1:		apache-136-v6-19990616-PLD.diff
-Patch2:		%{name}-htdocs.patch
-Patch3:		%{name}-release.patch
-Patch4:		apache-ndbm.patch
+Patch0:		apache-suexec.patch
+#Patch1:		apache-136-v6-19990616-PLD.diff
+Patch1:		apache-ipv6.patch
+Patch2:		apache-htdocs.patch
+#Patch3:		apache-release.patch
+Patch4:		apache-pld.patch
 Copyright:	BSD-like
 Provides:	httpd
 Provides:	webserver
@@ -104,7 +105,7 @@ Dokumentacja do Apache w formacie HTML.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
-%patch3 -p1
+#%patch3 -p1
 %patch4 -p1
 
 %build
@@ -119,6 +120,7 @@ OPTIM="$RPM_OPT_FLAGS" LDFLAGS="-s" \
 	--localstatedir=/var \
 	--runtimedir=/var/run \
 	--logfiledir=/var/log/httpd \
+	--with-layout=PLD \
 	--without-confadjust \
 	--enable-module=all \
 	--enable-shared=max \
