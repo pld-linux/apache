@@ -166,24 +166,24 @@ gzip -9nf $RPM_BUILD_ROOT%{_mandir}/man*/* \
 %pre
 if [ -n "`getgid http`" ]; then
 	if [ "`getgid http`" != "51" ]; then
-		echo "Warning: group http haven't gid=51. Corect this before install apache"
+		echo "Warning: group http haven't gid=51. Corect this before install apache" 1>&2
 		exit 1
 	fi
 else
 	/usr/sbin/groupadd -g 51 -r -f http
 	if [ -f /var/db/group.db ]; then
-		/usr/bin/update-db
+		/usr/bin/update-db 1>&2
 	fi
 fi
-if [ -n "`id -u http`" ]; then
+if [ -n "`id -u http 2>/dev/null`" ]; then
 	if [ "`id -u http`" != "51" ]; then
-		echo "Warning: user http haven't gid=51. Corect this before install apache"
+		echo "Warning: user http haven't gid=51. Corect this before install apache" 1>&2
 		exit 1
 	fi
 else
 	/usr/sbin/useradd -u 51 -r -d /home/httpd -s /bin/false -c "HTTP User" -g http -M http
 	if [ -f /var/db/passwd.db ]; then
-		/usr/bin/update-db
+		/usr/bin/update-db 1>&2
 	fi
 fi
 
