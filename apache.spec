@@ -36,6 +36,8 @@ Patch8:		%{name}-modules_symbols.patch
 Patch9:		%{name}-apxs_force_rm_cp.patch
 Patch10:	%{name}-db3.patch
 Patch11:	%{name}-lookup_map_ldap.patch
+Patch12:	%{name}-rewrite.patch
+Patch13:	%{name}-man.patch
 Provides:	httpd
 Provides:	webserver
 Prereq:		/sbin/chkconfig
@@ -452,6 +454,8 @@ Requires:	%{name}(EAPI) = %{version}
 %patch9 -p1
 %patch10 -p1
 %{?mod_rewrite_ldap:%patch11 -p1}
+%patch12 -p1
+%patch13 -p1
 
 %build
 OPTIM="%{!?debug:$RPM_OPT_FLAGS}%{?debug:-O -g}" \
