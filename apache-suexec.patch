@@ -7,3 +7,14 @@
 -	$(LINK) -static $(suexec_OBJECTS) $(PROGRAM_LDADD)
 +	$(LINK) -static $(suexec_OBJECTS) 
  
+--- httpd-2.0.43/Makefile.in.wiget	Fri Oct  4 15:20:09 2002
++++ httpd-2.0.43/Makefile.in	Fri Oct  4 15:20:32 2002
+@@ -195,7 +195,7 @@
+ 	@if test -f $(builddir)/support/suexec; then \
+             test -d $(DESTDIR)$(sbindir) || $(MKINSTALLDIRS) $(DESTDIR)$(sbindir); \
+             $(INSTALL_PROGRAM) $(top_builddir)/support/suexec $(DESTDIR)$(sbindir); \
+-            chmod 4755 $(DESTDIR)$(sbindir)/suexec; \
++            chmod 0755 $(DESTDIR)$(sbindir)/suexec; \
+ 	fi
+ 
+ suexec:
