@@ -10,7 +10,7 @@ Summary(pl):	Serwer WWW (World Wide Web)
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	1.3.12
-Release:	27
+Release:	28
 License:	BSD-like
 Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
@@ -51,6 +51,7 @@ Requires:	mailcap
 Requires:	/etc/mime.types
 URL:		http://www.apache.org/
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
+PreReq:		mm
 Provides:	%{name}(EAPI) = %{version}
 Obsoletes:	apache-extra
 Obsoletes:	apache6
