@@ -1385,7 +1385,7 @@ fi
 #%{_libdir}/APRVARS
 %{_libdir}/apr*.exp
 %attr(755,root,root) %{_libdir}/libapr*.so
-%attr(755,root,root) %{_libdir}/libapr*.la
+%{_libdir}/libapr*.la
 
 %files -n apr-static
 %defattr(644,root,root,755)
