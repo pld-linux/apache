@@ -164,7 +164,7 @@ gzip -9nf $RPM_BUILD_ROOT%{_mandir}/man*/* \
 	ABOUT_APACHE src/CHANGES KEYS README README.v6
 
 %pre
-if [ -n `getgid http` ]; then
+if [ -n "`getgid http`" ]; then
 	if [ "`getgid http`" != "51" ]; then
 		echo "Warning: group http haven't gid=51. Corect this before install apache"
 		exit 1
@@ -172,7 +172,7 @@ if [ -n `getgid http` ]; then
 else
 	/usr/sbin/groupadd -u 51 -r -f httpd
 fi
-if [ -n `id -u http` ]; then
+if [ -n "`id -u http`" ]; then
 	if [ "`id -u http`" != "51" ]; then
 		echo "Warning: user http haven't gid=51. Corect this before install apache"
 		exit 1
