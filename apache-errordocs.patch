@@ -2,8 +2,8 @@ diff -Nru apache_1.3.9/errordocs/400.shtml apache_1.3.9.new/errordocs/400.shtml
 --- apache_1.3.9/errordocs/400.shtml	Thu Jan  1 01:00:00 1970
 +++ apache_1.3.9.new/errordocs/400.shtml	Wed Jul 15 13:54:20 1998
 @@ -0,0 +1,24 @@
++<!--#set var="title" value="Bad Request : Niepoprawne zapytanie"-->
 +<!--#include virtual="HEADER.shtml"-->
-+<!--#set var="title" value="Bad Request"-->
 +<H2 ALIGN="center">
 +[<!--#echo var="REDIRECT_STATUS"-->] Bad Request : Niepoprawne zapytanie
 +</H2>
@@ -30,8 +30,8 @@ diff -Nru apache_1.3.9/errordocs/401.shtml apache_1.3.9.new/errordocs/401.shtml
 --- apache_1.3.9/errordocs/401.shtml	Thu Jan  1 01:00:00 1970
 +++ apache_1.3.9.new/errordocs/401.shtml	Wed Jul 15 13:54:30 1998
 @@ -0,0 +1,28 @@
++<!--#set var="title" value="Authorization Required : Brak autoryzacji"-->
 +<!--#include virtual="HEADER.shtml"-->
-+<!--#set var="title" value="Authorization Required"-->
 +<H2 ALIGN="center">
 +[<!--#echo var="REDIRECT_STATUS"-->] Authorization Required : Brak autoryzacji
 +</H2>
@@ -62,8 +62,8 @@ diff -Nru apache_1.3.9/errordocs/403.shtml apache_1.3.9.new/errordocs/403.shtml
 --- apache_1.3.9/errordocs/403.shtml	Thu Jan  1 01:00:00 1970
 +++ apache_1.3.9.new/errordocs/403.shtml	Wed Jul 15 13:54:52 1998
 @@ -0,0 +1,31 @@
++<!--#set var="title" value="Forbidden : Dostêp zabroniony"-->
 +<!--#include virtual="HEADER.shtml"-->
-+<!--#set var="title" value="Forbidden"-->
 +<H2 ALIGN="center">
 +[<!--#echo var="REDIRECT_STATUS"-->] Forbidden : Dostêp zabroniony
 +</H2>
@@ -97,8 +97,8 @@ diff -Nru apache_1.3.9/errordocs/404.shtml apache_1.3.9.new/errordocs/404.shtml
 --- apache_1.3.9/errordocs/404.shtml	Thu Jan  1 01:00:00 1970
 +++ apache_1.3.9.new/errordocs/404.shtml	Wed Jul 15 13:54:58 1998
 @@ -0,0 +1,31 @@
++<!--#set var="title" value="File Not Found : Plik nie istnieje"-->
 +<!--#include virtual="HEADER.shtml"-->
-+<!--#set var="title" value="File Not Found"-->
 +<H2 ALIGN="center">
 +[<!--#echo var="REDIRECT_STATUS"-->] File Not Found : Plik nie istnieje
 +</H2>
@@ -132,8 +132,8 @@ diff -Nru apache_1.3.9/errordocs/405.shtml apache_1.3.9.new/errordocs/405.shtml
 --- apache_1.3.9/errordocs/405.shtml	Thu Jan  1 01:00:00 1970
 +++ apache_1.3.9.new/errordocs/405.shtml	Wed Jul 15 13:55:04 1998
 @@ -0,0 +1,37 @@
++<!--#set var="title" value="Method Not Allowed : Niedozwolona metoda"-->
 +<!--#include virtual="HEADER.shtml"-->
-+<!--#set var="title" value="Method Not Allowed"-->
 +<H2 ALIGN="center">
 +[<!--#echo var="REDIRECT_STATUS"-->] Method Not Allowed : Niedozwolona metoda
 +</H2>
@@ -173,8 +173,8 @@ diff -Nru apache_1.3.9/errordocs/406.shtml apache_1.3.9.new/errordocs/406.shtml
 --- apache_1.3.9/errordocs/406.shtml	Thu Jan  1 01:00:00 1970
 +++ apache_1.3.9.new/errordocs/406.shtml	Wed Jul 15 13:55:10 1998
 @@ -0,0 +1,31 @@
++<!--#set var="title" value="Not Acceptable : Brak akceptacji"-->
 +<!--#include virtual="HEADER.shtml"-->
-+<!--#set var="title" value="Not Acceptable"-->
 +<H2 ALIGN="center">
 +[<!--#echo var="REDIRECT_STATUS"-->] Not Acceptable : Brak akceptacji
 +</H2>
@@ -208,8 +208,8 @@ diff -Nru apache_1.3.9/errordocs/408.shtml apache_1.3.9.new/errordocs/408.shtml
 --- apache_1.3.9/errordocs/408.shtml	Thu Jan  1 01:00:00 1970
 +++ apache_1.3.9.new/errordocs/408.shtml	Wed Jul 15 13:55:18 1998
 @@ -0,0 +1,23 @@
++<!--#set var="title" value="Request Time-out : Przekroczony czas oczekiwania"-->
 +<!--#include virtual="HEADER.shtml"-->
-+<!--#set var="title" value="Request Time-out"-->
 +<H2 ALIGN="center">
 +[<!--#echo var="REDIRECT_STATUS"-->] Request Time-out : Przekroczony czas oczekiwania
 +</H2>
@@ -235,8 +235,8 @@ diff -Nru apache_1.3.9/errordocs/410.shtml apache_1.3.9.new/errordocs/410.shtml
 --- apache_1.3.9/errordocs/410.shtml	Thu Jan  1 01:00:00 1970
 +++ apache_1.3.9.new/errordocs/410.shtml	Wed Jul 15 13:55:22 1998
 @@ -0,0 +1,33 @@
++<!--#set var="title" value="Gone : URI usuniête"-->
 +<!--#include virtual="HEADER.shtml"-->
-+<!--#set var="title" value="Gone"-->
 +<H2 ALIGN="center">
 +[<!--#echo var="REDIRECT_STATUS"-->] Gone : URI usuniête
 +</H2>
@@ -272,8 +272,8 @@ diff -Nru apache_1.3.9/errordocs/411.shtml apache_1.3.9.new/errordocs/411.shtml
 --- apache_1.3.9/errordocs/411.shtml	Thu Jan  1 01:00:00 1970
 +++ apache_1.3.9.new/errordocs/411.shtml	Wed Jul 15 13:55:26 1998
 @@ -0,0 +1,31 @@
++<!--#set var="title" value="Length Required : Wymagana d³ugo¶æ"-->
 +<!--#include virtual="HEADER.shtml"-->
-+<!--#set var="title" value="Length Required"-->
 +<H2 ALIGN="center">
 +[<!--#echo var="REDIRECT_STATUS"-->] Length Required : Wymagana d³ugo¶æ
 +</H2>
@@ -307,8 +307,8 @@ diff -Nru apache_1.3.9/errordocs/414.shtml apache_1.3.9.new/errordocs/414.shtml
 --- apache_1.3.9/errordocs/414.shtml	Thu Jan  1 01:00:00 1970
 +++ apache_1.3.9.new/errordocs/414.shtml	Wed Jul 15 13:55:34 1998
 @@ -0,0 +1,23 @@
++<!--#set var="title" value="Request-URI Too Large : Zbyt d³ugi URI"-->
 +<!--#include virtual="HEADER.shtml"-->
-+<!--#set var="title" value="Request-URI Too Large"-->
 +<H2 ALIGN="center">
 +[<!--#echo var="REDIRECT_STATUS"-->] Request-URI Too Large : Zbyt d³ugi URI
 +</H2>
@@ -334,8 +334,8 @@ diff -Nru apache_1.3.9/errordocs/500.shtml apache_1.3.9.new/errordocs/500.shtml
 --- apache_1.3.9/errordocs/500.shtml	Thu Jan  1 01:00:00 1970
 +++ apache_1.3.9.new/errordocs/500.shtml	Wed Jul 15 13:55:38 1998
 @@ -0,0 +1,37 @@
++<!--#set var="title" value="Internal Server Error : Wewnêtrzny b³±d serwera"-->
 +<!--#include virtual="HEADER.shtml"-->
-+<!--#set var="title" value="Internal Server Error"-->
 +<H2 ALIGN="center">
 +[<!--#echo var="REDIRECT_STATUS"-->] Internal Server Error : Wewnêtrzny b³±d serwera
 +</H2>
@@ -375,8 +375,8 @@ diff -Nru apache_1.3.9/errordocs/503.shtml apache_1.3.9.new/errordocs/503.shtml
 --- apache_1.3.9/errordocs/503.shtml	Thu Jan  1 01:00:00 1970
 +++ apache_1.3.9.new/errordocs/503.shtml	Wed Jul 15 13:55:48 1998
 @@ -0,0 +1,25 @@
++<!--#set var="title" value="Service Temporarily Unavailable : Us³ugi tymczasowo niedostêpne"-->
 +<!--#include virtual="HEADER.shtml"-->
-+<!--#set var="title" value="Service Temporarily Unavailable"-->
 +<H2 ALIGN="center">
 +[<!--#echo var="REDIRECT_STATUS"-->] Service Temporarily Unavailable : Us³ugi tymczasowo niedostêpne
 +</H2>
