@@ -38,9 +38,8 @@ case "$1" in
 	$0 start
 	;;
   reload)
-	echo -n "Reloading httpd: "
+	msg_reloading httpd
 	killproc httpd -HUP
-	echo
 	;;
   *)
 	msg_usage "$0 {start|stop|restart|reload|status}"
