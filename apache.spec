@@ -46,10 +46,11 @@ Patch0:		%{name}-apxs.patch
 Patch1:		%{name}-configdir_skip_backups.patch
 Patch2:		%{name}-layout.patch
 Patch3:		%{name}-suexec.patch
+Patch4:		%{name}-db.patch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %{!?_without_ssl:BuildRequires:	openssl-devel >= 0.9.6f}
 %{!?_without_ssl:BuildRequires:	openssl-tools}
-BuildRequires:	db4-devel
+BuildRequires:	db-devel
 BuildRequires:	zlib-devel
 BuildRequires:	expat-devel
 BuildRequires:	perl-devel >= 5.004
@@ -576,6 +577,7 @@ Statyczne biblioteki APR.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 
 %build
 %configure \
@@ -638,7 +640,7 @@ install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig}
 install -d $RPM_BUILD_ROOT%{_var}/log/{httpd,archiv/httpd}
 install -d $RPM_BUILD_ROOT%{_var}/{run,cache}/apache
 
-%{makeinstall} \
+%{__make} install DESTDIR=$RPM_BUILD_ROOT \
 	prefix=%{_sysconfdir}/httpd \
 	bindir=$RPM_BUILD_ROOT%{_bindir} \
 	sbindir=$RPM_BUILD_ROOT%{_sbindir} \
