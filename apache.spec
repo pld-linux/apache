@@ -57,8 +57,9 @@ Patch1:		%{name}-layout.patch
 Patch2:		%{name}-suexec.patch
 Patch3:		%{name}-nolibs.patch
 Patch4:		%{name}-apr.patch
-# taken from suse. project homepage http://www.metux.de/mpm/en/?patpage=index
-Patch5:		httpd-2.0.47-metuxmpm-r6.diff
+# project homepage http://www.metux.de/mpm/en/?patpage=index
+# http://www.sannes.org/metuxmpm/
+Patch5:		httpd-2.0.47-metuxmpm-r7.diff
 Patch6:		%{name}-posix_syntax
 Patch7:		httpd-2.0.40-xfsz.patch
 Patch8: 	httpd-2.0.45-davetag.patch
