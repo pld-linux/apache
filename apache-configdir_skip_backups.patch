@@ -20,7 +20,7 @@ diff -urN httpd-2.0.35.org/server/config.c httpd-2.0.35/server/config.c
 -                fnew = (fnames *) apr_array_push(candidates);
 -                fnew->fname = ap_make_full_path(p, fname, dirent.name);
 +                && strcmp(dirent.name, "..")
-+		&& (dirent.name)[slen-1] != '~') {
++		&& (dirent.name)[slen-1] != '~' && (dirent.name)[0] != ".") {
 +		if (slen < 8 || strcmp((dirent.name + slen - 7), ".rpmnew")) {
 +		    if (slen < 9 || 
 +			    strcmp((dirent.name + slen - 8), ".rpmorig") && 
