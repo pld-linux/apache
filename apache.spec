@@ -58,19 +58,20 @@ Patch4:		%{name}-apr.patch
 # taken from suse. project homepage http://www.metux.de/mpm/en/?patpage=index
 Patch5:		httpd-2.0.47-metuxmpm-r6.diff
 Patch6:		%{name}-posix_syntax
+Patch7:		%{name}-gcc2.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	automake
 BuildRequires:	apr-devel >= 1:0.9.4-1
 BuildRequires:	apr-util-devel >= 1:0.9.5-0.3
-BuildRequires:	db-devel
+BuildRequires:	db3-devel
 BuildRequires:	expat-devel
-BuildRequires:	gdbm-devel >= 1.8.3
+BuildRequires:	gdbm-devel
 BuildRequires:	libtool >= 1.5
 %{!?_without_ldap:BuildRequires:	openldap-devel}
-%{!?_without_ssl:BuildRequires:	openssl-devel >= 0.9.7c}
-%{!?_without_ssl:BuildRequires:	openssl-tools >= 0.9.7c}
+%{!?_without_ssl:BuildRequires:	openssl-devel >= 0.9.5k}
+%{!?_without_ssl:BuildRequires:	openssl-tools >= 0.9.5k}
 BuildRequires:	perl-devel >= 5.004
-BuildRequires:	rpm-perlprov >= 4.0.4
+BuildRequires:	rpm-perlprov
 BuildRequires:	zlib-devel
 PreReq:		perl-base
 PreReq:		rc-scripts
@@ -609,6 +610,7 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 %patch4 -p1
 %patch6 -p1
 #%patch5 -p1
+%patch7 -p1
 
 %build
 # sanity check
