@@ -26,7 +26,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.0.47
-Release:	0.5
+Release:	0.6
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -61,8 +61,8 @@ BuildRequires:	perl-devel >= 5.004
 BuildRequires:	rpm-perlprov >= 4.0.4
 BuildRequires:	zlib-devel
 BuildRequires:	libtool >= 1.5
-BuildRequires:	apr-devel >= 1:0.9.3
-BuildRequires:	apr-util-devel >= 1:0.9.3
+BuildRequires:	apr-devel >= 1:0.9.4
+BuildRequires:	apr-util-devel >= 1:0.9.4
 PreReq:		perl
 PreReq:		rc-scripts
 Requires(pre):	/bin/id
@@ -171,7 +171,7 @@ Summary(pt_BR):	Arquivos de inclusЦo do Apache para desenvolvimento de mСdulos
 Summary(ru):	Средства разработки модулей для веб-сервера Apache
 Group:		Networking/Utilities
 Requires:	%{name} = %{version}
-Requires:	apr-util-devel >= 1:0.9.3
+Requires:	apr-util-devel >= 1:0.9.4
 Requires:	libtool
 Obsoletes:	%{name}-static
 
