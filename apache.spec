@@ -11,7 +11,7 @@ Summary(pl):	Serwer WWW (World Wide Web)
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	1.3.19
-Release:	6
+Release:	7
 License:	Apache Group License
 Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
@@ -1017,9 +1017,12 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_datadir}
 %dir %{_datadir}/manual
 %dir %{_datadir}/manual/images/
-%{_datadir}/manual/images/sub.gif
-%{_datadir}/manual/images/index.gif
+%{_datadir}/manual/images/apache_header.gif 
+%{_datadir}/manual/images/custom_errordocs.gif 
 %{_datadir}/manual/images/home.gif 
+%{_datadir}/manual/images/index.gif
+%{_datadir}/manual/images/pixel.gif 
+%{_datadir}/manual/images/sub.gif 
 %{_datadir}/manual/misc
 %dir %{_datadir}/manual/search
 %attr(755,root,root) %{_datadir}/manual/search/manual-index.cgi
@@ -1234,6 +1237,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_rewrite.so
 %{_datadir}/manual/mod/mod_rewrite.html
+%{_datadir}/manual/images/mod_rewrite*
 
 %files mod_status
 %defattr(644,root,root,755)
