@@ -3102,8 +3102,8 @@ diff -Nur apache_1.3.28.orig/src/modules/proxy/proxy_ftp.c apache_1.3.28/src/mod
  
 -    memset(&server, 0, sizeof(struct sockaddr_in));
 -    server.sin_family = AF_INET;
--    server.sin_port = htons((unsigned short)port);
--    err = ap_proxy_host2addr(host, &server_hp);
+-    server.sin_port = htons((unsigned short)destport);
+-    err = ap_proxy_host2addr(desthost, &server_hp);
 -    if (err != NULL)
 -        return ap_proxyerror(r, HTTP_INTERNAL_SERVER_ERROR, err);
 -
@@ -3112,11 +3112,11 @@ diff -Nur apache_1.3.28.orig/src/modules/proxy/proxy_ftp.c apache_1.3.28/src/mod
 -        ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
 -                      "proxy: error creating socket");
 -        return HTTP_INTERNAL_SERVER_ERROR;
-+    ap_snprintf(portbuf, sizeof(portbuf), "%d", port);
++    ap_snprintf(portbuf, sizeof(portbuf), "%d", destport);
 +    memset(&hints, 0, sizeof(hints));
 +    hints.ai_family = PF_UNSPEC;
 +    hints.ai_socktype = SOCK_STREAM;
-+    error = getaddrinfo(host, portbuf, &hints, &res0);
++    error = getaddrinfo(desthost, portbuf, &hints, &res0);
 +    if (error) {
 +        return ap_proxyerror(r, HTTP_INTERNAL_SERVER_ERROR, gai_strerror(error));
      }
