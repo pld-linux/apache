@@ -57,6 +57,7 @@ Patch3:		%{name}-nolibs.patch
 Patch4:		%{name}-apr.patch
 # taken from suse. project homepage http://www.metux.de/mpm/en/?patpage=index
 Patch5:		httpd-2.0.47-metuxmpm-r6.diff
+Patch6:		posix_syntax
 URL:		http://httpd.apache.org/
 BuildRequires:	automake
 BuildRequires:	apr-devel >= 1:0.9.4-1
@@ -606,6 +607,7 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
+%patch6 -p1
 #%patch5 -p1
 
 %build
