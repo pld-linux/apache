@@ -1,24 +1,29 @@
-Summary:     HTTP server daemon to provide WWW services
-Summary(de): Leading World Wide Web-Server
-Summary(fr): Serveur Web leader du marché
-Summary(pl): Serwer WWW (World Wide Web)
-Summary(tr): Lider WWW tarayýcý
-Name:        apache
-Version:     1.3.3
-Release:     1
-Group:       Networking/Daemons
-Source0:     ftp://ftp.apache.org/apache/dist/%{name}_%{version}.tar.gz
-Source1:     httpd.init
-Source2:     apache.log
-Patch0:      apache-suexec.patch
-Patch1:      apache-config.patch
-Copyright:   BSD-like
-Obsoletes:   apache-extra
-Provides:    httpd
-Requires:    /etc/mime.types, initscripts >= 3.25, setup >= 1.10.0
-Prereq:      /sbin/chkconfig
-URL:         http://www.apache.org/
-BuildRoot:   /tmp/%{name}-%{version}-root
+Summary:	HTTP server daemon to provide WWW services
+Name:		apache
+Version:	1.3.4
+Release:	3d
+Group:		Networking/Daemons
+Group(pl):	Sieci/Demony
+Source0:	ftp://ftp.apache.org/apache/dist/%{name}_%{version}.tar.gz
+Source1:	httpd.init
+Source2:	%{name}.log
+Source3:	%{name}-config.tar.gz
+Source4:	httpd.conf
+########	http://www.eos.ncsu.edu/apache
+Source5:	mod_auth_kerb-3.6.tar.gz
+Patch0:		%{name}-1.3.2-suexec.patch
+Patch1:		%{name}-ndbm.patch
+Copyright:	BSD-like
+Obsoletes:	apache-extra
+Obsoletes:	apache6
+Provides:	httpd
+Prereq:		/sbin/chkconfig
+URL:		http://www.apache.org/
+BuildRoot:	/tmp/%{name}-%{version}-root
+Summary(de):	Leading World Wide Web-Server
+Summary(fr):	Serveur Web leader du marché
+Summary(pl):	Serwer WWW (World Wide Web)
+Summary(tr):	Lider WWW tarayýcý
 
 %description
 Apache is a full featured web server that is freely available, and also
@@ -33,18 +38,19 @@ Apache est un serveur Web complet, disponible librement, et se trouve être
 aussi le plus utilisé à travers le monde.
 
 %description -l pl
-Apache jest serwerem WWW (World Wide Web). Instaluj±c ten
-pakiet bêdziesz móg³ prezentowaæ w³asne strony WWW w sieci internet
-Apache umozliwia równie¿ konfigurowanie serwerów wirtualnych.
+Apache jest serwerem WWW (World Wide Web). Instaluj±c ten pakiet bêdziesz 
+móg³ prezentowaæ w³asne strony WWW w sieci internet. Apache umo¿liwia równie¿
+konfigurowanie serwerów wirtualnych.
 
 %description -l tr
 Apache serbest daðýtýlan ve çok kullanýlan yetenekli bir web sunucusudur.
 
 %package suexec
-Summary:     Apache suexec wrapper
-Summary(pl): suexec wrapper do serwera www Apache
-Group:       Networking/Daemons
-Requires:    %{name} = %{version}
+Summary:	Apache suexec wrapper
+Group:		Networking/Development
+Group(pl):	Sieci/Programowanie
+Requires:	%{name} = %{version}
+Summary(pl):	Suexec wrapper do serwera www Apache
 
 %description suexec
 The suEXEC feature provides Apache users the ability to run CGI and SSI
@@ -53,27 +59,30 @@ Normally, when a CGI or SSI program executes, it runs as the same user
 who is running the web server. 
 
 %description -l pl suexec
-suEXEC umo¿liwia serwerowi Apache uruchamianie programów CGI i SSI z innym
-UID ni¿ wywo³yj±cy je serwer. Normalnie programy CGI i SSI s± wykonywane
-jako taki sam urzytkownik jak serwer WWW.
+SuEXEC umo¿liwia serwerowi Apache uruchamianie programów CGI i SSI z innym
+UID ni¿ wywo³uj±cy je serwer. Normalnie programy CGI i SSI s± wykonywane
+jako taki sam u¿ytkownik jak serwer WWW.
 
 %package devel
-Summary:     Apache include files
-Summary(pl): Pliki nag³ówkowe do serwera www Apache
-Group:       Networking/Development
-Requires:    %{name} = %{version}
+Summary:	Apache include files
+Group:		Networking/Development
+Group(pl):	Sieci/Programowanie
+Requires:	%{name} = %{version}
+Summary(pl):	Pliki nag³ówkowe do serwera www Apache
 
 %description devel
 Apache include files.
 
 %description -l pl devel
-Pliki nag³owkowe do serwera www Apache.
+Pliki nag³ówkowe do serwera www Apache.
 
 %package doc
-Summary:     Apache dokumentation
-Summary(pl): Dokumentacja do Apache
-Group:       Documentation
-Requires:    %{name} = %{version}
+Summary:	Apache dokumentation
+Group:		Documentation
+Group(pl):	Dokumentacja
+Requires:	%{name} = %{version}
+URL:		http://www.apache.org/
+Summary(pl):	Dokumentacja do Apache
 
 %description doc
 Documentation for apache in HTML format.
@@ -87,7 +96,8 @@ Dokumentacja do Apache w formacie HTML
 %patch1 -p1
 
 %build
-OPTIM="$RPM_OPT_FLAGS" ./configure \
+OPTIM=$RPM_OPT_FLAGS \
+    ./configure \
 	--prefix=/usr \
 	--sysconfdir=/etc/httpd/conf \
 	--datadir=/home/httpd \
@@ -98,12 +108,15 @@ OPTIM="$RPM_OPT_FLAGS" ./configure \
 	--without-confadjust \
 	--enable-module=all \
 	--enable-shared=max \
+	--disable-module=auth_db \
 	--proxycachedir=/var/spool/proxy \
 	--with-perl=/usr/bin/perl \
 	--enable-suexec \
 	--suexec-caller=http \
 	--suexec-uidmin=500 \
-	--suexec-gidmin=500
+	--suexec-gidmin=500 \
+	--sbindir=/usr/sbin \
+	--includedir=/usr/include/apache
 
 make
 
@@ -111,17 +124,28 @@ make
 rm -rf $RPM_BUILD_ROOT
 make install-quiet root="$RPM_BUILD_ROOT"
 
-install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d}
+mv $RPM_BUILD_ROOT/home/httpd/htdocs $RPM_BUILD_ROOT/home/httpd/html
 
-install $RPM_SOURCE_DIR/apache.log $RPM_BUILD_ROOT/etc/logrotate.d/apache
-install $RPM_SOURCE_DIR/httpd.init $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
+install -d $RPM_BUILD_ROOT/etc/{httpd/conf,logrotate.d,rc.d/init.d}
+install -d $RPM_BUILD_ROOT/home/httpd/{html/manual,icons,cgi-bin}
+install -d $RPM_BUILD_ROOT/{usr/{lib/apache,sbin,man/man{1,8}},var/log/httpd}
 
-# Only needed for from_cvs tarballs, but doesn't hurt otherwise
+install %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/apache
+install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
+
+install -d $RPM_BUILD_ROOT/usr/include/apache
+
+tar zxf %{SOURCE3} -C $RPM_BUILD_ROOT/etc/httpd/conf
+
+rm -f $RPM_BUILD_ROOT/etc/httpd/conf/httpd.conf
+install %{SOURCE4} $RPM_BUILD_ROOT/etc/httpd/conf
+
 rm -f $RPM_BUILD_ROOT/home/httpd/html/manual/expand.pl
 
-strip --strip-debug $RPM_BUILD_ROOT/usr/libexec/apache/*.so || :
-
-touch $RPM_BUILD_ROOT/var/log/httpd/{access,error,suexec}_log
+touch $RPM_BUILD_ROOT/var/log/httpd/{access,error}_log
+ 
+bzip2 -9 $RPM_BUILD_ROOT/usr/man/{man1/*,man8/*}
+bzip2 -9 ABOUT_APACHE src/CHANGES KEYS README
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -138,48 +162,70 @@ if [ $1 = 0 ]; then
 fi
 
 %files
-%defattr(644, root, root, 755)
-%doc ABOUT_APACHE src/CHANGES KEYS LICENSE README
-%doc src/support/suexec.[ch]
-%doc /home/httpd/html/manual
+%defattr(644,root,root,755)
+%doc ABOUT_APACHE.bz2 src/CHANGES.bz2 KEYS.bz2 README.bz2
+%doc conf/mime.types
 
-%dir /etc/httpd
-%dir /etc/httpd/conf
-%config(noreplace) %verify(not size mtime md5) /etc/httpd/conf/*.conf
-/etc/httpd/conf/*.conf.default
-%attr(600, root, root) %config /etc/logrotate.d/*
-%attr(755, root, root) %dir /home/httpd
-%attr(755, root, root) %dir /home/httpd/html
+%attr(750,root,root) %dir /etc/httpd
+%attr(750,root,root) %dir /etc/httpd/conf
+%attr(640,root,root) %config %verify(not size mtime md5) /etc/httpd/conf/*
+
+%attr(640,root,root) %config /etc/logrotate.d/*
+%attr(755,root,root) %dir /home/httpd/html
+
 %config(noreplace) /home/httpd/html/index.html
-/home/httpd/html/apache_pb.gif
-%attr(755, root, root) /etc/rc.d/init.d/httpd
-%attr(755, root, root, 755) /home/httpd/cgi-bin
-%attr(755, root, root, 755) /usr/libexec/apache
-%dir /home/httpd/icons
-/home/httpd/icons/*.gif
-%attr(755, root, root) /usr/bin/*
-%attr(755, root, root) /usr/sbin/ab
-%attr(755, root, root) /usr/sbin/apachectl
-%attr(755, root, root) /usr/sbin/apxs
-%attr(755, root, root) /usr/sbin/httpd
-%attr(755, root, root) /usr/sbin/logresolve
-%attr(755, root, root) /usr/sbin/rotatelogs
-%attr(4751,root, root) /usr/sbin/suexec
-%attr(644, root,  man) /usr/man/man[18]/*
-%attr(700, root, root) %dir /var/log/httpd
-%ghost /var/log/httpd/*
+
+%attr(644,root,root) /home/httpd/html/*.gif
+%attr(700,root,root) %config %verify(not size mtime md5) /etc/rc.d/init.d/*
+
+%attr(755,root,root,755) /home/httpd/cgi-bin
+%attr(755,root,root,755) /usr/libexec/apache
+%attr(755,root,root,755) %dir /home/httpd/icons
+
+%attr(644,root,root) /home/httpd/icons/*.gif
+
+%attr(755,root,root) /usr/bin/dbmmanage 
+%attr(755,root,root) /usr/bin/htdigest
+%attr(755,root,root) /usr/bin/htpasswd
+
+%attr(755,root,root) /usr/sbin/ab
+%attr(755,root,root) /usr/sbin/apachectl
+%attr(755,root,root) /usr/sbin/apxs
+%attr(755,root,root) /usr/sbin/httpd
+%attr(755,root,root) /usr/sbin/logresolve
+%attr(755,root,root) /usr/sbin/rotatelogs
+
+%attr(644,root, man) /usr/man/man[18]/*
+
+%attr(750,root,root) %dir /var/log/httpd
+%attr(640,root,root) %config %verify(not size mtime md5) /var/log/httpd/*
 
 %files suexec
-%attr(4751,root, root) /usr/sbin/suexec
-%ghost /var/log/httpd/suexec_log
+%attr(4711,root,root) /usr/sbin/suexec
 
 %files devel
-%attr(644, root, root, 755) /usr/include/apache
+%defattr(644,root,root,755) 
+
+%dir /usr/include/apache
+/usr/include/apache/*
 
 %files doc
-%doc /home/httpd/html/manual
+%defattr(644,root,root,755)
+/home/httpd/html/manual
 
 %changelog
+* Thu Jan 21 1999 Wojtek ¦lusarczyk <wojtek@shadow.eu.org>
+  [1.3.4-3d]
+- fixed files permission,
+- fixed apache.init,
+- some other changes.
+
+* Sun Jan 17 1999 Wojtek ¦lusarczyk <wojtek@shadow.eu.org>
+  [1.3.4-2d]
+- fixed sbindir && apache includes (by Mirek Nowakowski <nowam@pg.gda.pl>),
+- compressed documentation,
+- fixed Group(pl).
+
 * Wed Nov 13 1998 Tomasz K³oczko <kloczek@rudy.mif.pg.gda.pl>
   [1.3.3-1]
 - removed making symlinks in /etc/rc.d/rc?.d and in %install also
@@ -192,19 +238,30 @@ fi
   http user/group.
 
 * Wed Oct 14 1998 Konrad Stêpieñ <konrad@interdata.com.pl>
-  [1.3.3-0]
-- changed user/group to http,
-- enabled all modules,
-- added magic (for mod_mime_magic),
-- rebuild spec file to minimize number of patches,
-- suEXEC in separated package.
+  [1.3.3-1d]
+- up to 1.3.3
+- changed user/group to http
+- added patch against GNU libc-2.1, 
+  prepared by Wojtek ¦lusarczyk <wojtek@shadow.eu.org>
+- enabled all modules (without auth_db ....)
+- added magic (for mod_mime_magic)
+- rebuild spec file to minimize number of patches
+- suEXEC in separated package
+
+* Wed Oct 14 1998 Wojtek ¦lusarczyk <wojtek@shadow.eu.org>
+  [1.3.2-1d]
+- build against Tornado (GNU libc-2.1),
+- minor changes. 
 
 * Fri Sep 25 1998 Konrad Stêpieñ <konrad@interdata.com.pl>
   [1.3.2-1]
-- reconfig to use /etc/mime.types (again),
+- up to 1.3.2
+- reconfig to use /etc/mime.types (again)
   orginal mime.types can be found in documentation directory
-- restore orginal start page,
-- added "Provides: httpd".
+- changed to user/group httpd
+- restore orginal start page
+- documentation in separate package
+- added "Provides:httpd"
 
 * Thu Sep  3 1998 Tomasz K³oczko <kloczek@rudy.mif.pg.gda.pl>
   [1.3.1-2]
@@ -219,13 +276,13 @@ fi
 - changed permidssion on logrotate config file to 600,
 - changed permidssion on /var/log/httpd to 700,
 - added %ghost /var/log/httpd/*
-- added stripping modules.
+- added striping modules.
 - added patch to defeat header dos attack
 
 * Sat Jul 18 1998 Manoj Kasichainula <manojk@io.com>
   [1.3.1-1]
-some of the changes from 1.3.0-1 (mine was done independantly, so there are
-probably other changes)
+  some of the changes from 1.3.0-1 (mine was done independantly, so there are
+  probably other changes)
 - /etc/rc.d/init.d/httpd includes reload
 - logrotate doesn't kill all httpd processes, just one. This is recommended.
 - Doesn't uses Red Hat MIME typesm since RH mime.types doesn't include .htm,
