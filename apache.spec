@@ -97,7 +97,7 @@ Dokumentacja do Apache w formacie HTML
 
 %build
 OPTIM=$RPM_OPT_FLAGS LDFLAGS=-s\
-    ./configure \
+    ./configure %{_target} \
 	--prefix=/usr \
 	--sysconfdir=/etc/httpd/conf \
 	--datadir=/home/httpd \
