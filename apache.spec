@@ -1,6 +1,7 @@
 #
 # Conditional build:
 # mod_rewrite_ldap - enable ldap map supoort for mod_rewrite (alpha)
+# bcond_apache_disable_ipv6 - disable IPv6 support
 #
 %include	/usr/lib/rpm/macros.perl
 Summary:	The most widely used Web server on the Internet
@@ -457,7 +458,6 @@ Requires:	%{name}(EAPI) = %{version}
 
 %build
 OPTIM="%{!?debug:$RPM_OPT_FLAGS}%{?debug:-O -g}" \
-IPV6_RULE=%{!?bcond_apache_disable_ipv6:--enable-rule=INET6}
 ./configure \
 	--prefix=%{_prefix} \
 	--sysconfdir=%{_sysconfdir} \
@@ -480,7 +480,8 @@ IPV6_RULE=%{!?bcond_apache_disable_ipv6:--enable-rule=INET6}
 	--suexec-gidmin=500 \
 	--suexec-docroot=%{_datadir} \
 	--disable-rule=WANTHSREGEX \
-	--enable-rule=EAPI ${IPV6_RULE}
+	--enable-rule=EAPI \
+	%{!?bcond_apache_disable_ipv6:--enable-rule=INET6}
 
 %{__make} LIBS1="-lm -lcrypt -lmm -ldl"
 
