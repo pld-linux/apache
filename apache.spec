@@ -10,7 +10,8 @@ Group:       Networking/Daemons
 Source0:     ftp://ftp.apache.org/apache/dist/%{name}_%{version}.tar.gz
 Source1:     httpd.init
 Source2:     apache.log
-Patch0:      apache-1.3.2-suexec.patch
+Patch0:      apache-suexec.patch
+Patch1:      apache-config.patch
 Copyright:   BSD-like
 Obsoletes:   apache-extra
 Provides:    httpd
@@ -83,6 +84,7 @@ Dokumentacja do Apache w formacie HTML
 %prep 
 %setup -q -n apache_%{version}
 %patch0 -p1
+%patch1 -p1
 
 %build
 OPTIM="$RPM_OPT_FLAGS" ./configure \
@@ -109,9 +111,7 @@ make
 rm -rf $RPM_BUILD_ROOT
 make install-quiet root="$RPM_BUILD_ROOT"
 
-install -d $RPM_BUILD_ROOT/etc/{httpd/conf,logrotate.d,rc.d/init.d}
-install -d $RPM_BUILD_ROOT/home/httpd/{html/manual,icons,cgi-bin}
-install -d $RPM_BUILD_ROOT/{usr/{lib/apache,sbin,man/man{1,8}},var/log/httpd}
+install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d}
 
 install $RPM_SOURCE_DIR/apache.log $RPM_BUILD_ROOT/etc/logrotate.d/apache
 install $RPM_SOURCE_DIR/httpd.init $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
@@ -121,7 +121,7 @@ rm -f $RPM_BUILD_ROOT/home/httpd/html/manual/expand.pl
 
 strip --strip-debug $RPM_BUILD_ROOT/usr/libexec/apache/*.so || :
 
-touch $RPM_BUILD_ROOT/var/log/httpd/{access,error}_log
+touch $RPM_BUILD_ROOT/var/log/httpd/{access,error,suexec}_log
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -171,6 +171,7 @@ fi
 
 %files suexec
 %attr(4751,root, root) /usr/sbin/suexec
+%ghost /var/log/httpd/suexec_log
 
 %files devel
 %attr(644, root, root, 755) /usr/include/apache
@@ -184,6 +185,9 @@ fi
 - removed making symlinks in /etc/rc.d/rc?.d and in %install also
   removed this symlinks from %files (/etc/rc.d/init.d/httpd suports
   chkconfig),
+- more simplifications in %install,
+- added new apache-config.patch,
+- added "%ghost /var/log/httpd/suexec_log" for suexec subpackage,
 - added "Requires: setup >= 1.10.0" for proper install in enviroment with
   http user/group.
 
