@@ -6,8 +6,6 @@
 # - add %%post/%%postun to suexec
 # - --with-suexec-gidmin=500 or =100 ?
 # - --with-suexec-uidmin=500 or =1000 ?
-# - subpackages for MPMs
-# - check if all modules (*.so) are exactly the same for different MPMs
 #
 # Conditional build:
 %bcond_without	ssl	# don't build with SSL support
@@ -99,6 +97,8 @@ Requires:	psmisc >= 20.1
 Provides:	httpd = %{version}
 Provides:	webserver = %{version}
 Provides:	apache(modules-api) = %{_apache_modules_api}
+Conflicts:	apr
+Conflicts:	apr-util
 Obsoletes:	apache-extra
 Obsoletes:	apache-doc
 Obsoletes:	apache6
@@ -644,7 +644,9 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 %patch22 -p1
 
 %build
-{,srclib/{apr,apr-util}} %{__libtoolize}
+%{__libtoolize}
+cd srclib/apr && %{__libtoolize} && cd -
+cd srclib/apr-util && %{__libtoolize} && cd -
 # sanity check
 MODULES_API=`awk '/#define MODULE_MAGIC_NUMBER_MAJOR/ {print $3}' include/ap_mmn.h`
 if [ "$MODULES_API" != "%_apache_modules_api" ]; then
@@ -716,7 +718,6 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig} \
 	$RPM_BUILD_ROOT%{_var}/{log/{httpd,archiv/httpd},{run,cache}/apache}
 
-# prefork is default one
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT \
 	installbuilddir=%{_sysconfdir}/build \
@@ -1310,10 +1311,10 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/ap*
 %{_includedir}
-%attr(644,root,root) %{_libdir}/lib*.so
-%{_libdir}/lib*.la
-%{_libdir}/lib*.a
 %{_libdir}/apr*.exp
+%{_libdir}/lib*.a
+%{_libdir}/lib*.la
+%attr(644,root,root) %{_libdir}/lib*.so
 %{_libexecdir}/*.exp
 %attr(750,root,root) %dir %{_sysconfdir}/build
 %attr(755,root,root) %dir %{_libexecdir}/build
