@@ -26,7 +26,7 @@ Summary(ru):	óÁÍÙÊ ÐÏÐÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.0.47
-Release:	0.4
+Release:	0.5
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -50,6 +50,7 @@ Patch0:		%{name}-configdir_skip_backups.patch
 Patch1:		%{name}-layout.patch
 Patch2:		%{name}-suexec.patch
 Patch3:		%{name}-nolibs.patch
+Patch4:		%{name}-apr.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	db-devel
 BuildRequires:	expat-devel
@@ -60,6 +61,8 @@ BuildRequires:	perl-devel >= 5.004
 BuildRequires:	rpm-perlprov >= 4.0.4
 BuildRequires:	zlib-devel
 BuildRequires:	libtool >= 1.5
+BuildRequires:	apr-devel >= 1:0.9.3
+BuildRequires:	apr-util-devel >= 1:0.9.3
 PreReq:		perl
 PreReq:		rc-scripts
 Requires(pre):	/bin/id
@@ -168,7 +171,7 @@ Summary(pt_BR):	Arquivos de inclusão do Apache para desenvolvimento de módulos
 Summary(ru):	óÒÅÄÓÔ×Á ÒÁÚÒÁÂÏÔËÉ ÍÏÄÕÌÅÊ ÄÌÑ ×ÅÂ-ÓÅÒ×ÅÒÁ Apache
 Group:		Networking/Utilities
 Requires:	%{name} = %{version}
-Requires:	apr-devel = %{version}
+Requires:	apr-devel >= 1:0.9.3
 Requires:	libtool
 
 %description devel
@@ -574,56 +577,13 @@ Caches a static list of files in memory.
 %description mod_file_cache -l pl
 Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 
-%package -n apr
-Summary:	The Apache Portable Runtime library
-Summary(pl):	Przeno¶na biblioteka Apache
-Group:		Libraries
-
-%description -n apr
-The Apache Portable Run-time libraries have been designed to provide a
-common interface to low level routines across any platform.
-
-%description -n apr -l pl
-Przeno¶na biblioteka Apache zosta³a zaprojektowana w celu
-udostêpnienia popularnego i jednolitego interfejsu do niskopoziomowych
-funkcji na dowolnej platformie.
-
-%package -n apr-devel
-Summary:	The includes and linker libraries for development with APR
-Summary(pl):	Pliki nag³ówkowe, biblioteki dla konsolidatora APR
-Group:		Development/Libraries
-Requires:	apr = %{version}
-Requires:	gdbm-devel >= 1.8.3
-Requires:	db-devel
-Requires:	expat-devel
-
-%description -n apr-devel
-The includes and linker libraries for development with APR.
-
-%description -n apr-devel -l pl
-Pliki nag³ówkowe, biblioteki dla konsolidatora APR.
-
-#%package -n apr-static
-#Summary:	Static APR libraries
-#Summary(pl):	Statyczne biblioteki APR
-#Group:		Development/Libraries
-#Requires:	apr-devel = %{version}
-#Requires:	gdbm-static >= 1.8.3
-#Requires:	db-static
-#Requires:	expat-static
-
-#%description -n apr-static
-#Static APR libraries.
-
-#%description -n apr-static -l pl
-#Statyczne biblioteki APR.
-
 %prep
 %setup -q -n httpd-%{version}
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 
 %build
 # sanity check
@@ -684,7 +644,9 @@ fi
 	--with-suexec-logfile=/var/log/httpd/suexec_log \
 	--with-suexec-uidmin=500 \
 	--with-suexec-gidmin=500 \
-	--with-suexec-umask=077
+	--with-suexec-umask=077 \
+	--with-apr=%{_bindir} \
+	--with-apr-util=%{_bindir}
 
 %{__make}
 
@@ -1133,9 +1095,6 @@ if [ "$1" = "0" ]; then
 	fi
 fi
 
-%post	-n apr -p /sbin/ldconfig
-%postun -n apr -p /sbin/ldconfig
-
 %files
 %defattr(644,root,root,755)
 %doc ABOUT_APACHE CHANGES README
@@ -1427,22 +1386,3 @@ fi
 %{_datadir}/manual/mod/mod_vhost_alias.html.en
 %{_datadir}/manual/vhosts
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_vhost_alias.conf
-
-%files -n apr
-%defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/libapr*.so.*
-
-%files -n apr-devel
-%defattr(644,root,root,755)
-%attr(755,root,root) %{_bindir}/apr-config
-%attr(755,root,root) %{_bindir}/apu-config
-%dir %{_includedir}
-%{_includedir}/apr*.h
-#%%{_libdir}/APRVARS
-%{_libdir}/apr*.exp
-%attr(755,root,root) %{_libdir}/libapr*.so
-%{_libdir}/libapr*.la
-
-#%files -n apr-static
-#%defattr(644,root,root,755)
-#%{_libdir}/libapr.a
