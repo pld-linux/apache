@@ -1,6 +1,6 @@
-diff -urN httpd-2.0.35.org/support/apxs.in httpd-2.0.35/support/apxs.in
---- httpd-2.0.35.org/support/apxs.in	Thu Apr 11 14:09:07 2002
-+++ httpd-2.0.35/support/apxs.in	Thu Apr 11 14:11:26 2002
+diff -urN httpd-2.0.36.org/support/apxs.in httpd-2.0.36/support/apxs.in
+--- httpd-2.0.36.org/support/apxs.in	Sat May 11 21:28:40 2002
++++ httpd-2.0.36/support/apxs.in	Sat May 11 21:29:41 2002
 @@ -61,12 +61,12 @@
  ##  Configuration
  ##
@@ -16,7 +16,21 @@ diff -urN httpd-2.0.35.org/support/apxs.in httpd-2.0.35/support/apxs.in
  
  my $exec_prefix    = get_vars("exec_prefix");
  my $CFG_TARGET     = get_vars("progname");
-@@ -415,7 +415,7 @@
+@@ -223,9 +223,10 @@
+ my $httpd = get_vars("sbindir") . "/" . get_vars("progname");
+ $httpd = eval qq("$httpd");
+ $httpd = eval qq("$httpd");
+-my $envvars = get_vars("bindir") . "/envvars";
+-$envvars = eval qq("$envvars");
+-$envvars = eval qq("$envvars");
++my $envvars = "";
++#my $envvars = get_vars("bindir") . "/envvars";
++#$envvars = eval qq("$envvars");
++#$envvars = eval qq("$envvars");
+ 
+ #allow apxs to be run from the source tree, before installation
+ if ($0 =~ m:support/apxs$:) {
+@@ -418,7 +419,7 @@
          $la =~ s|\.c$|.la|;
          my $o = $s;
          $o =~ s|\.c$|.o|;
@@ -25,7 +39,7 @@ diff -urN httpd-2.0.35.org/support/apxs.in httpd-2.0.35/support/apxs.in
          unshift(@objs, $lo);
      }
  
-@@ -440,7 +440,7 @@
+@@ -443,7 +444,7 @@
          $opt .= " -l$opt_l";
      }
  
@@ -34,7 +48,7 @@ diff -urN httpd-2.0.35.org/support/apxs.in httpd-2.0.35/support/apxs.in
  
      #   execute the commands
      &execute_cmds(@cmds);
-@@ -472,7 +472,7 @@
+@@ -475,7 +476,7 @@
          $t =~ s|\.la$|\.so|;
          if ($opt_i) {
  	    push(@cmds, "$prefix/build/instdso.sh SH_LIBTOOL='" .
