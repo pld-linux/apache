@@ -174,7 +174,7 @@ Apache est aussi le serveur Web le plus populaire sur Internet.
 
 %description -l pl
 Apache jest serwerem WWW (World Wide Web). Instaluj±c ten pakiet
-bêdziesz móg³ prezentowaæ w³asne strony WWW w sieci internet.
+bêdziesz móg³ prezentowaæ w³asne strony WWW w sieci Internet.
 
 %description -l pt_BR
 O servidor web Apache é o melhor servidor gratuito disponível no mundo
@@ -220,7 +220,7 @@ Obsoletes:	indexhtml
 Apache index.html* files.
 
 %description index -l pl
-Pliki Apache index.html*.
+Pliki index.html* Apache'a.
 
 %package doc
 Summary:	Apache manual
@@ -274,7 +274,7 @@ Objets Dynamiques Partages (DSOs) pour Apache.
 
 %description devel -l pl
 Pliki nag³ówkowe i inne zasoby niezbêdne przy budowaniu modu³ów DSO
-(Dynamic Shared Objects) dla Apache.
+(Dynamic Shared Objects) dla Apache'a.
 
 %description devel -l ru
 óÒÅÄÓÔ×Á ÒÁÚÒÁÂÏÔËÉ ÍÏÄÕÌÅÊ ÄÌÑ ×ÅÂ-ÓÅÒ×ÅÒÁ Apache.
@@ -353,7 +353,7 @@ Requires:	%{name}-mod_ldap = %{version}-%{release}
 Apache module with LDAP user access authentication.
 
 %description mod_auth_ldap -l pl
-Modu³ Apache'a oferuj±cy autoryzacjê u¿ytkowników poprzez LDAP
+Modu³ Apache'a oferuj±cy autoryzacjê u¿ytkowników poprzez LDAP.
 
 %package mod_auth_dbm
 Summary:	Apache module with user authentication which uses DBM files
@@ -421,8 +421,8 @@ storage manager (primarily useful for caching local content).
 Implementacja zgodnej z RFC 2616 pamiêci podrêcznej, która mo¿e byæ
 u¿ywana do zapamiêtywania zawarto¶ci lokalnej lub dostêpnej przez
 proxy. Do³±czono dwa modu³y pozwalaj±ce magazynowaæ dane w pamiêci
-(g³ównie u¿yteczne przy cacheowaniu lokalnej zawarto¶ci) oraz na dysku
-(u¿ywane do cacheowania proxy).
+(g³ównie u¿yteczne przy cache'owaniu lokalnej zawarto¶ci) oraz na
+dysku (u¿ywane do cache'owania proxy).
 
 %package mod_cgid
 Summary:	Execution of CGI scripts using an external CGI daemon
@@ -511,7 +511,7 @@ customization of HTTP response headers. Headers can be merged,
 replaced or removed.
 
 %description mod_headers -l pl
-Modu³ pozwalaj±cy na ³±czenie, usuwania, zamianê nag³ówków HTTP
+Modu³ pozwalaj±cy na ³±czenie, usuwanie oraz zamianê nag³ówków HTTP
 wysy³anych do przegl±darki.
 
 %package mod_imap
@@ -629,7 +629,7 @@ browser).
 
 %description mod_status -l pl
 Modu³ pozwala administratorowi na przegl±danie statystyk dotycz±cych
-pracy serwera apache (w postaci strony HTML).
+pracy serwera Apache (w postaci strony HTML).
 
 %package mod_usertrack
 Summary:	Apache module for user tracking using cookies
@@ -729,11 +729,11 @@ package contains htpasswd from Apache 2; this version supports
 plaintext passwords and CRYPT (default), MD5 and SHA1 encryptions.
 
 %description -n htpasswd-%{name} -l pl
-htpasswd s³u¿y do tworzenia i uaktualniania p³askich plików s³u¿±cych
-do przechowywania nazw u¿ytkowników i hase³ do uwierzytelnienia basic
-u¿ytkowników HTTP. Ten pakiet zawiera htpasswd z Apache'a 2; ta wersja
-obs³uguje has³a zapisane czystym tekstem oraz zakodowane algorytmami
-CRYPT (domy¶lnym), MD5 i SHA1.
+htpasswd s³u¿y do tworzenia i uaktualniania plików tekstowych
+s³u¿±cych do przechowywania nazw u¿ytkowników i hase³ do podstawowego
+uwierzytelnienia u¿ytkowników HTTP. Ten pakiet zawiera htpasswd z
+Apache'a 2; ta wersja obs³uguje has³a zapisane czystym tekstem oraz
+zakodowane algorytmami CRYPT (domy¶lnym), MD5 i SHA1.
 
 %prep
 %setup -q -n httpd-%{version}
