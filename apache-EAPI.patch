@@ -1,6 +1,131 @@
-diff -Nru apache_1.3.9/README.EAPI apache_1.3.9.EAPI/README.EAPI
---- apache_1.3.9/README.EAPI	Thu Jan  1 01:00:00 1970
-+++ apache_1.3.9.EAPI/README.EAPI	Wed Dec 29 21:25:55 1999
+diff -Nru apache_1.3.11/src/ApacheCore.def apache_1.3.11.new/src/ApacheCore.def
+--- apache_1.3.11/src/ApacheCore.def	Fri Nov  5 16:41:06 1999
++++ apache_1.3.11.new/src/ApacheCore.def	Wed Feb 23 07:53:13 2000
+@@ -360,3 +360,17 @@
+ 	ap_SHA1Final   @355
+ 	ap_sha1_base64   @356
+         ap_send_error_response @357
++	ap_add_config_define   @357
++	ap_global_ctx   @358
++	ap_ctx_new   @359
++	ap_ctx_get   @360
++	ap_ctx_set   @361
++	ap_hook_init   @362
++	ap_hook_kill   @363
++	ap_hook_configure   @364
++	ap_hook_register_I   @365
++	ap_hook_unregister_I   @366
++	ap_hook_status   @367
++	ap_hook_use   @368
++	ap_hook_call   @369
++
+diff -Nru apache_1.3.11/src/Configuration.tmpl apache_1.3.11.new/src/Configuration.tmpl
+--- apache_1.3.11/src/Configuration.tmpl	Sat Aug 14 10:35:43 1999
++++ apache_1.3.11.new/src/Configuration.tmpl	Wed Feb 23 07:53:13 2000
+@@ -68,6 +68,24 @@
+ #TARGET=
+ 
+ ################################################################
++# Extended API (EAPI) support:
++#
++# EAPI:
++#   The EAPI rule enables more module hooks, a generic low-level hook
++#   mechanism, a generic context mechanism and shared memory based pools. 
++#
++# EAPI_MM:
++#   Set the EAPI_MM variable to either the directory of a MM Shared Memory
++#   Library source tree or the installation tree of MM. Alternatively you can
++#   also use the value 'SYSTEM' which then indicates that MM is installed
++#   under various system locations. When the MM library files cannot be found
++#   the EAPI still can be built, but without shared memory pool support, of
++#   course.
++
++Rule EAPI=no
++#EAPI_MM=SYSTEM
++
++################################################################
+ # Dynamic Shared Object (DSO) support
+ #
+ # There is experimental support for compiling the Apache core and
+diff -Nru apache_1.3.11/src/Configure apache_1.3.11.new/src/Configure
+--- apache_1.3.11/src/Configure	Mon Jan 17 01:48:30 2000
++++ apache_1.3.11.new/src/Configure	Wed Feb 23 07:53:13 2000
+@@ -1720,6 +1720,72 @@
+ fi
+ 
+ ####################################################################
++## Extended API (EAPI) support:
++##
++if [ "x$RULE_EAPI" = "x" ]; then
++    RULE_EAPI=`./helpers/CutRule EAPI $file`
++fi
++if [ "x$RULE_EAPI" = "xyes" ]; then
++    echo " + enabling Extended API (EAPI)"
++    CFLAGS="$CFLAGS -DEAPI"
++    #   some vendor compilers are too restrictive
++    #   for our ap_hook and ap_ctx sources.
++    case "$OS:$CC" in
++        *IRIX-32*:*/cc|*IRIX-32*:cc )
++            CFLAGS="$CFLAGS -woff 1048,1110,1164"
++            ;;
++    esac
++    #   MM Shared Memory Library support for EAPI
++    if [ "x$EAPI_MM" = "x" ]; then
++        EAPI_MM=`egrep '^EAPI_MM=' $file | tail -1 | awk -F= '{print $2}'`
++    fi
++    if [ "x$EAPI_MM" != "x" ]; then
++        case $EAPI_MM in
++            SYSTEM|/* ) ;;
++            * ) for p in . .. ../..; do
++                    if [ -d "$p/$EAPI_MM" ]; then
++                        EAPI_MM="`echo $p/$EAPI_MM | sed -e 's;/\./;/;g'`" 
++                        break
++                    fi
++                done
++                ;;
++        esac
++        if [ "x$EAPI_MM" = "xSYSTEM" ]; then
++            echo "   using MM library for EAPI: (system-wide)"
++            CFLAGS="$CFLAGS -DEAPI_MM"
++            __INCLUDES="`mm-config --cflags`"
++            if [ "x$__INCLUDES" != "x-I/usr/include" ]; then
++                INCLUDES="$INCLUDES $__INCLUDES"
++            fi
++            LDFLAGS="$LDFLAGS `mm-config --ldflags`"
++            LIBS="$LIBS `mm-config --libs`"
++        else
++            if [ -f "$EAPI_MM/.libs/libmm.a" -a -f "$EAPI_MM/mm.h" ]; then
++                echo "   using MM library: $EAPI_MM (source-tree only)"
++                case $EAPI_MM in
++                    /* ) ;;
++                    *  ) EAPI_MM="\$(SRCDIR)/$EAPI_MM" ;;
++                esac
++                CFLAGS="$CFLAGS -DEAPI_MM"
++                INCLUDES="$INCLUDES -I$EAPI_MM"
++                LDFLAGS="$LDFLAGS -L$EAPI_MM/.libs"
++                LIBS="$LIBS -lmm"
++            elif [ -f "$EAPI_MM/bin/mm-config" ]; then
++                echo "   using MM library: $EAPI_MM (installed)"
++                CFLAGS="$CFLAGS -DEAPI_MM"
++                INCLUDES="$INCLUDES `$EAPI_MM/bin/mm-config --cflags`"
++                LDFLAGS="$LDFLAGS `$EAPI_MM/bin/mm-config --ldflags`"
++                LIBS="$LIBS `$EAPI_MM/bin/mm-config --libs`"
++            else
++                echo "Configure:Error: Cannot find MM library under $EAPI_MM" 1>&2
++                exit 1
++            fi
++        fi
++    fi
++fi
++
++
++####################################################################
+ ## Add in the Expat library if needed/wanted.
+ ##
+ if [ -d ./lib/expat-lite/ ]; then
+diff -Nru apache_1.3.11/src/README.EAPI apache_1.3.11.new/src/README.EAPI
+--- apache_1.3.11/src/README.EAPI	Thu Jan  1 01:00:00 1970
++++ apache_1.3.11.new/src/README.EAPI	Wed Feb 23 07:53:13 2000
 @@ -0,0 +1,340 @@
 +
 + Extended API (EAPI)
@@ -342,308 +467,9 @@ diff -Nru apache_1.3.9/README.EAPI apache_1.3.9.EAPI/README.EAPI
 +     client processing inside mod_proxy.  This can be used for a lot of
 +     tricks.
 +
-diff -Nru apache_1.3.9/htdocs/manual/mod/directives.html apache_1.3.9.EAPI/htdocs/manual/mod/directives.html
---- apache_1.3.9/htdocs/manual/mod/directives.html	Wed Dec 29 22:03:42 1999
-+++ apache_1.3.9.EAPI/htdocs/manual/mod/directives.html	Wed Dec 29 21:25:55 1999
-@@ -96,6 +96,7 @@
- <LI><A HREF="mod_autoindex.html#defaulticon">DefaultIcon</A>
- <LI><A HREF="mod_mime.html#defaultlanguage">DefaultLanguage</A>
- <LI><A HREF="core.html#defaulttype">DefaultType</A>
-+<LI><A HREF="mod_define.html#define">Define</A>
- <LI><A HREF="mod_access.html#deny">deny</A>
- <LI><A HREF="core.html#directory">&lt;Directory&gt;</A>
- <LI><A HREF="core.html#directorymatch">&lt;DirectoryMatch&gt;</A>
-diff -Nru apache_1.3.9/htdocs/manual/mod/index.html apache_1.3.9.EAPI/htdocs/manual/mod/index.html
---- apache_1.3.9/htdocs/manual/mod/index.html	Wed Dec 29 22:03:42 1999
-+++ apache_1.3.9.EAPI/htdocs/manual/mod/index.html	Wed Dec 29 21:25:55 1999
-@@ -62,6 +62,8 @@
- <DT><A HREF="mod_cookies.html">mod_cookies</A> up to Apache 1.1.1
- <DD>Support for Netscape-like cookies.  Replaced in Apache 1.2 by
- mod_usertrack
-+<DT><A HREF="mod_define.html">mod_define</A>
-+<DD>Variable Definition for Arbitrary Directives
- <DT><A HREF="mod_digest.html">mod_digest</A>
- <DD>MD5 authentication
- <DT><A HREF="mod_dir.html">mod_dir</A>
-diff -Nru apache_1.3.9/htdocs/manual/mod/mod_define.html apache_1.3.9.EAPI/htdocs/manual/mod/mod_define.html
---- apache_1.3.9/htdocs/manual/mod/mod_define.html	Thu Jan  1 01:00:00 1970
-+++ apache_1.3.9.EAPI/htdocs/manual/mod/mod_define.html	Wed Dec 29 21:25:55 1999
-@@ -0,0 +1,135 @@
-+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
-+<!--%hypertext -->
-+<!-- mod_define.html                                  -->
-+<!-- Documentation for the mod_define Apache module   -->
-+<HTML>
-+<HEAD>
-+<TITLE>Apache module mod_define</TITLE>
-+</HEAD>
-+
-+<!-- Background white, links blue (unvisited), navy (visited), red (active) -->
-+<BODY
-+ BGCOLOR="#FFFFFF"
-+ TEXT="#000000"
-+ LINK="#0000FF"
-+ VLINK="#000080"
-+ ALINK="#FF0000"
-+>
-+<BLOCKQUOTE><!-- page indentation -->
-+<!--#include virtual="header.html" -->
-+
-+<BR>
-+<H1 ALIGN="CENTER">Module mod_define</H1>
-+<H2 ALIGN="CENTER">Variable Definition For Arbitrary Directives</H2>
-+
-+This module is contained in the <CODE>mod_define.c</CODE> file.  It provides
-+the definition variables for arbitrary directives, i.e. variables which can be
-+expanded on any(!) directive line. It needs Extended API (EAPI). It is not
-+compiled into the server by default. To use <CODE>mod_define</CODE> you have
-+to enable the following line in the server build <CODE>Configuration</CODE>
-+file:
-+
-+<P>
-+<PRE>
-+    AddModule  modules/extra/mod_define.o
-+</PRE>
-+
-+<P>
-+<HR NOSHADE SIZE=1>
-+
-+<H3><A NAME="Define">Define</A></H3>
-+<A
-+ HREF="directive-dict.html#Syntax"
-+ REL="Help"
-+><STRONG>Syntax:</STRONG></A>
-+    <CODE>Define</CODE> <EM>variable</EM> <EM>value</EM><BR>
-+<A
-+ HREF="directive-dict.html#Default"
-+ REL="Help"
-+><STRONG>Default:</STRONG></A>
-+    <EM>none</EM><BR>
-+<A
-+ HREF="directive-dict.html#Context"
-+ REL="Help"
-+><STRONG>Context:</STRONG></A>
-+    server config, virtual host, directory, .htaccess<BR>
-+<A
-+ HREF="directive-dict.html#Override"
-+ REL="Help"
-+><STRONG>Override:</STRONG></A> none<BR>
-+<A
-+ HREF="directive-dict.html#Status"
-+ REL="Help"
-+><STRONG>Status:</STRONG></A> Extension<BR>
-+<A
-+ HREF="directive-dict.html#Module"
-+ REL="Help"
-+><STRONG>Module:</STRONG></A> mod_define.c<BR>
-+<A
-+ HREF="directive-dict.html#Compatibility"
-+ REL="Help"
-+><STRONG>Compatibility:</STRONG></A> Apache+EAPI<BR>
-+
-+<P>
-+The <CODE>Define</CODE> directive defines a variable which later can be
-+expanded with the unsafe but short construct
-+``<CODE>$</CODE><EM>variable</EM>'' or the safe but longer construct
-+``<CODE>${</CODE><EM>variable</EM><CODE>}</CODE>'' on any configuration line.
-+Do not intermix this with the third-party module <CODE>mod_macro</CODE>. The
-+<CODE>mod_define</CODE> module doesn't provide a general macro mechanism,
-+although one can consider variable substitutions as a special form of macros.
-+Because the value of to which ``<CODE>$</CODE><EM>variable</EM>'' expands has
-+to fit into one line. When you need macros which can span more lines, you've
-+to use <CODE>mod_macro</CODE>. OTOH <CODE>mod_macro</CODE> cannot be used to
-+expand a variable/macro on an arbitrary directive line.  So, the typical use
-+case of <CODE>mod_define</CODE> is to make strings <EM>variable</EM> (and this
-+way easily changeable at one location) and not to <EM>bundle</EM> things
-+together (as it's the typical use case for macros).
-+
-+<P>
-+The syntax of the expansion construct (
-+``<CODE>${</CODE><EM>variable</EM><CODE>}</CODE>'') follows the Perl and Shell
-+syntax, but can be changed via the <CODE>Define</CODE> directive, too. Four
-+internal variables can be used for this. The default is:
-+
-+<BLOCKQUOTE>
-+<PRE>
-+Define mod_define::escape "\\"
-+Define mod_define::dollar "$"
-+Define mod_define::open   "{"
-+Define mod_define::close  "}"
-+</PRE>
-+</BLOCKQUOTE>
-+
-+<P>
-+When you need to escape some of the expansion constructs you place the
-+mod_define::escape character in front of it.  The default is the backslash as
-+in Perl or the Shell.
-+
-+<P>
-+<STRONG>Example:</STRONG>
-+<BLOCKQUOTE>
-+<PRE>
-+Define master     "Joe Average &lt;joe@average.dom&gt;"
-+Define docroot    /usr/local/apache/htdocs
-+Define hostname   foo
-+Define domainname bar.dom
-+Define portnumber 80
-+  :
-+&lt;VirtualHost $hostname.$domainname:$portnumber&gt;
-+SetEnv       SERVER_MASTER "$master"
-+ServerName   $hostname.$domainname
-+ServerAlias  $hostname
-+Port         $portnumber
-+DocumentRoot $docroot
-+&lt;Directory $docroot&gt;
-+  :
-+&lt;Directory&gt;
-+</PRE>
-+</BLOCKQUOTE>
-+
-+<!--#include virtual="footer.html" -->
-+</BLOCKQUOTE><!-- page indentation -->
-+</BODY>
-+</HTML>
-+<!--/%hypertext -->
-diff -Nru apache_1.3.9/src/ApacheCore.def apache_1.3.9.EAPI/src/ApacheCore.def
---- apache_1.3.9/src/ApacheCore.def	Wed Dec 29 22:03:42 1999
-+++ apache_1.3.9.EAPI/src/ApacheCore.def	Wed Dec 29 21:25:55 1999
-@@ -359,4 +359,17 @@
- 	ap_SHA1Update   @354
- 	ap_SHA1Final   @355
- 	ap_sha1_base64   @356
-+	ap_add_config_define   @357
-+	ap_global_ctx   @358
-+	ap_ctx_new   @359
-+	ap_ctx_get   @360
-+	ap_ctx_set   @361
-+	ap_hook_init   @362
-+	ap_hook_kill   @363
-+	ap_hook_configure   @364
-+	ap_hook_register_I   @365
-+	ap_hook_unregister_I   @366
-+	ap_hook_status   @367
-+	ap_hook_use   @368
-+	ap_hook_call   @369
- 
-diff -Nru apache_1.3.9/src/Configuration.tmpl apache_1.3.9.EAPI/src/Configuration.tmpl
---- apache_1.3.9/src/Configuration.tmpl	Wed Dec 29 22:03:42 1999
-+++ apache_1.3.9.EAPI/src/Configuration.tmpl	Wed Dec 29 21:27:21 1999
-@@ -68,6 +68,24 @@
- #TARGET=
- 
- ################################################################
-+# Extended API (EAPI) support:
-+#
-+# EAPI:
-+#   The EAPI rule enables more module hooks, a generic low-level hook
-+#   mechanism, a generic context mechanism and shared memory based pools. 
-+#
-+# EAPI_MM:
-+#   Set the EAPI_MM variable to either the directory of a MM Shared Memory
-+#   Library source tree or the installation tree of MM. Alternatively you can
-+#   also use the value 'SYSTEM' which then indicates that MM is installed
-+#   under various system locations. When the MM library files cannot be found
-+#   the EAPI still can be built, but without shared memory pool support, of
-+#   course.
-+
-+Rule EAPI=no
-+EAPI_MM=SYSTEM
-+
-+################################################################
- # Dynamic Shared Object (DSO) support
- #
- # There is experimental support for compiling the Apache core and
-@@ -246,6 +265,11 @@
- ## it does not do per-request stuff.
- 
- AddModule modules/standard/mod_env.o
-+
-+## mod_define expands variables on arbitrary directive lines.
-+## It requires Extended API (EAPI).
-+
-+# AddModule modules/extra/mod_define.o
- 
- ##
- ## Request logging modules
-diff -Nru apache_1.3.9/src/Configure apache_1.3.9.EAPI/src/Configure
---- apache_1.3.9/src/Configure	Wed Dec 29 22:03:42 1999
-+++ apache_1.3.9.EAPI/src/Configure	Wed Dec 29 21:42:17 1999
-@@ -1725,6 +1732,72 @@
-     SUBDIRS="regex $SUBDIRS"
-     CFLAGS="$CFLAGS -DUSE_HSREGEX"
- fi
-+
-+####################################################################
-+## Extended API (EAPI) support:
-+##
-+if [ "x$RULE_EAPI" = "x" ]; then
-+    RULE_EAPI=`./helpers/CutRule EAPI $file`
-+fi
-+if [ "x$RULE_EAPI" = "xyes" ]; then
-+    echo " + enabling Extended API (EAPI)"
-+    CFLAGS="$CFLAGS -DEAPI"
-+    #   some vendor compilers are too restrictive
-+    #   for our ap_hook and ap_ctx sources.
-+    case "$OS:$CC" in
-+        *IRIX-32*:*/cc|*IRIX-32*:cc )
-+            CFLAGS="$CFLAGS -woff 1048,1110,1164"
-+            ;;
-+    esac
-+    #   MM Shared Memory Library support for EAPI
-+    if [ "x$EAPI_MM" = "x" ]; then
-+        EAPI_MM=`egrep '^EAPI_MM=' $file | tail -1 | awk -F= '{print $2}'`
-+    fi
-+    if [ "x$EAPI_MM" != "x" ]; then
-+        case $EAPI_MM in
-+            SYSTEM|/* ) ;;
-+            * ) for p in . .. ../..; do
-+                    if [ -d "$p/$EAPI_MM" ]; then
-+                        EAPI_MM="`echo $p/$EAPI_MM | sed -e 's;/\./;/;g'`" 
-+                        break
-+                    fi
-+                done
-+                ;;
-+        esac
-+        if [ "x$EAPI_MM" = "xSYSTEM" ]; then
-+            echo "   using MM library for EAPI: (system-wide)"
-+            CFLAGS="$CFLAGS -DEAPI_MM"
-+            __INCLUDES="`mm-config --cflags`"
-+            if [ "x$__INCLUDES" != "x-I/usr/include" ]; then
-+                INCLUDES="$INCLUDES $__INCLUDES"
-+            fi
-+            LDFLAGS="$LDFLAGS `mm-config --ldflags`"
-+            LIBS="$LIBS `mm-config --libs`"
-+        else
-+            if [ -f "$EAPI_MM/.libs/libmm.a" -a -f "$EAPI_MM/mm.h" ]; then
-+                echo "   using MM library: $EAPI_MM (source-tree only)"
-+                case $EAPI_MM in
-+                    /* ) ;;
-+                    *  ) EAPI_MM="\$(SRCDIR)/$EAPI_MM" ;;
-+                esac
-+                CFLAGS="$CFLAGS -DEAPI_MM"
-+                INCLUDES="$INCLUDES -I$EAPI_MM"
-+                LDFLAGS="$LDFLAGS -L$EAPI_MM/.libs"
-+                LIBS="$LIBS -lmm"
-+            elif [ -f "$EAPI_MM/bin/mm-config" ]; then
-+                echo "   using MM library: $EAPI_MM (installed)"
-+                CFLAGS="$CFLAGS -DEAPI_MM"
-+                INCLUDES="$INCLUDES `$EAPI_MM/bin/mm-config --cflags`"
-+                LDFLAGS="$LDFLAGS `$EAPI_MM/bin/mm-config --ldflags`"
-+                LIBS="$LIBS `$EAPI_MM/bin/mm-config --libs`"
-+            else
-+                echo "Configure:Error: Cannot find MM library under $EAPI_MM" 1>&2
-+                exit 1
-+            fi
-+        fi
-+    fi
-+fi
-+
- 
- ####################################################################
- ## Add in the Expat library if needed/wanted.
-diff -Nru apache_1.3.9/src/ap/Makefile.tmpl apache_1.3.9.EAPI/src/ap/Makefile.tmpl
---- apache_1.3.9/src/ap/Makefile.tmpl	Wed Dec 29 22:03:42 1999
-+++ apache_1.3.9.EAPI/src/ap/Makefile.tmpl	Wed Dec 29 21:25:56 1999
+diff -Nru apache_1.3.11/src/ap/Makefile.tmpl apache_1.3.11.new/src/ap/Makefile.tmpl
+--- apache_1.3.11/src/ap/Makefile.tmpl	Sun Aug  8 19:59:28 1999
++++ apache_1.3.11.new/src/ap/Makefile.tmpl	Wed Feb 23 07:53:13 2000
 @@ -6,7 +6,8 @@
  LIB=libap.a
  
@@ -654,9 +480,9 @@ diff -Nru apache_1.3.9/src/ap/Makefile.tmpl apache_1.3.9.EAPI/src/ap/Makefile.tm
  
  .c.o:
  	$(CC) -c $(INCLUDES) $(CFLAGS) $<
-diff -Nru apache_1.3.9/src/ap/ap.mak apache_1.3.9.EAPI/src/ap/ap.mak
---- apache_1.3.9/src/ap/ap.mak	Wed Dec 29 22:03:42 1999
-+++ apache_1.3.9.EAPI/src/ap/ap.mak	Wed Dec 29 21:25:56 1999
+diff -Nru apache_1.3.11/src/ap/ap.mak apache_1.3.11.new/src/ap/ap.mak
+--- apache_1.3.11/src/ap/ap.mak	Sun Aug  8 20:20:05 1999
++++ apache_1.3.11.new/src/ap/ap.mak	Wed Feb 23 07:53:13 2000
 @@ -47,6 +47,9 @@
  	-@erase "$(INTDIR)\ap_cpystrn.obj"
  	-@erase "$(INTDIR)\ap_fnmatch.obj"
@@ -697,12 +523,12 @@ diff -Nru apache_1.3.9/src/ap/ap.mak apache_1.3.9.EAPI/src/ap/ap.mak
  	"$(INTDIR)\ap_signal.obj" \
  	"$(INTDIR)\ap_slack.obj" \
  	"$(INTDIR)\ap_snprintf.obj" \
-diff -Nru apache_1.3.9/src/ap/ap_ctx.c apache_1.3.9.EAPI/src/ap/ap_ctx.c
---- apache_1.3.9/src/ap/ap_ctx.c	Thu Jan  1 01:00:00 1970
-+++ apache_1.3.9.EAPI/src/ap/ap_ctx.c	Wed Dec 29 21:25:56 1999
+diff -Nru apache_1.3.11/src/ap/ap_ctx.c apache_1.3.11.new/src/ap/ap_ctx.c
+--- apache_1.3.11/src/ap/ap_ctx.c	Thu Jan  1 01:00:00 1970
++++ apache_1.3.11.new/src/ap/ap_ctx.c	Wed Feb 23 07:53:13 2000
 @@ -0,0 +1,155 @@
 +/* ====================================================================
-+ * Copyright (c) 1998 The Apache Group.  All rights reserved.
++ * Copyright (c) 1998-2000 The Apache Group.  All rights reserved.
 + *
 + * Redistribution and use in source and binary forms, with or without
 + * modification, are permitted provided that the following conditions
@@ -856,15 +682,15 @@ diff -Nru apache_1.3.9/src/ap/ap_ctx.c apache_1.3.9.EAPI/src/ap/ap_ctx.c
 +}
 +
 +#endif /* EAPI */
-diff -Nru apache_1.3.9/src/ap/ap_hook.c apache_1.3.9.EAPI/src/ap/ap_hook.c
---- apache_1.3.9/src/ap/ap_hook.c	Thu Jan  1 01:00:00 1970
-+++ apache_1.3.9.EAPI/src/ap/ap_hook.c	Wed Dec 29 21:25:56 1999
+diff -Nru apache_1.3.11/src/ap/ap_hook.c apache_1.3.11.new/src/ap/ap_hook.c
+--- apache_1.3.11/src/ap/ap_hook.c	Thu Jan  1 01:00:00 1970
++++ apache_1.3.11.new/src/ap/ap_hook.c	Wed Feb 23 07:53:13 2000
 @@ -0,0 +1,930 @@
 +#if 0
 +=pod
 +#endif
 +/* ====================================================================
-+ * Copyright (c) 1998 The Apache Group.  All rights reserved.
++ * Copyright (c) 1998-2000 The Apache Group.  All rights reserved.
 + *
 + * Redistribution and use in source and binary forms, with or without
 + * modification, are permitted provided that the following conditions
@@ -1790,12 +1616,12 @@ diff -Nru apache_1.3.9/src/ap/ap_hook.c apache_1.3.9.EAPI/src/ap/ap_hook.c
 +
 +=pod
 +*/
-diff -Nru apache_1.3.9/src/ap/ap_mm.c apache_1.3.9.EAPI/src/ap/ap_mm.c
---- apache_1.3.9/src/ap/ap_mm.c	Thu Jan  1 01:00:00 1970
-+++ apache_1.3.9.EAPI/src/ap/ap_mm.c	Wed Dec 29 21:25:56 1999
+diff -Nru apache_1.3.11/src/ap/ap_mm.c apache_1.3.11.new/src/ap/ap_mm.c
+--- apache_1.3.11/src/ap/ap_mm.c	Thu Jan  1 01:00:00 1970
++++ apache_1.3.11.new/src/ap/ap_mm.c	Wed Feb 23 07:53:13 2000
 @@ -0,0 +1,178 @@
 +/* ====================================================================
-+ * Copyright (c) 1999 The Apache Group.  All rights reserved.
++ * Copyright (c) 1999-2000 The Apache Group.  All rights reserved.
 + *
 + * Redistribution and use in source and binary forms, with or without
 + * modification, are permitted provided that the following conditions
@@ -1972,9 +1798,9 @@ diff -Nru apache_1.3.9/src/ap/ap_mm.c apache_1.3.9.EAPI/src/ap/ap_mm.c
 +    STUB(mm_lib_version(), 0)
 +
 +#endif /* EAPI */
-diff -Nru apache_1.3.9/src/include/alloc.h apache_1.3.9.EAPI/src/include/alloc.h
---- apache_1.3.9/src/include/alloc.h	Wed Dec 29 22:03:42 1999
-+++ apache_1.3.9.EAPI/src/include/alloc.h	Wed Dec 29 21:25:56 1999
+diff -Nru apache_1.3.11/src/include/alloc.h apache_1.3.11.new/src/include/alloc.h
+--- apache_1.3.11/src/include/alloc.h	Thu Jul 29 19:53:54 1999
++++ apache_1.3.11.new/src/include/alloc.h	Wed Feb 23 07:53:13 2000
 @@ -93,6 +93,15 @@
  
  pool * ap_init_alloc(void);		/* Set up everything */
@@ -1991,12 +1817,12 @@ diff -Nru apache_1.3.9/src/include/alloc.h apache_1.3.9.EAPI/src/include/alloc.h
  API_EXPORT(void) ap_destroy_pool(pool *);
  
  /* pools have nested lifetimes -- sub_pools are destroyed when the
-diff -Nru apache_1.3.9/src/include/ap_ctx.h apache_1.3.9.EAPI/src/include/ap_ctx.h
---- apache_1.3.9/src/include/ap_ctx.h	Thu Jan  1 01:00:00 1970
-+++ apache_1.3.9.EAPI/src/include/ap_ctx.h	Wed Dec 29 21:25:56 1999
+diff -Nru apache_1.3.11/src/include/ap_ctx.h apache_1.3.11.new/src/include/ap_ctx.h
+--- apache_1.3.11/src/include/ap_ctx.h	Thu Jan  1 01:00:00 1970
++++ apache_1.3.11.new/src/include/ap_ctx.h	Wed Feb 23 07:53:13 2000
 @@ -0,0 +1,110 @@
 +/* ====================================================================
-+ * Copyright (c) 1998 The Apache Group.  All rights reserved.
++ * Copyright (c) 1998-2000 The Apache Group.  All rights reserved.
 + *
 + * Redistribution and use in source and binary forms, with or without
 + * modification, are permitted provided that the following conditions
@@ -2105,15 +1931,15 @@ diff -Nru apache_1.3.9/src/include/ap_ctx.h apache_1.3.9.EAPI/src/include/ap_ctx
 +#endif /* AP_CTX_H */
 +
 +#endif /* EAPI */
-diff -Nru apache_1.3.9/src/include/ap_hook.h apache_1.3.9.EAPI/src/include/ap_hook.h
---- apache_1.3.9/src/include/ap_hook.h	Thu Jan  1 01:00:00 1970
-+++ apache_1.3.9.EAPI/src/include/ap_hook.h	Wed Dec 29 21:25:56 1999
+diff -Nru apache_1.3.11/src/include/ap_hook.h apache_1.3.11.new/src/include/ap_hook.h
+--- apache_1.3.11/src/include/ap_hook.h	Thu Jan  1 01:00:00 1970
++++ apache_1.3.11.new/src/include/ap_hook.h	Wed Feb 23 07:53:14 2000
 @@ -0,0 +1,710 @@
 +#if 0
 +=cut
 +#endif
 +/* ====================================================================
-+ * Copyright (c) 1998 The Apache Group.  All rights reserved.
++ * Copyright (c) 1998-2000 The Apache Group.  All rights reserved.
 + *
 + * Redistribution and use in source and binary forms, with or without
 + * modification, are permitted provided that the following conditions
@@ -2808,8 +2634,8 @@ diff -Nru apache_1.3.9/src/include/ap_hook.h apache_1.3.9.EAPI/src/include/ap_ho
 +
 +=head1 HISTORY
 +
-+The ap_hook(3) interface was originally designed and implemented in October
-+1998 by Ralf S. Engelschall as part of the mod_ssl project.
++The ap_hook(3) interface was originally designed and 
++implemented in October 1998 by Ralf S. Engelschall.
 +
 +=head1 AUTHOR
 +
@@ -2819,12 +2645,12 @@ diff -Nru apache_1.3.9/src/include/ap_hook.h apache_1.3.9.EAPI/src/include/ap_ho
 +
 +=cut
 +*/
-diff -Nru apache_1.3.9/src/include/ap_mm.h apache_1.3.9.EAPI/src/include/ap_mm.h
---- apache_1.3.9/src/include/ap_mm.h	Thu Jan  1 01:00:00 1970
-+++ apache_1.3.9.EAPI/src/include/ap_mm.h	Wed Dec 29 21:25:56 1999
+diff -Nru apache_1.3.11/src/include/ap_mm.h apache_1.3.11.new/src/include/ap_mm.h
+--- apache_1.3.11/src/include/ap_mm.h	Thu Jan  1 01:00:00 1970
++++ apache_1.3.11.new/src/include/ap_mm.h	Wed Feb 23 07:53:14 2000
 @@ -0,0 +1,130 @@
 +/* ====================================================================
-+ * Copyright (c) 1999 The Apache Group.  All rights reserved.
++ * Copyright (c) 1999-2000 The Apache Group.  All rights reserved.
 + *
 + * Redistribution and use in source and binary forms, with or without
 + * modification, are permitted provided that the following conditions
@@ -2953,9 +2779,9 @@ diff -Nru apache_1.3.9/src/include/ap_mm.h apache_1.3.9.EAPI/src/include/ap_mm.h
 +
 +#endif /* EAPI */
 +
-diff -Nru apache_1.3.9/src/include/ap_mmn.h apache_1.3.9.EAPI/src/include/ap_mmn.h
---- apache_1.3.9/src/include/ap_mmn.h	Wed Dec 29 22:03:42 1999
-+++ apache_1.3.9.EAPI/src/include/ap_mmn.h	Wed Dec 29 21:25:56 1999
+diff -Nru apache_1.3.11/src/include/ap_mmn.h apache_1.3.11.new/src/include/ap_mmn.h
+--- apache_1.3.11/src/include/ap_mmn.h	Wed Jan 12 16:54:56 2000
++++ apache_1.3.11.new/src/include/ap_mmn.h	Wed Feb 23 07:53:14 2000
 @@ -228,7 +228,23 @@
   *                        ap_pbase64decode(), ap_pbase64encode()
   */
@@ -2980,9 +2806,9 @@ diff -Nru apache_1.3.9/src/include/ap_mmn.h apache_1.3.9.EAPI/src/include/ap_mmn
  
  #ifndef MODULE_MAGIC_NUMBER_MAJOR
  #define MODULE_MAGIC_NUMBER_MAJOR 19990320
-diff -Nru apache_1.3.9/src/include/buff.h apache_1.3.9.EAPI/src/include/buff.h
---- apache_1.3.9/src/include/buff.h	Wed Dec 29 22:03:42 1999
-+++ apache_1.3.9.EAPI/src/include/buff.h	Wed Dec 29 21:25:56 1999
+diff -Nru apache_1.3.11/src/include/buff.h apache_1.3.11.new/src/include/buff.h
+--- apache_1.3.11/src/include/buff.h	Wed Feb 23 07:52:42 2000
++++ apache_1.3.11.new/src/include/buff.h	Wed Feb 23 07:53:14 2000
 @@ -124,6 +124,10 @@
      /* transport handle, for RPC binding handle or some such */
      void *t_handle;
@@ -2994,7 +2820,7 @@ diff -Nru apache_1.3.9/src/include/buff.h apache_1.3.9.EAPI/src/include/buff.h
  #ifdef B_SFIO
      Sfio_t *sf_in;
      Sfio_t *sf_out;
-@@ -175,6 +179,10 @@
+@@ -178,6 +182,10 @@
  /* Internal routines */
  API_EXPORT(int) ap_bflsbuf(int c, BUFF *fb);
  API_EXPORT(int) ap_bfilbuf(BUFF *fb);
@@ -3005,11 +2831,11 @@ diff -Nru apache_1.3.9/src/include/buff.h apache_1.3.9.EAPI/src/include/buff.h
  
  #ifndef CHARSET_EBCDIC
  
-diff -Nru apache_1.3.9/src/include/http_conf_globals.h apache_1.3.9.EAPI/src/include/http_conf_globals.h
---- apache_1.3.9/src/include/http_conf_globals.h	Wed Dec 29 22:03:42 1999
-+++ apache_1.3.9.EAPI/src/include/http_conf_globals.h	Wed Dec 29 21:25:56 1999
-@@ -89,6 +89,9 @@
- extern int ap_listenbacklog;
+diff -Nru apache_1.3.11/src/include/http_conf_globals.h apache_1.3.11.new/src/include/http_conf_globals.h
+--- apache_1.3.11/src/include/http_conf_globals.h	Wed Feb 23 07:52:42 2000
++++ apache_1.3.11.new/src/include/http_conf_globals.h	Wed Feb 23 07:53:14 2000
+@@ -92,6 +92,9 @@
+ extern char *ap_tunnel;
  extern int ap_dump_settings;
  extern API_VAR_EXPORT int ap_extended_status;
 +#ifdef EAPI
@@ -3018,9 +2844,9 @@ diff -Nru apache_1.3.9/src/include/http_conf_globals.h apache_1.3.9.EAPI/src/inc
  
  extern char *ap_pid_fname;
  extern char *ap_scoreboard_fname;
-diff -Nru apache_1.3.9/src/include/http_config.h apache_1.3.9.EAPI/src/include/http_config.h
---- apache_1.3.9/src/include/http_config.h	Wed Dec 29 22:03:42 1999
-+++ apache_1.3.9.EAPI/src/include/http_config.h	Wed Dec 29 21:25:56 1999
+diff -Nru apache_1.3.11/src/include/http_config.h apache_1.3.11.new/src/include/http_config.h
+--- apache_1.3.11/src/include/http_config.h	Fri May  7 02:16:10 1999
++++ apache_1.3.11.new/src/include/http_config.h	Wed Feb 23 07:53:14 2000
 @@ -275,6 +275,65 @@
      void (*child_exit) (server_rec *, pool *);
  #endif
@@ -3087,9 +2913,9 @@ diff -Nru apache_1.3.9/src/include/http_config.h apache_1.3.9.EAPI/src/include/h
  } module;
  
  /* Initializer for the first few module slots, which are only
-diff -Nru apache_1.3.9/src/include/http_main.h apache_1.3.9.EAPI/src/include/http_main.h
---- apache_1.3.9/src/include/http_main.h	Wed Dec 29 22:03:42 1999
-+++ apache_1.3.9.EAPI/src/include/http_main.h	Wed Dec 29 21:25:56 1999
+diff -Nru apache_1.3.11/src/include/http_main.h apache_1.3.11.new/src/include/http_main.h
+--- apache_1.3.11/src/include/http_main.h	Fri Jan  1 20:04:40 1999
++++ apache_1.3.11.new/src/include/http_main.h	Wed Feb 23 07:53:14 2000
 @@ -124,7 +124,11 @@
  API_EXPORT(void) ap_sync_scoreboard_image(void);
  int ap_update_child_status(int child_num, int status, request_rec *r);
@@ -3102,9 +2928,9 @@ diff -Nru apache_1.3.9/src/include/http_main.h apache_1.3.9.EAPI/src/include/htt
  API_EXPORT(int) ap_check_alarm(void);
  
  #ifndef NO_OTHER_CHILD
-diff -Nru apache_1.3.9/src/include/httpd.h apache_1.3.9.EAPI/src/include/httpd.h
---- apache_1.3.9/src/include/httpd.h	Wed Dec 29 22:03:42 1999
-+++ apache_1.3.9.EAPI/src/include/httpd.h	Wed Dec 29 21:25:56 1999
+diff -Nru apache_1.3.11/src/include/httpd.h apache_1.3.11.new/src/include/httpd.h
+--- apache_1.3.11/src/include/httpd.h	Thu Jan 20 03:41:16 2000
++++ apache_1.3.11.new/src/include/httpd.h	Wed Feb 23 07:53:24 2000
 @@ -69,7 +69,19 @@
  /* Headers in which EVERYONE has an interest... */
  
@@ -3125,7 +2951,7 @@ diff -Nru apache_1.3.9/src/include/httpd.h apache_1.3.9.EAPI/src/include/httpd.h
  #include "buff.h"
  #include "ap.h"
  
-@@ -138,8 +150,13 @@
+@@ -140,8 +152,13 @@
  #define DEFAULT_HTTP_PORT	80
  #define DEFAULT_HTTPS_PORT	443
  #define ap_is_default_port(port,r)	((port) == ap_default_port(r))
@@ -3139,7 +2965,7 @@ diff -Nru apache_1.3.9/src/include/httpd.h apache_1.3.9.EAPI/src/include/httpd.h
  
  /* --------- Default user name and group name running standalone ---------- */
  /* --- These may be specified as numbers by placing a # before a number --- */
-@@ -351,6 +368,19 @@
+@@ -353,6 +370,19 @@
  #define SCOREBOARD_MAINTENANCE_INTERVAL 1000000
  #endif
  
@@ -3149,7 +2975,7 @@ diff -Nru apache_1.3.9/src/include/httpd.h apache_1.3.9.EAPI/src/include/httpd.h
 + */
 +#ifdef EAPI
 +#ifndef EAPI_MM_CORE_PATH
-+#define EAPI_MM_CORE_PATH "/var/state/apache/mm"
++#define EAPI_MM_CORE_PATH "tmp/mm"
 +#endif
 +#ifndef EAPI_MM_CORE_MAXSIZE
 +#define EAPI_MM_CORE_MAXSIZE 1024*1024*1 /* max. 1MB */
@@ -3159,7 +2985,7 @@ diff -Nru apache_1.3.9/src/include/httpd.h apache_1.3.9.EAPI/src/include/httpd.h
  /* Number of requests to try to handle in a single process.  If <= 0,
   * the children don't die off.  That's the default here, since I'm still
   * interested in finding and stanching leaks.
-@@ -430,6 +460,9 @@
+@@ -432,6 +462,9 @@
  API_EXPORT(const char *) ap_get_server_version(void);
  API_EXPORT(void) ap_add_version_component(const char *component);
  API_EXPORT(const char *) ap_get_server_built(void);
@@ -3169,7 +2995,7 @@ diff -Nru apache_1.3.9/src/include/httpd.h apache_1.3.9.EAPI/src/include/httpd.h
  
  /* Numeric release version identifier: MMNNFFRBB: major minor fix final beta
   * Always increases along the same track as the source branch.
-@@ -801,6 +834,10 @@
+@@ -813,6 +846,10 @@
   * record to improve 64bit alignment the next time we need to break
   * binary compatibility for some other reason.
   */
@@ -3180,7 +3006,7 @@ diff -Nru apache_1.3.9/src/include/httpd.h apache_1.3.9.EAPI/src/include/httpd.h
  };
  
  
-@@ -849,6 +886,9 @@
+@@ -861,6 +898,9 @@
      char *local_host;		/* used for ap_get_server_name when
  				 * UseCanonicalName is set to DNS
  				 * (ignores setting of HostnameLookups) */
@@ -3190,7 +3016,7 @@ diff -Nru apache_1.3.9/src/include/httpd.h apache_1.3.9.EAPI/src/include/httpd.h
  };
  
  /* Per-vhost config... */
-@@ -921,6 +961,10 @@
+@@ -933,6 +973,10 @@
      int limit_req_line;      /* limit on size of the HTTP request line    */
      int limit_req_fieldsize; /* limit on size of any request header field */
      int limit_req_fields;    /* limit on number of request header fields  */
@@ -3201,9 +3027,9 @@ diff -Nru apache_1.3.9/src/include/httpd.h apache_1.3.9.EAPI/src/include/httpd.h
  };
  
  /* These are more like real hosts than virtual hosts */
-diff -Nru apache_1.3.9/src/main/alloc.c apache_1.3.9.EAPI/src/main/alloc.c
---- apache_1.3.9/src/main/alloc.c	Wed Dec 29 22:03:42 1999
-+++ apache_1.3.9.EAPI/src/main/alloc.c	Wed Dec 29 21:25:56 1999
+diff -Nru apache_1.3.11/src/main/alloc.c apache_1.3.11.new/src/main/alloc.c
+--- apache_1.3.11/src/main/alloc.c	Thu Oct 21 22:44:28 1999
++++ apache_1.3.11.new/src/main/alloc.c	Wed Feb 23 07:53:14 2000
 @@ -63,6 +63,10 @@
   */
  
@@ -3420,7 +3246,7 @@ diff -Nru apache_1.3.9/src/main/alloc.c apache_1.3.9.EAPI/src/main/alloc.c
  #ifdef ALLOC_STATS
  static void dump_stats(void)
  {
-@@ -519,14 +611,73 @@
+@@ -519,14 +611,74 @@
      return permanent_pool;
  }
  
@@ -3437,7 +3263,9 @@ diff -Nru apache_1.3.9/src/main/alloc.c apache_1.3.9.EAPI/src/main/alloc.c
 +        mm_size = ap_mm_maxsize();
 +        if (mm_size > EAPI_MM_CORE_MAXSIZE)
 +            mm_size = EAPI_MM_CORE_MAXSIZE;
-+        mm_path = ap_server_root_relative(permanent_pool, EAPI_MM_CORE_PATH);
++        mm_path = ap_server_root_relative(permanent_pool, 
++                  ap_psprintf(permanent_pool, "%s.%ld", 
++                              EAPI_MM_CORE_PATH, (long)getpid()));
 +        if ((mm = ap_mm_create(mm_size, mm_path)) == NULL) {
 +            fprintf(stderr, "Ouch! ap_mm_create(%d, \"%s\") failed\n", mm_size, mm_path);
 +            err1 = ap_mm_error();
@@ -3447,7 +3275,6 @@ diff -Nru apache_1.3.9/src/main/alloc.c apache_1.3.9.EAPI/src/main/alloc.c
 +            if (err2 == NULL)
 +                err2 = "-unknown-";
 +            fprintf(stderr, "Error: MM: %s: OS: %s\n", err1, err2);
-+            abort();
 +            exit(1);
 +        }
 +    }
@@ -3494,7 +3321,7 @@ diff -Nru apache_1.3.9/src/main/alloc.c apache_1.3.9.EAPI/src/main/alloc.c
      /* Don't hold the mutex during cleanups. */
      run_cleanups(a->cleanups);
      a->cleanups = NULL;
-@@ -560,6 +711,10 @@
+@@ -560,6 +712,10 @@
      ap_block_alarms();
      ap_clear_pool(a);
  
@@ -3505,7 +3332,7 @@ diff -Nru apache_1.3.9/src/main/alloc.c apache_1.3.9.EAPI/src/main/alloc.c
      (void) ap_acquire_mutex(alloc_mutex);
      if (a->parent) {
  	if (a->parent->sub_pools == a)
-@@ -570,6 +725,10 @@
+@@ -570,6 +726,10 @@
  	    a->sub_next->sub_prev = a->sub_prev;
      }
      (void) ap_release_mutex(alloc_mutex);
@@ -3516,7 +3343,7 @@ diff -Nru apache_1.3.9/src/main/alloc.c apache_1.3.9.EAPI/src/main/alloc.c
  
      free_blocks(a->first);
      ap_unblock_alarms();
-@@ -584,6 +743,30 @@
+@@ -584,6 +744,30 @@
      return bytes_in_block_list(block_freelist);
  }
  
@@ -3547,7 +3374,7 @@ diff -Nru apache_1.3.9/src/main/alloc.c apache_1.3.9.EAPI/src/main/alloc.c
  /*****************************************************************
   * POOL_DEBUG support
   */
-@@ -749,16 +932,31 @@
+@@ -749,16 +933,31 @@
  
      ap_block_alarms();
  
@@ -3579,7 +3406,7 @@ diff -Nru apache_1.3.9/src/main/alloc.c apache_1.3.9.EAPI/src/main/alloc.c
  
      ap_unblock_alarms();
  
-@@ -870,6 +1068,11 @@
+@@ -870,6 +1069,11 @@
      char *ptr;
  
      size = (char *)ps->vbuff.curpos - ps->base;
@@ -3591,7 +3418,7 @@ diff -Nru apache_1.3.9/src/main/alloc.c apache_1.3.9.EAPI/src/main/alloc.c
      ptr = realloc(ps->base, 2*size);
      if (ptr == NULL) {
  	fputs("Ouch!  Out of memory!\n", stderr);
-@@ -890,9 +1093,21 @@
+@@ -890,9 +1094,21 @@
      cur_len = strp - blok->h.first_avail;
  
      /* must try another blok */
@@ -3613,7 +3440,7 @@ diff -Nru apache_1.3.9/src/main/alloc.c apache_1.3.9.EAPI/src/main/alloc.c
      memcpy(nblok->h.first_avail, blok->h.first_avail, cur_len);
      ps->vbuff.curpos = nblok->h.first_avail + cur_len;
      /* save a byte for the NUL terminator */
-@@ -901,10 +1116,18 @@
+@@ -901,10 +1117,18 @@
      /* did we allocate the current blok? if so free it up */
      if (ps->got_a_new_block) {
  	debug_fill(blok->h.first_avail, blok->h.endp - blok->h.first_avail);
@@ -3632,7 +3459,7 @@ diff -Nru apache_1.3.9/src/main/alloc.c apache_1.3.9.EAPI/src/main/alloc.c
      }
      ps->blok = nblok;
      ps->got_a_new_block = 1;
-@@ -923,6 +1146,11 @@
+@@ -923,6 +1147,11 @@
      void *ptr;
  
      ap_block_alarms();
@@ -3644,7 +3471,7 @@ diff -Nru apache_1.3.9/src/main/alloc.c apache_1.3.9.EAPI/src/main/alloc.c
      ps.base = malloc(512);
      if (ps.base == NULL) {
  	fputs("Ouch!  Out of memory!\n", stderr);
-@@ -935,6 +1163,11 @@
+@@ -935,6 +1164,11 @@
      *ps.vbuff.curpos++ = '\0';
      ptr = ps.base;
      /* shrink */
@@ -3656,9 +3483,9 @@ diff -Nru apache_1.3.9/src/main/alloc.c apache_1.3.9.EAPI/src/main/alloc.c
      ptr = realloc(ptr, (char *)ps.vbuff.curpos - (char *)ptr);
      if (ptr == NULL) {
  	fputs("Ouch!  Out of memory!\n", stderr);
-diff -Nru apache_1.3.9/src/main/buff.c apache_1.3.9.EAPI/src/main/buff.c
---- apache_1.3.9/src/main/buff.c	Wed Dec 29 22:03:42 1999
-+++ apache_1.3.9.EAPI/src/main/buff.c	Wed Dec 29 21:25:56 1999
+diff -Nru apache_1.3.11/src/main/buff.c apache_1.3.11.new/src/main/buff.c
+--- apache_1.3.11/src/main/buff.c	Wed Feb 23 07:52:42 2000
++++ apache_1.3.11.new/src/main/buff.c	Wed Feb 23 07:53:14 2000
 @@ -125,7 +125,11 @@
    select() sometimes returns 1 even though the write will block. We must work around this.
  */
@@ -3671,7 +3498,7 @@ diff -Nru apache_1.3.9/src/main/buff.c apache_1.3.9.EAPI/src/main/buff.c
  {
      int iostate = 1;
      fd_set fdset;
-@@ -183,8 +187,11 @@
+@@ -193,8 +197,11 @@
      return (rv);
  }
  
@@ -3684,19 +3511,19 @@ diff -Nru apache_1.3.9/src/main/buff.c apache_1.3.9.EAPI/src/main/buff.c
  {
      int iostate = 1;
      fd_set fdset;
-@@ -242,6 +249,9 @@
-     }
+@@ -258,6 +265,9 @@
      else
  #endif
+     {
 +#ifdef EAPI
 +	if (!ap_hook_call("ap::buff::read", &rv, fb, buf, nbyte))
 +#endif /* EAPI */
- 	rv = read(fb->fd_in, buf, nbyte);
-     
-     return rv;
-@@ -253,6 +263,9 @@
+ 	if(! fb->init_h_bytes_left) rv = read(fb->fd_in, buf, nbyte);
+ 	else {
+ 		if(nbyte > fb->init_h_bytes_left) nbyte = fb->init_h_bytes_left;
+@@ -278,6 +288,9 @@
  
- #if defined (WIN32)
+ #if defined (WIN32) || defined(NETWARE)
      if (fb->flags & B_SOCKET) {
 +#ifdef EAPI
 +	if (!ap_hook_call("ap::buff::recvwithtimeout", &rv, fb, buf, nbyte))
@@ -3704,7 +3531,7 @@ diff -Nru apache_1.3.9/src/main/buff.c apache_1.3.9.EAPI/src/main/buff.c
  	rv = recvwithtimeout(fb->fd_in, buf, nbyte, 0);
  	if (rv == SOCKET_ERROR)
  	    errno = WSAGetLastError();
-@@ -299,6 +312,9 @@
+@@ -325,6 +338,9 @@
      }
      else
  #endif
@@ -3714,9 +3541,9 @@ diff -Nru apache_1.3.9/src/main/buff.c apache_1.3.9.EAPI/src/main/buff.c
  #if defined (B_SFIO)
  	rv = sfwrite(fb->sf_out, buf, nbyte);
  #else
-@@ -314,6 +330,9 @@
+@@ -351,6 +367,9 @@
  
- #if defined(WIN32)
+ #if defined(WIN32) || defined(NETWARE)
      if (fb->flags & B_SOCKET) {
 +#ifdef EAPI
 +	if (!ap_hook_call("ap::buff::sendwithtimeout", &rv, fb, buf, nbyte))
@@ -3724,9 +3551,9 @@ diff -Nru apache_1.3.9/src/main/buff.c apache_1.3.9.EAPI/src/main/buff.c
  	rv = sendwithtimeout(fb->fd, buf, nbyte, 0);
  	if (rv == SOCKET_ERROR)
  	    errno = WSAGetLastError();
-@@ -394,6 +413,10 @@
- 		       (size_t) SF_UNBOUND, 1, SF_WRITE);
- #endif
+@@ -434,6 +453,10 @@
+ 	fb->init_header = NULL;
+ 	fb->init_h_bytes_left = 0;
  
 +#ifdef EAPI
 +    fb->ctx = ap_ctx_new(p);
@@ -3735,7 +3562,7 @@ diff -Nru apache_1.3.9/src/main/buff.c apache_1.3.9.EAPI/src/main/buff.c
      return fb;
  }
  
-@@ -1051,6 +1074,9 @@
+@@ -1080,6 +1103,9 @@
      i = 0;
      while (i < nvec) {
  	do
@@ -3745,10 +3572,10 @@ diff -Nru apache_1.3.9/src/main/buff.c apache_1.3.9.EAPI/src/main/buff.c
  	    rv = writev(fb->fd, &vec[i], nvec - i);
  	while (rv == -1 && (errno == EINTR || errno == EAGAIN)
  	       && !(fb->flags & B_EOUT));
-diff -Nru apache_1.3.9/src/main/http_config.c apache_1.3.9.EAPI/src/main/http_config.c
---- apache_1.3.9/src/main/http_config.c	Wed Dec 29 22:03:42 1999
-+++ apache_1.3.9.EAPI/src/main/http_config.c	Wed Dec 29 21:25:56 1999
-@@ -583,6 +583,20 @@
+diff -Nru apache_1.3.11/src/main/http_config.c apache_1.3.11.new/src/main/http_config.c
+--- apache_1.3.11/src/main/http_config.c	Sat Jan 15 17:40:42 2000
++++ apache_1.3.11.new/src/main/http_config.c	Wed Feb 23 07:53:14 2000
+@@ -582,6 +582,20 @@
  	m->name = tmp;
      }
  #endif /*_OSD_POSIX*/
@@ -3769,7 +3596,7 @@ diff -Nru apache_1.3.9/src/main/http_config.c apache_1.3.9.EAPI/src/main/http_co
  }
  
  /* 
-@@ -597,6 +611,21 @@
+@@ -596,6 +610,21 @@
  {
      module *modp;
  
@@ -3830,7 +3657,7 @@ diff -Nru apache_1.3.9/src/main/http_config.c apache_1.3.9.EAPI/src/main/http_co
      *ps = s;
  
      return ap_parse_vhost_addrs(p, hostname, s);
-@@ -1483,6 +1537,10 @@
+@@ -1444,6 +1498,10 @@
  
      s->module_config = create_server_config(p, s);
      s->lookup_defaults = create_default_per_dir_config(p);
@@ -3841,11 +3668,11 @@ diff -Nru apache_1.3.9/src/main/http_config.c apache_1.3.9.EAPI/src/main/http_co
  
      return s;
  }
-diff -Nru apache_1.3.9/src/main/http_main.c apache_1.3.9.EAPI/src/main/http_main.c
---- apache_1.3.9/src/main/http_main.c	Wed Dec 29 22:03:42 1999
-+++ apache_1.3.9.EAPI/src/main/http_main.c	Wed Dec 29 21:25:56 1999
-@@ -256,6 +256,9 @@
- int ap_listenbacklog;
+diff -Nru apache_1.3.11/src/main/http_main.c apache_1.3.11.new/src/main/http_main.c
+--- apache_1.3.11/src/main/http_main.c	Wed Feb 23 07:52:42 2000
++++ apache_1.3.11.new/src/main/http_main.c	Wed Feb 23 07:53:14 2000
+@@ -263,6 +263,9 @@
+ char * ap_tunnel = NULL;
  int ap_dump_settings = 0;
  API_VAR_EXPORT int ap_extended_status = 0;
 +#ifdef EAPI
@@ -3854,7 +3681,7 @@ diff -Nru apache_1.3.9/src/main/http_main.c apache_1.3.9.EAPI/src/main/http_main
  
  /*
   * The max child slot ever assigned, preserved across restarts.  Necessary
-@@ -427,6 +430,30 @@
+@@ -445,6 +448,30 @@
      }
  }
  
@@ -3882,10 +3709,10 @@ diff -Nru apache_1.3.9/src/main/http_main.c apache_1.3.9.EAPI/src/main/http_main
 +}
 +#endif /* EAPI */
 +
+ #ifndef NETWARE
  static APACHE_TLS int volatile exit_after_unblock = 0;
- 
- #ifdef GPROF
-@@ -1144,6 +1171,10 @@
+ #endif
+@@ -1195,6 +1222,10 @@
  	    ap_log_transaction(log_req);
  	}
  
@@ -3895,9 +3722,9 @@ diff -Nru apache_1.3.9/src/main/http_main.c apache_1.3.9.EAPI/src/main/http_main
 +
  	ap_bsetflag(save_req->connection->client, B_EOUT, 1);
  	ap_bclose(save_req->connection->client);
- 
-@@ -1153,6 +1184,9 @@
- 	ap_longjmp(jmpbuffer, 1);
+ 	
+@@ -1203,6 +1234,9 @@
+         ap_longjmp(jmpbuffer, 1);
      }
      else {			/* abort the connection */
 +#ifdef EAPI
@@ -3906,7 +3733,7 @@ diff -Nru apache_1.3.9/src/main/http_main.c apache_1.3.9.EAPI/src/main/http_main
  	ap_bsetflag(current_conn->client, B_EOUT, 1);
  	ap_bclose(current_conn->client);
  	current_conn->aborted = 1;
-@@ -1209,7 +1243,11 @@
+@@ -1268,7 +1302,11 @@
  }
  #endif
  
@@ -3918,7 +3745,7 @@ diff -Nru apache_1.3.9/src/main/http_main.c apache_1.3.9.EAPI/src/main/http_main
  {
      unsigned int old;
  
-@@ -1426,10 +1464,16 @@
+@@ -1504,10 +1542,16 @@
      /* Send any leftover data to the client, but never try to again */
  
      if (ap_bflush(r->connection->client) == -1) {
@@ -3935,8 +3762,8 @@ diff -Nru apache_1.3.9/src/main/http_main.c apache_1.3.9.EAPI/src/main/http_main
      ap_bsetflag(r->connection->client, B_EOUT, 1);
  
      /* Close our half of the connection --- send the client a FIN */
-@@ -2121,6 +2165,9 @@
- {
+@@ -2207,6 +2251,9 @@
+ #endif
      /* Clear the pool - including any registered cleanups */
      ap_destroy_pool(pglobal);
 +#ifdef EAPI
@@ -3945,14 +3772,14 @@ diff -Nru apache_1.3.9/src/main/http_main.c apache_1.3.9.EAPI/src/main/http_main
      exit(code);
  }
  
-@@ -3105,6 +3152,25 @@
-     hostnamebuf, sizeof(hostnamebuf), NULL, 0, NI_NUMERICHOST);
-     conn->remote_ip = ap_pstrdup(conn->pool, hostnamebuf);
- 
+@@ -3215,6 +3262,24 @@
+     conn->remote_addr = *remaddr;
+     conn->remote_ip = ap_pstrdup(conn->pool,
+ 			      inet_ntoa(conn->remote_addr.sin_addr));
 +#ifdef EAPI
 +    conn->ctx = ap_ctx_new(conn->pool);
 +#endif /* EAPI */
-+  
++
 +#ifdef EAPI
 +    /*
 +     * Invoke the `new_connection' hook of modules to let them do
@@ -3967,11 +3794,10 @@ diff -Nru apache_1.3.9/src/main/http_main.c apache_1.3.9.EAPI/src/main/http_main
 +                    (*m->new_connection)(conn);
 +    }
 +#endif /* EAPI */
-+
+ 
      return conn;
  }
- 
-@@ -3541,6 +3607,12 @@
+@@ -3696,6 +3761,15 @@
      printf("Server's Module Magic Number: %u:%u\n",
  	   MODULE_MAGIC_NUMBER_MAJOR, MODULE_MAGIC_NUMBER_MINOR);
      printf("Server compiled with....\n");
@@ -3980,11 +3806,14 @@ diff -Nru apache_1.3.9/src/main/http_main.c apache_1.3.9.EAPI/src/main/http_main
 +#endif
 +#ifdef EAPI_MM
 +    printf(" -D EAPI_MM\n");
++#ifdef EAPI_MM_CORE_PATH
++    printf(" -D EAPI_MM_CORE_PATH=\"" EAPI_MM_CORE_PATH "\"\n");
++#endif
 +#endif
  #ifdef BIG_SECURITY_HOLE
      printf(" -D BIG_SECURITY_HOLE\n");
  #endif
-@@ -3688,6 +3760,22 @@
+@@ -3849,6 +3923,22 @@
      ap_server_pre_read_config  = ap_make_array(pcommands, 1, sizeof(char *));
      ap_server_post_read_config = ap_make_array(pcommands, 1, sizeof(char *));
      ap_server_config_defines   = ap_make_array(pcommands, 1, sizeof(char *));
@@ -4007,7 +3836,7 @@ diff -Nru apache_1.3.9/src/main/http_main.c apache_1.3.9.EAPI/src/main/http_main
  }
  
  #ifndef MULTITHREAD
-@@ -4109,6 +4197,9 @@
+@@ -4284,6 +4374,9 @@
  
  	    ap_sync_scoreboard_image();
  	    if (ap_scoreboard_image->global.running_generation != ap_my_generation) {
@@ -4017,7 +3846,7 @@ diff -Nru apache_1.3.9/src/main/http_main.c apache_1.3.9.EAPI/src/main/http_main
  		ap_bclose(conn_io);
  		clean_child_exit(0);
  	    }
-@@ -4137,6 +4228,9 @@
+@@ -4312,6 +4405,9 @@
  	 */
  
  #ifdef NO_LINGCLOSE
@@ -4027,7 +3856,7 @@ diff -Nru apache_1.3.9/src/main/http_main.c apache_1.3.9.EAPI/src/main/http_main
  	ap_bclose(conn_io);	/* just close it */
  #else
  	if (r && r->connection
-@@ -4147,6 +4241,9 @@
+@@ -4322,6 +4418,9 @@
  	    lingering_close(r);
  	}
  	else {
@@ -4037,7 +3866,7 @@ diff -Nru apache_1.3.9/src/main/http_main.c apache_1.3.9.EAPI/src/main/http_main
  	    ap_bsetflag(conn_io, B_EOUT, 1);
  	    ap_bclose(conn_io);
  	}
-@@ -4879,10 +4976,17 @@
+@@ -5046,16 +5145,31 @@
  	    usage(argv[0]);
  	}
      }
@@ -4054,8 +3883,22 @@ diff -Nru apache_1.3.9/src/main/http_main.c apache_1.3.9.EAPI/src/main/http_main
 +
      if (ap_configtestonly) {
          fprintf(stderr, "Syntax OK\n");
++#ifdef EAPI
++        clean_parent_exit(0);
++#else
          exit(0);
-@@ -5033,6 +5137,10 @@
++#endif
+     }
+     if (ap_dump_settings) {
++#ifdef EAPI
++        clean_parent_exit(0);
++#else
+         exit(0);
++#endif
+     }
+ 
+     child_timeouts = !ap_standalone || one_process;
+@@ -5186,6 +5300,10 @@
  	    ap_destroy_pool(r->pool);
  	}
  
@@ -4066,7 +3909,7 @@ diff -Nru apache_1.3.9/src/main/http_main.c apache_1.3.9.EAPI/src/main/http_main
  	ap_bclose(cio);
      }
      exit(0);
-@@ -5361,6 +5469,9 @@
+@@ -5537,6 +5655,9 @@
  	ap_kill_cleanups_for_socket(ptrans, csd);
  
  #ifdef NO_LINGCLOSE
@@ -4076,7 +3919,7 @@ diff -Nru apache_1.3.9/src/main/http_main.c apache_1.3.9.EAPI/src/main/http_main
  	ap_bclose(conn_io);	/* just close it */
  #else
  	if (r && r->connection
-@@ -5371,6 +5482,9 @@
+@@ -5547,6 +5668,9 @@
  	    lingering_close(r);
  	}
  	else {
@@ -4086,18 +3929,17 @@ diff -Nru apache_1.3.9/src/main/http_main.c apache_1.3.9.EAPI/src/main/http_main
  	    ap_bsetflag(conn_io, B_EOUT, 1);
  	    ap_bclose(conn_io);
  	}
-@@ -6490,6 +6604,10 @@
+@@ -6873,6 +6997,9 @@
          }
      }
  
 +#ifdef EAPI
 +    ap_init_alloc_shared(TRUE);
 +#endif
-+
+ 
      if (!ap_os_is_path_absolute(ap_server_confname)) {
          char *full_conf_path;
- 
-@@ -6522,6 +6640,10 @@
+@@ -6906,6 +7033,10 @@
      }
  #endif
      server_conf = ap_read_config(pconf, ptrans, ap_server_confname);
@@ -4108,10 +3950,10 @@ diff -Nru apache_1.3.9/src/main/http_main.c apache_1.3.9.EAPI/src/main/http_main
  
      if (ap_configtestonly) {
          fprintf(stderr, "%s: Syntax OK\n", ap_server_root_relative(pcommands, ap_server_confname));
-diff -Nru apache_1.3.9/src/main/http_protocol.c apache_1.3.9.EAPI/src/main/http_protocol.c
---- apache_1.3.9/src/main/http_protocol.c	Wed Dec 29 22:03:42 1999
-+++ apache_1.3.9.EAPI/src/main/http_protocol.c	Wed Dec 29 21:25:56 1999
-@@ -935,6 +935,10 @@
+diff -Nru apache_1.3.11/src/main/http_protocol.c apache_1.3.11.new/src/main/http_protocol.c
+--- apache_1.3.11/src/main/http_protocol.c	Tue Jan 11 15:13:41 2000
++++ apache_1.3.11.new/src/main/http_protocol.c	Wed Feb 23 07:53:14 2000
+@@ -991,6 +991,10 @@
      r->status          = HTTP_REQUEST_TIME_OUT;  /* Until we get a request */
      r->the_request     = NULL;
  
@@ -4122,7 +3964,7 @@ diff -Nru apache_1.3.9/src/main/http_protocol.c apache_1.3.9.EAPI/src/main/http_
  #ifdef CHARSET_EBCDIC
      ap_bsetflag(r->connection->client, B_ASCII2EBCDIC|B_EBCDIC2ASCII, 1);
  #endif
-@@ -1079,6 +1083,11 @@
+@@ -1137,6 +1141,11 @@
      rnew->read_body       = REQUEST_NO_BODY;
  
      rnew->main = (request_rec *) r;
@@ -4134,10 +3976,10 @@ diff -Nru apache_1.3.9/src/main/http_protocol.c apache_1.3.9.EAPI/src/main/http_
  }
  
  void ap_finalize_sub_req_protocol(request_rec *sub)
-diff -Nru apache_1.3.9/src/main/http_request.c apache_1.3.9.EAPI/src/main/http_request.c
---- apache_1.3.9/src/main/http_request.c	Wed Dec 29 22:03:42 1999
-+++ apache_1.3.9.EAPI/src/main/http_request.c	Wed Dec 29 21:25:56 1999
-@@ -1315,6 +1315,9 @@
+diff -Nru apache_1.3.11/src/main/http_request.c apache_1.3.11.new/src/main/http_request.c
+--- apache_1.3.11/src/main/http_request.c	Tue Jan 11 15:13:41 2000
++++ apache_1.3.11.new/src/main/http_request.c	Wed Feb 23 07:53:14 2000
+@@ -1316,6 +1316,9 @@
      new->no_local_copy   = r->no_local_copy;
      new->read_length     = r->read_length;     /* We can only read it once */
      new->vlist_validator = r->vlist_validator;
@@ -4147,459 +3989,9 @@ diff -Nru apache_1.3.9/src/main/http_request.c apache_1.3.9.EAPI/src/main/http_r
  
      ap_table_setn(new->subprocess_env, "REDIRECT_STATUS",
  	ap_psprintf(r->pool, "%d", r->status));
-diff -Nru apache_1.3.9/src/modules/extra/mod_define.c apache_1.3.9.EAPI/src/modules/extra/mod_define.c
---- apache_1.3.9/src/modules/extra/mod_define.c	Thu Jan  1 01:00:00 1970
-+++ apache_1.3.9.EAPI/src/modules/extra/mod_define.c	Wed Dec 29 21:25:56 1999
-@@ -0,0 +1,446 @@
-+/* ====================================================================
-+ * Copyright (c) 1995-1998 The Apache Group.  All rights reserved.
-+ *
-+ * Redistribution and use in source and binary forms, with or without
-+ * modification, are permitted provided that the following conditions
-+ * are met:
-+ *
-+ * 1. Redistributions of source code must retain the above copyright
-+ *    notice, this list of conditions and the following disclaimer. 
-+ *
-+ * 2. Redistributions in binary form must reproduce the above copyright
-+ *    notice, this list of conditions and the following disclaimer in
-+ *    the documentation and/or other materials provided with the
-+ *    distribution.
-+ *
-+ * 3. All advertising materials mentioning features or use of this
-+ *    software must display the following acknowledgment:
-+ *    "This product includes software developed by the Apache Group
-+ *    for use in the Apache HTTP server project (http://www.apache.org/)."
-+ *
-+ * 4. The names "Apache Server" and "Apache Group" must not be used to
-+ *    endorse or promote products derived from this software without
-+ *    prior written permission. For written permission, please contact
-+ *    apache@apache.org.
-+ *
-+ * 5. Products derived from this software may not be called "Apache"
-+ *    nor may "Apache" appear in their names without prior written
-+ *    permission of the Apache Group.
-+ *
-+ * 6. Redistributions of any form whatsoever must retain the following
-+ *    acknowledgment:
-+ *    "This product includes software developed by the Apache Group
-+ *    for use in the Apache HTTP server project (http://www.apache.org/)."
-+ *
-+ * THIS SOFTWARE IS PROVIDED BY THE APACHE GROUP ``AS IS'' AND ANY
-+ * EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE APACHE GROUP OR
-+ * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
-+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
-+ * OF THE POSSIBILITY OF SUCH DAMAGE.
-+ * ====================================================================
-+ *
-+ * This software consists of voluntary contributions made by many
-+ * individuals on behalf of the Apache Group and was originally based
-+ * on public domain software written at the National Center for
-+ * Supercomputing Applications, University of Illinois, Urbana-Champaign.
-+ * For more information on the Apache Group and the Apache HTTP server
-+ * project, please see <http://www.apache.org/>.
-+ *
-+ */
-+
-+/*
-+**  mod_define.c -- Apache module for configuration defines ($xxx)
-+**  v1.0: Originally written in December 1998 by 
-+**        Ralf S. Engelschall <rse@engelschall.com> and
-+**        Christian Reiber <chrei@en.muc.de>
-+**  v1.1: Completely Overhauled in August 1999 by
-+**        Ralf S. Engelschall <rse@engelschall.com>
-+*/
-+
-+#include "ap_config.h"
-+#include "ap_ctype.h"
-+#include "httpd.h"
-+#include "http_config.h"
-+#include "http_conf_globals.h"
-+#include "http_core.h"
-+#include "http_log.h"
-+
-+#ifndef EAPI
-+#error "This module requires the Extended API (EAPI) facilities."
-+#endif
-+
-+/* 
-+ * The global table of defines
-+ */
-+
-+static table *tDefines         = NULL;   /* global table of defines */
-+static int    bOnceSeenADefine = FALSE;  /* optimization flag */
-+
-+/* 
-+ * Forward declaration
-+ */
-+static int   DefineIndex      (pool *, char *, int *, int *, char **);
-+static char *DefineFetch      (pool *, char *);
-+static char *DefineExpand     (pool *, char *, int, char *);
-+static void  DefineInit       (pool *);
-+static void  DefineCleanup    (void *);
-+static char *DefineRewriteHook(cmd_parms *, void *, const char *);
-+
-+/*
-+ * Character classes for scanner function
-+ */
-+typedef enum {
-+    CC_ESCAPE, CC_DOLLAR, CC_BRACEOPEN, CC_BRACECLOSE, 
-+    CC_IDCHAR1, CC_IDCHAR, CC_OTHER, CC_EOS   
-+} CharClass;
-+
-+/*
-+ * Scanner states for scanner function
-+ */
-+typedef enum {
-+    SS_NONE, SS_SKIP, SS_DOLLAR, SS_TOKEN_BRACED,
-+    SS_TOKEN_UNBRACED, SS_ERROR, SS_FOUND
-+} ScanState;
-+
-+/*
-+ * Default meta characters
-+ */
-+#define DEFAULT_MC_ESCAPE      "\\"
-+#define DEFAULT_MC_DOLLAR      "$"
-+#define DEFAULT_MC_BRACEOPEN   "{"
-+#define DEFAULT_MC_BRACECLOSE  "}"
-+
-+/*
-+ * Scanner for variable constructs $xxx and ${xxx}
-+ */
-+static int DefineIndex(pool *p, char *cpLine, int *pos, int *len, char **cpVar)
-+{
-+    int rc;
-+    char *cp;
-+    char *cp2;
-+    CharClass cc;
-+    char cEscape;
-+    char cDefine;
-+    char cBraceOpen;
-+    char cBraceClose;
-+    char *cpError;
-+    ScanState s;
-+
-+    cEscape = DEFAULT_MC_ESCAPE[0];
-+    if ((cp = DefineFetch(p, "mod_define::escape")) != NULL)
-+        cEscape = cp[0];
-+    cDefine = DEFAULT_MC_DOLLAR[0];
-+    if ((cp = DefineFetch(p, "mod_define::dollar")) != NULL)
-+        cDefine = cp[0];
-+    cBraceOpen = DEFAULT_MC_BRACEOPEN[0];
-+    if ((cp = DefineFetch(p, "mod_define::braceopen")) != NULL)
-+        cBraceOpen = cp[0];
-+    cBraceClose = DEFAULT_MC_BRACECLOSE[0];
-+    if ((cp = DefineFetch(p, "mod_define::braceclose")) != NULL)
-+        cBraceClose = cp[0];
-+
-+    rc = 0;
-+    *len = 0;
-+    cc = CC_OTHER;
-+    s = SS_NONE;
-+    for (cp = cpLine+(*pos); cc != CC_EOS; cp++) {
-+        if (*cp == cEscape)
-+            cc = CC_ESCAPE;
-+        else if (*cp == cDefine)
-+            cc = CC_DOLLAR;
-+        else if (*cp == cBraceOpen)
-+            cc = CC_BRACEOPEN;
-+        else if (*cp == cBraceClose)
-+            cc = CC_BRACECLOSE;
-+        else if (ap_isalpha(*cp))
-+            cc = CC_IDCHAR1;
-+        else if (ap_isdigit(*cp) || *cp == '_' || *cp == ':')
-+            cc = CC_IDCHAR;
-+        else if (*cp == '\0')
-+            cc = CC_EOS;
-+        else
-+            cc = CC_OTHER;
-+        switch (s) {
-+            case SS_NONE:
-+                switch (cc) {
-+                    case CC_ESCAPE: 
-+                        s = SS_SKIP;
-+                        break;
-+                    case CC_DOLLAR: 
-+                        s = SS_DOLLAR; 
-+                        break;
-+                    default:
-+                        break;
-+                }
-+                break;
-+            case SS_SKIP:
-+                s = SS_NONE;
-+                continue;
-+                break;
-+            case SS_DOLLAR:
-+                switch (cc) {
-+                    case CC_BRACEOPEN: 
-+                        s = SS_TOKEN_BRACED;   
-+                        *pos = cp-cpLine-1; 
-+                        (*len) = 2; 
-+                        *cpVar = cp+1; 
-+                        break;
-+                    case CC_IDCHAR1: 
-+                        s = SS_TOKEN_UNBRACED; 
-+                        *pos = cp-cpLine-1; 
-+                        (*len) = 2; 
-+                        *cpVar = cp; 
-+                        break;
-+                    case CC_ESCAPE:
-+                        s = SS_SKIP; 
-+                        break;
-+                    default: 
-+                        s = SS_NONE; 
-+                        break;
-+                }
-+                break;
-+            case SS_TOKEN_BRACED:
-+                switch (cc) {
-+                    case CC_IDCHAR1:
-+                    case CC_IDCHAR: 
-+                        (*len)++; 
-+                        break;
-+                    case CC_BRACECLOSE: 
-+                        (*len)++; 
-+                        cp2 = ap_palloc(p, cp-*cpVar+1);
-+                        ap_cpystrn(cp2, *cpVar, cp-*cpVar+1); 
-+                        *cpVar = cp2;
-+                        s = SS_FOUND; 
-+                        break;
-+                    default:
-+                        cpError = ap_psprintf(p, "Illegal character '%c' in identifier", *cp);
-+                        s = SS_ERROR;
-+                        break;
-+                }
-+                break;
-+            case SS_TOKEN_UNBRACED:
-+                switch (cc) {
-+                    case CC_IDCHAR1:
-+                    case CC_IDCHAR: 
-+                        (*len)++; 
-+                        break;
-+                    default:
-+                        cp2 = ap_palloc(p, cp-*cpVar+1);
-+                        ap_cpystrn(cp2, *cpVar, cp-*cpVar+1); 
-+                        *cpVar = cp2;
-+                        s = SS_FOUND; 
-+                        break;
-+                }
-+                break;
-+            case SS_FOUND:
-+            case SS_ERROR:
-+                break;
-+        }
-+        if (s == SS_ERROR) {
-+            fprintf(stderr, "Error\n");
-+            break;
-+        }
-+        else if (s == SS_FOUND) {
-+            rc = 1;
-+            break;
-+        }
-+    }
-+    return rc;
-+}
-+
-+/*
-+ * Determine the value of a variable
-+ */
-+static char *DefineFetch(pool *p, char *cpVar)
-+{
-+    char *cpVal;
-+
-+    /* first try out table */
-+    if ((cpVal = (char *)ap_table_get(tDefines, (char *)cpVar)) != NULL)
-+        return cpVal;
-+    /* second try the environment */
-+    if ((cpVal = getenv(cpVar)) != NULL)
-+        return cpVal;
-+    return NULL;
-+}
-+
-+/*
-+ * Expand a variable
-+ */
-+static char *DefineExpand(pool *p, char *cpToken, int tok_len, char *cpVal)
-+{
-+    char *cp;
-+    int val_len, rest_len;
-+
-+    val_len  = strlen(cpVal);
-+    rest_len = strlen(cpToken+tok_len);
-+    if (val_len < tok_len) 
-+        memcpy(cpToken+val_len, cpToken+tok_len, rest_len+1);
-+    else if (val_len > tok_len)
-+        for (cp = cpToken+strlen(cpToken); cp > cpToken+tok_len-1; cp--)  
-+            *(cp+(val_len-tok_len)) = *cp;
-+    memcpy(cpToken, cpVal, val_len);
-+    return NULL;
-+}
-+
-+/*
-+ * The EAPI hook which is called after Apache has read a
-+ * configuration line and before it's actually processed
-+ */
-+static char *DefineRewriteHook(cmd_parms *cmd, void *config, const char *line)
-+{
-+    pool *p;
-+    char *cpBuf;
-+    char *cpLine;
-+    int pos;
-+    int len;
-+    char *cpError;
-+    char *cpVar;
-+    char *cpVal;
-+    server_rec *s;
-+
-+    /* runtime optimization */
-+    if (!bOnceSeenADefine)
-+        return NULL;
-+
-+    p  = cmd->pool;
-+    s  = cmd->server;
-+
-+    /*
-+     * Search for:
-+     *  ....\$[a-zA-Z][:_a-zA-Z0-9]*....
-+     *  ....\${[a-zA-Z][:_a-zA-Z0-9]*}....
-+     */
-+    cpBuf = NULL;
-+    cpLine = (char *)line;
-+    pos = 0;
-+    while (DefineIndex(p, cpLine, &pos, &len, &cpVar)) {
-+#ifdef DEFINE_DEBUG
-+        {
-+        char prefix[1024];
-+        char marker[1024];
-+        int i;
-+        for (i = 0; i < pos; i++)
-+            prefix[i] = ' ';
-+        prefix[i] = '\0';
-+        for (i = 0; i < len; i++)
-+            marker[i] = '^';
-+        marker[i] = '\0';
-+        fprintf(stderr, 
-+                "Found variable `%s' (pos: %d, len: %d)\n"
-+                "  %s\n"
-+                "  %s%s\n",
-+                cpVar, pos, len, cpLine, prefix, marker);
-+        }
-+#endif
-+        if (cpBuf == NULL) {
-+            cpBuf = ap_palloc(p, MAX_STRING_LEN);
-+            ap_cpystrn(cpBuf, line, MAX_STRING_LEN);
-+            cpLine = cpBuf;
-+        }
-+        if ((cpVal = DefineFetch(p, cpVar)) == NULL) {
-+            ap_log_error(APLOG_MARK, APLOG_ERR, s, 
-+                         "mod_define: Variable '%s' not defined: file %s, line %d", 
-+                         cpVar, cmd->config_file->name,
-+                         cmd->config_file->line_number);
-+            cpBuf = NULL;
-+            break;
-+        }
-+        if ((cpError = DefineExpand(p, cpLine+pos, len, cpVal)) != NULL) {
-+            ap_log_error(APLOG_MARK, APLOG_ERR, s, 
-+                         "mod_define: %s: file %s, line %d", 
-+                         cpError, cmd->config_file->name,
-+                         cmd->config_file->line_number);
-+            cpBuf = NULL;
-+            break;
-+        }
-+    }
-+    return cpBuf;
-+}
-+
-+/*
-+ * Implementation of the `Define' configuration directive
-+ */
-+static const char *cmd_define(cmd_parms *cmd, void *config, 
-+                              char *cpVar, char *cpVal)
-+{
-+    if (tDefines == NULL)
-+        DefineInit(cmd->pool);
-+    ap_table_set(tDefines, cpVar, cpVal);
-+    bOnceSeenADefine = TRUE;
-+    return NULL;
-+}
-+
-+/*
-+ * Module Initialization
-+ */
-+
-+static void DefineInit(pool *p)
-+{
-+    tDefines = ap_make_table(p, 10);
-+    /* predefine delimiters */
-+    ap_table_set(tDefines, "mod_define::escape", DEFAULT_MC_ESCAPE);
-+    ap_table_set(tDefines, "mod_define::dollar", DEFAULT_MC_DOLLAR);
-+    ap_table_set(tDefines, "mod_define::open",   DEFAULT_MC_BRACEOPEN);
-+    ap_table_set(tDefines, "mod_define::close",  DEFAULT_MC_BRACECLOSE);
-+    ap_register_cleanup(p, NULL, DefineCleanup, ap_null_cleanup);
-+    return;
-+}
-+
-+/*
-+ * Module Cleanup
-+ */
-+
-+static void DefineCleanup(void *data)
-+{
-+    /* reset private variables when config pool is cleared */
-+    tDefines         = NULL;
-+    bOnceSeenADefine = FALSE;
-+    return;
-+}
-+
-+/* 
-+ * Module Directive lists
-+ */
-+static const command_rec DefineDirectives[] = {
-+    { "Define", cmd_define, NULL, RSRC_CONF|ACCESS_CONF, TAKE2,
-+      "Define a configuration variable" },
-+    { NULL }
-+};
-+
-+/* 
-+ * Module API dispatch list
-+ */
-+module MODULE_VAR_EXPORT define_module = {
-+    STANDARD_MODULE_STUFF, 
-+    NULL,                  /* module initializer                  */
-+    NULL,                  /* create per-dir    config structures */
-+    NULL,                  /* merge  per-dir    config structures */
-+    NULL,                  /* create per-server config structures */
-+    NULL,                  /* merge  per-server config structures */
-+    DefineDirectives,      /* table of config file commands       */
-+    NULL,                  /* [#8] MIME-typed-dispatched handlers */
-+    NULL,                  /* [#1] URI to filename translation    */
-+    NULL,                  /* [#4] validate user id from request  */
-+    NULL,                  /* [#5] check if the user is ok _here_ */
-+    NULL,                  /* [#2] check access by host address   */
-+    NULL,                  /* [#6] determine MIME type            */
-+    NULL,                  /* [#7] pre-run fixups                 */
-+    NULL,                  /* [#9] log a transaction              */
-+    NULL,                  /* [#3] header parser                  */
-+    NULL,                  /* child_init                          */
-+    NULL,                  /* child_exit                          */
-+    NULL,                  /* [#0] post read-request              */
-+    NULL,                  /* EAPI: add_module                    */
-+    NULL,                  /* EAPI: del_module                    */
-+    DefineRewriteHook,     /* EAPI: rewrite_command               */
-+    NULL                   /* EAPI: new_connection                */
-+};
-+
-diff -Nru apache_1.3.9/src/modules/proxy/mod_proxy.c apache_1.3.9.EAPI/src/modules/proxy/mod_proxy.c
---- apache_1.3.9/src/modules/proxy/mod_proxy.c	Wed Dec 29 22:03:42 1999
-+++ apache_1.3.9.EAPI/src/modules/proxy/mod_proxy.c	Wed Dec 29 21:25:56 1999
+diff -Nru apache_1.3.11/src/modules/proxy/mod_proxy.c apache_1.3.11.new/src/modules/proxy/mod_proxy.c
+--- apache_1.3.11/src/modules/proxy/mod_proxy.c	Tue Jan 11 15:13:43 2000
++++ apache_1.3.11.new/src/modules/proxy/mod_proxy.c	Wed Feb 23 07:53:14 2000
 @@ -214,6 +214,9 @@
  static int proxy_fixup(request_rec *r)
  {
@@ -4608,7 +4000,7 @@ diff -Nru apache_1.3.9/src/modules/proxy/mod_proxy.c apache_1.3.9.EAPI/src/modul
 +    int rc;
 +#endif /* EAPI */
  
-     if (!r->proxyreq || strncmp(r->filename, "proxy:", 6) != 0)
+     if (r->proxyreq == NOT_PROXY || strncmp(r->filename, "proxy:", 6) != 0)
  	return DECLINED;
 @@ -221,6 +224,14 @@
      url = &r->filename[6];
@@ -4705,7 +4097,7 @@ diff -Nru apache_1.3.9/src/modules/proxy/mod_proxy.c apache_1.3.9.EAPI/src/modul
      if (r->method_number == M_CONNECT)
  	return ap_proxy_connect_handler(r, cr, url, NULL, 0);
      if (strcasecmp(scheme, "http") == 0)
-@@ -895,4 +956,10 @@
+@@ -954,6 +1015,12 @@
      NULL,			/* child_init */
      NULL,			/* child_exit */
      proxy_detect		/* post read-request */
@@ -4716,41 +4108,25 @@ diff -Nru apache_1.3.9/src/modules/proxy/mod_proxy.c apache_1.3.9.EAPI/src/modul
 +    NULL			/* EAPI: new_connection  */
 +#endif
  };
-diff -Nru apache_1.3.9/src/modules/proxy/proxy_http.c apache_1.3.9.EAPI/src/modules/proxy/proxy_http.c
---- apache_1.3.9/src/modules/proxy/proxy_http.c	Wed Dec 29 22:03:42 1999
-+++ apache_1.3.9.EAPI/src/modules/proxy/proxy_http.c	Wed Dec 29 22:02:34 1999
-@@ -181,8 +181,11 @@
-     pool *p = r->pool;
-     const long int zero = 0L;
-     char *destportstr = NULL;
--    const char *urlptr = NULL;
-+#ifdef EAPI
-+    int destport = 0;
-+#endif /* EAPI */
-     const char *datestr;
-+    const char *urlptr = NULL;
-     struct tbl_do_args tdo;
-     struct addrinfo hints, *res, *tres;
-     int error;
-@@ -202,6 +205,17 @@
+ 
+ 
+diff -Nru apache_1.3.11/src/modules/proxy/proxy_http.c apache_1.3.11.new/src/modules/proxy/proxy_http.c
+--- apache_1.3.11/src/modules/proxy/proxy_http.c	Tue Jan 11 15:13:45 2000
++++ apache_1.3.11.new/src/modules/proxy/proxy_http.c	Wed Feb 23 07:53:14 2000
+@@ -207,6 +207,12 @@
+ 	return HTTP_BAD_REQUEST;
      urlptr += 3;
-     ap_snprintf(portstr, sizeof(portstr), "%d", DEFAULT_HTTP_PORT);
-     destportstr = portstr;
-+
+     destport = DEFAULT_HTTP_PORT;
 +#ifdef EAPI
-+
 +    ap_hook_use("ap::mod_proxy::http::handler::set_destport", 
 +                AP_HOOK_SIG2(int,ptr), 
 +                AP_HOOK_TOPMOST,
 +                &destport, r);
-+    ap_snprintf(portstr, sizeof(portstr), "%d", DEFAULT_HTTP_PORT);
-+    destportstr = portstr;
 +#endif /* EAPI */
-+
      strp = strchr(urlptr, '/');
      if (strp == NULL) {
  	desthost = ap_pstrdup(p, urlptr);
-@@ -374,13 +388,41 @@
+@@ -305,13 +311,41 @@
      f = ap_bcreate(p, B_RDWR | B_SOCKET);
      ap_bpushfd(f, sock, sock);
  
@@ -4784,7 +4160,7 @@ diff -Nru apache_1.3.9/src/modules/proxy/proxy_http.c apache_1.3.9.EAPI/src/modu
 +        }
 +    }
 +#else /* EAPI */
-     if (destportstr != NULL && atoi(destportstr) != DEFAULT_HTTP_PORT)
+     if (destportstr != NULL && destport != DEFAULT_HTTP_PORT)
  	ap_bvputs(f, "Host: ", desthost, ":", destportstr, CRLF, NULL);
      else
  	ap_bvputs(f, "Host: ", desthost, CRLF, NULL);
@@ -4792,460 +4168,10 @@ diff -Nru apache_1.3.9/src/modules/proxy/proxy_http.c apache_1.3.9.EAPI/src/modu
  
      if (conf->viaopt == via_block) {
  	/* Block all outgoing Via: headers */
-diff -Nru apache_1.3.9/src/modules/standard/mod_define.c apache_1.3.9.EAPI/src/modules/standard/mod_define.c
---- apache_1.3.9/src/modules/standard/mod_define.c	Thu Jan  1 01:00:00 1970
-+++ apache_1.3.9.EAPI/src/modules/standard/mod_define.c	Wed Dec 29 21:25:56 1999
-@@ -0,0 +1,446 @@
-+/* ====================================================================
-+ * Copyright (c) 1995-1998 The Apache Group.  All rights reserved.
-+ *
-+ * Redistribution and use in source and binary forms, with or without
-+ * modification, are permitted provided that the following conditions
-+ * are met:
-+ *
-+ * 1. Redistributions of source code must retain the above copyright
-+ *    notice, this list of conditions and the following disclaimer. 
-+ *
-+ * 2. Redistributions in binary form must reproduce the above copyright
-+ *    notice, this list of conditions and the following disclaimer in
-+ *    the documentation and/or other materials provided with the
-+ *    distribution.
-+ *
-+ * 3. All advertising materials mentioning features or use of this
-+ *    software must display the following acknowledgment:
-+ *    "This product includes software developed by the Apache Group
-+ *    for use in the Apache HTTP server project (http://www.apache.org/)."
-+ *
-+ * 4. The names "Apache Server" and "Apache Group" must not be used to
-+ *    endorse or promote products derived from this software without
-+ *    prior written permission. For written permission, please contact
-+ *    apache@apache.org.
-+ *
-+ * 5. Products derived from this software may not be called "Apache"
-+ *    nor may "Apache" appear in their names without prior written
-+ *    permission of the Apache Group.
-+ *
-+ * 6. Redistributions of any form whatsoever must retain the following
-+ *    acknowledgment:
-+ *    "This product includes software developed by the Apache Group
-+ *    for use in the Apache HTTP server project (http://www.apache.org/)."
-+ *
-+ * THIS SOFTWARE IS PROVIDED BY THE APACHE GROUP ``AS IS'' AND ANY
-+ * EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE APACHE GROUP OR
-+ * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
-+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
-+ * OF THE POSSIBILITY OF SUCH DAMAGE.
-+ * ====================================================================
-+ *
-+ * This software consists of voluntary contributions made by many
-+ * individuals on behalf of the Apache Group and was originally based
-+ * on public domain software written at the National Center for
-+ * Supercomputing Applications, University of Illinois, Urbana-Champaign.
-+ * For more information on the Apache Group and the Apache HTTP server
-+ * project, please see <http://www.apache.org/>.
-+ *
-+ */
-+
-+/*
-+**  mod_define.c -- Apache module for configuration defines ($xxx)
-+**  v1.0: Originally written in December 1998 by 
-+**        Ralf S. Engelschall <rse@engelschall.com> and
-+**        Christian Reiber <chrei@en.muc.de>
-+**  v1.1: Completely Overhauled in August 1999 by
-+**        Ralf S. Engelschall <rse@engelschall.com>
-+*/
-+
-+#include "ap_config.h"
-+#include "ap_ctype.h"
-+#include "httpd.h"
-+#include "http_config.h"
-+#include "http_conf_globals.h"
-+#include "http_core.h"
-+#include "http_log.h"
-+
-+#ifndef EAPI
-+#error "This module requires the Extended API (EAPI) facilities."
-+#endif
-+
-+/* 
-+ * The global table of defines
-+ */
-+
-+static table *tDefines         = NULL;   /* global table of defines */
-+static int    bOnceSeenADefine = FALSE;  /* optimization flag */
-+
-+/* 
-+ * Forward declaration
-+ */
-+static int   DefineIndex      (pool *, char *, int *, int *, char **);
-+static char *DefineFetch      (pool *, char *);
-+static char *DefineExpand     (pool *, char *, int, char *);
-+static void  DefineInit       (pool *);
-+static void  DefineCleanup    (void *);
-+static char *DefineRewriteHook(cmd_parms *, void *, const char *);
-+
-+/*
-+ * Character classes for scanner function
-+ */
-+typedef enum {
-+    CC_ESCAPE, CC_DOLLAR, CC_BRACEOPEN, CC_BRACECLOSE, 
-+    CC_IDCHAR1, CC_IDCHAR, CC_OTHER, CC_EOS   
-+} CharClass;
-+
-+/*
-+ * Scanner states for scanner function
-+ */
-+typedef enum {
-+    SS_NONE, SS_SKIP, SS_DOLLAR, SS_TOKEN_BRACED,
-+    SS_TOKEN_UNBRACED, SS_ERROR, SS_FOUND
-+} ScanState;
-+
-+/*
-+ * Default meta characters
-+ */
-+#define DEFAULT_MC_ESCAPE      "\\"
-+#define DEFAULT_MC_DOLLAR      "$"
-+#define DEFAULT_MC_BRACEOPEN   "{"
-+#define DEFAULT_MC_BRACECLOSE  "}"
-+
-+/*
-+ * Scanner for variable constructs $xxx and ${xxx}
-+ */
-+static int DefineIndex(pool *p, char *cpLine, int *pos, int *len, char **cpVar)
-+{
-+    int rc;
-+    char *cp;
-+    char *cp2;
-+    CharClass cc;
-+    char cEscape;
-+    char cDefine;
-+    char cBraceOpen;
-+    char cBraceClose;
-+    char *cpError;
-+    ScanState s;
-+
-+    cEscape = DEFAULT_MC_ESCAPE[0];
-+    if ((cp = DefineFetch(p, "mod_define::escape")) != NULL)
-+        cEscape = cp[0];
-+    cDefine = DEFAULT_MC_DOLLAR[0];
-+    if ((cp = DefineFetch(p, "mod_define::dollar")) != NULL)
-+        cDefine = cp[0];
-+    cBraceOpen = DEFAULT_MC_BRACEOPEN[0];
-+    if ((cp = DefineFetch(p, "mod_define::braceopen")) != NULL)
-+        cBraceOpen = cp[0];
-+    cBraceClose = DEFAULT_MC_BRACECLOSE[0];
-+    if ((cp = DefineFetch(p, "mod_define::braceclose")) != NULL)
-+        cBraceClose = cp[0];
-+
-+    rc = 0;
-+    *len = 0;
-+    cc = CC_OTHER;
-+    s = SS_NONE;
-+    for (cp = cpLine+(*pos); cc != CC_EOS; cp++) {
-+        if (*cp == cEscape)
-+            cc = CC_ESCAPE;
-+        else if (*cp == cDefine)
-+            cc = CC_DOLLAR;
-+        else if (*cp == cBraceOpen)
-+            cc = CC_BRACEOPEN;
-+        else if (*cp == cBraceClose)
-+            cc = CC_BRACECLOSE;
-+        else if (ap_isalpha(*cp))
-+            cc = CC_IDCHAR1;
-+        else if (ap_isdigit(*cp) || *cp == '_' || *cp == ':')
-+            cc = CC_IDCHAR;
-+        else if (*cp == '\0')
-+            cc = CC_EOS;
-+        else
-+            cc = CC_OTHER;
-+        switch (s) {
-+            case SS_NONE:
-+                switch (cc) {
-+                    case CC_ESCAPE: 
-+                        s = SS_SKIP;
-+                        break;
-+                    case CC_DOLLAR: 
-+                        s = SS_DOLLAR; 
-+                        break;
-+                    default:
-+                        break;
-+                }
-+                break;
-+            case SS_SKIP:
-+                s = SS_NONE;
-+                continue;
-+                break;
-+            case SS_DOLLAR:
-+                switch (cc) {
-+                    case CC_BRACEOPEN: 
-+                        s = SS_TOKEN_BRACED;   
-+                        *pos = cp-cpLine-1; 
-+                        (*len) = 2; 
-+                        *cpVar = cp+1; 
-+                        break;
-+                    case CC_IDCHAR1: 
-+                        s = SS_TOKEN_UNBRACED; 
-+                        *pos = cp-cpLine-1; 
-+                        (*len) = 2; 
-+                        *cpVar = cp; 
-+                        break;
-+                    case CC_ESCAPE:
-+                        s = SS_SKIP; 
-+                        break;
-+                    default: 
-+                        s = SS_NONE; 
-+                        break;
-+                }
-+                break;
-+            case SS_TOKEN_BRACED:
-+                switch (cc) {
-+                    case CC_IDCHAR1:
-+                    case CC_IDCHAR: 
-+                        (*len)++; 
-+                        break;
-+                    case CC_BRACECLOSE: 
-+                        (*len)++; 
-+                        cp2 = ap_palloc(p, cp-*cpVar+1);
-+                        ap_cpystrn(cp2, *cpVar, cp-*cpVar+1); 
-+                        *cpVar = cp2;
-+                        s = SS_FOUND; 
-+                        break;
-+                    default:
-+                        cpError = ap_psprintf(p, "Illegal character '%c' in identifier", *cp);
-+                        s = SS_ERROR;
-+                        break;
-+                }
-+                break;
-+            case SS_TOKEN_UNBRACED:
-+                switch (cc) {
-+                    case CC_IDCHAR1:
-+                    case CC_IDCHAR: 
-+                        (*len)++; 
-+                        break;
-+                    default:
-+                        cp2 = ap_palloc(p, cp-*cpVar+1);
-+                        ap_cpystrn(cp2, *cpVar, cp-*cpVar+1); 
-+                        *cpVar = cp2;
-+                        s = SS_FOUND; 
-+                        break;
-+                }
-+                break;
-+            case SS_FOUND:
-+            case SS_ERROR:
-+                break;
-+        }
-+        if (s == SS_ERROR) {
-+            fprintf(stderr, "Error\n");
-+            break;
-+        }
-+        else if (s == SS_FOUND) {
-+            rc = 1;
-+            break;
-+        }
-+    }
-+    return rc;
-+}
-+
-+/*
-+ * Determine the value of a variable
-+ */
-+static char *DefineFetch(pool *p, char *cpVar)
-+{
-+    char *cpVal;
-+
-+    /* first try out table */
-+    if ((cpVal = (char *)ap_table_get(tDefines, (char *)cpVar)) != NULL)
-+        return cpVal;
-+    /* second try the environment */
-+    if ((cpVal = getenv(cpVar)) != NULL)
-+        return cpVal;
-+    return NULL;
-+}
-+
-+/*
-+ * Expand a variable
-+ */
-+static char *DefineExpand(pool *p, char *cpToken, int tok_len, char *cpVal)
-+{
-+    char *cp;
-+    int val_len, rest_len;
-+
-+    val_len  = strlen(cpVal);
-+    rest_len = strlen(cpToken+tok_len);
-+    if (val_len < tok_len) 
-+        memcpy(cpToken+val_len, cpToken+tok_len, rest_len+1);
-+    else if (val_len > tok_len)
-+        for (cp = cpToken+strlen(cpToken); cp > cpToken+tok_len-1; cp--)  
-+            *(cp+(val_len-tok_len)) = *cp;
-+    memcpy(cpToken, cpVal, val_len);
-+    return NULL;
-+}
-+
-+/*
-+ * The EAPI hook which is called after Apache has read a
-+ * configuration line and before it's actually processed
-+ */
-+static char *DefineRewriteHook(cmd_parms *cmd, void *config, const char *line)
-+{
-+    pool *p;
-+    char *cpBuf;
-+    char *cpLine;
-+    int pos;
-+    int len;
-+    char *cpError;
-+    char *cpVar;
-+    char *cpVal;
-+    server_rec *s;
-+
-+    /* runtime optimization */
-+    if (!bOnceSeenADefine)
-+        return NULL;
-+
-+    p  = cmd->pool;
-+    s  = cmd->server;
-+
-+    /*
-+     * Search for:
-+     *  ....\$[a-zA-Z][:_a-zA-Z0-9]*....
-+     *  ....\${[a-zA-Z][:_a-zA-Z0-9]*}....
-+     */
-+    cpBuf = NULL;
-+    cpLine = (char *)line;
-+    pos = 0;
-+    while (DefineIndex(p, cpLine, &pos, &len, &cpVar)) {
-+#ifdef DEFINE_DEBUG
-+        {
-+        char prefix[1024];
-+        char marker[1024];
-+        int i;
-+        for (i = 0; i < pos; i++)
-+            prefix[i] = ' ';
-+        prefix[i] = '\0';
-+        for (i = 0; i < len; i++)
-+            marker[i] = '^';
-+        marker[i] = '\0';
-+        fprintf(stderr, 
-+                "Found variable `%s' (pos: %d, len: %d)\n"
-+                "  %s\n"
-+                "  %s%s\n",
-+                cpVar, pos, len, cpLine, prefix, marker);
-+        }
-+#endif
-+        if (cpBuf == NULL) {
-+            cpBuf = ap_palloc(p, MAX_STRING_LEN);
-+            ap_cpystrn(cpBuf, line, MAX_STRING_LEN);
-+            cpLine = cpBuf;
-+        }
-+        if ((cpVal = DefineFetch(p, cpVar)) == NULL) {
-+            ap_log_error(APLOG_MARK, APLOG_ERR, s, 
-+                         "mod_define: Variable '%s' not defined: file %s, line %d", 
-+                         cpVar, cmd->config_file->name,
-+                         cmd->config_file->line_number);
-+            cpBuf = NULL;
-+            break;
-+        }
-+        if ((cpError = DefineExpand(p, cpLine+pos, len, cpVal)) != NULL) {
-+            ap_log_error(APLOG_MARK, APLOG_ERR, s, 
-+                         "mod_define: %s: file %s, line %d", 
-+                         cpError, cmd->config_file->name,
-+                         cmd->config_file->line_number);
-+            cpBuf = NULL;
-+            break;
-+        }
-+    }
-+    return cpBuf;
-+}
-+
-+/*
-+ * Implementation of the `Define' configuration directive
-+ */
-+static const char *cmd_define(cmd_parms *cmd, void *config, 
-+                              char *cpVar, char *cpVal)
-+{
-+    if (tDefines == NULL)
-+        DefineInit(cmd->pool);
-+    ap_table_set(tDefines, cpVar, cpVal);
-+    bOnceSeenADefine = TRUE;
-+    return NULL;
-+}
-+
-+/*
-+ * Module Initialization
-+ */
-+
-+static void DefineInit(pool *p)
-+{
-+    tDefines = ap_make_table(p, 10);
-+    /* predefine delimiters */
-+    ap_table_set(tDefines, "mod_define::escape", DEFAULT_MC_ESCAPE);
-+    ap_table_set(tDefines, "mod_define::dollar", DEFAULT_MC_DOLLAR);
-+    ap_table_set(tDefines, "mod_define::open",   DEFAULT_MC_BRACEOPEN);
-+    ap_table_set(tDefines, "mod_define::close",  DEFAULT_MC_BRACECLOSE);
-+    ap_register_cleanup(p, NULL, DefineCleanup, ap_null_cleanup);
-+    return;
-+}
-+
-+/*
-+ * Module Cleanup
-+ */
-+
-+static void DefineCleanup(void *data)
-+{
-+    /* reset private variables when config pool is cleared */
-+    tDefines         = NULL;
-+    bOnceSeenADefine = FALSE;
-+    return;
-+}
-+
-+/* 
-+ * Module Directive lists
-+ */
-+static const command_rec DefineDirectives[] = {
-+    { "Define", cmd_define, NULL, RSRC_CONF|ACCESS_CONF, TAKE2,
-+      "Define a configuration variable" },
-+    { NULL }
-+};
-+
-+/* 
-+ * Module API dispatch list
-+ */
-+module MODULE_VAR_EXPORT define_module = {
-+    STANDARD_MODULE_STUFF, 
-+    NULL,                  /* module initializer                  */
-+    NULL,                  /* create per-dir    config structures */
-+    NULL,                  /* merge  per-dir    config structures */
-+    NULL,                  /* create per-server config structures */
-+    NULL,                  /* merge  per-server config structures */
-+    DefineDirectives,      /* table of config file commands       */
-+    NULL,                  /* [#8] MIME-typed-dispatched handlers */
-+    NULL,                  /* [#1] URI to filename translation    */
-+    NULL,                  /* [#4] validate user id from request  */
-+    NULL,                  /* [#5] check if the user is ok _here_ */
-+    NULL,                  /* [#2] check access by host address   */
-+    NULL,                  /* [#6] determine MIME type            */
-+    NULL,                  /* [#7] pre-run fixups                 */
-+    NULL,                  /* [#9] log a transaction              */
-+    NULL,                  /* [#3] header parser                  */
-+    NULL,                  /* child_init                          */
-+    NULL,                  /* child_exit                          */
-+    NULL,                  /* [#0] post read-request              */
-+    NULL,                  /* EAPI: add_module                    */
-+    NULL,                  /* EAPI: del_module                    */
-+    DefineRewriteHook,     /* EAPI: rewrite_command               */
-+    NULL                   /* EAPI: new_connection                */
-+};
-+
-diff -Nru apache_1.3.9/src/modules/standard/mod_log_config.c apache_1.3.9.EAPI/src/modules/standard/mod_log_config.c
---- apache_1.3.9/src/modules/standard/mod_log_config.c	Wed Dec 29 22:03:42 1999
-+++ apache_1.3.9.EAPI/src/modules/standard/mod_log_config.c	Wed Dec 29 21:25:56 1999
-@@ -252,6 +252,9 @@
+diff -Nru apache_1.3.11/src/modules/standard/mod_log_config.c apache_1.3.11.new/src/modules/standard/mod_log_config.c
+--- apache_1.3.11/src/modules/standard/mod_log_config.c	Thu Dec 16 00:04:22 1999
++++ apache_1.3.11.new/src/modules/standard/mod_log_config.c	Wed Feb 23 07:53:14 2000
+@@ -257,6 +257,9 @@
  typedef const char *(*item_key_func) (request_rec *, char *);
  
  typedef struct {
@@ -5255,7 +4181,7 @@ diff -Nru apache_1.3.9/src/modules/standard/mod_log_config.c apache_1.3.9.EAPI/s
      item_key_func func;
      char *arg;
      int condition_sense;
-@@ -511,15 +514,36 @@
+@@ -554,15 +557,36 @@
      }
  };
  
@@ -5292,7 +4218,7 @@ diff -Nru apache_1.3.9/src/modules/standard/mod_log_config.c apache_1.3.9.EAPI/s
      return NULL;
  }
  
-@@ -645,7 +669,11 @@
+@@ -688,7 +712,11 @@
              break;
  
          default:
@@ -5304,7 +4230,7 @@ diff -Nru apache_1.3.9/src/modules/standard/mod_log_config.c apache_1.3.9.EAPI/s
              if (!l) {
                  char dummy[2];
  
-@@ -654,6 +682,9 @@
+@@ -697,6 +725,9 @@
                  return ap_pstrcat(p, "Unrecognized LogFormat directive %",
                                 dummy, NULL);
              }
@@ -5314,7 +4240,7 @@ diff -Nru apache_1.3.9/src/modules/standard/mod_log_config.c apache_1.3.9.EAPI/s
              it->func = l->func;
              if (it->want_orig == -1) {
                  it->want_orig = l->want_orig_default;
-@@ -715,6 +746,15 @@
+@@ -758,6 +789,15 @@
  
      /* We do.  Do it... */
  
@@ -5330,12 +4256,12 @@ diff -Nru apache_1.3.9/src/modules/standard/mod_log_config.c apache_1.3.9.EAPI/s
      cp = (*item->func) (item->want_orig ? orig : r, item->arg);
      return cp ? cp : "-";
  }
-diff -Nru apache_1.3.9/src/modules/standard/mod_rewrite.c apache_1.3.9.EAPI/src/modules/standard/mod_rewrite.c
---- apache_1.3.9/src/modules/standard/mod_rewrite.c	Wed Dec 29 22:03:43 1999
-+++ apache_1.3.9.EAPI/src/modules/standard/mod_rewrite.c	Wed Dec 29 21:25:56 1999
-@@ -3746,6 +3746,15 @@
+diff -Nru apache_1.3.11/src/modules/standard/mod_rewrite.c apache_1.3.11.new/src/modules/standard/mod_rewrite.c
+--- apache_1.3.11/src/modules/standard/mod_rewrite.c	Sun Jan 16 19:06:30 2000
++++ apache_1.3.11.new/src/modules/standard/mod_rewrite.c	Wed Feb 23 07:53:14 2000
+@@ -3770,6 +3770,15 @@
      }
- #endif /* ndef WIN32 */
+ #endif /* ndef WIN32 && NETWARE*/
  
 +#ifdef EAPI
 +    else {
@@ -5349,10 +4275,10 @@ diff -Nru apache_1.3.9/src/modules/standard/mod_rewrite.c apache_1.3.9.EAPI/src/
      if (result == NULL) {
          return ap_pstrdup(r->pool, "");
      }
-diff -Nru apache_1.3.9/src/modules/standard/mod_so.c apache_1.3.9.EAPI/src/modules/standard/mod_so.c
---- apache_1.3.9/src/modules/standard/mod_so.c	Wed Dec 29 22:03:43 1999
-+++ apache_1.3.9.EAPI/src/modules/standard/mod_so.c	Wed Dec 29 21:25:56 1999
-@@ -257,7 +257,12 @@
+diff -Nru apache_1.3.11/src/modules/standard/mod_so.c apache_1.3.11.new/src/modules/standard/mod_so.c
+--- apache_1.3.11/src/modules/standard/mod_so.c	Tue May  4 13:21:14 1999
++++ apache_1.3.11.new/src/modules/standard/mod_so.c	Wed Feb 23 07:53:14 2000
+@@ -257,11 +257,24 @@
       * Make sure the found module structure is really a module structure
       * 
       */
@@ -5365,104 +4291,37 @@ diff -Nru apache_1.3.9/src/modules/standard/mod_so.c apache_1.3.9.EAPI/src/modul
          return ap_pstrcat(cmd->pool, "API module structure `", modname,
                            "' in file ", szModuleFile, " is garbled -"
                            " perhaps this is not an Apache module DSO?", NULL);
-diff -Nru apache_1.3.9/src/modules/standard/mod_status.c apache_1.3.9.EAPI/src/modules/standard/mod_status.c
---- apache_1.3.9/src/modules/standard/mod_status.c	Wed Dec 29 22:03:43 1999
-+++ apache_1.3.9.EAPI/src/modules/standard/mod_status.c	Wed Dec 29 21:25:56 1999
-@@ -480,12 +480,33 @@
- 	    if (no_table_report)
- 		ap_rputs("<p><hr><h2>Server Details</h2>\n\n", r);
- 	    else
-+#ifndef NO_PRETTYPRINT
-+		ap_rputs("<p>\n\n<table bgcolor=\"#ffffff\" border=\"0\">"
-+			"<tr bgcolor=000000>"
-+			"<td><font face=\"Arial,Helvetica\" color=\"#ffffff\"><b>Srv</b></font></td>"
-+			"<td><font face=\"Arial,Helvetica\" color=\"#ffffff\"><b>PID</b></font></td>"
-+			"<td><font face=\"Arial,Helvetica\" color=\"#ffffff\"><b>Acc</b></font></td>"
-+			"<td><font face=\"Arial,Helvetica\" color=\"#ffffff\"><b>M</b></font></td>"
-+#ifndef NO_TIMES
-+			"<td><font face=\"Arial,Helvetica\" color=\"#ffffff\"><b>CPU</b></font></td>"
+     }
++#ifdef EAPI
++    if (modp->magic == MODULE_MAGIC_COOKIE_AP13) {
++        ap_log_error(APLOG_MARK, APLOG_WARNING|APLOG_NOERRNO, NULL,
++                     "Loaded DSO %s uses plain Apache 1.3 API, "
++                     "this module might crash under EAPI! "
++                     "(please recompile it with -DEAPI)", filename);
++    }
 +#endif
-+			"<td><font face=\"Arial,Helvetica\" color=\"#ffffff\"><b>SS</b></font></td>"
-+			"<td><font face=\"Arial,Helvetica\" color=\"#ffffff\"><b>Req</b></font></td>"
-+			"<td><font face=\"Arial,Helvetica\" color=\"#ffffff\"><b>Conn</b></font></td>"
-+			"<td><font face=\"Arial,Helvetica\" color=\"#ffffff\"><b>Child</b></font></td>"
-+			"<td><font face=\"Arial,Helvetica\" color=\"#ffffff\"><b>Slot</b></font></td>"
-+			"<td><font face=\"Arial,Helvetica\" color=\"#ffffff\"><b>Host</b></font></td>"
-+			"<td><font face=\"Arial,Helvetica\" color=\"#ffffff\"><b>VHost</b></font></td>"
-+			"<td><font face=\"Arial,Helvetica\" color=\"#ffffff\"><b>Request</b></td>"
-+			"</tr>\n", r);      
-+#else /* NO_PRETTYPRINT */
- #ifdef NO_TIMES
- 		/* Allow for OS/2 not having CPU stats */
- 		ap_rputs("<p>\n\n<table border=0><tr><th>Srv<th>PID<th>Acc<th>M\n<th>SS<th>Req<th>Conn<th>Child<th>Slot<th>Client<th>VHost<th>Request</tr>\n\n", r);
- #else
- 		ap_rputs("<p>\n\n<table border=0><tr><th>Srv<th>PID<th>Acc<th>M<th>CPU\n<th>SS<th>Req<th>Conn<th>Child<th>Slot<th>Client<th>VHost<th>Request</tr>\n\n", r);
+ 
+     /* 
+      * Add this module to the Apache core structures
+diff -Nru apache_1.3.11/src/modules/standard/mod_status.c apache_1.3.11.new/src/modules/standard/mod_status.c
+--- apache_1.3.11/src/modules/standard/mod_status.c	Wed Jan 12 16:55:02 2000
++++ apache_1.3.11.new/src/modules/standard/mod_status.c	Wed Feb 23 07:53:14 2000
+@@ -712,6 +712,12 @@
  #endif
-+#endif /* NO_PRETTYPRINT */
  	}
  
- 	for (i = 0; i < HARD_SERVER_LIMIT; ++i) {
-@@ -602,14 +623,19 @@
- 			    vhost ? vhost->server_hostname : "(unavailable)");
- 		    }
- 		    else {		/* !no_table_report */
-+#ifndef NO_PRETTYPRINT
-+			ap_rprintf(r,"<tr bgcolor=\"#ffffff\">");
-+#else
-+			ap_rprintf(r,"<tr>");
-+#endif
- 			if (score_record.status == SERVER_DEAD)
- 			    ap_rprintf(r,
--				"<tr><td><b>%d-%d</b><td>-<td>%d/%lu/%lu",
-+				"<td><b>%d-%d</b><td>-<td>%d/%lu/%lu",
- 				i, (int) ps_record.generation,
- 				(int) conn_lres, my_lres, lres);
- 			else
- 			    ap_rprintf(r,
--				"<tr><td><b>%d-%d</b><td>%d<td>%d/%lu/%lu",
-+				"<td><b>%d-%d</b><td>%d<td>%d/%lu/%lu",
- 				i, (int) ps_record.generation,
- 				(int) ps_record.pid, (int) conn_lres,
- 				my_lres, lres);
-@@ -669,11 +695,22 @@
- 			    ap_rprintf(r,
- 			     "<td>?<td nowrap>?<td nowrap>..reading.. </tr>\n\n");
- 			else
-+#ifndef NO_PRETTYPRINT
-+			    ap_rprintf(r,
-+			     "<td nowrap><font face=\"Arial,Helvetica\" size=\"-1\">%s</font>"
-+			     "<td nowrap><font face=\"Arial,Helvetica\" size=\"-1\">%s</font>"
-+			     "<td nowrap><font face=\"Arial,Helvetica\" size=\"-1\">%s</font>"
-+			     "</tr>\n\n",
-+			     score_record.client,
-+			     vhost ? vhost->server_hostname : "(unavailable)",
-+			     ap_escape_html(r->pool, score_record.request));
-+#else
- 			    ap_rprintf(r,
- 			     "<td>%s<td nowrap>%s<td nowrap>%s</tr>\n\n",
- 			     score_record.client,
- 			     vhost ? vhost->server_hostname : "(unavailable)",
- 			     ap_escape_html(r->pool, score_record.request));
-+#endif
- 		    }		/* no_table_report */
- 		}			/* !short_report */
- 	    }			/* if (<active child>) */
-@@ -711,6 +748,12 @@
- </table>\n", r);
- #endif
- 	}
-+
 +#ifdef EAPI
 +    ap_hook_use("ap::mod_status::display",
 +                AP_HOOK_SIG4(void,ptr,int,int), AP_HOOK_ALL,
 +                r, no_table_report, short_report);
 +#endif
- 
++
      } else {
  
-diff -Nru apache_1.3.9/src/support/apxs.pl apache_1.3.9.EAPI/src/support/apxs.pl
---- apache_1.3.9/src/support/apxs.pl	Wed Dec 29 22:03:43 1999
-+++ apache_1.3.9.EAPI/src/support/apxs.pl	Wed Dec 29 21:25:56 1999
+     ap_rputs("<hr>To obtain a full report with current status information ", r);
+diff -Nru apache_1.3.11/src/support/apxs.pl apache_1.3.11.new/src/support/apxs.pl
+--- apache_1.3.11/src/support/apxs.pl	Wed Feb 23 07:52:42 2000
++++ apache_1.3.11.new/src/support/apxs.pl	Wed Feb 23 07:53:14 2000
 @@ -651,5 +651,11 @@
      NULL,                  /* child_init                          */
      NULL,                  /* child_exit                          */
@@ -5475,10 +4334,10 @@ diff -Nru apache_1.3.9/src/support/apxs.pl apache_1.3.9.EAPI/src/support/apxs.pl
 +#endif
  };
  
-diff -Nru apache_1.3.9/src/support/httpd.exp apache_1.3.9.EAPI/src/support/httpd.exp
---- apache_1.3.9/src/support/httpd.exp	Wed Dec 29 22:03:43 1999
-+++ apache_1.3.9.EAPI/src/support/httpd.exp	Wed Dec 29 21:25:56 1999
-@@ -410,3 +410,59 @@
+diff -Nru apache_1.3.11/src/support/httpd.exp apache_1.3.11.new/src/support/httpd.exp
+--- apache_1.3.11/src/support/httpd.exp	Thu Dec  9 20:21:51 1999
++++ apache_1.3.11.new/src/support/httpd.exp	Wed Feb 23 07:53:14 2000
+@@ -413,3 +413,59 @@
  XML_SetUnparsedEntityDeclHandler
  XML_SetUserData
  XML_UseParserAsHandlerArg
