@@ -51,6 +51,7 @@ case "$1" in
 	if [ -f /var/lock/subsys/httpd ]; then
 		msg_stopping httpd
 		killproc httpd
+		sleep 1
 		rm -f /var/lock/subsys/httpd /var/run/httpd.pid /var/run/httpd.loc* >/dev/null 2>&1
 	else
 		msg_not_running httpd
