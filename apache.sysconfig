@@ -1,8 +1,0 @@
-# Customized setings for apache
-
-# Nice level for apache
-SERVICE_RUN_NICE_LEVEL="+5"
-
-# Cmdline options 
-HTTPD_OPTS=""
-
