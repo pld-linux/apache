@@ -14,7 +14,7 @@ Summary(pt_BR):	Servidor HTTPD para prover serviços WWW
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.0.35
-Release:	0.1
+Release:	0.2
 License:	Apache Group License
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/
@@ -818,9 +818,9 @@ if [ "$1" = "0" ]; then
 fi
 
 %post mod_cache
+%{_sbindir}/apxs -e -a -n cache %{_libexecdir}/mod_cache.so 1>&2
 %{_sbindir}/apxs -e -a -n mem_cache %{_libexecdir}/mod_mem_cache.so 1>&2
 %{_sbindir}/apxs -e -a -n disk_cache %{_libexecdir}/mod_disk_cache.so 1>&2
-%{_sbindir}/apxs -e -a -n cache %{_libexecdir}/mod_cache.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -829,9 +829,9 @@ fi
 
 %preun mod_cache
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n cache %{_libexecdir}/mod_cache.so 1>&2
 	%{_sbindir}/apxs -e -A -n disk_cache %{_libexecdir}/mod_disk_cache.so 1>&2
 	%{_sbindir}/apxs -e -A -n mem_cache %{_libexecdir}/mod_mem_cache.so 1>&2
+	%{_sbindir}/apxs -e -A -n cache %{_libexecdir}/mod_cache.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
@@ -870,7 +870,8 @@ if [ "$1" = "0" ]; then
 fi
 
 %post mod_dav
-%{_sbindir}/apxs -e -a -n dev %{_libexecdir}/mod_dav.so 1>&2
+%{_sbindir}/apxs -e -a -n dav %{_libexecdir}/mod_dav.so 1>&2
+%{_sbindir}/apxs -e -a -n dav_fs %{_libexecdir}/mod_dav_fs.so 1>&2
 if [ -f /etc/httpd/httpd.conf ] && ! grep -q "^Include.*mod_dav.conf" /etc/httpd/httpd.conf; then
 	echo "Include /etc/httpd/mod_dav.conf" >> /etc/httpd/httpd.conf
 fi
@@ -882,6 +883,7 @@ fi
 
 %preun mod_dav
 if [ "$1" = "0" ]; then
+	%{_sbindir}/apxs -e -A -n dav %{_libexecdir}/mod_dav_fs.so 1>&2
 	%{_sbindir}/apxs -e -A -n dav %{_libexecdir}/mod_dav.so 1>&2
 	grep -v "^Include.*mod_dav.conf" /etc/httpd/httpd.conf > \
 		/etc/httpd/httpd.conf.tmp
@@ -1342,6 +1344,11 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/mod_dav.conf
 %attr(755,root,root) %{_libexecdir}/mod_dav*.so
 %{_datadir}/manual/mod/mod_dav*.html
+
+%files mod_deflate
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libexecdir}/mod_deflate.so
+%{_datadir}/manual/mod/mod_deflate.html
 
 %files mod_dir
 %defattr(644,root,root,755)
