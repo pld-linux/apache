@@ -212,7 +212,7 @@ files for those systems which support DB and not DBM. It is only
 available in Apache 1.1 and later.
 
 %description -l pl mod_auth_db
-Ten modu³ zawiera modu³ mod_auth_db. Modu³ ten s³u¿y do autentykacji
+Ten pakiet zawiera modu³ mod_auth_db. Modu³ ten s³u¿y do autentykacji
 ale jako plików danych u¿ywa Berkeley DB.
 
 %package mod_define
