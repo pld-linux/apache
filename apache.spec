@@ -1293,7 +1293,7 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_httpd.conf
 %attr(640,root,root) %{_sysconfdir}/magic
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/sysconfig/*
-%attr(640,root,root) %config(noreplace) /etc/logrotate.d/*
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/logrotate.d/*
 %attr(750,root,root) %config(noreplace) %verify(not md5 size mtime) /etc/monit/*.monitrc
 
 %attr(755,root,root) %{_libexecdir}/mod_access.so
