@@ -27,7 +27,7 @@ Summary(uk):	îÁÊÐÏÐÕÌÑÒÎ¦ÛÉÊ Web-Server
 Summary(zh_CN):	Internet ÉÏÓ¦ÓÃ×î¹ã·ºµÄ Web ·þÎñ³ÌÐò¡£
 Name:		apache
 Version:	1.3.23
-Release:	4
+Release:	5
 License:	Apache Group License
 Group:		Networking/Daemons
 URL:		http://www.apache.org/
@@ -1039,7 +1039,7 @@ fi
 %preun mod_proxy
 if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n proxy %{_libexecdir}/libproxy.so 1>&2
-	grep -v -q "^Include.*mod_proxy.conf" /etc/httpd/httpd.conf > \
+	grep -v "^Include.*mod_proxy.conf" /etc/httpd/httpd.conf > \
 		/etc/httpd/httpd.conf.tmp
 	mv -f /etc/httpd/httpd.conf.tmp /etc/httpd/httpd.conf
 	if [ -f /var/lock/subsys/httpd ]; then
@@ -1077,7 +1077,7 @@ fi
 %preun mod_status
 if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n status %{_libexecdir}/mod_status.so 1>&2
-	grep -v -q "^Include.*mod_status.conf" /etc/httpd/httpd.conf > \
+	grep -v "^Include.*mod_status.conf" /etc/httpd/httpd.conf > \
 		/etc/httpd/httpd.conf.tmp
 	mv -f /etc/httpd/httpd.conf.tmp /etc/httpd/httpd.conf
 	if [ -f /var/lock/subsys/httpd ]; then
@@ -1131,7 +1131,7 @@ fi
 %preun mod_vhost_alias
 if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n vhost_alias %{_libexecdir}/mod_vhost_alias.so 1>&2
-	grep -v -q "^Include.*mod_vhost_alias.conf" /etc/httpd/httpd.conf > \
+	grep -v "^Include.*mod_vhost_alias.conf" /etc/httpd/httpd.conf > \
 		/etc/httpd/httpd.conf.tmp
 	mv -f /etc/httpd/httpd.conf.tmp /etc/httpd/httpd.conf
 	if [ -f /var/lock/subsys/httpd ]; then
