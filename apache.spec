@@ -35,6 +35,7 @@ Patch1:		%{name}-configdir_skip_backups.patch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 BuildRequires:	automake
 BuildRequires:	openssl-devel
+BuildRequires:	openssl-tools
 BuildRequires:	db4-devel
 BuildRequires:	zlib-devel
 BuildRequires:	expat-static
