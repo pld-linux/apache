@@ -4,21 +4,17 @@ Summary(fr): Serveur Web leader du marché
 Summary(pl): Serwer WWW (World Wide Web)
 Summary(tr): Lider WWW tarayýcý
 Name:        apache
-Version:     1.3.2
+Version:     1.3.3
 Release:     1
 Group:       Networking/Daemons
 Source0:     ftp://ftp.apache.org/apache/dist/%{name}_%{version}.tar.gz
 Source1:     httpd.init
 Source2:     apache.log
-Patch0:      apache-1.3.2-htdocs.patch
-Patch1:      apache-1.3.2-suexec.patch
-Patch2:      apache-1.3b7-perlpath.patch
-Patch3:      apache-1.3b8-config.patch
-Patch4:      apache-1.3b8-mimetypes.patch
+Patch0:      apache-1.3.2-suexec.patch
 Copyright:   BSD-like
-Obsoletes:   apache-suexec apache-extra
+Obsoletes:   apache-extra
 Provides:    httpd
-Requires:    /etc/mime.types, initscripts >= 3.25
+Requires:    /etc/mime.types, initscripts >= 3.25, setup >= 1.10.0
 Prereq:      /sbin/chkconfig
 URL:         http://www.apache.org/
 BuildRoot:   /tmp/%{name}-%{version}-root
@@ -43,6 +39,23 @@ Apache umozliwia równie¿ konfigurowanie serwerów wirtualnych.
 %description -l tr
 Apache serbest daðýtýlan ve çok kullanýlan yetenekli bir web sunucusudur.
 
+%package suexec
+Summary:     Apache suexec wrapper
+Summary(pl): suexec wrapper do serwera www Apache
+Group:       Networking/Daemons
+Requires:    %{name} = %{version}
+
+%description suexec
+The suEXEC feature provides Apache users the ability to run CGI and SSI
+programs under user IDs different from the user ID of the calling web-server.
+Normally, when a CGI or SSI program executes, it runs as the same user 
+who is running the web server. 
+
+%description -l pl suexec
+suEXEC umo¿liwia serwerowi Apache uruchamianie programów CGI i SSI z innym
+UID ni¿ wywo³yj±cy je serwer. Normalnie programy CGI i SSI s± wykonywane
+jako taki sam urzytkownik jak serwer WWW.
+
 %package devel
 Summary:     Apache include files
 Summary(pl): Pliki nag³ówkowe do serwera www Apache
@@ -55,37 +68,40 @@ Apache include files.
 %description -l pl devel
 Pliki nag³owkowe do serwera www Apache.
 
+%package doc
+Summary:     Apache dokumentation
+Summary(pl): Dokumentacja do Apache
+Group:       Documentation
+Requires:    %{name} = %{version}
+
+%description doc
+Documentation for apache in HTML format.
+
+%description -l pl doc
+Dokumentacja do Apache w formacie HTML
+
 %prep 
 %setup -q -n apache_%{version}
-
 %patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
 
 %build
-OPTIM="$RPM_OPT_FLAGS" ./configure --prefix=/usr --sysconfdir=/etc/httpd/conf \
-	--datadir=/home/httpd --libexecdir=/usr/libexec/apache \
-	--localstatedir=/var --runtimedir=/var/run \
+OPTIM="$RPM_OPT_FLAGS" ./configure \
+	--prefix=/usr \
+	--sysconfdir=/etc/httpd/conf \
+	--datadir=/home/httpd \
+	--libexecdir=/usr/libexec/apache \
+	--localstatedir=/var \
+	--runtimedir=/var/run \
 	--logfiledir=/var/log/httpd \
 	--without-confadjust \
-	--enable-module=auth_anon --enable-shared=auth_anon \
-	--enable-module=auth_db --enable-shared=auth_db \
-	--enable-module=digest --enable-shared=digest \
-	--enable-module=expires --enable-shared=expires \
-	--enable-module=headers --enable-shared=headers \
-	--enable-module=mime_magic --enable-shared=mime_magic \
-	--enable-module=mmap_static --enable-shared=mmap_static \
-	--enable-module=proxy --enable-shared=proxy \
+	--enable-module=all \
+	--enable-shared=max \
 	--proxycachedir=/var/spool/proxy \
-	--enable-module=rewrite --enable-shared=rewrite \
-	--enable-module=speling --enable-shared=speling \
-	--enable-module=status --enable-shared=status \
-	--enable-module=unique_id --enable-shared=unique_id \
-	--enable-module=usertrack --enable-shared=usertrack \
-	--enable-suexec --suexec-caller=nobody \
-	--suexec-uidmin=500 --suexec-gidmin=500
+	--with-perl=/usr/bin/perl \
+	--enable-suexec \
+	--suexec-caller=http \
+	--suexec-uidmin=500 \
+	--suexec-gidmin=500
 
 make
 
@@ -93,7 +109,7 @@ make
 rm -rf $RPM_BUILD_ROOT
 make install-quiet root="$RPM_BUILD_ROOT"
 
-install -d $RPM_BUILD_ROOT/etc/{httpd/conf,logrotate.d,rc.d/{init,rc{0,1,2,3,4,5,6}}.d}
+install -d $RPM_BUILD_ROOT/etc/{httpd/conf,logrotate.d,rc.d/init.d}
 install -d $RPM_BUILD_ROOT/home/httpd/{html/manual,icons,cgi-bin}
 install -d $RPM_BUILD_ROOT/{usr/{lib/apache,sbin,man/man{1,8}},var/log/httpd}
 
@@ -104,13 +120,6 @@ install $RPM_SOURCE_DIR/httpd.init $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
 rm -f $RPM_BUILD_ROOT/home/httpd/html/manual/expand.pl
 
 strip --strip-debug $RPM_BUILD_ROOT/usr/libexec/apache/*.so || :
-
-for I in 0 1 2 6; do
-        ln -s ../init.d/httpd $RPM_BUILD_ROOT/etc/rc.d/rc$I.d/K15httpd
-done
-for I in 3 5; do
-        ln -s ../init.d/httpd $RPM_BUILD_ROOT/etc/rc.d/rc$I.d/S85httpd
-done
 
 touch $RPM_BUILD_ROOT/var/log/httpd/{access,error}_log
 
@@ -138,7 +147,6 @@ fi
 %dir /etc/httpd/conf
 %config(noreplace) %verify(not size mtime md5) /etc/httpd/conf/*.conf
 /etc/httpd/conf/*.conf.default
-%config(missingok) /etc/rc.d/rc*.d/*
 %attr(600, root, root) %config /etc/logrotate.d/*
 %attr(755, root, root) %dir /home/httpd
 %attr(755, root, root) %dir /home/httpd/html
@@ -161,10 +169,32 @@ fi
 %attr(700, root, root) %dir /var/log/httpd
 %ghost /var/log/httpd/*
 
+%files suexec
+%attr(4751,root, root) /usr/sbin/suexec
+
 %files devel
 %attr(644, root, root, 755) /usr/include/apache
 
+%files doc
+%doc /home/httpd/html/manual
+
 %changelog
+* Wed Nov 13 1998 Tomasz K³oczko <kloczek@rudy.mif.pg.gda.pl>
+  [1.3.3-1]
+- removed making symlinks in /etc/rc.d/rc?.d and in %install also
+  removed this symlinks from %files (/etc/rc.d/init.d/httpd suports
+  chkconfig),
+- added "Requires: setup >= 1.10.0" for proper install in enviroment with
+  http user/group.
+
+* Wed Oct 14 1998 Konrad Stêpieñ <konrad@interdata.com.pl>
+  [1.3.3-0]
+- changed user/group to http,
+- enabled all modules,
+- added magic (for mod_mime_magic),
+- rebuild spec file to minimize number of patches,
+- suEXEC in separated package.
+
 * Fri Sep 25 1998 Konrad Stêpieñ <konrad@interdata.com.pl>
   [1.3.2-1]
 - reconfig to use /etc/mime.types (again),
