@@ -114,6 +114,7 @@ Pliki nag³ówkowe dla serwera WWW Apache.
 
 %package mod_actions
 Summary:	Apache module for run CGI whenever a file of a certain type is requested
+Summary(pl):	Modu³ dla apache do uruchamiania skryptów cgi
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
@@ -124,8 +125,13 @@ This package contains mod_actions module. This module lets you run CGI
 scripts whenever a file of a certain type is requested. This makes it much
 easier to execute scripts that process files.
 
+%description -l pl mod_actions
+Ten modu³ pozwala na uruchamianie skryptów w momencie gdy nadchodzi
+¿±danie pobrania pliku okre¶lonego typu.
+
 %package mod_auth_anon
 Summary:	Apache module with "anonymous" user access authentication
+Summary(pl):	Modu³ apache oferuj±cy anonimow± autoryzacjê u¿ytkownia
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
@@ -142,8 +148,14 @@ the site open for 'unregistered' users. One advantage of using Auth-based
 user tracking is that, unlike magic-cookies and funny URL pre/postfixes, it
 is completely browser independent and it allows users to share URLs.
 
+%description -l pl mod_auth_anon
+Ten modu³ oferuje anonimow± autoryzacjê u¿ytkownia podobnie do anonimowych
+serwerów ftp (u¿ytkownik ,,anonymous'' oraz has³o w postaci adresu pocztowego
+u¿ytkownika).
+
 %package mod_define
 Summary:	Apache module - authentication variables for arbitrary directives
+Summary(pl):	Modu³ apache do definiowania zmiennych
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
@@ -153,19 +165,27 @@ Requires:	%{name}(EAPI) = %{version}
 It provides the definition variables for arbitrary directives, i.e.
 variables which can be expanded on any(!) directive line.
 
+%description -l pl mod_define
+Modu³ ten umo¿liwia definicjê zmiennych i dyrektyw.
+
 %package mod_digest
 Summary:	Apache user authentication module using MD5 Digest Authentication 
+Summary(pl):	Modu³ apache do autoryzacji MD5
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
 Requires:	%{name}(EAPI) = %{version}
 
 %description mod_digest
-This package contains mod_dir module. It provides user authentication using
+This package contains mod_digest module. It provides user authentication using
 MD5 Digest Authentication.
 
+%description -l pl mod_digest
+Modu³ ten dostarcza metodê autoryzacji bazuj±c± na MD5 Digest Authentication.
+
 %package mod_dir
-Summary:	Apache module for trailing slash" redirects and serving directory index files
+Summary:	Apache module for "trailing slash" redirects and serving directory index files
+Summary(pl):	Modu³ oferuj±cy przekierowania i serwowanie indeksu katalogu.
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
@@ -175,8 +195,12 @@ Requires:	%{name}(EAPI) = %{version}
 This package contains mod_dir which provides "trailing slash" redirects and
 serving directory index files.
 
+%description -l pl mod_dir
+Modu³ oferuj±cy przekierowania i serwowanie indeksu katalogu.
+
 %package mod_headers
 Summary:	Apache module allows for the customization of HTTP response headers
+Summary(pl):	Modu³ pozwalaj±cy na modyfikacjê nag³ówków HTTP
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
@@ -187,8 +211,13 @@ This package contains mod_headers module. The module allows for the
 customization of HTTP response headers. Headers can be merged, replaced or
 removed.
 
+%description -l pl mod_headers
+Modu³ pozwalaj±cy na ³±czenie, usuwania, zamianê nag³ówków HTTP 
+wysy³anych do przegl±darki.
+
 %package mod_mmap_static
 Summary:	Apache module for mmap()ing statically configured list files
+Sumary(pl):	Modu³ s³u¿±cy do mmap()owania plików.
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
@@ -198,8 +227,13 @@ Requires:	%{name}(EAPI) = %{version}
 This package contains mod_mmap_static module. It provides mmap()ing of a
 statically configured list of frequently requested but not changed files.
 
+%description -l pl mod_mmap_static
+Modu³ umo¿liwia mmap()owanie statycznie skonfigurowanych plików 
+(czêsto u¿ywanych ale nie ulegaj±cych zmianom).
+
 %package mod_imap
 Summary:	Apache module with imap-file handler
+Summary(pl):	Modu³ z obs³ug± imap-file
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
@@ -210,20 +244,29 @@ This package contains mod_imap module. It provides for .map files, replacing
 the functionality of the imagemap CGI program. Any directory or document
 type configured to use the handler imap-file.
 
+%description -l pl mod_imap
+Modu³ umozliwiaj±cy obs³ugê plików .map (imap-file handler)
+
 %package mod_info
 Summary:	Apache module with comprehensive overview of the server configuration
+Summary(pl):	Modu³ dostarczaj±cy informacji na temat serwera.
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
 Requires:	%{name}(EAPI) = %{version}
 
 %description mod_info
-This package contains mod_mmap_static module. It provides a comprehensive
+This package contains mod_info module. It provides a comprehensive
 overview of the server configuration including all installed modules and
 directives in the configuration files.
 
+%description -l pl mod_info
+Modu³ dostarczaj±cy informacji o konfiguracji serwera, zainstalowanych
+modu³ach itp.
+
 %package mod_proxy
 Summary:	Apache module with Web proxy
+Summary(pl):	Modu³ dodaj±cy obs³ugê serwera proxy
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
@@ -235,8 +278,13 @@ It implements proxying capability for FTP, CONNECT (for SSL), HTTP/0.9, and
 HTTP/1.0. The module can be configured to connect to other proxy modules for
 these and other protocols.
 
+%description -l pl mod_proxy
+Modu³ zawiera implementacjê serwera proxy/cache dla Apache. Iplementacja
+zawiera obs³ugê FTP, CONNECT (dla SSL), HTTP/0.9 i HTTP/1.0.
+
 %package mod_rewrite
 Summary:	Apache module with rule-based engine for rewrite requested URLs on the fly
+Summary(pl):	Modu³ do ,,przepisywania'' adresów URL w locie
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
@@ -246,8 +294,12 @@ Requires:	%{name}(EAPI) = %{version}
 This package contains It provides a rule-based rewriting engine to rewrite
 requested URLs on the fly.
 
+%description -l pl mod_rewrite
+Modu³ oferuj±cy mo¿liwo¶æ ,,przepisywania'' adresów URL w locie.
+
 %package mod_status
 Summary:	Server status report module for apache
+Summary(pl):	Modu³ dostarczaj±cy informacje statystyczne o serwerze.
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
@@ -259,8 +311,13 @@ server is performing. A HTML page is presented that gives the current server
 statistics in an easily readable form. If required this page can be made to
 automatically refresh (given a compatible browser).
 
+%description -l pl mod_status
+Modu³ pozwala administratorowi na przegl±danie statystyk dotycz±cych
+pracy serwera apache (w postaci strony HTML).
+
 %package mod_usertrack
 Summary:	Apache module for user tracking using cookies
+Summary(pl):	Modu³ s³u¿±cy do ¶ledzenia ,,ciasteczek''.
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
@@ -270,8 +327,12 @@ Requires:	%{name}(EAPI) = %{version}
 This package contains the user tracking module which did its own logging
 using CookieLog directory. This module allow multiple log files.
 
+%description -l pl mod_usertrack
+Modu³ pozwalaj±cy na ¶ledzenie ,,ciasteczek''.
+
 %package mod_vhost_alias
 Summary:	Apache module for dynamically configured mass virtual hosting
+Summary(pl):	Modu³ dodaj±cy obs³ugê hostów wirtualnych.
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Prereq:		%{_sbindir}/apxs
@@ -280,6 +341,10 @@ Requires:	%{name}(EAPI) = %{version}
 %description mod_vhost_alias
 This package contains the mod_vhost_alias. It provides support for
 dynamically configured mass virtual hosting.
+
+%description -l pl mod_vhost_alias
+Modu³ umo¿liwia na dynamiczne konfigurowanie masowej ilo¶ci serwerów
+wirtualnych.
 
 %package mod_unique_id
 Summary:	Apache module which provides a magic token for each request
