@@ -18,6 +18,7 @@ Source5:	apache-access.conf
 Source6:	apache-httpd.conf
 Source7:	apache-srm.conf
 Source8:	apache-virtual-host.conf
+Source9:	apache-mod_status.conf
 Patch0:		apache-PLD.patch
 Patch1:		apache-suexec.patch
 Patch2:		apache-htdocs.patch
