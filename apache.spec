@@ -23,7 +23,7 @@ Summary(pt_BR):	Servidor HTTPD para prover serviços WWW
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.0.44
-Release:	0.3
+Release:	0.4
 License:	Apache Group License
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/
@@ -54,6 +54,7 @@ BuildRequires:	gdbm-devel >= 1.8.3
 BuildRequires:	perl-devel >= 5.004
 BuildRequires:	rpm-perlprov >= 4.0.4
 BuildRequires:	zlib-devel
+BuildRequires:	libtool
 PreReq:		perl
 PreReq:		rc-scripts
 Requires(pre):	/usr/bin/getgid
@@ -68,7 +69,6 @@ Requires(postun):	/usr/sbin/groupdel
 Requires:	mailcap
 Requires:	/etc/mime.types
 Requires:	psmisc >= 20.1
-Requires:	libtool
 Provides:	httpd = %{version}
 Provides:	webserver = %{version}
 Obsoletes:	apache-extra
