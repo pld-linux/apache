@@ -48,8 +48,8 @@ Patch2:		%{name}-errordocs.patch
 Patch3:		%{name}-apxs.patch
 Patch4:		%{name}-mod_ssl-addon.patch
 Patch5:		%{name}-mod_ssl-eapi.patch
-# http://allafrica.com/tools/apache/mod_proxy/
-Patch6:		http://allafrica.com/tools/apache/mod_proxy/mod_proxy-khk_1.3.26-patch.diff
+# http://allafrica.com/tools/apache/mod_proxy/mod_proxy-khk_1.3.26-patch.diff with eapi duplicates removed
+Patch6:		%{name}-mod_proxy-khk.patch
 Patch7:		%{name}-EAPI_MM_CORE_PATH-correction.patch
 Patch8:		%{name}-EAPI_MM=SYSTEM.patch
 Patch9:		%{name}-ipv6-PLD.patch
