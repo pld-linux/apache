@@ -51,6 +51,7 @@ Patch1:		%{name}-layout.patch
 Patch2:		%{name}-suexec.patch
 Patch3:		%{name}-nolibs.patch
 Patch4:		%{name}-apr.patch
+Patch5:		%{name}-new-apr.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	db-devel
 BuildRequires:	expat-devel
@@ -573,6 +574,7 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
+%patch5 -p1
 
 %build
 # sanity check
