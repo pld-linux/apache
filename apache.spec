@@ -32,7 +32,7 @@ Summary(ru):	óÁÍÙÊ ÐÏÐÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.0.50
-Release:	6.1
+Release:	6.9
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -82,6 +82,7 @@ Patch20:	%{name}-conffile-path.patch
 Patch21:	%{name}-apxs.patch
 # http://www.telana.com/peruser.php
 Patch22:	httpd-2.0.50-peruser-r3.patch
+Patch23:	%{name}-mod_ssl-secfix.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	automake
 BuildRequires:	apr-devel >= 1:0.9.5-6
@@ -687,6 +688,7 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 %patch20 -p1
 %patch21 -p1
 %patch22 -p1
+%patch23 -p1
 
 %{__perl} -pi -e "s@/usr/local/bin/perl@%{__perl}@" $(grep -rl "/usr/local/bin/perl" *)
 
@@ -924,6 +926,13 @@ if [ "$1" = "0" ]; then
 	%userremove http
 	%groupremove http
 fi
+
+%triggerpostun  -- %{name} <= 2.0.50-6
+echo "WARNING!!!"
+echo "Since that version autoindex module has been separated to package apache-mod_autoindex"
+echo "If you want to have the same functionality do:"
+echo "poldek --upgrade apache-mod_autoindex"
+echo
 
 %post mod_actions
 if [ -f /var/lock/subsys/httpd ]; then
