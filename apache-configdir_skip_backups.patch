@@ -1,6 +1,6 @@
 diff -urN httpd-2.0.35.org/server/config.c httpd-2.0.35/server/config.c
---- httpd-2.0.35.org/server/config.c	Thu Apr 11 13:35:30 2002
-+++ httpd-2.0.35/server/config.c	Thu Apr 11 13:42:14 2002
+--- httpd-2.0.35.org/server/config.c	Thu Apr 11 14:09:06 2002
++++ httpd-2.0.35/server/config.c	Thu Apr 11 14:24:03 2002
 @@ -1427,6 +1427,7 @@
          apr_dir_t *dirp;
          apr_finfo_t dirent;
@@ -9,7 +9,7 @@ diff -urN httpd-2.0.35.org/server/config.c httpd-2.0.35/server/config.c
          apr_array_header_t *candidates = NULL;
          fnames *fnew;
          apr_status_t rv;
-@@ -1448,11 +1449,18 @@
+@@ -1448,11 +1449,19 @@
  
          candidates = apr_array_make(p, 1, sizeof(fnames));
          while (apr_dir_read(&dirent, APR_FINFO_DIRENT, dirp) == APR_SUCCESS) {
@@ -28,6 +28,7 @@ diff -urN httpd-2.0.35.org/server/config.c httpd-2.0.35/server/config.c
 +	                fnew = (fnames *) apr_array_push(candidates);
 +        	        fnew->fname = ap_make_full_path(p, fname, dirent.name);
 +		    }
++		}
              }
          }
  
