@@ -921,7 +921,7 @@ touch /var/log/httpd/{access,error,agent,referer}_log
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
-	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache HTTP daemon."
 fi
 
 %preun
@@ -950,7 +950,7 @@ echo
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
-	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache HTTP daemon."
 fi
 
 %preun mod_actions
@@ -964,7 +964,7 @@ fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
-	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache HTTP daemon."
 fi
 
 %preun mod_auth
@@ -978,7 +978,7 @@ fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
-	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache HTTP daemon."
 fi
 
 %preun mod_auth_anon
@@ -992,7 +992,7 @@ fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
-	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache HTTP daemon."
 fi
 
 %preun mod_auth_dbm
@@ -1006,7 +1006,7 @@ fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
-	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache HTTP daemon."
 fi
 
 %preun mod_autoindex
@@ -1020,7 +1020,7 @@ fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
-	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache HTTP daemon."
 fi
 
 %preun mod_cache
@@ -1034,7 +1034,7 @@ fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
-	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache HTTP daemon."
 fi
 
 %preun mod_cgid
@@ -1048,7 +1048,7 @@ fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
-	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache HTTP daemon."
 fi
 
 %preun mod_charset_lite
@@ -1062,7 +1062,7 @@ fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
-	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache HTTP daemon."
 fi
 
 %preun mod_dav
@@ -1076,7 +1076,7 @@ fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
-	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache HTTP daemon."
 fi
 
 %preun mod_auth_digest
@@ -1090,7 +1090,7 @@ fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
-	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache HTTP daemon."
 fi
 
 %preun mod_deflate
@@ -1104,7 +1104,7 @@ fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
-	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache HTTP daemon."
 fi
 
 %preun mod_dir
@@ -1118,7 +1118,7 @@ fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
-	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache HTTP daemon."
 fi
 
 %preun mod_expires
@@ -1132,7 +1132,7 @@ fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
-	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache HTTP daemon."
 fi
 
 %preun mod_file_cache
@@ -1146,7 +1146,7 @@ fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
-	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache HTTP daemon."
 fi
 
 %preun mod_headers
@@ -1160,7 +1160,7 @@ fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
-	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache HTTP daemon."
 fi
 
 %preun mod_imap
@@ -1174,7 +1174,7 @@ fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
-	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache HTTP daemon."
 fi
 
 %preun mod_info
@@ -1188,7 +1188,7 @@ fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
-	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache HTTP daemon."
 fi
 
 %preun mod_proxy
@@ -1202,7 +1202,7 @@ fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
-	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache HTTP daemon."
 fi
 
 %preun mod_rewrite
@@ -1216,7 +1216,7 @@ fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
-	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache HTTP daemon."
 fi
 
 %preun mod_ssl
@@ -1230,7 +1230,7 @@ fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
-	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache HTTP daemon."
 fi
 
 %preun mod_status
@@ -1244,7 +1244,7 @@ fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
-	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache HTTP daemon."
 fi
 
 %preun mod_usertrack
@@ -1258,7 +1258,7 @@ fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
-	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache HTTP daemon."
 fi
 
 %preun mod_unique_id
@@ -1272,7 +1272,7 @@ fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
-	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache HTTP daemon."
 fi
 
 %preun mod_vhost_alias
