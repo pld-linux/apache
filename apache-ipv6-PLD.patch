@@ -5471,7 +5471,7 @@ diff -Nur apache_1.3.22.orig/src/modules/standard/mod_unique_id.c apache_1.3.22/
 -    unique_id_rec_offset[1] = XtOffsetOf(unique_id_rec, in_addr);
 -    unique_id_rec_size[1] = sizeof(cur_unique_id->in_addr);
 +    unique_id_rec_offset[1] = XtOffsetOf(unique_id_rec, addr);
-+    unique_id_rec_size[1] = sizeof(cur_unique_id.addr);
++    unique_id_rec_size[1] = sizeof(cur_unique_id->addr);
      unique_id_rec_offset[2] = XtOffsetOf(unique_id_rec, pid);
      unique_id_rec_size[2] = sizeof(cur_unique_id->pid);
  #ifdef MULTITHREAD
@@ -5530,18 +5530,18 @@ diff -Nur apache_1.3.22.orig/src/modules/standard/mod_unique_id.c apache_1.3.22/
      }
  
 -    cur_unique_id->in_addr = global_in_addr;
-+    memset(&cur_unique_id.addr, 0, sizeof(cur_unique_id.addr));
++    memset(&cur_unique_id->addr, 0, sizeof(cur_unique_id->addr));
 +    switch (global_addr.ss_family) {
 +    case AF_INET:
-+	cur_unique_id.addr.in = ((struct sockaddr_in *)&global_addr)->sin_addr;
++	cur_unique_id->addr.in = ((struct sockaddr_in *)&global_addr)->sin_addr;
 +	break;
 +#ifdef INET6
 +    case AF_INET6:
 +#ifdef SHORT_UNIQUE_ID
-+	cur_unique_id.addr.in6 =
++	cur_unique_id->addr.in6 =
 +	    ((struct sockaddr_in6 *)&global_addr)->sin6_addr.s6_addr32[3];
 +#else
-+	cur_unique_id.addr.in6 =
++	cur_unique_id->addr.in6 =
 +	    ((struct sockaddr_in6 *)&global_addr)->sin6_addr;
 +#endif
 +	break;
