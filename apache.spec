@@ -359,7 +359,6 @@ Authentication.
 Summary:	Apache module - display index of files
 Summary(pl):	Modu³ apache do wy¶wietlania indeksu plików
 Group:		Networking/Daemons
-Requires(post,preun):	%{apxs}
 Requires:	%{name} = %{version}-%{release}
 Obsoletes:	Apache-Gallery
 
