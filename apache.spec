@@ -32,7 +32,7 @@ Summary(ru):	óÁÍÙÊ ÐÏÐÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.0.52
-Release:	8
+Release:	9
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -84,6 +84,7 @@ Patch21:	%{name}-apxs.patch
 # http://www.telana.com/peruser.php
 Patch22:	httpd-2.0.50-peruser-r3.patch
 Patch23:	%{name}-apr1.patch
+Patch24:	%{name}-normalize-path.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	automake
 BuildRequires:	apr-devel >= 1:1.0.0
@@ -690,6 +691,7 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 %patch21 -p1
 %patch22 -p1
 %patch23 -p1
+%patch24 -p1
 
 %{__perl} -pi -e "s@/usr/local/bin/perl@%{__perl}@" $(grep -rl "/usr/local/bin/perl" *)
 %{__perl} -pi -e "s@BUILD_SUBDIRS.*@BUILD_SUBDIRS =@g" srclib/Makefile.in
