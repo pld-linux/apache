@@ -41,7 +41,7 @@ Patch1:		%{name}-configdir_skip_backups.patch
 Patch2:		%{name}-layout.patch
 Patch3:		%{name}-suexec.patch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
-BuildRequires:	openssl-devel
+BuildRequires:	openssl-devel >= 0.9.6f
 BuildRequires:	openssl-tools
 BuildRequires:	db4-devel
 BuildRequires:	zlib-devel
