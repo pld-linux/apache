@@ -30,20 +30,6 @@ Version:	1.3.23
 Release:	3
 License:	Apache Group License
 Group:		Networking/Daemons
-Group(cs):	Sí»ové/Démoni
-Group(da):	Netværks/Dæmoner
-Group(de):	Netzwerkwesen/Server
-Group(es):	Red/Servidores
-Group(fr):	Réseau/Serveurs
-Group(is):	Net/Púkar
-Group(it):	Rete/Demoni
-Group(no):	Nettverks/Daemoner
-Group(pl):	Sieciowe/Serwery
-Group(pt):	Rede/Servidores
-Group(ru):	óÅÔØ/äÅÍÏÎÙ
-Group(sl):	Omre¾ni/Stre¾niki
-Group(sv):	Nätverk/Demoner
-Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 URL:		http://www.apache.org/
 Source0:	ftp://ftp.apache.org/dist/%{name}_%{version}.tar.gz
 Source1:	%{name}.init
@@ -205,21 +191,6 @@ Summary(pl):	Suexec wrapper do serwera www Apache
 Summary(ru):	Apache suEXEC CGI wrapper
 Summary(uk):	Apache suEXEC CGI wrapper
 Group:		Development/Tools
-Group(cs):	Vıvojové prostøedky/Nástroje
-Group(da):	Udvikling/Værktøj
-Group(de):	Entwicklung/Tools
-Group(es):	Desarrollo/Herramientas
-Group(fr):	Development/Outils
-Group(is):	Şróunartól/Tól
-Group(it):	Sviluppo/Tool
-Group(ja):	³«È¯/¥Ä¡¼¥ë
-Group(no):	Utvikling/Verktøy
-Group(pl):	Programowanie/Narzêdzia
-Group(pt):	Desenvolvimento/Ferramentas
-Group(ru):	òÁÚÒÁÂÏÔËÁ/éÎÓÔÒÕÍÅÎÔÙ
-Group(sl):	Razvoj/Orodja
-Group(sv):	Utveckling/Verktyg
-Group(uk):	òÏÚÒÏÂËÁ/¶ÎÓÔÒÕÍÅÎÔÉ
 Requires:	%{name}(EAPI) = %{version}
 
 %description suexec
@@ -278,21 +249,6 @@ Summary(sv):	Huvudfiler för webbservern Apache
 Summary(uk):	úÁÓÏÂÉ ÓÔ×ÏÒÅÎÎÑ ÍÏÄÕÌ¦× ÄÌÑ web server'Õ Apache
 Summary(zh_CN):	ÓÃÓÚ Apache Web ·şÎñ³ÌĞòµÄ¿ª·¢¹¤¾ß¡£
 Group:		Networking/Utilities
-Group(cs):	Sí»ové/Utility
-Group(da):	Netværks/Værktøj
-Group(de):	Netzwerkwesen/Dienstprogramme
-Group(es):	Red/Utilitarios
-Group(fr):	Réseau/Utilitaires
-Group(is):	Net/Tól
-Group(it):	Rete/Utility
-Group(no):	Nettverks/Verktøy
-Group(pl):	Sieciowe/Narzêdzia
-Group(pt_BR):	Rede/Utilitários
-Group(pt):	Rede/Utilidades
-Group(ru):	óÅÔØ/õÔÉÌÉÔÙ
-Group(sl):	Omre¾ni/Pripomoèki
-Group(sv):	Nätverk/Verktyg
-Group(uk):	íÅÒÅÖÁ/õÔÉÌ¦ÔÉ
 Requires:	%{name}(EAPI) = %{version}
 Provides:	%{name}(EAPI)-devel
 
@@ -352,20 +308,6 @@ Paketet apache-devel innehåller huvudfilerna för Apache.
 Summary:	Apache module for run CGI whenever a file of a certain type is requested
 Summary(pl):	Modu³ dla apache do uruchamiania skryptów cgi
 Group:		Networking/Daemons
-Group(cs):	Sí»ové/Démoni
-Group(da):	Netværks/Dæmoner
-Group(de):	Netzwerkwesen/Server
-Group(es):	Red/Servidores
-Group(fr):	Réseau/Serveurs
-Group(is):	Net/Púkar
-Group(it):	Rete/Demoni
-Group(no):	Nettverks/Daemoner
-Group(pl):	Sieciowe/Serwery
-Group(pt):	Rede/Servidores
-Group(ru):	óÅÔØ/äÅÍÏÎÙ
-Group(sl):	Omre¾ni/Stre¾niki
-Group(sv):	Nätverk/Demoner
-Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -383,20 +325,6 @@ Ten modu³ pozwala na uruchamianie skryptów w momencie gdy nadchodzi
 Summary:	Apache module with user authentication using textual files
 Summary(pl):	Modu³ autentykacji u¿ytkownika przy u¿yciu plików tekstowych dla Apache
 Group:		Networking/Daemons
-Group(cs):	Sí»ové/Démoni
-Group(da):	Netværks/Dæmoner
-Group(de):	Netzwerkwesen/Server
-Group(es):	Red/Servidores
-Group(fr):	Réseau/Serveurs
-Group(is):	Net/Púkar
-Group(it):	Rete/Demoni
-Group(no):	Nettverks/Daemoner
-Group(pl):	Sieciowe/Serwery
-Group(pt):	Rede/Servidores
-Group(ru):	óÅÔØ/äÅÍÏÎÙ
-Group(sl):	Omre¾ni/Stre¾niki
-Group(sv):	Nätverk/Demoner
-Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -413,20 +341,6 @@ u¿yciu plików tekstowych.
 Summary:	Apache module with "anonymous" user access authentication
 Summary(pl):	Modu³ apache oferuj±cy anonimow± autoryzacjê u¿ytkownia
 Group:		Networking/Daemons
-Group(cs):	Sí»ové/Démoni
-Group(da):	Netværks/Dæmoner
-Group(de):	Netzwerkwesen/Server
-Group(es):	Red/Servidores
-Group(fr):	Réseau/Serveurs
-Group(is):	Net/Púkar
-Group(it):	Rete/Demoni
-Group(no):	Nettverks/Daemoner
-Group(pl):	Sieciowe/Serwery
-Group(pt):	Rede/Servidores
-Group(ru):	óÅÔØ/äÅÍÏÎÙ
-Group(sl):	Omre¾ni/Stre¾niki
-Group(sv):	Nätverk/Demoner
-Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -452,20 +366,6 @@ postaci adresu pocztowego u¿ytkownika).
 Summary:	Apache module with user authentication which uses Berkeley DB files
 Summary(pl):	Modu³ apache z mechanizmem autentykacji u¿ywaj±cym plików Berkeley DB
 Group:		Networking/Daemons
-Group(cs):	Sí»ové/Démoni
-Group(da):	Netværks/Dæmoner
-Group(de):	Netzwerkwesen/Server
-Group(es):	Red/Servidores
-Group(fr):	Réseau/Serveurs
-Group(is):	Net/Púkar
-Group(it):	Rete/Demoni
-Group(no):	Nettverks/Daemoner
-Group(pl):	Sieciowe/Serwery
-Group(pt):	Rede/Servidores
-Group(ru):	óÅÔØ/äÅÍÏÎÙ
-Group(sl):	Omre¾ni/Stre¾niki
-Group(sv):	Nätverk/Demoner
-Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -484,17 +384,6 @@ ale jako plików danych u¿ywa Berkeley DB.
 Summary:	Apache user authentication module using MD5 Digest Authentication 
 Summary(pl):	Modu³ apache do autoryzacji MD5
 Group:		Networking/Daemons
-Group(cs):	Sí»ové/Démoni
-Group(da):	Netværks/Dæmoner
-Group(de):	Netzwerkwesen/Server
-Group(es):	Red/Servidores
-Group(fr):	Réseau/Serveurs
-Group(it):	Rete/Demoni
-Group(no):	Nettverks/Daemoner
-Group(pl):	Sieciowe/Serwery
-Group(pt):	Rede/Servidores
-Group(ru):	óÅÔÅ×ÙÅ/äÅÍÏÎÙ
-Group(sv):	Nätverk/Demoner
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -512,20 +401,6 @@ Authentication.
 Summary:	Apache module - authentication variables for arbitrary directives
 Summary(pl):	Modu³ apache do definiowania zmiennych
 Group:		Networking/Daemons
-Group(cs):	Sí»ové/Démoni
-Group(da):	Netværks/Dæmoner
-Group(de):	Netzwerkwesen/Server
-Group(es):	Red/Servidores
-Group(fr):	Réseau/Serveurs
-Group(is):	Net/Púkar
-Group(it):	Rete/Demoni
-Group(no):	Nettverks/Daemoner
-Group(pl):	Sieciowe/Serwery
-Group(pt):	Rede/Servidores
-Group(ru):	óÅÔØ/äÅÍÏÎÙ
-Group(sl):	Omre¾ni/Stre¾niki
-Group(sv):	Nätverk/Demoner
-Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -541,20 +416,6 @@ Modu³ ten umo¿liwia definicjê zmiennych i dyrektyw.
 Summary:	Older version of apache user authentication module using MD5 Digest Authentication 
 Summary(pl):	Starsza wersja modu³u apache do autoryzacji MD5
 Group:		Networking/Daemons
-Group(cs):	Sí»ové/Démoni
-Group(da):	Netværks/Dæmoner
-Group(de):	Netzwerkwesen/Server
-Group(es):	Red/Servidores
-Group(fr):	Réseau/Serveurs
-Group(is):	Net/Púkar
-Group(it):	Rete/Demoni
-Group(no):	Nettverks/Daemoner
-Group(pl):	Sieciowe/Serwery
-Group(pt):	Rede/Servidores
-Group(ru):	óÅÔØ/äÅÍÏÎÙ
-Group(sl):	Omre¾ni/Stre¾niki
-Group(sv):	Nätverk/Demoner
-Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -577,20 +438,6 @@ wersji standardu.
 Summary:	Apache module for "trailing slash" redirects and serving directory index files
 Summary(pl):	Modu³ oferuj±cy przekierowania i serwowanie indeksu katalogu.
 Group:		Networking/Daemons
-Group(cs):	Sí»ové/Démoni
-Group(da):	Netværks/Dæmoner
-Group(de):	Netzwerkwesen/Server
-Group(es):	Red/Servidores
-Group(fr):	Réseau/Serveurs
-Group(is):	Net/Púkar
-Group(it):	Rete/Demoni
-Group(no):	Nettverks/Daemoner
-Group(pl):	Sieciowe/Serwery
-Group(pt):	Rede/Servidores
-Group(ru):	óÅÔØ/äÅÍÏÎÙ
-Group(sl):	Omre¾ni/Stre¾niki
-Group(sv):	Nätverk/Demoner
-Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -606,20 +453,6 @@ Modu³ oferuj±cy przekierowania i serwowanie indeksu katalogu.
 Summary:	Apache module allows for the customization of HTTP response headers
 Summary(pl):	Modu³ pozwalaj±cy na modyfikacjê nag³ówków HTTP
 Group:		Networking/Daemons
-Group(cs):	Sí»ové/Démoni
-Group(da):	Netværks/Dæmoner
-Group(de):	Netzwerkwesen/Server
-Group(es):	Red/Servidores
-Group(fr):	Réseau/Serveurs
-Group(is):	Net/Púkar
-Group(it):	Rete/Demoni
-Group(no):	Nettverks/Daemoner
-Group(pl):	Sieciowe/Serwery
-Group(pt):	Rede/Servidores
-Group(ru):	óÅÔØ/äÅÍÏÎÙ
-Group(sl):	Omre¾ni/Stre¾niki
-Group(sv):	Nätverk/Demoner
-Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -637,20 +470,6 @@ wysy³anych do przegl±darki.
 Summary:	Apache module for mmap()ing statically configured list files
 Summary(pl):	Modu³ s³u¿±cy do mmap()owania plików.
 Group:		Networking/Daemons
-Group(cs):	Sí»ové/Démoni
-Group(da):	Netværks/Dæmoner
-Group(de):	Netzwerkwesen/Server
-Group(es):	Red/Servidores
-Group(fr):	Réseau/Serveurs
-Group(is):	Net/Púkar
-Group(it):	Rete/Demoni
-Group(no):	Nettverks/Daemoner
-Group(pl):	Sieciowe/Serwery
-Group(pt):	Rede/Servidores
-Group(ru):	óÅÔØ/äÅÍÏÎÙ
-Group(sl):	Omre¾ni/Stre¾niki
-Group(sv):	Nätverk/Demoner
-Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -668,20 +487,6 @@ Modu³ umo¿liwia mmap()owanie statycznie skonfigurowanych plików
 Summary:	Apache module with imap-file handler
 Summary(pl):	Modu³ z obs³ug± imap-file
 Group:		Networking/Daemons
-Group(cs):	Sí»ové/Démoni
-Group(da):	Netværks/Dæmoner
-Group(de):	Netzwerkwesen/Server
-Group(es):	Red/Servidores
-Group(fr):	Réseau/Serveurs
-Group(is):	Net/Púkar
-Group(it):	Rete/Demoni
-Group(no):	Nettverks/Daemoner
-Group(pl):	Sieciowe/Serwery
-Group(pt):	Rede/Servidores
-Group(ru):	óÅÔØ/äÅÍÏÎÙ
-Group(sl):	Omre¾ni/Stre¾niki
-Group(sv):	Nätverk/Demoner
-Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -698,20 +503,6 @@ Modu³ umozliwiaj±cy obs³ugê plików .map (imap-file handler)
 Summary:	Apache module with comprehensive overview of the server configuration
 Summary(pl):	Modu³ dostarczaj±cy informacji na temat serwera.
 Group:		Networking/Daemons
-Group(cs):	Sí»ové/Démoni
-Group(da):	Netværks/Dæmoner
-Group(de):	Netzwerkwesen/Server
-Group(es):	Red/Servidores
-Group(fr):	Réseau/Serveurs
-Group(is):	Net/Púkar
-Group(it):	Rete/Demoni
-Group(no):	Nettverks/Daemoner
-Group(pl):	Sieciowe/Serwery
-Group(pt):	Rede/Servidores
-Group(ru):	óÅÔØ/äÅÍÏÎÙ
-Group(sl):	Omre¾ni/Stre¾niki
-Group(sv):	Nätverk/Demoner
-Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -729,20 +520,6 @@ modu³ach itp.
 Summary:	Apache module with Web proxy
 Summary(pl):	Modu³ dodaj±cy obs³ugê serwera proxy
 Group:		Networking/Daemons
-Group(cs):	Sí»ové/Démoni
-Group(da):	Netværks/Dæmoner
-Group(de):	Netzwerkwesen/Server
-Group(es):	Red/Servidores
-Group(fr):	Réseau/Serveurs
-Group(is):	Net/Púkar
-Group(it):	Rete/Demoni
-Group(no):	Nettverks/Daemoner
-Group(pl):	Sieciowe/Serwery
-Group(pt):	Rede/Servidores
-Group(ru):	óÅÔØ/äÅÍÏÎÙ
-Group(sl):	Omre¾ni/Stre¾niki
-Group(sv):	Nätverk/Demoner
-Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -762,20 +539,6 @@ HTTP/1.0.
 Summary:	Apache module with rule-based engine for rewrite requested URLs on the fly
 Summary(pl):	Modu³ do ,,przepisywania'' adresów URL w locie
 Group:		Networking/Daemons
-Group(cs):	Sí»ové/Démoni
-Group(da):	Netværks/Dæmoner
-Group(de):	Netzwerkwesen/Server
-Group(es):	Red/Servidores
-Group(fr):	Réseau/Serveurs
-Group(is):	Net/Púkar
-Group(it):	Rete/Demoni
-Group(no):	Nettverks/Daemoner
-Group(pl):	Sieciowe/Serwery
-Group(pt):	Rede/Servidores
-Group(ru):	óÅÔØ/äÅÍÏÎÙ
-Group(sl):	Omre¾ni/Stre¾niki
-Group(sv):	Nätverk/Demoner
-Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -791,20 +554,6 @@ Modu³ oferuj±cy mo¿liwo¶æ ,,przepisywania'' adresów URL w locie.
 Summary:	Server status report module for apache
 Summary(pl):	Modu³ dostarczaj±cy informacje statystyczne o serwerze.
 Group:		Networking/Daemons
-Group(cs):	Sí»ové/Démoni
-Group(da):	Netværks/Dæmoner
-Group(de):	Netzwerkwesen/Server
-Group(es):	Red/Servidores
-Group(fr):	Réseau/Serveurs
-Group(is):	Net/Púkar
-Group(it):	Rete/Demoni
-Group(no):	Nettverks/Daemoner
-Group(pl):	Sieciowe/Serwery
-Group(pt):	Rede/Servidores
-Group(ru):	óÅÔØ/äÅÍÏÎÙ
-Group(sl):	Omre¾ni/Stre¾niki
-Group(sv):	Nätverk/Demoner
-Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -824,20 +573,6 @@ pracy serwera apache (w postaci strony HTML).
 Summary:	Apache module for user tracking using cookies
 Summary(pl):	Modu³ s³u¿±cy do ¶ledzenia ,,ciasteczek''.
 Group:		Networking/Daemons
-Group(cs):	Sí»ové/Démoni
-Group(da):	Netværks/Dæmoner
-Group(de):	Netzwerkwesen/Server
-Group(es):	Red/Servidores
-Group(fr):	Réseau/Serveurs
-Group(is):	Net/Púkar
-Group(it):	Rete/Demoni
-Group(no):	Nettverks/Daemoner
-Group(pl):	Sieciowe/Serwery
-Group(pt):	Rede/Servidores
-Group(ru):	óÅÔØ/äÅÍÏÎÙ
-Group(sl):	Omre¾ni/Stre¾niki
-Group(sv):	Nätverk/Demoner
-Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -854,20 +589,6 @@ Modu³ pozwalaj±cy na ¶ledzenie ,,ciasteczek''.
 Summary:	Apache module for dynamically configured mass virtual hosting
 Summary(pl):	Modu³ dodaj±cy obs³ugê hostów wirtualnych.
 Group:		Networking/Daemons
-Group(cs):	Sí»ové/Démoni
-Group(da):	Netværks/Dæmoner
-Group(de):	Netzwerkwesen/Server
-Group(es):	Red/Servidores
-Group(fr):	Réseau/Serveurs
-Group(is):	Net/Púkar
-Group(it):	Rete/Demoni
-Group(no):	Nettverks/Daemoner
-Group(pl):	Sieciowe/Serwery
-Group(pt):	Rede/Servidores
-Group(ru):	óÅÔØ/äÅÍÏÎÙ
-Group(sl):	Omre¾ni/Stre¾niki
-Group(sv):	Nätverk/Demoner
-Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -884,20 +605,6 @@ wirtualnych.
 Summary:	Apache module which provides a magic token for each request
 Summary(pl):	Modu³ nadaj±cy ka¿demu ¿±daniu unikalny token
 Group:		Networking/Daemons
-Group(cs):	Sí»ové/Démoni
-Group(da):	Netværks/Dæmoner
-Group(de):	Netzwerkwesen/Server
-Group(es):	Red/Servidores
-Group(fr):	Réseau/Serveurs
-Group(is):	Net/Púkar
-Group(it):	Rete/Demoni
-Group(no):	Nettverks/Daemoner
-Group(pl):	Sieciowe/Serwery
-Group(pt):	Rede/Servidores
-Group(ru):	óÅÔØ/äÅÍÏÎÙ
-Group(sl):	Omre¾ni/Stre¾niki
-Group(sv):	Nätverk/Demoner
-Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
@@ -921,20 +628,6 @@ UNIQUE_ID.
 Summary:	Apache module which generates Expires HTTP headers
 Summary(pl):	Modu³ generuj±cy nag³ówki HTTP Expires
 Group:		Networking/Daemons
-Group(cs):	Sí»ové/Démoni
-Group(da):	Netværks/Dæmoner
-Group(de):	Netzwerkwesen/Server
-Group(es):	Red/Servidores
-Group(fr):	Réseau/Serveurs
-Group(is):	Net/Púkar
-Group(it):	Rete/Demoni
-Group(no):	Nettverks/Daemoner
-Group(pl):	Sieciowe/Serwery
-Group(pt):	Rede/Servidores
-Group(ru):	óÅÔØ/äÅÍÏÎÙ
-Group(sl):	Omre¾ni/Stre¾niki
-Group(sv):	Nätverk/Demoner
-Group(uk):	íÅÒÅÖÁ/äÅÍÏÎÉ
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
