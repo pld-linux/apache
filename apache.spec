@@ -211,6 +211,7 @@ Summary(pl):	Modu³ apache z mechanizmem autentykacji u¿ywaj±cym plików DBM
 Group:		Networking/Daemons
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
+Obsoletes:	apache-mod_auth_db
 Requires:	%{name}(EAPI) = %{version}
 
 %description mod_auth_dbm
@@ -555,6 +556,7 @@ Summary(pl):	Modu³ cacheuj±cy statyczn± listê plików w pamiêci
 Group:		Networking/Daemons
 Prereq:		%{_sbindir}/apxs
 Prereq:		perl
+Obsoletes:	apache-mod_mmap_static
 Requires:	%{name}(EAPI) = %{version}
 
 %description mod_file_cache
