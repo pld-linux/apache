@@ -7,7 +7,8 @@
 # - mod_echo
 # - config examples for mod_*
 # - check if all modules are (de)registered in %%post/%%postun
-# - find smart way to deregister module if its moved from main package to subpackage (maybe test -f ?)
+# - find smart way to deregister module if its moved from main package
+#   to subpackage (maybe test -f ?)
 # - add %%post/%%postun to suexec
 # - --with-suexec-gidmin=500 or =100 ?
 # - --with-suexec-uidmin=500 or =1000 ?
@@ -31,7 +32,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.0.52
-Release:	7
+Release:	8
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -826,10 +827,10 @@ install -d $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
 mv -f $RPM_BUILD_ROOT%{_sysconfdir}/build \
 	$RPM_BUILD_ROOT%{_libexecdir}/build
 
-perl -pi -e "s#$RPM_BUILD_ROOT##g" $RPM_BUILD_ROOT%{_libexecdir}/build/*
-perl -pi -e "s#$RPM_BUILD_DIR#%{_usrsrc}#g" $RPM_BUILD_ROOT%{_libexecdir}/build/*
-perl -pi -e "s#-pthread#-lpthread#g" $RPM_BUILD_ROOT%{_libdir}/lib*.la
-perl -pi -e 's#/etc/httpd/build#%{_libexecdir}/build#g' $RPM_BUILD_ROOT%{_libexecdir}/build/*
+%{__perl} -pi -e "s#$RPM_BUILD_ROOT##g" $RPM_BUILD_ROOT%{_libexecdir}/build/*
+%{__perl} -pi -e "s#$RPM_BUILD_DIR#%{_usrsrc}#g" $RPM_BUILD_ROOT%{_libexecdir}/build/*
+%{__perl} -pi -e "s#-pthread#-lpthread#g" $RPM_BUILD_ROOT%{_libdir}/lib*.la
+%{__perl} -pi -e 's#/etc/httpd/build#%{_libexecdir}/build#g' $RPM_BUILD_ROOT%{_libexecdir}/build/*
 ln -sf %{_bindir}/libtool $RPM_BUILD_ROOT%{_libexecdir}/build/libtool
 ln -sf %{_libexecdir}/build $RPM_BUILD_ROOT%{_sysconfdir}/build
 
@@ -881,6 +882,10 @@ echo "LoadModule usertrack_module	%{_libexecdir}/mod_usertrack.so" > $CFG/65_mod
 echo "LoadModule unique_id_module	%{_libexecdir}/mod_unique_id.so" > $CFG/66_mod_unique_id.conf
 
 ln -sf index.html.en $RPM_BUILD_ROOT%{_datadir}/html/index.html
+# let's remove trash (yes, *.html without lang suffix also contain trash)
+find $RPM_BUILD_ROOT%{_datadir}/manual -type f \
+	-name '*.xml' -o -name '*.xml.*' -o -name '*.html' \
+	| xargs rm -f
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -1350,389 +1355,151 @@ fi
 %defattr(644,root,root,755)
 %dir %{_datadir}/manual
 %{_datadir}/manual/LICENSE
-%{_datadir}/manual/*.html
-%{_datadir}/manual/*.xml
-%{_datadir}/manual/*.xml.meta
 %{_datadir}/manual/*.html.en
 %lang(de) %{_datadir}/manual/*.html.de
-%lang(de) %{_datadir}/manual/*.xml.de
 %lang(es) %{_datadir}/manual/*.html.es
-%lang(es) %{_datadir}/manual/*.xml.es
 %lang(fr) %{_datadir}/manual/*.html.fr
 %lang(ja) %{_datadir}/manual/*.html.ja*
-%lang(ja) %{_datadir}/manual/*.xml.ja*
 %lang(ko) %{_datadir}/manual/*.html.ko.euc-kr
-%lang(ko) %{_datadir}/manual/*.xml.ko
 %lang(ru) %{_datadir}/manual/*.html.ru.koi8-r
-%lang(ru) %{_datadir}/manual/*.xml.ru
 %dir %{_datadir}/manual/developer
-%{_datadir}/manual/developer/*.html
-%{_datadir}/manual/developer/*.xml
-%{_datadir}/manual/developer/*.xml.meta
 %{_datadir}/manual/developer/*.html.en
 %lang(ja) %{_datadir}/manual/developer/*.html.ja*
 %dir %{_datadir}/manual/faq
-%{_datadir}/manual/faq/*.html
-%{_datadir}/manual/faq/*.xml
-%{_datadir}/manual/faq/*.xml.meta
 %{_datadir}/manual/faq/*.html.en
 %lang(ko) %{_datadir}/manual/faq/*.html.ko.euc-kr
-%lang(ko) %{_datadir}/manual/faq/*.xml.ko
 %dir %{_datadir}/manual/howto
-%{_datadir}/manual/howto/*.html
-%{_datadir}/manual/howto/*.xml
-%{_datadir}/manual/howto/*.xml.meta
 %{_datadir}/manual/howto/*.html.en
 %lang(ja) %{_datadir}/manual/howto/*.html.ja*
-%lang(ja) %{_datadir}/manual/howto/*.xml.ja*
 %lang(ko) %{_datadir}/manual/howto/*.html.ko.euc-kr
-%lang(ko) %{_datadir}/manual/howto/*.xml.ko
 %dir %{_datadir}/manual/images
 %{_datadir}/manual/images/[!m]*
 %dir %{_datadir}/manual/misc
-%{_datadir}/manual/misc/*.html
-%{_datadir}/manual/misc/*.xml
-%{_datadir}/manual/misc/*.xml.meta
 %{_datadir}/manual/misc/*.html.en
 %lang(ko) %{_datadir}/manual/misc/*.html.ko.euc-kr
-%lang(ko) %{_datadir}/manual/misc/*.xml.ko
 %dir %{_datadir}/manual/mod
-%{_datadir}/manual/mod/[cdfhilpqtw]*.html
-%{_datadir}/manual/mod/[acdilpqtw]*.xml
-%{_datadir}/manual/mod/[acdilpqtw]*.xml.meta
 %{_datadir}/manual/mod/[cdfhilpqtw]*.html.en
 %lang(de) %{_datadir}/manual/mod/[cdfhilpqtw]*.html.de
-%lang(de) %{_datadir}/manual/mod/[acdilpqtw]*.xml.de
 %lang(es) %{_datadir}/manual/mod/[cdfhilpqtw]*.html.es
-%lang(es) %{_datadir}/manual/mod/[acdilpqtw]*.xml.es
 %lang(ja) %{_datadir}/manual/mod/[cdfhilpqtw]*.html.ja*
-%lang(ja) %{_datadir}/manual/mod/[acdilpqtw]*.xml.ja*
 %lang(ko) %{_datadir}/manual/mod/[cdfhilpqtw]*.html.ko.euc-kr
-%lang(ko) %{_datadir}/manual/mod/[acdilpqtw]*.xml.ko
 %lang(ru) %{_datadir}/manual/mod/[cdfhilpqtw]*.html.ru.koi8-r
-%lang(ru) %{_datadir}/manual/mod/[acdilpqtw]*.xml.ru
-%{_datadir}/manual/mod/module-dict.html
-%{_datadir}/manual/mod/module-dict.xml
-%{_datadir}/manual/mod/module-dict.xml.meta
 %{_datadir}/manual/mod/module-dict.html.en
 %lang(ja) %{_datadir}/manual/mod/module-dict.html.ja*
-%lang(ja) %{_datadir}/manual/mod/module-dict.xml.ja*
 %lang(ko) %{_datadir}/manual/mod/module-dict.html.ko.euc-kr
-%lang(ko) %{_datadir}/manual/mod/module-dict.xml.ko
-%{_datadir}/manual/mod/mpm_common.html
-%{_datadir}/manual/mod/mpm_common.xml
-%{_datadir}/manual/mod/mpm_common.xml.meta
 %{_datadir}/manual/mod/mpm_common.html.en
 %lang(de) %{_datadir}/manual/mod/mpm_common.html.de
-%lang(de) %{_datadir}/manual/mod/mpm_common.xml.de
 %lang(ja) %{_datadir}/manual/mod/mpm_common.html.ja*
-%lang(ja) %{_datadir}/manual/mod/mpm_common.xml.ja*
-%{_datadir}/manual/mod/mod_access.html
-%{_datadir}/manual/mod/mod_access.xml
-%{_datadir}/manual/mod/mod_access.xml.meta
 %{_datadir}/manual/mod/mod_access.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_access.html.ja*
-%lang(ja) %{_datadir}/manual/mod/mod_access.xml.ja*
-%{_datadir}/manual/mod/mod_alias.html
-%{_datadir}/manual/mod/mod_alias.xml
-%{_datadir}/manual/mod/mod_alias.xml.meta
 %{_datadir}/manual/mod/mod_alias.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_alias.html.ja*
-%lang(ja) %{_datadir}/manual/mod/mod_alias.xml.ja*
-%{_datadir}/manual/mod/mod_asis.html
-%{_datadir}/manual/mod/mod_asis.xml
-%{_datadir}/manual/mod/mod_asis.xml.meta
 %{_datadir}/manual/mod/mod_asis.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_asis.html.ja*
-%lang(ja) %{_datadir}/manual/mod/mod_asis.xml.ja*
 %lang(ko) %{_datadir}/manual/mod/mod_asis.html.ko.euc-kr
-%lang(ko) %{_datadir}/manual/mod/mod_asis.xml.ko
-%{_datadir}/manual/mod/mod_autoindex.html
-%{_datadir}/manual/mod/mod_autoindex.xml
-%{_datadir}/manual/mod/mod_autoindex.xml.meta
 %{_datadir}/manual/mod/mod_autoindex.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_autoindex.html.ja*
-%lang(ja) %{_datadir}/manual/mod/mod_autoindex.xml.ja*
 %lang(ko) %{_datadir}/manual/mod/mod_autoindex.html.ko.euc-kr
-%lang(ko) %{_datadir}/manual/mod/mod_autoindex.xml.ko
-%{_datadir}/manual/mod/mod_cern_meta.html
-%{_datadir}/manual/mod/mod_cern_meta.xml
-%{_datadir}/manual/mod/mod_cern_meta.xml.meta
 %{_datadir}/manual/mod/mod_cern_meta.html.en
 %lang(ko) %{_datadir}/manual/mod/mod_cern_meta.html.ko.euc-kr
-%lang(ko) %{_datadir}/manual/mod/mod_cern_meta.xml.ko
-%{_datadir}/manual/mod/mod_cgi.html
-%{_datadir}/manual/mod/mod_cgi.xml
-%{_datadir}/manual/mod/mod_cgi.xml.meta
 %{_datadir}/manual/mod/mod_cgi.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_cgi.html.ja*
-%lang(ja) %{_datadir}/manual/mod/mod_cgi.xml.ja*
 %lang(ko) %{_datadir}/manual/mod/mod_cgi.html.ko.euc-kr
-%lang(ko) %{_datadir}/manual/mod/mod_cgi.xml.ko
-%{_datadir}/manual/mod/mod_echo.html
-%{_datadir}/manual/mod/mod_echo.xml
-%{_datadir}/manual/mod/mod_echo.xml.meta
 %{_datadir}/manual/mod/mod_echo.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_echo.html.ja*
-%lang(ja) %{_datadir}/manual/mod/mod_echo.xml.ja*
 %lang(ko) %{_datadir}/manual/mod/mod_echo.html.ko.euc-kr
-%lang(ko) %{_datadir}/manual/mod/mod_echo.xml.ko
-%{_datadir}/manual/mod/mod_env.html
-%{_datadir}/manual/mod/mod_env.xml
-%{_datadir}/manual/mod/mod_env.xml.meta
 %{_datadir}/manual/mod/mod_env.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_env.html.ja*
-%lang(ja) %{_datadir}/manual/mod/mod_env.xml.ja*
 %lang(ko) %{_datadir}/manual/mod/mod_env.html.ko.euc-kr
-%lang(ko) %{_datadir}/manual/mod/mod_env.xml.ko
-%{_datadir}/manual/mod/mod_ext_filter.html
-%{_datadir}/manual/mod/mod_ext_filter.xml
-%{_datadir}/manual/mod/mod_ext_filter.xml.meta
 %{_datadir}/manual/mod/mod_ext_filter.html.en
 %lang(ko) %{_datadir}/manual/mod/mod_ext_filter.html.ko.euc-kr
-%lang(ko) %{_datadir}/manual/mod/mod_ext_filter.xml.ko
-%{_datadir}/manual/mod/mod_include.html
-%{_datadir}/manual/mod/mod_include.xml
-%{_datadir}/manual/mod/mod_include.xml.meta
 %{_datadir}/manual/mod/mod_include.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_include.html.ja*
-%lang(ja) %{_datadir}/manual/mod/mod_include.xml.ja*
-%{_datadir}/manual/mod/mod_log_config.html
-%{_datadir}/manual/mod/mod_log_config.xml
-%{_datadir}/manual/mod/mod_log_config.xml.meta
 %{_datadir}/manual/mod/mod_log_config.html.en
-%{_datadir}/manual/mod/mod_log_forensic.html
-%{_datadir}/manual/mod/mod_log_forensic.xml
-%{_datadir}/manual/mod/mod_log_forensic.xml.meta
 %{_datadir}/manual/mod/mod_log_forensic.html.en
-%{_datadir}/manual/mod/mod_mime*.html
-%{_datadir}/manual/mod/mod_mime*.xml
-%{_datadir}/manual/mod/mod_mime*.xml.meta
 %{_datadir}/manual/mod/mod_mime*.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_mime*.html.ja*
-%lang(ja) %{_datadir}/manual/mod/mod_mime*.xml.ja*
-%{_datadir}/manual/mod/mod_negotiation.html
-%{_datadir}/manual/mod/mod_negotiation.xml
-%{_datadir}/manual/mod/mod_negotiation.xml.meta
 %{_datadir}/manual/mod/mod_negotiation.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_negotiation.html.ja*
-%lang(ja) %{_datadir}/manual/mod/mod_negotiation.xml.ja*
-%{_datadir}/manual/mod/mod_setenvif.html
-%{_datadir}/manual/mod/mod_setenvif.xml
-%{_datadir}/manual/mod/mod_setenvif.xml.meta
 %{_datadir}/manual/mod/mod_setenvif.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_setenvif.html.ja*
-%lang(ja) %{_datadir}/manual/mod/mod_setenvif.xml.ja*
 %lang(ko) %{_datadir}/manual/mod/mod_setenvif.html.ko.euc-kr
-%lang(ko) %{_datadir}/manual/mod/mod_setenvif.xml.ko
-%{_datadir}/manual/mod/mod_speling.html
-%{_datadir}/manual/mod/mod_speling.xml
-%{_datadir}/manual/mod/mod_speling.xml.meta
 %{_datadir}/manual/mod/mod_speling.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_speling.html.ja*
-%lang(ja) %{_datadir}/manual/mod/mod_speling.xml.ja*
 %lang(ko) %{_datadir}/manual/mod/mod_speling.html.ko.euc-kr
-%lang(ko) %{_datadir}/manual/mod/mod_speling.xml.ko
-%{_datadir}/manual/mod/mod_userdir.html
-%{_datadir}/manual/mod/mod_userdir.xml
-%{_datadir}/manual/mod/mod_userdir.xml.meta
 %{_datadir}/manual/mod/mod_userdir.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_userdir.html.ja*
-%lang(ja) %{_datadir}/manual/mod/mod_userdir.xml.ja*
 %lang(ko) %{_datadir}/manual/mod/mod_userdir.html.ko.euc-kr
-%lang(ko) %{_datadir}/manual/mod/mod_userdir.xml.ko
 %dir %{_datadir}/manual/programs
-%{_datadir}/manual/programs/*.html
-%{_datadir}/manual/programs/*.xml
-%{_datadir}/manual/programs/*.xml.meta
 %{_datadir}/manual/programs/*.html.en
 %lang(es) %{_datadir}/manual/programs/*.html.es
-%lang(es) %{_datadir}/manual/programs/*.xml.es
 %lang(ko) %{_datadir}/manual/programs/*.html.ko.euc-kr
-%lang(ko) %{_datadir}/manual/programs/*.xml.ko
 %lang(ru) %{_datadir}/manual/programs/*.html.ru.koi8-r
-%lang(ru) %{_datadir}/manual/programs/*.xml.ru
-%{_datadir}/manual/style
+%dir %{_datadir}/manual/style
+%{_datadir}/manual/style/css
 
-%{_datadir}/manual/mod/mod_suexec.html
-%{_datadir}/manual/mod/mod_suexec.xml
-%{_datadir}/manual/mod/mod_suexec.xml.meta
 %{_datadir}/manual/mod/mod_suexec.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_suexec.html.ja*
-%lang(ja) %{_datadir}/manual/mod/mod_suexec.xml.ja*
 %lang(ko) %{_datadir}/manual/mod/mod_suexec.html.ko.euc-kr
-%lang(ko) %{_datadir}/manual/mod/mod_suexec.xml.ko
-%{_datadir}/manual/mod/mod_actions.html
-%{_datadir}/manual/mod/mod_actions.xml
-%{_datadir}/manual/mod/mod_actions.xml.meta
 %{_datadir}/manual/mod/mod_actions.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_actions.html.ja*
-%lang(ja) %{_datadir}/manual/mod/mod_actions.xml.ja*
 %lang(ko) %{_datadir}/manual/mod/mod_actions.html.ko.euc-kr
-%lang(ko) %{_datadir}/manual/mod/mod_actions.xml.ko
-%{_datadir}/manual/mod/mod_auth.html
-%{_datadir}/manual/mod/mod_auth.xml
-%{_datadir}/manual/mod/mod_auth.xml.meta
 %{_datadir}/manual/mod/mod_auth.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_auth.html.ja*
-%lang(ja) %{_datadir}/manual/mod/mod_auth.xml.ja*
-%{_datadir}/manual/mod/mod_auth_anon.html
-%{_datadir}/manual/mod/mod_auth_anon.xml
-%{_datadir}/manual/mod/mod_auth_anon.xml.meta
 %{_datadir}/manual/mod/mod_auth_anon.html.en
-%{_datadir}/manual/mod/mod_auth_ldap.html
-%{_datadir}/manual/mod/mod_auth_ldap.xml
-%{_datadir}/manual/mod/mod_auth_ldap.xml.meta
 %{_datadir}/manual/mod/mod_auth_ldap.html.en
-%{_datadir}/manual/mod/mod_ldap.html
-%{_datadir}/manual/mod/mod_ldap.xml
-%{_datadir}/manual/mod/mod_ldap.xml.meta
 %{_datadir}/manual/mod/mod_ldap.html.en
-%{_datadir}/manual/mod/mod_auth_dbm.html
-%{_datadir}/manual/mod/mod_auth_dbm.xml
-%{_datadir}/manual/mod/mod_auth_dbm.xml.meta
 %{_datadir}/manual/mod/mod_auth_dbm.html.en
-%{_datadir}/manual/mod/mod_auth_digest.html
-%{_datadir}/manual/mod/mod_auth_digest.xml
-%{_datadir}/manual/mod/mod_auth_digest.xml.meta
 %{_datadir}/manual/mod/mod_auth_digest.html.en
-%{_datadir}/manual/mod/mod_cache.html
-%{_datadir}/manual/mod/mod_cache.xml
-%{_datadir}/manual/mod/mod_cache.xml.meta
 %{_datadir}/manual/mod/mod_cache.html.en
 %lang(ko) %{_datadir}/manual/mod/mod_cache.html.ko.euc-kr
-%lang(ko) %{_datadir}/manual/mod/mod_cache.xml.ko
-%{_datadir}/manual/mod/mod_disk_cache.html
-%{_datadir}/manual/mod/mod_disk_cache.xml
-%{_datadir}/manual/mod/mod_disk_cache.xml.meta
 %{_datadir}/manual/mod/mod_disk_cache.html.en
 %lang(ko) %{_datadir}/manual/mod/mod_disk_cache.html.ko.euc-kr
-%lang(ko) %{_datadir}/manual/mod/mod_disk_cache.xml.ko
-%{_datadir}/manual/mod/mod_mem_cache.html
-%{_datadir}/manual/mod/mod_mem_cache.xml
-%{_datadir}/manual/mod/mod_mem_cache.xml.meta
 %{_datadir}/manual/mod/mod_mem_cache.html.en
-%{_datadir}/manual/mod/mod_cgid.html
-%{_datadir}/manual/mod/mod_cgid.xml
-%{_datadir}/manual/mod/mod_cgid.xml.meta
 %{_datadir}/manual/mod/mod_cgid.html.en
 %lang(ko) %{_datadir}/manual/mod/mod_cgid.html.ko.euc-kr
-%lang(ko) %{_datadir}/manual/mod/mod_cgid.xml.ko
-%{_datadir}/manual/mod/mod_charset_lite.html
-%{_datadir}/manual/mod/mod_charset_lite.xml
-%{_datadir}/manual/mod/mod_charset_lite.xml.meta
 %{_datadir}/manual/mod/mod_charset_lite.html.en
 %lang(ko) %{_datadir}/manual/mod/mod_charset_lite.html.ko.euc-kr
-%lang(ko) %{_datadir}/manual/mod/mod_charset_lite.xml.ko
-%{_datadir}/manual/mod/mod_dav*.html
-%{_datadir}/manual/mod/mod_dav*.xml
-%{_datadir}/manual/mod/mod_dav*.xml.meta
 %{_datadir}/manual/mod/mod_dav*.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_dav*.html.ja*
-%lang(ja) %{_datadir}/manual/mod/mod_dav*.xml.ja*
 %lang(ko) %{_datadir}/manual/mod/mod_dav*.html.ko.euc-kr
-%lang(ko) %{_datadir}/manual/mod/mod_dav*.xml.ko
-%{_datadir}/manual/mod/mod_deflate.html
-%{_datadir}/manual/mod/mod_deflate.xml
-%{_datadir}/manual/mod/mod_deflate.xml.meta
 %{_datadir}/manual/mod/mod_deflate.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_deflate.html.ja*
-%lang(ja) %{_datadir}/manual/mod/mod_deflate.xml.ja*
 %lang(ko) %{_datadir}/manual/mod/mod_deflate.html.ko.euc-kr
-%lang(ko) %{_datadir}/manual/mod/mod_deflate.xml.ko
-%{_datadir}/manual/mod/mod_dir.html
-%{_datadir}/manual/mod/mod_dir.xml
-%{_datadir}/manual/mod/mod_dir.xml.meta
 %{_datadir}/manual/mod/mod_dir.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_dir.html.ja*
-%lang(ja) %{_datadir}/manual/mod/mod_dir.xml.ja*
 %lang(ko) %{_datadir}/manual/mod/mod_dir.html.ko.euc-kr
-%lang(ko) %{_datadir}/manual/mod/mod_dir.xml.ko
-%{_datadir}/manual/mod/mod_expires.html
-%{_datadir}/manual/mod/mod_expires.xml
-%{_datadir}/manual/mod/mod_expires.xml.meta
 %{_datadir}/manual/mod/mod_expires.html.en
 %lang(ko) %{_datadir}/manual/mod/mod_expires.html.ko.euc-kr
-%lang(ko) %{_datadir}/manual/mod/mod_expires.xml.ko
-%{_datadir}/manual/mod/mod_file_cache.html
-%{_datadir}/manual/mod/mod_file_cache.xml
-%{_datadir}/manual/mod/mod_file_cache.xml.meta
 %{_datadir}/manual/mod/mod_file_cache.html.en
 %lang(ko) %{_datadir}/manual/mod/mod_file_cache.html.ko.euc-kr
-%lang(ko) %{_datadir}/manual/mod/mod_file_cache.xml.ko
-%{_datadir}/manual/mod/mod_headers.html
-%{_datadir}/manual/mod/mod_headers.xml
-%{_datadir}/manual/mod/mod_headers.xml.meta
 %{_datadir}/manual/mod/mod_headers.html.en
-%{_datadir}/manual/mod/mod_imap.html
-%{_datadir}/manual/mod/mod_imap.xml
-%{_datadir}/manual/mod/mod_imap.xml.meta
 %{_datadir}/manual/mod/mod_imap.html.en
-%{_datadir}/manual/mod/mod_info.html
-%{_datadir}/manual/mod/mod_info.xml
-%{_datadir}/manual/mod/mod_info.xml.meta
 %{_datadir}/manual/mod/mod_info.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_info.html.ja*
-%lang(ja) %{_datadir}/manual/mod/mod_info.xml.ja*
-%{_datadir}/manual/mod/mod_proxy*.html
-%{_datadir}/manual/mod/mod_proxy*.xml
-%{_datadir}/manual/mod/mod_proxy*.xml.meta
 %{_datadir}/manual/mod/mod_proxy*.html.en
-%{_datadir}/manual/mod/mod_rewrite.html
-%{_datadir}/manual/mod/mod_rewrite.xml
-%{_datadir}/manual/mod/mod_rewrite.xml.meta
 %{_datadir}/manual/mod/mod_rewrite.html.en
 %{_datadir}/manual/images/mod_rewrite*
 %dir %{_datadir}/manual/ssl
 %{_datadir}/manual/ssl/*.gif
 %{_datadir}/manual/ssl/*.png
-%{_datadir}/manual/ssl/*.html
-%{_datadir}/manual/ssl/*.xml
-%{_datadir}/manual/ssl/*.xml.meta
 %{_datadir}/manual/ssl/*.html.en
 %lang(ja) %{_datadir}/manual/ssl/*.html.ja*
-%lang(ja) %{_datadir}/manual/ssl/*.xml.ja*
-%{_datadir}/manual/mod/mod_ssl.html
-%{_datadir}/manual/mod/mod_ssl.xml
-%{_datadir}/manual/mod/mod_ssl.xml.meta
 %{_datadir}/manual/mod/mod_ssl.html.en
-%{_datadir}/manual/mod/mod_status.html
-%{_datadir}/manual/mod/mod_status.xml
-%{_datadir}/manual/mod/mod_status.xml.meta
 %{_datadir}/manual/mod/mod_status.html.en
 %lang(ko) %{_datadir}/manual/mod/mod_status.html.ko.euc-kr
-%lang(ko) %{_datadir}/manual/mod/mod_status.xml.ko
-%{_datadir}/manual/mod/mod_usertrack.html
-%{_datadir}/manual/mod/mod_usertrack.xml
-%{_datadir}/manual/mod/mod_usertrack.xml.meta
 %{_datadir}/manual/mod/mod_usertrack.html.en
-%{_datadir}/manual/mod/mod_unique_id.html
-%{_datadir}/manual/mod/mod_unique_id.xml
-%{_datadir}/manual/mod/mod_unique_id.xml.meta
 %{_datadir}/manual/mod/mod_unique_id.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_unique_id.html.ja*
-%lang(ja) %{_datadir}/manual/mod/mod_unique_id.xml.ja*
 %lang(ko) %{_datadir}/manual/mod/mod_unique_id.html.ko.euc-kr
-%lang(ko) %{_datadir}/manual/mod/mod_unique_id.xml.ko
-%{_datadir}/manual/mod/mod_vhost_alias.html
-%{_datadir}/manual/mod/mod_vhost_alias.xml
-%{_datadir}/manual/mod/mod_vhost_alias.xml.meta
 %{_datadir}/manual/mod/mod_vhost_alias.html.en
 %dir %{_datadir}/manual/vhosts
-%{_datadir}/manual/vhosts/*.html
-%{_datadir}/manual/vhosts/*.xml
-%{_datadir}/manual/vhosts/*.xml.meta
 %{_datadir}/manual/vhosts/*.html.en
 %lang(de) %{_datadir}/manual/vhosts/*.html.de
-%lang(de) %{_datadir}/manual/vhosts/*.xml.de
 %lang(es) %{_datadir}/manual/vhosts/*.html.es
-%lang(es) %{_datadir}/manual/vhosts/*.xml.es
 %lang(ja) %{_datadir}/manual/vhosts/*.html.ja*
-%lang(ja) %{_datadir}/manual/vhosts/*.xml.ja*
 %lang(ko) %{_datadir}/manual/vhosts/*.html.ko.euc-kr
-%lang(ko) %{_datadir}/manual/vhosts/*.xml.ko
 %lang(ru) %{_datadir}/manual/vhosts/*.html.ru.koi8-r
-%lang(ru) %{_datadir}/manual/vhosts/*.xml.ru
 
 %files suexec
 %defattr(644,root,root,755)
