@@ -30,7 +30,7 @@ Release:	0.1
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
-# Source0-md5:	63f16638c18b140b649fab32b54d7f9c
+# Source0-md5:	466c63bb71b710d20a5c353df8c1a19c
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}-icons.tar.gz
