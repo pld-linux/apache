@@ -610,6 +610,9 @@ if [ "$MODULES_API" != "%_apache_modules_api" ]; then
 	exit 1
 fi
 ./buildconf
+# Before configure; fix location of build dir in generated apxs
+%{__perl} -pi -e "s:\@exp_installbuilddir\@:%{_libdir}/apache/build:g" \
+        support/apxs.in
 install /usr/share/automake/config.* build/
 %configure \
 	--prefix=%{_libexecdir} \
