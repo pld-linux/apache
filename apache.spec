@@ -1078,7 +1078,7 @@ if [ "$1" = "0" ]; then
 	fi
 fi
 
-%post -n apr -p /sbin/ldconfig
+%post	-n apr -p /sbin/ldconfig
 %postun -n apr -p /sbin/ldconfig
 
 %files
@@ -1215,8 +1215,8 @@ fi
 
 %files devel
 %defattr(644,root,root,755)
-%{_includedir}
-%exclude %{_includedir}/apr*.h
+%{_includedir}/[!a]*
+%{_includedir}/ap[!r]*
 %{_libexecdir}/*.exp
 
 %files static
@@ -1384,6 +1384,7 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/apr-config
 %attr(755,root,root) %{_bindir}/apu-config
+%dir %{_includedir}
 %{_includedir}/apr*.h
 #%{_libdir}/APRVARS
 %{_libdir}/apr*.exp
