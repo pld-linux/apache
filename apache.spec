@@ -26,16 +26,18 @@ Summary(tr):	Lider WWW tarayýcý
 Summary(uk):	îÁÊÐÏÐÕÌÑÒÎ¦ÛÉÊ Web-Server
 Summary(zh_CN):	Internet ÉÏÓ¦ÓÃ×î¹ã·ºµÄ Web ·þÎñ³ÌÐò¡£
 Name:		apache
-Version:	1.3.27
-Release:	5
+Version:	1.3.28
+Release:	0.1
 License:	Apache Group 
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/%{name}_%{version}.tar.gz
+# Source0-md5:	2cdece7b4881d541e072de6a2b65db77
 Source1:	%{name}1.init
 Source2:	%{name}.logrotate
 Source3:	%{name}-icons.tar.gz
 Source4:	%{name}.sysconfig
 Source5:	http://www.mif.pg.gda.pl/homepages/ankry/man-PLD/%{name}-non-english-man-pages.tar.bz2
+# Source5-md5:	74ff6e8d8a7b365b48ed10a52fbeb84e
 Source6:	%{name}-httpd.conf
 Source8:	%{name}-mod_vhost_alias.conf
 Source9:	%{name}-mod_status.conf
