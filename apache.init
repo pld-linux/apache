@@ -28,7 +28,7 @@ if is_no "${NETWORKING}"; then
         exit 1
 fi
 
-if is_no ${IPV6_NETWORKING}; then
+if is_no "${IPV6_NETWORKING}"; then
         HTTPD_OPTS="$HTTPD_OPTS -4"
 fi
 
