@@ -15,6 +15,7 @@
 # - subpackages for MPMs
 # - check if all modules (*.so) are exactly the same for different MPMs
 # - install stage fails with distcc (make -jN)
+# - polish description and summary at package htpasswd
 #
 # Conditional build:
 %bcond_without	ssl		# build without SSL support
