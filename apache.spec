@@ -416,6 +416,7 @@ OPTIM="$RPM_OPT_FLAGS" \
 	--suexec-caller=http \
 	--suexec-uidmin=500 \
 	--suexec-gidmin=500 \
+  --suexec-docroot=/home/httpd \
 	--disable-rule=WANTHSREGEX \
 	--enable-rule=EAPI \
 	--enable-rule=INET6
