@@ -21,8 +21,8 @@ Summary(pl):	Serwer WWW (World Wide Web)
 Summary(pt_BR):	Servidor HTTPD para prover serviços WWW
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
-Version:	2.0.40
-Release:	0.4
+Version:	2.0.42
+Release:	0.6
 License:	Apache Group License
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/
@@ -1383,7 +1383,7 @@ fi
 %attr(755,root,root) %{_bindir}/apr-config
 %attr(755,root,root) %{_bindir}/apu-config
 %{_includedir}/apr*.h
-%{_libdir}/APRVARS
+#%{_libdir}/APRVARS
 %{_libdir}/apr*.exp
 %attr(755,root,root) %{_libdir}/libapr*.so
 %attr(755,root,root) %{_libdir}/libapr*.la
