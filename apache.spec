@@ -26,7 +26,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.0.47
-Release:	0.3
+Release:	0.4
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -169,6 +169,7 @@ Summary(ru):	Средства разработки модулей для веб-сервера Apache
 Group:		Networking/Utilities
 Requires:	%{name} = %{version}
 Requires:	apr-devel = %{version}
+Requires:	libtool
 
 %description devel
 The apache-devel package contains header files for Apache.
@@ -633,6 +634,7 @@ if [ "$MODULES_API" != "%_apache_modules_api" ]; then
 fi
 ./buildconf
 %configure \
+	--prefix=%{_libexecdir} \
 	--enable-layout=PLD \
 	--enable-modules=all \
 	--enable-mods-shared=all \
@@ -711,8 +713,12 @@ install -d $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
 mv -f $RPM_BUILD_ROOT%{_sysconfdir}/build \
 	$RPM_BUILD_ROOT%{_libexecdir}/build
 
-perl -pi -e "s#$RPM_BUILD_ROOT##g" $RPM_BUILD_ROOT%{_libexecdir}/build/config_vars.mk
+perl -pi -e "s#$RPM_BUILD_ROOT##g" $RPM_BUILD_ROOT%{_libexecdir}/build/*
+perl -pi -e "s#$RPM_BUILD_DIR#%{_usrsrc}#g" $RPM_BUILD_ROOT%{_libexecdir}/build/*
 perl -pi -e "s#-pthread#-lpthread#g" $RPM_BUILD_ROOT%{_libdir}/lib*.la
+perl -pi -e 's#/etc/httpd/build#%{_libexecdir}/build#g' $RPM_BUILD_ROOT%{_libexecdir}/build/*
+ln -sf %{_bindir}/libtool $RPM_BUILD_ROOT%{_libexecdir}/build/libtool
+ln -sf %{_libexecdir}/build $RPM_BUILD_ROOT%{_sysconfdir}/build
 
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/apache
@@ -1141,11 +1147,6 @@ fi
 %attr(750,root,root) %dir %{_sysconfdir}/httpd.conf
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_httpd.conf
 %attr(640,root,root) %{_sysconfdir}/magic
-%attr(755,root,root) %dir %{_libexecdir}/build
-%attr(755,root,root) %{_libexecdir}/build/*.mk
-%attr(755,root,root) %{_libexecdir}/build/*.sh
-%attr(755,root,root) %{_libexecdir}/build/libtool
-
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/sysconfig/*
 %attr(640,root,root) %config(noreplace) /etc/logrotate.d/*
 
@@ -1265,6 +1266,10 @@ fi
 %{_includedir}/[!a]*
 %{_includedir}/ap[!r]*
 %{_libexecdir}/*.exp
+%attr(755,root,root) %dir %{_libexecdir}/build
+%attr(644,root,root) %{_libexecdir}/build/*.mk
+%attr(755,root,root) %{_libexecdir}/build/*.sh
+%attr(755,root,root) %{_libexecdir}/build/libtool
 
 %files static
 %defattr(644,root,root,755)
