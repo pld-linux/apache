@@ -302,8 +302,8 @@ of this document.
 %patch6 -p1
 
 %build
-LDFLAGS="-s"
-export LDFLAGS
+
+LDFLAGS="-s"; export LDFLAGS
 OPTIM="$RPM_OPT_FLAGS" \
 ./configure \
 	--prefix=%{_prefix} \
@@ -354,7 +354,7 @@ install %{SOURCE8} $RPM_BUILD_ROOT%{_sysconfdir}/virtual-host.conf
 
 ln -sf index.html.en $RPM_BUILD_ROOT/home/httpd/html/index.html
 
-strip --strip-unneeded $RPM_BUILD_ROOT%{_libexecdir}/*.so
+#strip --strip-unneeded $RPM_BUILD_ROOT%{_libexecdir}/*.so
 
 gzip -9nf $RPM_BUILD_ROOT%{_mandir}/man*/* \
 	ABOUT_APACHE src/CHANGES KEYS README
@@ -388,54 +388,54 @@ fi
 /sbin/chkconfig --add httpd
 umask 137
 touch /var/log/httpd/{access,error,agent,referer}_log
+/usr/sbin/apxs -e -a -n access %{_libexecdir}/mod_access.so 1>&2
+/usr/sbin/apxs -e -a -n alias %{_libexecdir}/mod_alias.so 1>&2
+/usr/sbin/apxs -e -a -n asis %{_libexecdir}/mod_asis.so 1>&2
+/usr/sbin/apxs -e -a -n auth %{_libexecdir}/mod_auth.so 1>&2
+/usr/sbin/apxs -e -a -n auth_db %{_libexecdir}/mod_auth_db.so 1>&2
+/usr/sbin/apxs -e -a -n auth_dbm %{_libexecdir}/mod_auth_dbm.so 1>&2
+/usr/sbin/apxs -e -a -n autoindex %{_libexecdir}/mod_autoindex.so 1>&2
+/usr/sbin/apxs -e -a -n cern_meta %{_libexecdir}/mod_cern_meta.so 1>&2
+/usr/sbin/apxs -e -a -n cgi %{_libexecdir}/mod_cgi.so 1>&2
+/usr/sbin/apxs -e -a -n env %{_libexecdir}/mod_env.so 1>&2
+/usr/sbin/apxs -e -a -n include %{_libexecdir}/mod_include.so 1>&2
+/usr/sbin/apxs -e -a -n log_agent %{_libexecdir}/mod_log_agent.so 1>&2
+/usr/sbin/apxs -e -a -n log_config %{_libexecdir}/mod_log_config.so 1>&2
+/usr/sbin/apxs -e -a -n log_referer %{_libexecdir}/mod_log_referer.so 1>&2
+/usr/sbin/apxs -e -a -n mime %{_libexecdir}/mod_mime.so 1>&2
+/usr/sbin/apxs -e -a -n mime_magic %{_libexecdir}/mod_mime_magic.so 1>&2
+/usr/sbin/apxs -e -a -n negotiation %{_libexecdir}/mod_negotiation.so 1>&2
+/usr/sbin/apxs -e -a -n setenvif %{_libexecdir}/mod_setenvif.so 1>&2
+/usr/sbin/apxs -e -a -n speling %{_libexecdir}/mod_speling.so 1>&2
+/usr/sbin/apxs -e -a -n userdir %{_libexecdir}/mod_userdir.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
 	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
 fi
-/usr/sbin/apxs -e -a -n mod_access %{_libexecdir}/mod_access.so 1>&2
-/usr/sbin/apxs -e -a -n mod_alias %{_libexecdir}/mod_alias.so 1>&2
-/usr/sbin/apxs -e -a -n mod_asis %{_libexecdir}/mod_asis.so 1>&2
-/usr/sbin/apxs -e -a -n mod_auth %{_libexecdir}/mod_auth.so 1>&2
-/usr/sbin/apxs -e -a -n mod_auth_db %{_libexecdir}/mod_auth_db.so 1>&2
-/usr/sbin/apxs -e -a -n mod_auth_dbm %{_libexecdir}/mod_auth_dbm.so 1>&2
-/usr/sbin/apxs -e -a -n mod_autoindex %{_libexecdir}/mod_autoindex.so 1>&2
-/usr/sbin/apxs -e -a -n mod_cern_meta %{_libexecdir}/mod_cern_meta.so 1>&2
-/usr/sbin/apxs -e -a -n mod_cgi %{_libexecdir}/mod_cgi.so 1>&2
-/usr/sbin/apxs -e -a -n mod_env %{_libexecdir}/mod_env.so 1>&2
-/usr/sbin/apxs -e -a -n mod_include %{_libexecdir}/mod_include.so 1>&2
-/usr/sbin/apxs -e -a -n mod_log_agent %{_libexecdir}/mod_log_agent.so 1>&2
-/usr/sbin/apxs -e -a -n mod_log_config %{_libexecdir}/mod_log_config.so 1>&2
-/usr/sbin/apxs -e -a -n mod_log_referer %{_libexecdir}/mod_log_referer.so 1>&2
-/usr/sbin/apxs -e -a -n mod_mime %{_libexecdir}/mod_mime.so 1>&2
-/usr/sbin/apxs -e -a -n mod_mime_magic %{_libexecdir}/mod_mime_magic.so 1>&2
-/usr/sbin/apxs -e -a -n mod_negotiation %{_libexecdir}/mod_negotiation.so 1>&2
-/usr/sbin/apxs -e -a -n mod_setenvif %{_libexecdir}/mod_setenvif.so 1>&2
-/usr/sbin/apxs -e -a -n mod_speling %{_libexecdir}/mod_speling.so 1>&2
-/usr/sbin/apxs -e -a -n mod_userdir %{_libexecdir}/mod_userdir.so 1>&2
 
 %preun
 if [ "$1" = "0" ]; then
-	/usr/sbin/apxs -e -A -n mod_access %{_libexecdir}/mod_access.so 1>&2
-	/usr/sbin/apxs -e -A -n mod_alias %{_libexecdir}/mod_alias.so 1>&2
-	/usr/sbin/apxs -e -A -n mod_asis %{_libexecdir}/mod_asis.so 1>&2
-	/usr/sbin/apxs -e -A -n mod_auth %{_libexecdir}/mod_auth.so 1>&2
-	/usr/sbin/apxs -e -A -n mod_auth_db %{_libexecdir}/mod_auth_db.so 1>&2
-	/usr/sbin/apxs -e -A -n mod_auth_dbm %{_libexecdir}/mod_auth_dbm.so 1>&2
-	/usr/sbin/apxs -e -A -n mod_autoindex %{_libexecdir}/mod_autoindex.so 1>&2
-	/usr/sbin/apxs -e -A -n mod_cern_meta %{_libexecdir}/mod_cern_meta.so 1>&2
-	/usr/sbin/apxs -e -A -n mod_cgi %{_libexecdir}/mod_cgi.so 1>&2
-	/usr/sbin/apxs -e -A -n mod_env %{_libexecdir}/mod_env.so 1>&2
-	/usr/sbin/apxs -e -A -n mod_include %{_libexecdir}/mod_include.so 1>&2
-	/usr/sbin/apxs -e -A -n mod_log_agent %{_libexecdir}/mod_log_agent.so 1>&2
-	/usr/sbin/apxs -e -A -n mod_log_config %{_libexecdir}/mod_log_config.so 1>&2
-	/usr/sbin/apxs -e -A -n mod_log_referer %{_libexecdir}/mod_log_referer.so 1>&2
-	/usr/sbin/apxs -e -A -n mod_mime %{_libexecdir}/mod_mime.so 1>&2
-	/usr/sbin/apxs -e -A -n mod_mime_magic %{_libexecdir}/mod_mime_magic.so 1>&2
-	/usr/sbin/apxs -e -A -n mod_negotiation %{_libexecdir}/mod_negotiation.so 1>&2
-	/usr/sbin/apxs -e -A -n mod_setenvif %{_libexecdir}/mod_setenvif.so 1>&2
-	/usr/sbin/apxs -e -A -n mod_speling %{_libexecdir}/mod_speling.so 1>&2
-	/usr/sbin/apxs -e -A -n mod_userdir %{_libexecdir}/mod_userdir.so 1>&2
+	/usr/sbin/apxs -e -A -n access %{_libexecdir}/mod_access.so 1>&2
+	/usr/sbin/apxs -e -A -n alias %{_libexecdir}/mod_alias.so 1>&2
+	/usr/sbin/apxs -e -A -n asis %{_libexecdir}/mod_asis.so 1>&2
+	/usr/sbin/apxs -e -A -n auth %{_libexecdir}/mod_auth.so 1>&2
+	/usr/sbin/apxs -e -A -n auth_db %{_libexecdir}/mod_auth_db.so 1>&2
+	/usr/sbin/apxs -e -A -n auth_dbm %{_libexecdir}/mod_auth_dbm.so 1>&2
+	/usr/sbin/apxs -e -A -n autoindex %{_libexecdir}/mod_autoindex.so 1>&2
+	/usr/sbin/apxs -e -A -n cern_meta %{_libexecdir}/mod_cern_meta.so 1>&2
+	/usr/sbin/apxs -e -A -n cgi %{_libexecdir}/mod_cgi.so 1>&2
+	/usr/sbin/apxs -e -A -n env %{_libexecdir}/mod_env.so 1>&2
+	/usr/sbin/apxs -e -A -n include %{_libexecdir}/mod_include.so 1>&2
+	/usr/sbin/apxs -e -A -n log_agent %{_libexecdir}/mod_log_agent.so 1>&2
+	/usr/sbin/apxs -e -A -n log_config %{_libexecdir}/mod_log_config.so 1>&2
+	/usr/sbin/apxs -e -A -n log_referer %{_libexecdir}/mod_log_referer.so 1>&2
+	/usr/sbin/apxs -e -A -n mime %{_libexecdir}/mod_mime.so 1>&2
+	/usr/sbin/apxs -e -A -n mime_magic %{_libexecdir}/mod_mime_magic.so 1>&2
+	/usr/sbin/apxs -e -A -n negotiation %{_libexecdir}/mod_negotiation.so 1>&2
+	/usr/sbin/apxs -e -A -n setenvif %{_libexecdir}/mod_setenvif.so 1>&2
+	/usr/sbin/apxs -e -A -n speling %{_libexecdir}/mod_speling.so 1>&2
+	/usr/sbin/apxs -e -A -n userdir %{_libexecdir}/mod_userdir.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd stop 1>&2
 	fi
@@ -455,122 +455,122 @@ if [ "$1" = "0" ]; then
 fi
 
 %post mod_actions
-/usr/sbin/apxs -e -a -n mod_actions %{_libexecdir}/mod_actions.so 1>&2
+/usr/sbin/apxs -e -a -n actions %{_libexecdir}/mod_actions.so 1>&2
 
 %preun mod_actions
 if [ "$1" = "0" ]; then
-	/usr/sbin/apxs -e -A -n mod_actions %{_libexecdir}/mod_actions.so 1>&2
+	/usr/sbin/apxs -e -A -n actions %{_libexecdir}/mod_actions.so 1>&2
 fi
 
 %post mod_auth_anon
-/usr/sbin/apxs -e -a -n mod_auth_anon %{_libexecdir}/mod_auth_anon.so 1>&2
+/usr/sbin/apxs -e -a -n auth_anon %{_libexecdir}/mod_auth_anon.so 1>&2
 
 %preun mod_auth_anon
 if [ "$1" = "0" ]; then
-	/usr/sbin/apxs -e -A -n mod_auth_anon %{_libexecdir}/mod_auth_anon.so 1>&2
+	/usr/sbin/apxs -e -A -n auth_anon %{_libexecdir}/mod_auth_anon.so 1>&2
 fi
 
 %post mod_digest
-/usr/sbin/apxs -e -a -n mod_digest %{_libexecdir}/mod_digest.so 1>&2
+/usr/sbin/apxs -e -a -n digest %{_libexecdir}/mod_digest.so 1>&2
 
 %preun mod_digest
 if [ "$1" = "0" ]; then
-	/usr/sbin/apxs -e -A -n mod_digest %{_libexecdir}/mod_digest.so 1>&2
+	/usr/sbin/apxs -e -A -n digest %{_libexecdir}/mod_digest.so 1>&2
 fi
 
 %post mod_dir
-/usr/sbin/apxs -e -a -n mod_dir %{_libexecdir}/mod_dir.so 1>&2
+/usr/sbin/apxs -e -a -n dir %{_libexecdir}/mod_dir.so 1>&2
 
 %preun mod_dir
 if [ "$1" = "0" ]; then
-	/usr/sbin/apxs -e -A -n mod_dir %{_libexecdir}/mod_dir.so 1>&2
+	/usr/sbin/apxs -e -A -n dir %{_libexecdir}/mod_dir.so 1>&2
 fi
 
 %post mod_expires
-/usr/sbin/apxs -e -a -n mod_expires %{_libexecdir}/mod_expires.so 1>&2
+/usr/sbin/apxs -e -a -n expires %{_libexecdir}/mod_expires.so 1>&2
 
 %preun mod_expires
 if [ "$1" = "0" ]; then
-	/usr/sbin/apxs -e -A -n mod_expires %{_libexecdir}/mod_expires.so 1>&2
+	/usr/sbin/apxs -e -A -n expires %{_libexecdir}/mod_expires.so 1>&2
 fi
 %post mod_headers
-/usr/sbin/apxs -e -a -n mod_headers %{_libexecdir}/mod_headers.so 1>&2
+/usr/sbin/apxs -e -a -n headers %{_libexecdir}/mod_headers.so 1>&2
 
 %preun mod_headers
 if [ "$1" = "0" ]; then
-	/usr/sbin/apxs -e -A -n mod_headers %{_libexecdir}/mod_headers.so 1>&2
+	/usr/sbin/apxs -e -A -n headers %{_libexecdir}/mod_headers.so 1>&2
 fi
 
 %post mod_mmap_static
-/usr/sbin/apxs -e -a -n mod_mmap_static %{_libexecdir}/mod_mmap_static.so 1>&2
+/usr/sbin/apxs -e -a -n mmap_static %{_libexecdir}/mod_mmap_static.so 1>&2
 
 %preun mod_mmap_static
 if [ "$1" = "0" ]; then
-	/usr/sbin/apxs -e -A -n mod_mmap_static %{_libexecdir}/mod_mmap_static.so 1>&2
+	/usr/sbin/apxs -e -A -n mmap_static %{_libexecdir}/mod_mmap_static.so 1>&2
 fi
 
 %post mod_imap
-/usr/sbin/apxs -e -a -n mod_imap %{_libexecdir}/mod_imap.so 1>&2
+/usr/sbin/apxs -e -a -n imap %{_libexecdir}/mod_imap.so 1>&2
 
 %preun mod_imap
 if [ "$1" = "0" ]; then
-	/usr/sbin/apxs -e -A -n mod_imap %{_libexecdir}/mod_imap.so 1>&2
+	/usr/sbin/apxs -e -A -n imap %{_libexecdir}/mod_imap.so 1>&2
 fi
 
 %post mod_info
-/usr/sbin/apxs -e -a -n mod_info %{_libexecdir}/mod_info.so 1>&2
+/usr/sbin/apxs -e -a -n info %{_libexecdir}/mod_info.so 1>&2
 
 %preun mod_info
 if [ "$1" = "0" ]; then
-	/usr/sbin/apxs -e -A -n mod_info %{_libexecdir}/mod_info.so 1>&2
+	/usr/sbin/apxs -e -A -n info %{_libexecdir}/mod_info.so 1>&2
 fi
 
 %post mod_proxy
-/usr/sbin/apxs -e -a -n libproxy %{_libexecdir}/libproxy.so 1>&2
+/usr/sbin/apxs -e -a -n proxy %{_libexecdir}/libproxy.so 1>&2
 
 %preun mod_proxy
 if [ "$1" = "0" ]; then
-	/usr/sbin/apxs -e -A -n libproxy %{_libexecdir}/libproxy.so 1>&2
+	/usr/sbin/apxs -e -A -n proxy %{_libexecdir}/libproxy.so 1>&2
 fi
 
 %post mod_rewrite
-/usr/sbin/apxs -e -a -n mod_rewrite %{_libexecdir}/mod_rewrite.so 1>&2
+/usr/sbin/apxs -e -a -n rewrite %{_libexecdir}/mod_rewrite.so 1>&2
 
 %preun mod_rewrite
 if [ "$1" = "0" ]; then
-	/usr/sbin/apxs -e -A -n mod_rewrite %{_libexecdir}/mod_rewrite.so 1>&2
+	/usr/sbin/apxs -e -A -n rewrite %{_libexecdir}/mod_rewrite.so 1>&2
 fi
 
 %post mod_status
-/usr/sbin/apxs -e -a -n mod_status %{_libexecdir}/mod_status.so 1>&2
+/usr/sbin/apxs -e -a -n status %{_libexecdir}/mod_status.so 1>&2
 
 %preun mod_status
 if [ "$1" = "0" ]; then
-	/usr/sbin/apxs -e -A -n mod_status %{_libexecdir}/mod_status.so 1>&2
+	/usr/sbin/apxs -e -A -n status %{_libexecdir}/mod_status.so 1>&2
 fi
 
 %post mod_usertrack
-/usr/sbin/apxs -e -a -n mod_usertrack %{_libexecdir}/mod_usertrack.so 1>&2
+/usr/sbin/apxs -e -a -n usertrack %{_libexecdir}/mod_usertrack.so 1>&2
 
 %preun mod_usertrack
 if [ "$1" = "0" ]; then
-	/usr/sbin/apxs -e -A -n mod_usertrack %{_libexecdir}/mod_usertrack.so 1>&2
+	/usr/sbin/apxs -e -A -n usertrack %{_libexecdir}/mod_usertrack.so 1>&2
 fi
 
 %post mod_unique_id
-/usr/sbin/apxs -e -a -n mod_unique_id %{_libexecdir}/mod_unique_id.so 1>&2
+/usr/sbin/apxs -e -a -n unique_id %{_libexecdir}/mod_unique_id.so 1>&2
 
 %preun mod_unique_id
 if [ "$1" = "0" ]; then
-	/usr/sbin/apxs -e -A -n mod_unique_id %{_libexecdir}/mod_unique_id.so 1>&2
+	/usr/sbin/apxs -e -A -n unique_id %{_libexecdir}/mod_unique_id.so 1>&2
 fi
 
 %post mod_vhost_alias
-/usr/sbin/apxs -e -a -n libproxy %{_libexecdir}/mod_vhost_alias.so 1>&2
+/usr/sbin/apxs -e -a -n vhost_alias %{_libexecdir}/mod_vhost_alias.so 1>&2
 
 %preun mod_vhost_alias
 if [ "$1" = "0" ]; then
-	/usr/sbin/apxs -e -A -n libproxy %{_libexecdir}/mod_vhost_alias.so 1>&2
+	/usr/sbin/apxs -e -A -n vhost_alias %{_libexecdir}/mod_vhost_alias.so 1>&2
 fi
 
 %clean
