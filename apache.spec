@@ -1281,6 +1281,7 @@ fi
 %dir %{_datadir}/manual
 
 %files doc
+%defattr(644,root,root,755)
 %{_datadir}/manual/LICENSE
 %{_datadir}/manual/*.xml
 %{_datadir}/manual/*.html.en
