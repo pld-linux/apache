@@ -1,4 +1,5 @@
 # _without_ssl	- don't build with SSL support
+# _without_ldap	- don't build with LDAP support
 # TODO:
 # - mod_case_filter
 # - mod_case_filter_in
@@ -58,6 +59,7 @@ BuildRequires:	db-devel
 BuildRequires:	expat-devel
 BuildRequires:	gdbm-devel >= 1.8.3
 BuildRequires:	libtool >= 1.5
+%{!?_without_ldap:BuildRequires:	openldap-devel}
 %{!?_without_ssl:BuildRequires:	openssl-devel >= 0.9.7c}
 %{!?_without_ssl:BuildRequires:	openssl-tools >= 0.9.7c}
 BuildRequires:	perl-devel >= 5.004
@@ -255,6 +257,15 @@ Ten modu³ oferuje autoryzacjê u¿ytkownika "anonimowego" podobnie do
 anonimowych serwerów FTP (u¿ytkownik "anonymous" oraz has³o w postaci
 adresu pocztowego u¿ytkownika).
 
+%package mod_auth_ldap
+Summary:	Apache module with LDAP user access authentication
+Summary(pl):	Modu³ Apache'a oferuj±cy autoryzacjê u¿ytkownika LDAP
+Group:		Networking/Daemons
+Requires:	%{name} = %{version}
+
+%description mod_auth_ldap
+Apache module with LDAP user access authentication
+
 %package mod_auth_dbm
 Summary:	Apache module with user authentication which uses DBM files
 Summary(pl):	Modu³ Apache'a z mechanizmem identyfikacji korzystaj±cym z plików DBM
@@ -418,6 +429,14 @@ and directives in the configuration files.
 %description mod_info -l pl
 Modu³ udostêpniaj±cy informacje o konfiguracji serwera,
 zainstalowanych modu³ach itp.
+
+%package mod_ldap
+Summary:	Apache module to use LDAP connections
+Group:		Networking/Daemons
+Requires:	%{name} = %{version}
+
+%description mod_ldap
+Apache module to use LDAP connections
 
 %package mod_proxy
 Summary:	Apache module with Web proxy
@@ -617,6 +636,8 @@ fi
 	--enable-optional-hook-import \
 	--enable-optional-fn-import \
 	--enable-optional-fn-export \
+	%{!?_without_ldap:--enable-ldap} \
+	%{!?_without_ldap:--enable-auth-ldap} \
 	--enable-dav \
 	--enable-info \
 	--enable-suexec \
@@ -695,6 +716,7 @@ install %{SOURCE12} $CFG/40_mod_ssl.conf
 install %{SOURCE13} $CFG/45_mod_dav.conf
 install %{SOURCE14} $CFG/59_mod_dir.conf
 
+echo "LoadModule ldap_module       %{_libexecdir}/mod_ldap.so" > $CFG/49_mod_ldap.conf
 echo "LoadModule actions_module       %{_libexecdir}/mod_actions.so" > $CFG/50_mod_actions.conf
 echo "LoadModule auth_module          %{_libexecdir}/mod_auth.so" > $CFG/51_mod_auth.conf
 echo "LoadModule auth_anon_module     %{_libexecdir}/mod_auth_anon.so" > $CFG/52_mod_auth_anon.conf
@@ -706,6 +728,7 @@ LoadModule disk_cache_module    %{_libexecdir}/mod_disk_cache.so" > $CFG/55_mod_
 echo "LoadModule cgid_module          %{_libexecdir}/mod_cgid.so" > $CFG/56_mod_cgid.conf
 echo "LoadModule charset_lite_module  %{_libexecdir}/mod_charset_lite.so" > $CFG/57_mod_charset_lite.conf
 echo "LoadModule deflate_module       %{_libexecdir}/mod_deflate.so" > $CFG/58_mod_deflate.conf
+echo "LoadModule auth_ldap_module     %{_libexecdir}/mod_auth_ldap.so" > $CFG/59_mod_auth_ldap.conf
 echo "LoadModule expires_module       %{_libexecdir}/mod_expires.so" > $CFG/60_mod_expires.conf
 echo "LoadModule file_cache_module    %{_libexecdir}/mod_file_cache.so" > $CFG/61_mod_file_cache.conf
 echo "LoadModule headers_module       %{_libexecdir}/mod_headers.so" > $CFG/62_mod_headers.conf
@@ -1238,6 +1261,22 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_auth_anon.conf
 %attr(755,root,root) %{_libexecdir}/mod_auth_anon.so
 %{_datadir}/manual/mod/mod_auth_anon.html.en
+
+%if %{!?_without_ldap:1}%{?_without_ldap:0}
+%files mod_auth_ldap
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_auth_ldap.conf
+%attr(755,root,root) %{_libexecdir}/mod_auth_ldap.so
+%{_datadir}/manual/mod/mod_auth_ldap.html.en
+%endif
+
+%if %{!?_without_ldap:1}%{?_without_ldap:0}
+%files mod_ldap
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_ldap.conf
+%attr(755,root,root) %{_libexecdir}/mod_ldap.so
+%{_datadir}/manual/mod/mod_ldap.html.en
+%endif
 
 %files mod_auth_dbm
 %defattr(644,root,root,755)
