@@ -4719,7 +4719,15 @@ diff -Nur apache_1.3.28.orig/src/support/logresolve.c apache_1.3.28/src/support/
      dcfg = ap_get_module_config(r->per_dir_config, &usertrack_module);
 --- apache_1.3.31/src/modules/standard/mod_rewrite.c.orig	Wed May 12 14:57:09 2004
 +++ apache_1.3.31/src/modules/standard/mod_rewrite.c	Wed May 12 15:40:04 2004
-@@ -3651,8 +3651,19 @@
+@@ -48,6 +48,7 @@
+ 
+ 
+ #include "mod_rewrite.h"
++#include "sa_len.h"
+ 
+ #ifndef NO_WRITEV
+ #ifndef NETWARE
+@@ -3651,8 +3652,19 @@
          result = r->connection->remote_ip;
      }
      else if (strcasecmp(var, "REMOTE_PORT") == 0) {
