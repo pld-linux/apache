@@ -641,24 +641,17 @@ install -d $RPM_BUILD_ROOT%{_var}/log/{httpd,archiv/httpd}
 install -d $RPM_BUILD_ROOT%{_var}/{run,cache}/apache
 
 %{__make} install DESTDIR=$RPM_BUILD_ROOT \
+	installbuilddir=%{_sysconfdir}/build \
 	prefix=%{_sysconfdir}/httpd \
-	bindir=$RPM_BUILD_ROOT%{_bindir} \
-	sbindir=$RPM_BUILD_ROOT%{_sbindir} \
-	installbuilddir=$RPM_BUILD_ROOT%{_sysconfdir}/build \
-	libexecdir=$RPM_BUILD_ROOT%{_libdir}/%{name} \
-	mandir=$RPM_BUILD_ROOT%{_mandir} \
-	sysconfdir=$RPM_BUILD_ROOT%{_sysconfdir} \
-	datadir=$RPM_BUILD_ROOT%{_datadir} \
-	iconsdir=$RPM_BUILD_ROOT%{_datadir}/icons \
-	errordir=$RPM_BUILD_ROOT%{_datadir}/error \
-	htdocsdir=$RPM_BUILD_ROOT%{_datadir}/html \
-	manualdir=$RPM_BUILD_ROOT%{_datadir}/manual \
-	cgidir=$RPM_BUILD_ROOT%{_datadir}/cgi-bin \
-	includedir=$RPM_BUILD_ROOT%{_includedir} \
-	localstatedir=$RPM_BUILD_ROOT%{_localstatedir} \
-	runtimedir=$RPM_BUILD_ROOT%{_var}/run \
-	logdir=$RPM_BUILD_ROOT%{_var}/log/httpd \
-	proxycachedir=$RPM_BUILD_ROOT%{_var}/cache/httpd
+	libexecdir=%{_libdir}/%{name} \
+	iconsdir=%{_datadir}/icons \
+	errordir=%{_datadir}/error \
+	htdocsdir=%{_datadir}/html \
+	manualdir=%{_datadir}/manual \
+	cgidir=%{_datadir}/cgi-bin \
+	runtimedir=%{_var}/run \
+	logdir=%{_var}/log/httpd \
+	proxycachedir=%{_var}/cache/httpd
 
 rm -f $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
@@ -675,7 +668,7 @@ install %{SOURCE4} $RPM_BUILD_ROOT/etc/sysconfig/apache
 
 touch $RPM_BUILD_ROOT/var/log/httpd/{access,error,agent,referer,suexec}_log
 
-%if %{?_without_ssl:1}%{!?_without_ssl:0}
+%if %{?_without_ssl:0}%{!?_without_ssl:1}
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/ssl
 install %{SOURCE20} $RPM_BUILD_ROOT%{_sysconfdir}/ssl/server.crt
 install %{SOURCE21} $RPM_BUILD_ROOT%{_sysconfdir}/ssl/server.key
@@ -712,8 +705,6 @@ echo "LoadModule usertrack_module     %{_libexecdir}/mod_usertrack.so" > $CFG/65
 echo "LoadModule unique_id_module     %{_libexecdir}/mod_unique_id.so" > $CFG/66_mod_unique_id.conf
 
 ln -sf index.html.en $RPM_BUILD_ROOT%{_datadir}/html/index.html
-
-gzip -9nf ABOUT_APACHE CHANGES README ROADMAP
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -1089,7 +1080,7 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc *.gz
+%doc ABOUT_APACHE CHANGES README ROADMAP
 %doc docs/conf/mime.types
 
 %attr(754,root,root) /etc/rc.d/init.d/httpd
