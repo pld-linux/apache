@@ -11,8 +11,8 @@ Summary(pl):	Serwer WWW (World Wide Web)
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	1.3.14
-Release:	4
-License:	BSD-like
+Release:	9
+License:	Apache Group License
 Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
@@ -38,6 +38,9 @@ Patch9:		%{name}-apxs_force_rm_cp.patch
 Patch10:	%{name}-db3.patch
 Patch11:	%{name}-lookup_map_ldap.patch
 Patch12:	%{name}-man.patch
+Patch13:	%{name}-fpic.patch
+Patch14:	%{name}-buff.patch
+Patch15:	%{name}-mkstemp.patch
 Provides:	httpd
 Provides:	webserver
 Prereq:		/sbin/chkconfig
@@ -48,7 +51,7 @@ Prereq:		sh-utils
 BuildRequires:  db3-devel
 BuildRequires:	mm-devel >= 1.1.3
 %{?mod_rewrite_ldap:BuildRequires: openldap-devel}
-Requires:	rc-scripts
+Prereq:		rc-scripts
 Requires:	mailcap
 Requires:	/etc/mime.types
 URL:		http://www.apache.org/
@@ -474,6 +477,9 @@ Requires:	%{name}(EAPI) = %{version}
 %patch10 -p1
 %{?mod_rewrite_ldap:%patch11 -p1}
 %patch12 -p1
+%patch13 -p1
+%patch14 -p1
+%patch15 -p1
 
 %build
 OPTIM="%{?debug:-O0 -g}%{!?debug:$RPM_OPT_FLAGS}" \
