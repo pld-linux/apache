@@ -1,46 +1,123 @@
+<<<<<<< apache.spec
+# TODO:
+# - mod_case_filter
+# - mod_case_filter_in
+# - mod_optional_fn_{export,import}
+# - mod_optional_hook_{export,import}
+# - mod_ext_filter
+# - mod_echo
+# - config examples for mod_*
+# - check if all modules are (de)registered in %%post/%%postun
+# - find smart way to deregister module if its moved from main package to subpackage (maybe test -f ?)
+# - add %%post/%%postun to suexec
+# - --with-suexec-gidmin=500 or =100 ?
+# - --with-suexec-uidmin=500 or =1000 ?
+# - subpackages for MPMs
+# - check if all modules (*.so) are exactly the same for different MPMs
+=======
+>>>>>>> 1.188.2.3
 #
 # Conditional build:
+<<<<<<< apache.spec
+%bcond_without	ssl	# don't build with SSL support
+%bcond_without	ldap	# don't build with LDAP support
+%bcond_without	metuxmpm	# use METUX MPM
+=======
 # mod_rewrite_ldap	- enable ldap map supoort for mod_rewrite (alpha)
 # _without_ipv6		- disable IPv6 support
+>>>>>>> 1.188.2.3
 #
 %include	/usr/lib/rpm/macros.perl
+# this is internal macro, don't change to %%apache_modules_api
+%define		_apache_modules_api 20020903
 Summary:	The most widely used Web server on the Internet
-Summary(cs):	Nejroz¹íøenìj¹í WWW server v Internetu
-Summary(da):	Den mest brugte web-tjener på Internet
-Summary(de):	Der am häufigsten verwendete Web-Server im Internet
-Summary(es):	El servidor web más conocido y usado en Internet
-Summary(fr):	Le serveur Web le plus utilisé sur Internet
-Summary(id):	Web server yang paling banyak digunakan di Internet
-Summary(is):	Vinsælasti vefşjónninn á Netinu
-Summary(it):	Il web server più diffuso su Internet
-Summary(ja):	¥¤¥ó¥¿¡¼¥Í¥Ã¥È¾å¤ÇºÇ¤â°ìÈÌÅª¤Ë»ÈÍÑ¤µ¤ì¤Æ¤¤¤ë Web ¥µ¡¼¥Ğ¡¼
-Summary(no):	Den mest utbredte web-tjeneren på Internett
+Summary(de):	Leading World Wide Web-Server
+Summary(es):	Servidor HTTPD para proveer servicios WWW
+Summary(fr):	Le serveur web le plus utilise sur Internet
 Summary(pl):	Serwer WWW (World Wide Web)
-Summary(pt):	O servidor Web mais largamente utilizado em toda a Internet
 Summary(pt_BR):	Servidor HTTPD para prover serviços WWW
-Summary(ru):	óÁÍÙÊ ĞÏĞÕÌÑÒÎÙÊ Web-Server
-Summary(sk):	Najviac pou¾ívanı Web server na Internete
-Summary(sl):	Najbolj uporabljani spletni stre¾nik interneta
-Summary(sv):	Den mest använda webbservern på Internet
+Summary(ru):	óÁÍÙÊ ĞÏĞÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayıcı
-Summary(uk):	îÁÊĞÏĞÕÌÑÒÎ¦ÛÉÊ Web-Server
-Summary(zh_CN):	Internet ÉÏÓ¦ÓÃ×î¹ã·ºµÄ Web ·şÎñ³ÌĞò¡£
 Name:		apache
+<<<<<<< apache.spec
+Version:	2.0.49
+Release:	3
+=======
 Version:	1.3.24
 Release:	0.2
+>>>>>>> 1.188.2.3
 License:	Apache Group License
 Group:		Networking/Daemons
-URL:		http://www.apache.org/
-Source0:	ftp://ftp.apache.org/dist/%{name}_%{version}.tar.gz
+Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
+# Source0-md5:	275d3d37eed1b070f333d3618f7d1954
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}-icons.tar.gz
+# Source3-md5:	2b085cbc19fd28536dc883f0b864cd83
 Source4:	%{name}.sysconfig
-Source5:	http://www.mif.pg.gda.pl/homepages/ankry/man-PLD/%{name}-non-english-man-pages.tar.bz2
 Source6:	%{name}-httpd.conf
 Source8:	%{name}-mod_vhost_alias.conf
 Source9:	%{name}-mod_status.conf
 Source10:	%{name}-mod_proxy.conf
+<<<<<<< apache.spec
+Source11:	%{name}-mod_info.conf
+Source12:	%{name}-mod_ssl.conf
+Source13:	%{name}-mod_dav.conf
+Source14:	%{name}-mod_dir.conf
+Source15:	%{name}-mod_suexec.conf
+Source16:	%{name}-mod_deflate.conf
+Source20:	%{name}-server.crt
+Source21:	%{name}-server.key
+Patch0:		%{name}-configdir_skip_backups.patch
+Patch1:		%{name}-layout.patch
+Patch2:		%{name}-suexec.patch
+Patch3:		%{name}-nolibs.patch
+Patch4:		%{name}-apr.patch
+# project homepage http://www.metux.de/mpm/en/?patpage=index
+# http://www.sannes.org/metuxmpm/
+Patch5:		httpd-2.0.47-metuxmpm-r7.diff
+Patch6:		httpd-2.0.40-xfsz.patch
+Patch7:		httpd-2.0.45-davetag.patch
+Patch8:		httpd-2.0.45-encode.patch
+Patch9:		httpd-2.0.45-export.patch
+Patch10:	httpd-2.0.46-dav401dest.patch
+Patch11:	httpd-2.0.46-md5dig.patch
+Patch12:	httpd-2.0.46-rolog.patch
+Patch13:	httpd-2.0.46-shmcb.patch
+Patch14:	httpd-2.0.46-sslmutex.patch
+Patch15:	httpd-2.0.47-sslcleanup.patch
+Patch16:	httpd-2.0.48-corelimit.patch
+Patch17:	httpd-2.0.48-debuglog.patch
+Patch18:	httpd-2.0.48-dynlimit.patch
+Patch19:	httpd-2.0.48-fdsetsize.patch
+Patch20:	httpd-2.0.48-sslpphrase.patch
+Patch21:	%{name}-v6only-ENOPROTOOPT.patch
+Patch22:	%{name}-conffile-path.patch
+URL:		http://httpd.apache.org/
+BuildRequires:	automake
+BuildRequires:	db-devel
+BuildRequires:	expat-devel
+BuildRequires:	gdbm-devel >= 1.8.3
+BuildRequires:	libtool >= 1.5
+%{?with_ldap:BuildRequires:	openldap-devel}
+%{?with_ssl:BuildRequires:	openssl-devel >= 0.9.7d}
+%{?with_ssl:BuildRequires:	openssl-tools >= 0.9.7d}
+BuildRequires:	perl-devel >= 5.004
+BuildRequires:	rpm-perlprov >= 4.0.4
+BuildRequires:	zlib-devel
+PreReq:		perl-base
+PreReq:		rc-scripts
+Requires(pre):	/bin/id
+Requires(pre):	/usr/bin/getgid
+Requires(pre):	/usr/sbin/groupadd
+Requires(pre):	/usr/sbin/useradd
+Requires(postun):	/usr/sbin/userdel
+Requires(postun):	/usr/sbin/groupdel
+Requires(post,preun):	/sbin/chkconfig
+Requires(post,postun):	/sbin/ldconfig
+Requires(post):	fileutils
+Requires:	/etc/mime.types
+=======
 Patch0:		%{name}-PLD.patch
 Patch1:		%{name}-suexec.patch
 Patch2:		%{name}-htdocs.patch
@@ -79,36 +156,31 @@ Prereq:		sh-utils
 Prereq:		rc-scripts
 Prereq:		mm
 Prereq:		perl
+>>>>>>> 1.188.2.3
 Requires:	mailcap
-Requires:	/etc/mime.types
 Requires:	psmisc >= 20.1
+Provides:	httpd = %{version}
+Provides:	webserver = %{version}
+Provides:	apache(modules-api) = %{_apache_modules_api}
 Obsoletes:	apache-extra
-Obsoletes:	apache6
 Obsoletes:	apache-doc
+Obsoletes:	apache6
 Obsoletes:	indexhtml
+BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_sysconfdir	/etc/httpd
 %define		_includedir	%{_prefix}/include/apache
-%define		_datadir	/home/httpd
-%define		_libexecdir	%{_prefix}/lib/apache
+%define		_datadir	/home/services/httpd
+%define		_libexecdir	%{_libdir}/apache
 
 %description
 Apache is a powerful, full-featured, efficient and freely-available
 Web server. Apache is also the most popular Web server on the
 Internet.
 
-%description -l cs
-Apache je vıkonnı plnì funkèní efektivní a volnì dostupnı WWW server.
-Je to nejpopulárnìj¹í WWW server v Internetu.
-
-%description -l da
-Apache er en stærk, funktionsrig, effektiv og frit tilgængelig
-web-tjener. Apache er også den mest populære web-tjener på Internet.
-
 %description -l de
-Apache ist ein leistungsfähiger, frei verfügbarer und effizienter
-Web-Server mit umfassenden Funktionen. Apache ist zudem der populärste
-Web-Server im Internet.
+Apache ist ein voll funktionsfähiger Web-Server, der kostenlos
+erhältlich und weit verbreitet ist.
 
 %description -l es
 El servidor web Apache es el mejor servidor gratuito disponible en el
@@ -122,37 +194,9 @@ dinámica de tipo, y otras más.
 Apache est un serveur Web puissant, efficace, gratuit et complet.
 Apache est aussi le serveur Web le plus populaire sur Internet.
 
-%description -l id
-Apache adalah Web server yang powerful, efisien, kaya akan feature,
-dan tersedia dengan free. Apache juga merupakan Web server yang paling
-populer di Internet.
-
-%description -l is
-Apache er mjög öflugur og háşróağur vefşjónn sem er ókeypis. Apache er
-einnig mest notaği vefşjónninn á Internetinu.
-
-%description -l it
-Apache è un Web server potente, dotato di tutte le caratteristiche,
-efficiente e gratuito. Ed è anche il web server più diffuso su
-Internet.
-
-%description -l ja
-Apache ¤Ï¶¯ÎÏ¤Ç½¼¼Â¤·¤¿µ¡Ç½¤ò»ı¤ÄÌµ½ş¤Î Web ¥µ¡¼¥Ğ¡¼
-¤Ç¤¹¡£¤Ş¤¿¡¢apache ¤Ï¥¤¥ó¥¿¡¼¥Í¥Ã¥È¾å¤ÇºÇ¤â°ìÈÌÅª¤Ë»ÈÍÑ ¤µ¤ì¤Æ¤¤¤ë Web
-¥µ¡¼¥Ğ¡¼¤Ç¤¹¡£
-
-%description -l no
-Apache er en kraftig, funksjonsrik, effektiv og fritt tilgjengelig
-web-tjener. Apache er også den mest populære web-tjeneren på Internet.
-
 %description -l pl
 Apache jest serwerem WWW (World Wide Web). Instaluj±c ten pakiet
 bêdziesz móg³ prezentowaæ w³asne strony WWW w sieci internet.
-
-%description -l pt
-O Apache é um servidor de Web poderoso, cheio de potencialidades,
-eficiente e gratuito. O Apache é também o servidor Web mais conhecido
-na Internet.
 
 %description -l pt_BR
 O servidor web Apache é o melhor servidor gratuito disponível no mundo
@@ -163,36 +207,18 @@ cache, e oferece características como monitor de status, conversão
 dinâmica de tipo, e mais.
 
 %description -l ru
-Apache - ÜÔÏ ÍÏİÎÙÊ, ĞÏÌÎÏÆÕÎËÃÉÏÎÁÌØÎÙÊ, ÜÆÆÅËÔÉ×ÎÙÊ, Ó×ÏÂÏÄÎÏ
-ÒÁÓĞÒÏÓÔÒÁÎÑÅÍÙÊ É ÓÁÍÙÊ ĞÏĞÕÌÑÒÎÙÊ × Internet WWW-ÓÅÒ×ÅÒ.
-
-%description -l sk
-Apache je vıkonnı, efektívny a voµne dostupnı Web server, bohatı na
-funkcie. Apache je tie¾ najpopulárnej¹ím Web serverom na Internete.
-
-%description -l sv
-Apache är en kraftfull, finessrik, effektiv och fritt tillgänglig
-webbserver. Apache är också den populäraste webbservern på Internet.
+Apache - ÍÏİÎÙÊ, ÆÕÎËÃÉÏÎÁÌØÎÙÊ, ×ÙÓÏËÏĞÒÏÉÚ×ÏÄÉÔÅÌØÎÙÊ É Ó×ÏÂÏÄÎÏ
+ÒÁÓĞÒÏÓÔÒÁÎÑÅÍÙÊ ×ÅÂ-ÓÅÒ×ÅÒ.
 
 %description -l tr
 Apache serbest dağıtılan ve çok kullanılan yetenekli bir web
 sunucusudur.
 
-%description -l uk
-
-%description -l zh_CN
-Apache ÊÇ¹¦ÄÜÇ¿¾¢ÆëÈ«¡¢¸ßĞ§ÇÒÃâ·ÑÌá¹©µÄ Web ·şÎñ³ÌĞò£¬ Í¬Ê±Ò²ÊÇ
-Internet ÉÏ×îÁ÷ĞĞµÄ Web ·şÎñ³ÌĞò¡£
-
-Èç¹ûÄúĞèÒª Web ·şÎñ³ÌĞò£¬Çë°²×° apache Èí¼ş°ü¡£
-
 %package suexec
 Summary:	Apache suexec wrapper
-Summary(pl):	Suexec wrapper do serwera www Apache
-Summary(ru):	Apache suEXEC CGI wrapper
-Summary(uk):	Apache suEXEC CGI wrapper
+Summary(pl):	Wrapper suexec do serwera WWW Apache
 Group:		Development/Tools
-Requires:	%{name}(EAPI) = %{version}
+Requires:	%{name} = %{version}-%{release}
 
 %description suexec
 The suEXEC feature provides Apache users the ability to run CGI and
@@ -205,113 +231,79 @@ SuEXEC umo¿liwia serwerowi Apache uruchamianie programów CGI i SSI z
 innym UID ni¿ wywo³uj±cy je serwer. Normalnie programy CGI i SSI s±
 wykonywane jako taki sam u¿ytkownik jak serwer WWW.
 
-%description suexec -l ru
-ğÁËÅÔ suEXEC ĞÏÚ×ÏÌÑÅÔ ÚÁĞÕÓËÁÔØ CGI-ĞÒÏÇÒÁÍÍÙ ĞÏÄ user-id, ÏÔÌÉŞÎÙÍÉ
-ÏÔ ÔÏÇÏ, ĞÏÄ ËÏÔÏÒÙÍ ÒÁÂÏÔÁÅÔ ×ÙÚÙ×ÁÀİÉÊ ÉÈ web-ÓÅÒ×ÅÒ. âÕÄÕŞÉ
-ĞÒÁ×ÉÌØÎÏ ÉÓĞÏÌØÚÏ×ÁÎÎÙÍ, ÜÔÏÔ ĞÁËÅÔ ĞÏÚ×ÏÌÑÅÔ ÚÁÍÅÔÎÏ ÓÎÉÚÉÔØ ÒÉÓË
-ÎÁÒÕÛÅÎÉÑ ÓÉÓÔÅÍÎÏÊ ÂÅÚÏĞÁÓÎÏÓÔÉ, ×ÙÚ×ÁÎÎÙÊ ÒÁÚÒÅÛÅÎÉÅÍ ÚÁĞÕÓËÁ
-ĞÏÌØÚÏ×ÁÔÅÌÑÍ CGI-ĞÒÏÇÒÁÍÍ. ÷ÍÅÓÔÅ Ó ÔÅÍ, ÂÕÄÕŞÉ ÎÅĞÒÁ×ÉÌØÎÏ
-ÓËÏÎÆÉÇÕÒÉÒÏ×ÁÎÎÙÍ, ÜÔÏÔ ĞÁËÅÔ ÍÏÖÅÔ ÒÁÚÒÕÛÉÔØ ×ÁÛÕ ÓÉÓÔÅÍÕ, ÓÖÅŞØ ×ÁÛ
-ÄÏÍ É ÕËÒÁÓÔØ ÄÅÎØÇÉ ÉÚ ×ÁÛÅÇÏ ĞÅÎÓÉÏÎÎÏÇÏ ÆÏÎÄÁ :)). åÓÌÉ ×Ù ÎÅ
-ÉÍÅÅÔÅ ÏĞÙÔÁ ÒÁÂÏÔÙ Ó setuid root ĞÒÏÇÒÁÍÍÁÍÉ É ĞÒÏÂÌÅÍÁÍÉ ÓÉÓÔÅÍÎÏÊ
-ÂÅÚÏĞÁÓÎÏÓÔÉ, ĞÏÒÏÖÄÅÎÎÙÍÉ ÉÈ ĞÒÉÍÅÎÅÎÉÅÍ, ÎÁÓÔÏÑÔÅÌØÎÏ ÒÅËÏÍÅÎÄÕÅÍ ÎÅ
-ÉÓĞÏÌØÚÏ×ÁÔØ ÜÔÏÇÏ ĞÁËÅÔÁ...
+%package index
+Summary:	Apache index.html* files
+Summary(pl):	Pliki Apache index.html*
+Group:		Documentation
+Requires:	%{name} = %{version}-%{release}
 
-%description suexec -l uk
-ğÁËÅÔ suEXEC ÄÏÚ×ÏÌÑ¤ ÚÁĞÕÓËÁÔÉ CGI-ĞÒÏÇÒÁÍÉ Ğ¦Ä user-id, ×¦ÄÍ¦ÎÎÉÍ
-×¦Ä ÔÏÇÏ, Ğ¦Ä ÑËÉÍ ĞÒÁÃÀ¤ ÓÅÒ×ÅÒ. ğÒÉ ĞÒÁ×ÉÌØÎÏÍÕ ×ÉËÏÒÉÓÔÁÎÎ¦, ÃÅÊ
-ĞÁËÅÔ ÄÏÚ×ÏÌÑ¤ ĞÏÍ¦ÔÎÏ ÚÎÉÚÉÔÉ ÒÉÚÉË ĞÏÒÕÛÅÎÎÑ ÓÉÓÔÅÍÎÏ§ ÂÅÚĞÅËÉ,
-×ÉËÌÉËÁÎÉÊ ÄÏÚ×ÏÌÏÍ ÚÁĞÕÓËÕ ËÏÒÉÓÔÕ×ÁŞÁÍÉ CGI-ĞÒÏÇÒÁÍ. òÁÚÏÍ Ú ÔÉÍ,
-ĞÒÉ ÎÅ×¦ÒÎÏÍÕ ËÏÎÆ¦ÇÕÒÕ×ÁÎÎ¦, ÃÅÊ ĞÁËÅÔ ÍÏÖÅ ÚÒÕÊÎÕ×ÁÔÉ ×ÁÛÉ ÓÉÓÔÅÍÕ,
-ÓĞÁÌÉÔÉ ×ÁÛ Ä¦Í ¦ ×ËÒÁÓÔÉ ÇÒÏÛ¦ Ú ×ÁÛÏÇÏ ĞÅÎÓ¦ÊÎÏÇÏ ÆÏÎÄÕ :)). ñËİÏ ×É
-ÎÅ ÍÁ¤ÔÅ ÄÏÓ×¦ÄÕ ÒÏÂÏÔÉ Ú setuid root ĞÒÏÇÒÁÍÁÍÉ ÔÁ ĞÒÏÂÌÅÍÁÍÉ
-ÓÉÓÔÅÍÎÏ§ ÂÅÚĞÅËÉ, ËÏÔÒ¦ ĞÏÒÏÄÖÅÎ¦ ×ÉËÏÒÉÓÔÁÎÎÑÍ ÔÁËÉÈ ĞÒÏÇÒÁÍ,
-ÎÁÓÔ¦ÊÌÉ×Ï ÒÁÄÉÍÏ ÎÅ ×ÉËÏÒÉÓÔÏ×Õ×ÁÔÉ ÃØÏÇÏ ĞÁËÅÔÕ...
+%description index
+Apache index.html* files.
+
+%description index -l pl
+Pliki Apache index.html*.
+
+%package doc
+Summary:	Apache manual
+Summary(pl):	Podrêcznik Apache'a
+Group:		Documentation
+Requires:	%{name} = %{version}-%{release}
+
+%description doc
+Apache manual.
+
+%description doc -l pl
+Podrêcznik Apache'a.
 
 %package devel
 Summary:	Module development tools for the Apache web server
-Summary(cs):	Hlavièkové soubory pro Apache Web server
-Summary(da):	Header-filer for Apache webserveren
-Summary(de):	Include-Dateien für den Apache Web-Server
 Summary(es):	Archivos de inclusión del Apache para desarrollo de módulos
-Summary(fr):	Fichiers à inclure pour le serveur Web Apache
-Summary(id):	File header untuk Apache Web server
-Summary(is):	Hausaskrár meğ Apache vefşjóninum
-Summary(it):	File include per il web server Apache
-Summary(ja):	Apache Web ¥µ¡¼¥Ğ¡¼ÍÑ¤Î³«È¯¥Ä¡¼¥ë
-Summary(no):	Headerfiler for webtjeneren Apache
-Summary(pl):	Pliki nag³ówkowe do tworzenai modu³ów rozszerzeñ do serwera www Apache
-Summary(pt):	Ficheiros de inclusão para o servidor Web Apache
+Summary(fr):	Les outils de developpement de modules pour le serveur web Apache
+Summary(pl):	Pliki nag³ówkowe do tworzenia modu³ów rozszerzeñ do serwera WWW Apache
 Summary(pt_BR):	Arquivos de inclusão do Apache para desenvolvimento de módulos
-Summary(ru):	æÁÊÌÙ ÚÁÇÏÌÏ×ËÏ× ÄÌÑ web server'Á Apache
-Summary(sk):	Hlavièkové súbory pre Apache Web server
-Summary(sl):	Glave za spletni stre¾nik Apache
-Summary(sv):	Huvudfiler för webbservern Apache
-Summary(uk):	úÁÓÏÂÉ ÓÔ×ÏÒÅÎÎÑ ÍÏÄÕÌ¦× ÄÌÑ web server'Õ Apache
-Summary(zh_CN):	ÓÃÓÚ Apache Web ·şÎñ³ÌĞòµÄ¿ª·¢¹¤¾ß¡£
+Summary(ru):	óÒÅÄÓÔ×Á ÒÁÚÒÁÂÏÔËÉ ÍÏÄÕÌÅÊ ÄÌÑ ×ÅÂ-ÓÅÒ×ÅÒÁ Apache
 Group:		Networking/Utilities
+<<<<<<< apache.spec
+Requires:	%{name} = %{version}-%{release}
+Requires:	libtool
+Obsoletes:	apache-static
+=======
 Requires:	%{name}(EAPI) = %{version}
 Provides:	%{name}(EAPI)-devel = %{version}
+>>>>>>> 1.188.2.3
 
 %description devel
 The apache-devel package contains header files for Apache.
 
-%description devel -l cs
-Balíèek apache-devel obsahuje hlavièkové soubory pro Apache.
-
-%description devel -l da
-Apache-devel pakken indeholder headerfiler for Apache.
-
-%description devel -l de
-Das Paket apache-devel enthält Header-Dateien für Apache.
-
 %description devel -l es
-Este paquete contiene los archivos de inclusión para el Apache.
+Este paquete contiene los archivos de inclusión para el Apache, bien
+como el utilitario apxs para la construcción de objetos compartidos
+dinámicos (DSOs). Ha ce falta instalar este paquete si deseas compilar
+o desarrollar módulos adicionales para Apache.
 
 %description devel -l fr
 Le package apache-devel contient le code source pour le serveur Web
-Apache.
-
-%description devel -l id
-Package apache-devel berisi source code dari Apache Web server.
-
-%description devel -l is
-Apache-devel pakkinn inniheldur frumkóğa Apache vefşjónsins.
-
-%description devel -l it
-Il pacchetto apache-devel contiene i file header per Apache.
-
-%description devel -l no
-Apache-devel pakken inneholder headerfiler for Apache.
+Apache et le binaire APXS dont vous aurez besoin pour construire des
+Objets Dynamiques Partages (DSOs) pour Apache.
 
 %description devel -l pl
-Pliki nag³ówkowe dla serwera WWW Apache.
-
-%description devel -l pt
-O pacote apache-devel contém outros ficheiros para o Apache.
-
-%description devel -l pt_BR
-Este pacote contem os arquivos de inclusão para o Apache.
+Pliki nag³ówkowe i inne zasoby niezbêdne przy budowaniu modu³ów DSO
+(Dynamic Shared Objects) dla Apache.
 
 %description devel -l ru
-ğÁËÅÔ apache-devel ÓÏÄÅÒÖÉÔ ÈÅÄÅÒÙ ÄÌÑ Web Server'Á.
+óÒÅÄÓÔ×Á ÒÁÚÒÁÂÏÔËÉ ÍÏÄÕÌÅÊ ÄÌÑ ×ÅÂ-ÓÅÒ×ÅÒÁ Apache.
 
-%description devel -l sk
-Balík apache-devel obsahuje zdrojovı kód Apache Web servera.
-
-%description devel -l sv
-Paketet apache-devel innehåller huvudfilerna för Apache.
-
-%description devel -l uk
-ğÁËÅÔ apache-devel Í¦ÓÔÉÔØ ÈÅÄÅÒÉ ÄÌÑ Web Server'Á.
+%description devel -l pt_BR
+Este pacote contem os arquivos de inclusão para o Apache, bem como o
+utilitário apxs para a construção de objetos compartilhados dinâmicos
+(DSOs). Este pacote precisa ser instalado se você deseja compilar ou
+desenvolver módulos adicionais para o Apache.
 
 %package mod_actions
 Summary:	Apache module for run CGI whenever a file of a certain type is requested
-Summary(pl):	Modu³ dla apache do uruchamiania skryptów cgi
+Summary(pl):	Modu³ Apache'a do uruchamiania skryptów CGI
 Group:		Networking/Daemons
-Prereq:		%{_sbindir}/apxs
-Prereq:		perl
-Requires:	%{name}(EAPI) = %{version}
+Requires:	%{name} = %{version}-%{release}
 
 %description mod_actions
 This package contains mod_actions module. This module lets you run CGI
@@ -324,27 +316,23 @@ Ten modu³ pozwala na uruchamianie skryptów w momencie gdy nadchodzi
 
 %package mod_auth
 Summary:	Apache module with user authentication using textual files
-Summary(pl):	Modu³ autentykacji u¿ytkownika przy u¿yciu plików tekstowych dla Apache
+Summary(pl):	Modu³ Apache'a identyfikuj±cy u¿ytkowników na podstawie plików tekstowych
 Group:		Networking/Daemons
-Prereq:		%{_sbindir}/apxs
-Prereq:		perl
-Requires:	%{name}(EAPI) = %{version}
+Requires:	%{name} = %{version}-%{release}
 
 %description mod_auth
 This package contains mod_auth module. It provides for user
 authentication using textual files.
 
 %description mod_auth -l pl
-Ten pakiet zawiera modu³ mod_auth. S³u¿y on do autentykacji przy
-u¿yciu plików tekstowych.
+Ten pakiet zawiera modu³ mod_auth. S³u¿y on do sprawdzania to¿samo¶ci
+u¿ytkowników na podstawie plików tekstowych.
 
 %package mod_auth_anon
 Summary:	Apache module with "anonymous" user access authentication
-Summary(pl):	Modu³ apache oferuj±cy anonimow± autoryzacjê u¿ytkownia
+Summary(pl):	Modu³ Apache'a oferuj±cy autoryzacjê u¿ytkownika "anonimowego"
 Group:		Networking/Daemons
-Prereq:		%{_sbindir}/apxs
-Prereq:		perl
-Requires:	%{name}(EAPI) = %{version}
+Requires:	%{name} = %{version}-%{release}
 
 %description mod_auth_anon
 This package contains mod_auth_anon module. It allows "anonymous" user
@@ -359,36 +347,44 @@ magic-cookies and funny URL pre/postfixes, it is completely browser
 independent and it allows users to share URLs.
 
 %description mod_auth_anon -l pl
-Ten modu³ oferuje anonimow± autoryzacjê u¿ytkownia podobnie do
-anonimowych serwerów ftp (u¿ytkownik ,,anonymous'' oraz has³o w
-postaci adresu pocztowego u¿ytkownika).
+Ten modu³ oferuje autoryzacjê u¿ytkownika "anonimowego" podobnie do
+anonimowych serwerów FTP (u¿ytkownik "anonymous" oraz has³o w postaci
+adresu pocztowego u¿ytkownika).
 
-%package mod_auth_db
-Summary:	Apache module with user authentication which uses Berkeley DB files
-Summary(pl):	Modu³ apache z mechanizmem autentykacji u¿ywaj±cym plików Berkeley DB
+%package mod_auth_ldap
+Summary:	Apache module with LDAP user access authentication
+Summary(pl):	Modu³ Apache'a oferuj±cy autoryzacjê u¿ytkowników poprzez LDAP
 Group:		Networking/Daemons
-Prereq:		%{_sbindir}/apxs
-Prereq:		perl
-Requires:	%{name}(EAPI) = %{version}
+Requires:	%{name} = %{version}-%{release}
 
-%description mod_auth_db
-This package contains mod_auth_db module. It provides for user
-authentication using Berkeley DB files. It is an alternative to DBM
-files for those systems which support DB and not DBM. It is only
-available in Apache 1.1 and later.
+%description mod_auth_ldap
+Apache module with LDAP user access authentication.
 
-%description mod_auth_db -l pl
-Ten pakiet zawiera modu³ mod_auth_db. Modu³ ten s³u¿y do autentykacji
-ale jako plików danych u¿ywa Berkeley DB.
+%description mod_auth_ldap -l pl
+Modu³ Apache'a oferuj±cy autoryzacjê u¿ytkowników poprzez LDAP
+
+%package mod_auth_dbm
+Summary:	Apache module with user authentication which uses DBM files
+Summary(pl):	Modu³ Apache'a z mechanizmem identyfikacji korzystaj±cym z plików DBM
+Group:		Networking/Daemons
+Obsoletes:	apache-mod_auth_db
+Requires:	%{name} = %{version}-%{release}
+
+%description mod_auth_dbm
+This module provides for HTTP Basic Authentication, where the
+usernames and passwords are stored in DBM type database files. It is
+an alternative to the plain text password files provided by mod_auth.
+
+%description mod_auth_dbm -l pl
+Ten modu³ udostêpnia Prost± Autoryzacjê HTTP, gdzie u¿ytkownicy oraz
+ich has³a s± trzymane w plikach bazy typu DBM.
 
 %package mod_auth_digest
 Summary:	Apache user authentication module using MD5 Digest Authentication
-Summary(pl):	Modu³ apache do autoryzacji MD5
+Summary(pl):	Modu³ Apache'a do autoryzacji MD5
 Group:		Networking/Daemons
-Prereq:		%{_sbindir}/apxs
-Prereq:		perl
-Requires:	%{name}(EAPI) = %{version}
-Obsoletes:	%{name}-mod_digest
+Obsoletes:	apache-mod_digest
+Requires:	%{name} = %{version}-%{release}
 
 %description mod_auth_digest
 This package contains mod_digest module. It provides user
@@ -398,66 +394,100 @@ authentication using MD5 Digest Authentication.
 Modu³ ten dostarcza metodê autoryzacji bazuj±c± na MD5 Digest
 Authentication.
 
-%package mod_define
-Summary:	Apache module - authentication variables for arbitrary directives
-Summary(pl):	Modu³ apache do definiowania zmiennych
+%package mod_cache
+Summary:	Content cache keyed to URIs
+Summary(pl):	Pamiêæ podrêczna wg klucza URI
 Group:		Networking/Daemons
-Prereq:		%{_sbindir}/apxs
-Prereq:		perl
-Requires:	%{name}(EAPI) = %{version}
+Requires:	%{name} = %{version}-%{release}
 
-%description mod_define
-It provides the definition variables for arbitrary directives, i.e.
-variables which can be expanded on any(!) directive line.
+%description mod_cache
+mod_cache implements an RFC 2616 compliant HTTP content cache that can
+be used to cache either local or proxied content. Two storage
+management modules are included in the base Apache distribution:
+mod_disk_cache implements a disk based storage manager (generally used
+for proxy caching) and mod_mem_cache implements an in-memory based
+storage manager (primarily useful for caching local content).
 
-%description mod_define -l pl
-Modu³ ten umo¿liwia definicjê zmiennych i dyrektyw.
+%description mod_cache -l pl
+Implementacja zgodnej z RFC 2616 pamiêci podrêcznej, która mo¿e byæ
+u¿ywana do zapamiêtywania zawarto¶ci lokalnej lub dostêpnej przez
+proxy. Do³±czono dwa modu³y pozwalaj±ce magazynowaæ dane w pamiêci
+(g³ównie u¿yteczne przy cacheowaniu lokalnej zawarto¶ci) oraz na dysku
+(u¿ywane do cacheowania proxy).
 
-%package mod_digest
-Summary:	Older version of apache user authentication module using MD5 Digest Authentication
-Summary(pl):	Starsza wersja modu³u apache do autoryzacji MD5
+%package mod_cgid
+Summary:	Execution of CGI scripts using an external CGI daemon
+Summary(pl):	Uruchamianie zewnêtrznych skryptów CGI za pomoc± daemona CGI
 Group:		Networking/Daemons
-Prereq:		%{_sbindir}/apxs
-Prereq:		perl
-Requires:	%{name}(EAPI) = %{version}
+Requires:	%{name} = %{version}-%{release}
 
-%description mod_digest
-This package contains mod_digest module. It provides user
-authentication using MD5 Digest Authentication. It implements an older
-version of the MD5 Digest Authentication specification which will
-probably not work with modern browsers. Please take a look at
-mod_auth_digest which implements the most recent version of the
-standard.
+%description mod_cgid
+Execution of CGI scripts using an external CGI daemon.
 
-%description mod_digest -l pl
-Modu³ ten dostarcza metodê autoryzacji bazuj±c± na MD5 Digest
-Authentication. Implementuje on jedynie starsz± wersjê specyfikacji
-autentykacji MD5, i mo¿e nie dzia³aæ z nowoczesnymi przegl±darkami.
-Sprawd¼ mod_auth_digest je¶li potrzebujesz implementacji najnowszej
-wersji standardu.
+%description mod_cgid -l pl
+Uruchamianie zewnêtrznych skryptów CGI za pomoc± demona CGI.
+
+%package mod_charset_lite
+Summary:	Specify character set translation or recoding
+Summary(pl):	Translacja lub przekodowywanie znaków
+Group:		Networking/Daemons
+Requires:	%{name} = %{version}-%{release}
+
+%description mod_charset_lite
+Specify character set translation or recoding.
+
+%description mod_charset_lite -l pl
+Translacja lub przekodowywanie znaków.
+
+%package mod_dav
+Summary:	Apache module - Distributed Authoring and Versioning
+Summary(pl):	Modu³ Apache'a - rozproszone autorstwo i wersjonowanie
+Group:		Networking/Daemons
+Requires:	%{name} = %{version}-%{release}
+
+%description mod_dav
+This module provides class 1 and class 2 WebDAV ('Web-based
+Distributed Authoring and Versioning') functionality for Apache. This
+extension to the HTTP protocol allows creating, moving, copying, and
+deleting resources and collections on a remote web server.
+
+%description mod_dav -l pl
+Modu³ udostêpnia klasê 1 oraz klasê 2 WebDAV (Bazuj±cego na WWW
+rozproszonego autorstwa i wersjonowania). To rozszerzenie HTTP pozwala
+na tworzenie, przesuwanie, kopiowanie oraz kasowanie zasobów na
+zdalnym serwerze WWW.
+
+%package mod_deflate
+Summary:	Apache module: Compress content before it is delivered to the client
+Summary(pl):	Modu³ Apache'a kompresuj±cy dane przed przes³aniem ich do klienta
+Group:		Networking/Daemons
+Requires:	%{name} = %{version}-%{release}
+
+%description mod_deflate
+Compress content before it is delivered to the client.
+
+%description mod_deflate -l pl
+Modu³ kompresuj±cy dane przed przes³aniem ich do klienta.
 
 %package mod_dir
 Summary:	Apache module for "trailing slash" redirects and serving directory index files
-Summary(pl):	Modu³ oferuj±cy przekierowania i serwowanie indeksu katalogu.
+Summary(pl):	Modu³ Apache'a oferuj±cy przekierowania i udostêpnianie informacji o zawarto¶ci katalogu
 Group:		Networking/Daemons
-Prereq:		%{_sbindir}/apxs
-Prereq:		perl
-Requires:	%{name}(EAPI) = %{version}
+Requires:	%{name} = %{version}-%{release}
 
 %description mod_dir
 This package contains mod_dir which provides "trailing slash"
 redirects and serving directory index files.
 
 %description mod_dir -l pl
-Modu³ oferuj±cy przekierowania i serwowanie indeksu katalogu.
+Modu³ oferuj±cy przekierowania i udostêpnianie informacji o zawarto¶ci
+katalogu.
 
 %package mod_headers
 Summary:	Apache module allows for the customization of HTTP response headers
-Summary(pl):	Modu³ pozwalaj±cy na modyfikacjê nag³ówków HTTP
+Summary(pl):	Modu³ Apache'a pozwalaj±cy na modyfikacjê nag³ówków HTTP
 Group:		Networking/Daemons
-Prereq:		%{_sbindir}/apxs
-Prereq:		perl
-Requires:	%{name}(EAPI) = %{version}
+Requires:	%{name} = %{version}-%{release}
 
 %description mod_headers
 This package contains mod_headers module. The module allows for the
@@ -468,30 +498,11 @@ replaced or removed.
 Modu³ pozwalaj±cy na ³±czenie, usuwania, zamianê nag³ówków HTTP
 wysy³anych do przegl±darki.
 
-%package mod_mmap_static
-Summary:	Apache module for mmap()ing statically configured list files
-Summary(pl):	Modu³ s³u¿±cy do mmap()owania plików.
-Group:		Networking/Daemons
-Prereq:		%{_sbindir}/apxs
-Prereq:		perl
-Requires:	%{name}(EAPI) = %{version}
-
-%description mod_mmap_static
-This package contains mod_mmap_static module. It provides mmap()ing of
-a statically configured list of frequently requested but not changed
-files.
-
-%description mod_mmap_static -l pl
-Modu³ umo¿liwia mmap()owanie statycznie skonfigurowanych plików
-(czêsto u¿ywanych ale nie ulegaj±cych zmianom).
-
 %package mod_imap
 Summary:	Apache module with imap-file handler
-Summary(pl):	Modu³ z obs³ug± imap-file
+Summary(pl):	Modu³ Apache'a z obs³ug± imap-file
 Group:		Networking/Daemons
-Prereq:		%{_sbindir}/apxs
-Prereq:		perl
-Requires:	%{name}(EAPI) = %{version}
+Requires:	%{name} = %{version}-%{release}
 
 %description mod_imap
 This package contains mod_imap module. It provides for .map files,
@@ -499,15 +510,13 @@ replacing the functionality of the imagemap CGI program. Any directory
 or document type configured to use the handler imap-file.
 
 %description mod_imap -l pl
-Modu³ umozliwiaj±cy obs³ugê plików .map (imap-file handler)
+Modu³ umo¿liwiaj±cy obs³ugê plików .map (imap-file handler).
 
 %package mod_info
 Summary:	Apache module with comprehensive overview of the server configuration
-Summary(pl):	Modu³ dostarczaj±cy informacji na temat serwera.
+Summary(pl):	Modu³ Apache'a udostêpniaj±cy informacje o serwerze
 Group:		Networking/Daemons
-Prereq:		%{_sbindir}/apxs
-Prereq:		perl
-Requires:	%{name}(EAPI) = %{version}
+Requires:	%{name} = %{version}-%{release}
 
 %description mod_info
 This package contains mod_info module. It provides a comprehensive
@@ -515,50 +524,78 @@ overview of the server configuration including all installed modules
 and directives in the configuration files.
 
 %description mod_info -l pl
-Modu³ dostarczaj±cy informacji o konfiguracji serwera, zainstalowanych
-modu³ach itp.
+Modu³ udostêpniaj±cy informacje o konfiguracji serwera,
+zainstalowanych modu³ach itp.
+
+%package mod_ldap
+Summary:	Apache module to use LDAP connections
+Summary(pl):	Modu³ Apache'a umo¿liwiaj±cy korzystanie z po³±czeñ LDAP
+Group:		Networking/Daemons
+Requires:	%{name} = %{version}-%{release}
+
+%description mod_ldap
+Apache module to use LDAP connections.
+
+%description mod_ldap -l pl
+Modu³ Apache'a umo¿liwiaj±cy korzystanie z po³±czeñ LDAP.
 
 %package mod_proxy
 Summary:	Apache module with Web proxy
-Summary(pl):	Modu³ dodaj±cy obs³ugê serwera proxy
+Summary(pl):	Modu³ Apache'a dodaj±cy obs³ugê serwera proxy
 Group:		Networking/Daemons
-Prereq:		%{_sbindir}/apxs
-Prereq:		perl
-Requires:	%{name}(EAPI) = %{version}
+Requires:	%{name} = %{version}-%{release}
 
 %description mod_proxy
 This package contains module with implementation a proxy/cache for
 Apache. It implements proxying capability for FTP, CONNECT (for SSL),
-HTTP/0.9, and HTTP/1.0. The module can be configured to connect to
-other proxy modules for these and other protocols.
+HTTP/0.9, HTTP/1.0 and HTTP/1.1. The module can be configured to
+connect to other proxy modules for these and other protocols.
 
 %description mod_proxy -l pl
 Modu³ zawiera implementacjê serwera proxy/cache dla Apache.
-Iplementacja zawiera obs³ugê FTP, CONNECT (dla SSL), HTTP/0.9 i
-HTTP/1.0.
+Implementacja zawiera obs³ugê FTP, CONNECT (dla SSL), HTTP/0.9,
+HTTP/1.0 i HTTP/1.1.
 
 %package mod_rewrite
 Summary:	Apache module with rule-based engine for rewrite requested URLs on the fly
-Summary(pl):	Modu³ do ,,przepisywania'' adresów URL w locie
+Summary(pl):	Modu³ Apache'a do "przepisywania" adresów URL w locie
 Group:		Networking/Daemons
-Prereq:		%{_sbindir}/apxs
-Prereq:		perl
-Requires:	%{name}(EAPI) = %{version}
+Requires:	%{name} = %{version}-%{release}
 
 %description mod_rewrite
 This package contains It provides a rule-based rewriting engine to
 rewrite requested URLs on the fly.
 
 %description mod_rewrite -l pl
-Modu³ oferuj±cy mo¿liwo¶æ ,,przepisywania'' adresów URL w locie.
+Modu³ oferuj±cy mo¿liwo¶æ "przepisywania" adresów URL w locie.
+
+%package mod_ssl
+Summary:	SSL/TLS module for the Apache HTTP server
+Summary(pl):	Modu³ SSL/TSL dla serwera Apache
+Summary(ru):	íÏÄÕÌØ SSL/TLS ÄÌÑ ×ÅÂ-ÓÅÒ×ÅÒÁ Apache
+Group:		Networking/Daemons
+Epoch:		1
+Requires:	%{name} = %{version}-%{release}
+
+%description mod_ssl
+The mod_ssl module provides strong cryptography for the Apache Web
+server via the Secure Sockets Layer (SSL) and Transport Layer Security
+(TLS) protocols.
+
+%description mod_ssl -l pl
+Modu³ mod_ssl udostêpnia wsparcie do silnej kryptografii dla serwera
+Apache poprzez protoko³y SSL/TSL (Secure Sockets Layer/Transport Layer
+Security).
+
+%description mod_ssl -l ru
+íÏÄÕÌØ mod_ssl ÏÂÅÓĞÅŞÉ×ÁÅÔ ĞÏÄÄÅÒÖËÕ × ×ÅÂ-ÓÅÒ×ÅÒÅ Apache ÎÁÄÅÖÎÏÇÏ
+ÛÉÆÒÏ×ÁÎÉÑ ÓÒÅÄÓÔ×ÁÍÉ Secure Sockets Layer (SSL) É Transport Layer
 
 %package mod_status
-Summary:	Server status report module for apache
-Summary(pl):	Modu³ dostarczaj±cy informacje statystyczne o serwerze.
+Summary:	Server status report module for Apache
+Summary(pl):	Modu³ udostêpniaj±cy informacje statystyczne z serwera Apache
 Group:		Networking/Daemons
-Prereq:		%{_sbindir}/apxs
-Prereq:		perl
-Requires:	%{name}(EAPI) = %{version}
+Requires:	%{name} = %{version}-%{release}
 
 %description mod_status
 The Status module allows a server administrator to find out how well
@@ -573,11 +610,9 @@ pracy serwera apache (w postaci strony HTML).
 
 %package mod_usertrack
 Summary:	Apache module for user tracking using cookies
-Summary(pl):	Modu³ s³u¿±cy do ¶ledzenia ,,ciasteczek''.
+Summary(pl):	Modu³ Apache'a s³u¿±cy do ¶ledzenia "ciasteczek"
 Group:		Networking/Daemons
-Prereq:		%{_sbindir}/apxs
-Prereq:		perl
-Requires:	%{name}(EAPI) = %{version}
+Requires:	%{name} = %{version}-%{release}
 
 %description mod_usertrack
 This package contains the user tracking module which did its own
@@ -585,15 +620,13 @@ logging using CookieLog directory. This module allow multiple log
 files.
 
 %description mod_usertrack -l pl
-Modu³ pozwalaj±cy na ¶ledzenie ,,ciasteczek''.
+Modu³ pozwalaj±cy na ¶ledzenie "ciasteczek".
 
 %package mod_vhost_alias
 Summary:	Apache module for dynamically configured mass virtual hosting
-Summary(pl):	Modu³ dodaj±cy obs³ugê hostów wirtualnych.
+Summary(pl):	Modu³ Apache'a dodaj±cy obs³ugê hostów wirtualnych
 Group:		Networking/Daemons
-Prereq:		%{_sbindir}/apxs
-Prereq:		perl
-Requires:	%{name}(EAPI) = %{version}
+Requires:	%{name} = %{version}-%{release}
 
 %description mod_vhost_alias
 This package contains the mod_vhost_alias. It provides support for
@@ -605,11 +638,9 @@ wirtualnych.
 
 %package mod_unique_id
 Summary:	Apache module which provides a magic token for each request
-Summary(pl):	Modu³ nadaj±cy ka¿demu ¿±daniu unikalny token
+Summary(pl):	Modu³ Apache'a nadaj±cy ka¿demu zapytaniu unikalny token
 Group:		Networking/Daemons
-Prereq:		%{_sbindir}/apxs
-Prereq:		perl
-Requires:	%{name}(EAPI) = %{version}
+Requires:	%{name} = %{version}-%{release}
 
 %description mod_unique_id
 This package contains the mod_unique_id. This module provides a magic
@@ -621,18 +652,16 @@ for each request. Unique identifiers are useful for various reasons
 which are beyond the scope of this document.
 
 %description mod_unique_id -l pl
-Modu³ nadaje przy ka¿dym ¿±daniu token unikalny w ramach wszystkich
-¿±dañ, nawet w ramach poprawnie skonfigurowanego klastra z wielu
-maszyn. Modu³ ustawia przy ka¿dym ¿±daniu zmienn± ¶rodowiskow±
+Modu³ nadaje ka¿demu zapytaniu token unikalny w ramach wszystkich
+zapytañ, nawet w ramach poprawnie skonfigurowanego klastra z wielu
+maszyn. Modu³ ustawia przy ka¿dym zapytaniu zmienn± ¶rodowiskow±
 UNIQUE_ID.
 
 %package mod_expires
 Summary:	Apache module which generates Expires HTTP headers
-Summary(pl):	Modu³ generuj±cy nag³ówki HTTP Expires
+Summary(pl):	Modu³ Apache'a generuj±cy nag³ówki HTTP Expires
 Group:		Networking/Daemons
-Prereq:		%{_sbindir}/apxs
-Prereq:		perl
-Requires:	%{name}(EAPI) = %{version}
+Requires:	%{name} = %{version}-%{release}
 
 %description mod_expires
 This module controls the setting of the Expires HTTP header in server
@@ -645,55 +674,153 @@ Modu³ kontroluje ustawianie nag³ówka HTTP Expires. Data wyga¶niêcia
 wa¿no¶ci mo¿e byæ ustalana w zale¿no¶ci od czasu modyfikacji plików
 ¼ród³owych lub odwo³ania klienta.
 
+%package mod_file_cache
+Summary:	Apache module: caches a static list of files in memory
+Summary(pl):	Modu³ Apache'a cache'uj±cy statyczn± listê plików w pamiêci
+Group:		Networking/Daemons
+Obsoletes:	apache-mmap_static
+Requires:	%{name} = %{version}-%{release}
+
+%description mod_file_cache
+Caches a static list of files in memory.
+
+%description mod_file_cache -l pl
+Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
+
 %prep
+<<<<<<< apache.spec
+%setup -q -n httpd-%{version}
+=======
 %setup -q -n apache_%{version} -a3
 cd src
 %patch22 -p0
 cd ..
+>>>>>>> 1.188.2.3
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
-%patch5 -p0
-%patch6 -p0
+%{?with_metuxmpm:%patch5 -p1}
 %patch7 -p1
 %patch8 -p1
+<<<<<<< apache.spec
+%patch9 -p1
+=======
 %{!?_without_ipv6:%patch9 -p1}
+>>>>>>> 1.188.2.3
 %patch10 -p1
 %patch11 -p1
 %patch12 -p1
-%{?mod_rewrite_ldap:%patch13 -p1}
+%patch13 -p1
 %patch14 -p1
 %patch15 -p1
 %patch16 -p1
 %patch17 -p1
 %patch18 -p1
+<<<<<<< apache.spec
+%patch19 -p1
+=======
 %{?_without_ipv6:%patch19 -p1}
+>>>>>>> 1.188.2.3
 %patch20 -p1
 %patch21 -p1
+%patch22 -p1
 
 %build
-OPTIM="%{rpmcflags}" \
-./configure \
-	--prefix=%{_prefix} \
-	--sysconfdir=%{_sysconfdir} \
-	--includedir=%{_includedir} \
-	--sbindir=%{_sbindir} \
-	--libexecdir=%{_libexecdir} \
-	--datadir=%{_datadir} \
-	--manualdir=%{_datadir}/html/manual \
-	--localstatedir=/var \
-	--runtimedir=/var/run \
-	--logfiledir=/var/log/httpd \
-	--with-layout=PLD \
-	--without-confadjust \
-	--enable-module=all \
-	--enable-module=auth_digest \
-	--enable-shared=max \
-	--proxycachedir=/var/cache/apache \
-	--with-perl=%{_bindir}/perl \
+# sanity check
+MODULES_API=`awk '/#define MODULE_MAGIC_NUMBER_MAJOR/ {print $3}' include/ap_mmn.h`
+if [ "$MODULES_API" != "%_apache_modules_api" ]; then
+	echo "Set %%_apache_modules_api to $MODULES_API and rerun."
+	exit 1
+fi
+./buildconf
+# Before configure; fix location of build dir in generated apxs
+%{__perl} -pi -e "s:\@exp_installbuilddir\@:%{_libdir}/apache/build:g" \
+	support/apxs.in
+install /usr/share/automake/config.* build/
+CPPFLAGS="-DMAX_SERVER_LIMIT=200000 -DBIG_SECURITY_HOLE=1"
+for mpm in %{?with_metuxmpm:metuxmpm} perchild prefork worker; do
+install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
+../%configure \
+	--prefix=%{_sysconfdir} \
+	--exec-prefix=%{_libexecdir} \
+	--with-installbuilddir=%{_libdir}/apache/build \
+	--enable-layout=PLD \
+	--enable-modules=all \
+	--enable-mods-shared=all \
+	--enable-auth-anon \
+	--enable-auth-dbm \
+	--enable-auth-digest \
+	--enable-file-cache \
+	--enable-echo \
+	--enable-cache \
+	--enable-charset-lite \
+	--enable-mem-cache \
+	--enable-disk-cache \
+	--enable-ext-filter \
+	--enable-case-filter \
+	--enable-case-filter-in \
+	--enable-deflate \
+	--with-z=%{_prefix} \
+	--enable-mime-magic \
+	--enable-cern-meta \
+	--enable-expires \
+	--enable-headers \
+	--enable-usertrack \
+	--enable-unique-id \
+	--enable-proxy \
+	--enable-proxy-connect \
+	--enable-proxy-ftp \
+	--enable-proxy-http \
+	%{?with_ssl:--enable-ssl} \
+	--enable-optional-hook-export \
+	--enable-optional-hook-import \
+	--enable-optional-fn-import \
+	--enable-optional-fn-export \
+	%{?with_ldap:--enable-ldap} \
+	%{?with_ldap:--enable-auth-ldap} \
+	--enable-dav \
+	--enable-info \
 	--enable-suexec \
+<<<<<<< apache.spec
+	--enable-cgi \
+	--enable-cgid \
+	--enable-dav-fs \
+	--enable-vhost-alias \
+	--enable-speling \
+	--enable-rewrite \
+	--enable-so \
+	--with-program-name=httpd.${mpm} \
+	--with-mpm=${mpm} \
+%ifarch %{ix86}
+%ifnarch i386 i486
+	$( [ "${mpm}" = "leader" ] && echo "--enable-nonportable-atomics=yes" ) \
+%endif
+%endif
+	--with-suexec-bin=%{_sbindir}/suexec \
+	--with-suexec-caller=http \
+	--with-suexec-docroot=%{_datadir} \
+	--with-suexec-logfile=/var/log/httpd/suexec_log \
+	--with-suexec-uidmin=500 \
+	--with-suexec-gidmin=500 \
+	--with-suexec-umask=077 \
+%{__make}
+./httpd.${mpm} -l | grep -v "${mpm}" > modules-inside
+
+find include -name '*.h' | xargs perl -pi -e "s#/httpd\.(.*?)\.conf#/etc/httpd/httpd.conf#"
+
+cd ..
+done
+
+for mpm in %{?with_metuxmpm:metuxmpm} perchild worker; do
+	if ! cmp -s buildmpm-prefork/modules-inside buildmpm-${mpm}/modules-inside; then
+		echo "List of compiled modules is different between prefork-MPM and ${mpm}-MPM!"
+		echo "Build failed."
+		exit 1
+	fi
+done
+=======
 	--suexec-caller=http \
 	--suexec-uidmin=500 \
 	--suexec-gidmin=500 \
@@ -709,31 +836,96 @@ rm -f src/modules/standard/mod_auth_db.so
 
 rm -f src/modules/standard/mod_rewrite.so
 %{__make} -C src/modules/standard mod_rewrite.so LIBS_SHLIB="-ldb %{?mod_rewrite_ldap:-lldap -llber}"
+>>>>>>> 1.188.2.3
 
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig} \
-	$RPM_BUILD_ROOT%{_datadir}/errordocs \
-	$RPM_BUILD_ROOT/var/{log/{httpd,archiv/httpd},run/apache}
+	$RPM_BUILD_ROOT%{_var}/{log/{httpd,archiv/httpd},{run,cache}/apache}
 
-%{__make} install-quiet root="$RPM_BUILD_ROOT"
+# prefork is default one
+%{__make} -C buildmpm-prefork install \
+	DESTDIR=$RPM_BUILD_ROOT \
+	installbuilddir=%{_sysconfdir}/build \
+	prefix=%{_sysconfdir}/httpd \
+	libexecdir=%{_libdir}/%{name} \
+	iconsdir=%{_datadir}/icons \
+	errordir=%{_datadir}/error \
+	htdocsdir=%{_datadir}/html \
+	manualdir=%{_datadir}/manual \
+	cgidir=%{_datadir}/cgi-bin \
+	runtimedir=%{_var}/run \
+	logdir=%{_var}/log/httpd \
+	proxycachedir=%{_var}/cache/httpd
 
-mv -f $RPM_BUILD_ROOT%{_datadir}/html/manual $RPM_BUILD_ROOT%{_datadir}
+for mpm in %{?with_metuxmpm:metuxmpm} perchild worker; do
+	install buildmpm-${mpm}/httpd.${mpm} $RPM_BUILD_ROOT%{_sbindir}/httpd.${mpm}
+	ln -s httpd.conf $RPM_BUILD_ROOT%{_sysconfdir}/httpd.${mpm}.conf
+done
 
-install %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/apache
+ln -s httpd.prefork $RPM_BUILD_ROOT%{_sbindir}/httpd
+
+ln -s %{_libdir}/apache $RPM_BUILD_ROOT%{_sysconfdir}/modules
+ln -s %{_localstatedir}/run/apache $RPM_BUILD_ROOT%{_sysconfdir}/run
+ln -s %{_libdir}/apache/build $RPM_BUILD_ROOT%{_sysconfdir}/build
+
+rm -f $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
+install -d $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
+
+mv -f $RPM_BUILD_ROOT%{_sysconfdir}/build \
+	$RPM_BUILD_ROOT%{_libexecdir}/build
+
+perl -pi -e "s#$RPM_BUILD_ROOT##g" $RPM_BUILD_ROOT%{_libexecdir}/build/*
+perl -pi -e "s#$RPM_BUILD_DIR#%{_usrsrc}#g" $RPM_BUILD_ROOT%{_libexecdir}/build/*
+perl -pi -e "s#-pthread#-lpthread#g" $RPM_BUILD_ROOT%{_libdir}/lib*.la
+perl -pi -e 's#/etc/httpd/build#%{_libexecdir}/build#g' $RPM_BUILD_ROOT%{_libexecdir}/build/*
+ln -sf %{_bindir}/libtool $RPM_BUILD_ROOT%{_libexecdir}/build/libtool
+ln -sf %{_libexecdir}/build $RPM_BUILD_ROOT%{_sysconfdir}/build
+
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
+install %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/apache
 install %{SOURCE4} $RPM_BUILD_ROOT/etc/sysconfig/apache
-bzip2 -dc %{SOURCE5} | tar xf - -C $RPM_BUILD_ROOT%{_mandir}
 
-touch $RPM_BUILD_ROOT/var/log/httpd/{access,error,agent,referer}_log
+touch $RPM_BUILD_ROOT/var/log/httpd/{access,error,agent,referer,suexec}_log
 
-install errordocs/* $RPM_BUILD_ROOT%{_datadir}/errordocs
+%if %{with ssl}
+install -d $RPM_BUILD_ROOT%{_sysconfdir}/ssl
+install %{SOURCE20} $RPM_BUILD_ROOT%{_sysconfdir}/ssl/server.crt
+install %{SOURCE21} $RPM_BUILD_ROOT%{_sysconfdir}/ssl/server.key
+%endif
 
-install %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
+CFG="$RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf/"
 
-install %{SOURCE8}  $RPM_BUILD_ROOT%{_sysconfdir}/mod_vhost_alias.conf
-install %{SOURCE9}  $RPM_BUILD_ROOT%{_sysconfdir}/mod_status.conf
-install %{SOURCE10} $RPM_BUILD_ROOT%{_sysconfdir}/mod_proxy.conf
+install %{SOURCE6} $CFG/10_httpd.conf
+install %{SOURCE8} $CFG/20_mod_vhost_alias.conf
+install %{SOURCE9} $CFG/25_mod_status.conf
+install %{SOURCE10} $CFG/30_mod_proxy.conf
+install %{SOURCE11} $CFG/35_mod_info.conf
+install %{SOURCE12} $CFG/40_mod_ssl.conf
+install %{SOURCE13} $CFG/45_mod_dav.conf
+install %{SOURCE14} $CFG/59_mod_dir.conf
+install %{SOURCE15} $CFG/13_mod_suexec.conf
+install %{SOURCE16} $CFG/58_mod_deflate.conf
+
+echo "LoadModule ldap_module	%{_libexecdir}/mod_ldap.so" > $CFG/49_mod_ldap.conf
+echo "LoadModule actions_module	%{_libexecdir}/mod_actions.so" > $CFG/50_mod_actions.conf
+echo "LoadModule auth_module	%{_libexecdir}/mod_auth.so" > $CFG/51_mod_auth.conf
+echo "LoadModule auth_anon_module	%{_libexecdir}/mod_auth_anon.so" > $CFG/52_mod_auth_anon.conf
+echo "LoadModule auth_dbm_module	%{_libexecdir}/mod_auth_dbm.so" > $CFG/53_mod_auth_dbm.conf
+echo "LoadModule auth_digest_module	%{_libexecdir}/mod_auth_digest.so" > $CFG/54_mod_auth_digest.conf
+echo "LoadModule cache_module	%{_libexecdir}/mod_cache.so
+LoadModule mem_cache_module	%{_libexecdir}/mod_mem_cache.so
+LoadModule disk_cache_module	%{_libexecdir}/mod_disk_cache.so" > $CFG/55_mod_cache.conf
+echo "LoadModule cgid_module	%{_libexecdir}/mod_cgid.so" > $CFG/56_mod_cgid.conf
+echo "LoadModule charset_lite_module	%{_libexecdir}/mod_charset_lite.so" > $CFG/57_mod_charset_lite.conf
+echo "LoadModule auth_ldap_module	%{_libexecdir}/mod_auth_ldap.so" > $CFG/59_mod_auth_ldap.conf
+echo "LoadModule expires_module	%{_libexecdir}/mod_expires.so" > $CFG/60_mod_expires.conf
+echo "LoadModule file_cache_module	%{_libexecdir}/mod_file_cache.so" > $CFG/61_mod_file_cache.conf
+echo "LoadModule headers_module	%{_libexecdir}/mod_headers.so" > $CFG/62_mod_headers.conf
+echo "LoadModule imap_module	%{_libexecdir}/mod_imap.so" > $CFG/63_mod_imap.conf
+echo "LoadModule rewrite_module	%{_libexecdir}/mod_rewrite.so" > $CFG/64_mod_rewrite.conf
+echo "LoadModule usertrack_module	%{_libexecdir}/mod_usertrack.so" > $CFG/65_mod_usertrack.conf
+echo "LoadModule unique_id_module	%{_libexecdir}/mod_unique_id.so" > $CFG/66_mod_unique_id.conf
 
 ln -sf index.html.en $RPM_BUILD_ROOT%{_datadir}/html/index.html
 
@@ -743,7 +935,7 @@ rm -rf $RPM_BUILD_ROOT
 %pre
 if [ -n "`getgid http`" ]; then
 	if [ "`getgid http`" != "51" ]; then
-		echo "Warning: group http haven't gid=51. Correct this before installing apache" 1>&2
+		echo "Error: group http doesn't have gid=51. Correct this before installing apache." 1>&2
 		exit 1
 	fi
 else
@@ -751,32 +943,16 @@ else
 fi
 if [ -n "`id -u http 2>/dev/null`" ]; then
 	if [ "`id -u http`" != "51" ]; then
-		echo "Warning: user http haven't uid=51. Correct this before installing apache" 1>&2
+		echo "Error: user http doesn't have uid=51. Correct this before installing apache." 1>&2
 		exit 1
 	fi
 else
-	/usr/sbin/useradd -u 51 -r -d /home/httpd -s /bin/false -c "HTTP User" -g http http 1>&2
+	/usr/sbin/useradd -u 51 -r -d /home/services/httpd -s /bin/false -c "HTTP User" -g http http 1>&2
 fi
 
 %post
+/sbin/ldconfig
 /sbin/chkconfig --add httpd
-%{_sbindir}/apxs -e -a -n access %{_libexecdir}/mod_access.so 1>&2
-%{_sbindir}/apxs -e -a -n alias %{_libexecdir}/mod_alias.so 1>&2
-%{_sbindir}/apxs -e -a -n asis %{_libexecdir}/mod_asis.so 1>&2
-%{_sbindir}/apxs -e -a -n autoindex %{_libexecdir}/mod_autoindex.so 1>&2
-%{_sbindir}/apxs -e -a -n cern_meta %{_libexecdir}/mod_cern_meta.so 1>&2
-%{_sbindir}/apxs -e -a -n cgi %{_libexecdir}/mod_cgi.so 1>&2
-%{_sbindir}/apxs -e -a -n env %{_libexecdir}/mod_env.so 1>&2
-%{_sbindir}/apxs -e -a -n include %{_libexecdir}/mod_include.so 1>&2
-%{_sbindir}/apxs -e -a -n log_agent %{_libexecdir}/mod_log_agent.so 1>&2
-%{_sbindir}/apxs -e -a -n log_config %{_libexecdir}/mod_log_config.so 1>&2
-%{_sbindir}/apxs -e -a -n log_referer %{_libexecdir}/mod_log_referer.so 1>&2
-%{_sbindir}/apxs -e -a -n mime_magic %{_libexecdir}/mod_mime_magic.so 1>&2
-%{_sbindir}/apxs -e -a -n mime %{_libexecdir}/mod_mime.so 1>&2
-%{_sbindir}/apxs -e -a -n negotiation %{_libexecdir}/mod_negotiation.so 1>&2
-%{_sbindir}/apxs -e -a -n setenvif %{_libexecdir}/mod_setenvif.so 1>&2
-%{_sbindir}/apxs -e -a -n speling %{_libexecdir}/mod_speling.so 1>&2
-%{_sbindir}/apxs -e -a -n userdir %{_libexecdir}/mod_userdir.so 1>&2
 umask 137
 touch /var/log/httpd/{access,error,agent,referer}_log
 if [ -f /var/lock/subsys/httpd ]; then
@@ -787,23 +963,6 @@ fi
 
 %preun
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n access %{_libexecdir}/mod_access.so 1>&2
-	%{_sbindir}/apxs -e -A -n alias %{_libexecdir}/mod_alias.so 1>&2
-	%{_sbindir}/apxs -e -A -n asis %{_libexecdir}/mod_asis.so 1>&2
-	%{_sbindir}/apxs -e -A -n autoindex %{_libexecdir}/mod_autoindex.so 1>&2
-	%{_sbindir}/apxs -e -A -n cern_meta %{_libexecdir}/mod_cern_meta.so 1>&2
-	%{_sbindir}/apxs -e -A -n cgi %{_libexecdir}/mod_cgi.so 1>&2
-	%{_sbindir}/apxs -e -A -n env %{_libexecdir}/mod_env.so 1>&2
-	%{_sbindir}/apxs -e -A -n include %{_libexecdir}/mod_include.so 1>&2
-	%{_sbindir}/apxs -e -A -n log_agent %{_libexecdir}/mod_log_agent.so 1>&2
-	%{_sbindir}/apxs -e -A -n log_config %{_libexecdir}/mod_log_config.so 1>&2
-	%{_sbindir}/apxs -e -A -n log_referer %{_libexecdir}/mod_log_referer.so 1>&2
-	%{_sbindir}/apxs -e -A -n mime %{_libexecdir}/mod_mime.so 1>&2
-	%{_sbindir}/apxs -e -A -n mime_magic %{_libexecdir}/mod_mime_magic.so 1>&2
-	%{_sbindir}/apxs -e -A -n negotiation %{_libexecdir}/mod_negotiation.so 1>&2
-	%{_sbindir}/apxs -e -A -n setenvif %{_libexecdir}/mod_setenvif.so 1>&2
-	%{_sbindir}/apxs -e -A -n speling %{_libexecdir}/mod_speling.so 1>&2
-	%{_sbindir}/apxs -e -A -n userdir %{_libexecdir}/mod_userdir.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd stop 1>&2
 	fi
@@ -811,13 +970,13 @@ if [ "$1" = "0" ]; then
 fi
 
 %postun
+/sbin/ldconfig
 if [ "$1" = "0" ]; then
 	/usr/sbin/userdel http
 	/usr/sbin/groupdel http
 fi
 
 %post mod_actions
-%{_sbindir}/apxs -e -a -n actions %{_libexecdir}/mod_actions.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -826,14 +985,12 @@ fi
 
 %preun mod_actions
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n actions %{_libexecdir}/mod_actions.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
 fi
 
 %post mod_auth
-%{_sbindir}/apxs -e -a -n auth %{_libexecdir}/mod_auth.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -842,14 +999,12 @@ fi
 
 %preun mod_auth
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n auth %{_libexecdir}/mod_auth.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
 fi
 
 %post mod_auth_anon
-%{_sbindir}/apxs -e -a -n auth_anon %{_libexecdir}/mod_auth_anon.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -858,30 +1013,82 @@ fi
 
 %preun mod_auth_anon
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n auth_anon %{_libexecdir}/mod_auth_anon.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
 fi
 
-%post mod_auth_db
-%{_sbindir}/apxs -e -a -n auth_db %{_libexecdir}/mod_auth_db.so 1>&2
+%post mod_auth_dbm
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
 	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
 fi
 
-%preun mod_auth_db
+%preun mod_auth_dbm
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n auth_db %{_libexecdir}/mod_auth_db.so 1>&2
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2
+	fi
+fi
+
+%post mod_cache
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+fi
+
+%preun mod_cache
+if [ "$1" = "0" ]; then
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2
+	fi
+fi
+
+%post mod_cgid
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+fi
+
+%preun mod_cgid
+if [ "$1" = "0" ]; then
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2
+	fi
+fi
+
+%post mod_charset_lite
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+fi
+
+%preun mod_charset_lite
+if [ "$1" = "0" ]; then
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2
+	fi
+fi
+
+%post mod_dav
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+fi
+
+%preun mod_dav
+if [ "$1" = "0" ]; then
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
 fi
 
 %post mod_auth_digest
-%{_sbindir}/apxs -e -a -n auth_digest %{_libexecdir}/mod_auth_digest.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -890,49 +1097,26 @@ fi
 
 %preun mod_auth_digest
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n auth_digest %{_libexecdir}/mod_auth_digest.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
 fi
 
-%triggerpostun mod_auth_db -- apache-mod_auth_db <= 1.3.20-2
-%{_sbindir}/apxs -e -A -n auth_dbm %{_libexecdir}/mod_auth_dbm.so 1>&2
-
-%post mod_define
-%{_sbindir}/apxs -e -a -n define %{_libexecdir}/mod_define.so 1>&2
+%post mod_deflate
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
 	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
 fi
 
-%preun mod_define
+%preun mod_deflate
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n define %{_libexecdir}/mod_define.so 1>&2
-	if [ -f /var/lock/subsys/httpd ]; then
-		/etc/rc.d/init.d/httpd restart 1>&2
-	fi
-fi
-
-%post mod_digest
-%{_sbindir}/apxs -e -a -n digest %{_libexecdir}/mod_digest.so 1>&2
-if [ -f /var/lock/subsys/httpd ]; then
-	/etc/rc.d/init.d/httpd restart 1>&2
-else
-	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
-fi
-
-%preun mod_digest
-if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n digest %{_libexecdir}/mod_digest.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
 fi
 
 %post mod_dir
-%{_sbindir}/apxs -e -a -n dir %{_libexecdir}/mod_dir.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -941,14 +1125,12 @@ fi
 
 %preun mod_dir
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n dir %{_libexecdir}/mod_dir.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
 fi
 
 %post mod_expires
-%{_sbindir}/apxs -e -a -n expires %{_libexecdir}/mod_expires.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -957,14 +1139,26 @@ fi
 
 %preun mod_expires
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n expires %{_libexecdir}/mod_expires.so 1>&2
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2
+	fi
+fi
+
+%post mod_file_cache
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+fi
+
+%preun mod_file_cache
+if [ "$1" = "0" ]; then
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
 fi
 
 %post mod_headers
-%{_sbindir}/apxs -e -a -n headers %{_libexecdir}/mod_headers.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -973,30 +1167,12 @@ fi
 
 %preun mod_headers
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n headers %{_libexecdir}/mod_headers.so 1>&2
-	if [ -f /var/lock/subsys/httpd ]; then
-		/etc/rc.d/init.d/httpd restart 1>&2
-	fi
-fi
-
-%post mod_mmap_static
-%{_sbindir}/apxs -e -a -n mmap_static %{_libexecdir}/mod_mmap_static.so 1>&2
-if [ -f /var/lock/subsys/httpd ]; then
-	/etc/rc.d/init.d/httpd restart 1>&2
-else
-	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
-fi
-
-%preun mod_mmap_static
-if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n mmap_static %{_libexecdir}/mod_mmap_static.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
 fi
 
 %post mod_imap
-%{_sbindir}/apxs -e -a -n imap %{_libexecdir}/mod_imap.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -1005,14 +1181,12 @@ fi
 
 %preun mod_imap
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n imap %{_libexecdir}/mod_imap.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
 fi
 
 %post mod_info
-%{_sbindir}/apxs -e -a -n info %{_libexecdir}/mod_info.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -1021,17 +1195,12 @@ fi
 
 %preun mod_info
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n info %{_libexecdir}/mod_info.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
 fi
 
 %post mod_proxy
-%{_sbindir}/apxs -e -a -n proxy %{_libexecdir}/libproxy.so 1>&2
-if [ -f /etc/httpd/httpd.conf ] && ! grep -q "^Include.*mod_proxy.conf" /etc/httpd/httpd.conf; then
-	echo "Include /etc/httpd/mod_proxy.conf" >> /etc/httpd/httpd.conf
-fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -1040,17 +1209,12 @@ fi
 
 %preun mod_proxy
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n proxy %{_libexecdir}/libproxy.so 1>&2
-	grep -v "^Include.*mod_proxy.conf" /etc/httpd/httpd.conf > \
-		/etc/httpd/httpd.conf.tmp
-	mv -f /etc/httpd/httpd.conf.tmp /etc/httpd/httpd.conf
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
 fi
 
 %post mod_rewrite
-%{_sbindir}/apxs -e -a -n rewrite %{_libexecdir}/mod_rewrite.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -1059,17 +1223,26 @@ fi
 
 %preun mod_rewrite
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n rewrite %{_libexecdir}/mod_rewrite.so 1>&2
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2
+	fi
+fi
+
+%post mod_ssl
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+fi
+
+%preun mod_ssl
+if [ "$1" = "0" ]; then
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
 fi
 
 %post mod_status
-%{_sbindir}/apxs -e -a -n status %{_libexecdir}/mod_status.so 1>&2
-if [ -f /etc/httpd/httpd.conf ] && ! grep -q "^Include.*mod_status.conf" /etc/httpd/httpd.conf; then
-	echo "Include /etc/httpd/mod_status.conf" >> /etc/httpd/httpd.conf
-fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -1078,17 +1251,12 @@ fi
 
 %preun mod_status
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n status %{_libexecdir}/mod_status.so 1>&2
-	grep -v "^Include.*mod_status.conf" /etc/httpd/httpd.conf > \
-		/etc/httpd/httpd.conf.tmp
-	mv -f /etc/httpd/httpd.conf.tmp /etc/httpd/httpd.conf
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
 fi
 
 %post mod_usertrack
-%{_sbindir}/apxs -e -a -n usertrack %{_libexecdir}/mod_usertrack.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -1097,14 +1265,12 @@ fi
 
 %preun mod_usertrack
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n usertrack %{_libexecdir}/mod_usertrack.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
 fi
 
 %post mod_unique_id
-%{_sbindir}/apxs -e -a -n unique_id %{_libexecdir}/mod_unique_id.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -1113,17 +1279,12 @@ fi
 
 %preun mod_unique_id
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n unique_id %{_libexecdir}/mod_unique_id.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
 fi
 
 %post mod_vhost_alias
-%{_sbindir}/apxs -e -a -n vhost_alias %{_libexecdir}/mod_vhost_alias.so 1>&2
-if [ -f /etc/httpd/httpd.conf ] && ! grep -q "^Include.*mod_vhost_alias.conf" /etc/httpd/httpd.conf; then
-	echo "Include /etc/httpd/mod_vhost_alias.conf" >> /etc/httpd/httpd.conf
-fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -1132,10 +1293,6 @@ fi
 
 %preun mod_vhost_alias
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n vhost_alias %{_libexecdir}/mod_vhost_alias.so 1>&2
-	grep -v "^Include.*mod_vhost_alias.conf" /etc/httpd/httpd.conf > \
-		/etc/httpd/httpd.conf.tmp
-	mv -f /etc/httpd/httpd.conf.tmp /etc/httpd/httpd.conf
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
@@ -1143,15 +1300,22 @@ fi
 
 %files
 %defattr(644,root,root,755)
+<<<<<<< apache.spec
+%doc ABOUT_APACHE CHANGES README
+%doc docs/conf/mime.types
+=======
 %doc ABOUT_APACHE src/CHANGES README
 %doc conf/mime.types
+>>>>>>> 1.188.2.3
 
 %attr(754,root,root) /etc/rc.d/init.d/httpd
 
 %attr(750,root,root) %dir %{_sysconfdir}
-%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf
+%attr(750,root,root) %dir %{_sysconfdir}/httpd.conf
+%attr(750,root,root) %dir %{_sysconfdir}/modules
+%attr(750,root,root) %dir %{_sysconfdir}/run
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_httpd.conf
 %attr(640,root,root) %{_sysconfdir}/magic
-
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/sysconfig/*
 %attr(640,root,root) %config(noreplace) /etc/logrotate.d/*
 
@@ -1164,9 +1328,7 @@ fi
 %attr(755,root,root) %{_libexecdir}/mod_cgi.so
 %attr(755,root,root) %{_libexecdir}/mod_env.so
 %attr(755,root,root) %{_libexecdir}/mod_include.so
-%attr(755,root,root) %{_libexecdir}/mod_log_agent.so
 %attr(755,root,root) %{_libexecdir}/mod_log_config.so
-%attr(755,root,root) %{_libexecdir}/mod_log_referer.so
 %attr(755,root,root) %{_libexecdir}/mod_mime.so
 %attr(755,root,root) %{_libexecdir}/mod_mime_magic.so
 %attr(755,root,root) %{_libexecdir}/mod_negotiation.so
@@ -1174,351 +1336,279 @@ fi
 %attr(755,root,root) %{_libexecdir}/mod_speling.so
 %attr(755,root,root) %{_libexecdir}/mod_userdir.so
 
-%attr(755,root,root) %{_bindir}/htdigest
+# look at TODO on top
+%attr(755,root,root) %{_libexecdir}/mod_case_filter.so
+%attr(755,root,root) %{_libexecdir}/mod_case_filter_in.so
+%attr(755,root,root) %{_libexecdir}/mod_echo.so
+%attr(755,root,root) %{_libexecdir}/mod_ext_filter.so
+%attr(755,root,root) %{_libexecdir}/mod_optional_fn_export.so
+%attr(755,root,root) %{_libexecdir}/mod_optional_fn_import.so
+%attr(755,root,root) %{_libexecdir}/mod_optional_hook_export.so
+%attr(755,root,root) %{_libexecdir}/mod_optional_hook_import.so
+
+%attr(755,root,root) %{_sbindir}/htdigest
 
 %attr(755,root,root) %{_sbindir}/ab
 %attr(755,root,root) %{_sbindir}/apachectl
 %attr(755,root,root) %{_sbindir}/apxs
+%attr(755,root,root) %{_sbindir}/checkgid
 %attr(755,root,root) %{_sbindir}/httpd
+%attr(755,root,root) %{_sbindir}/httpd.*
 %attr(755,root,root) %{_sbindir}/logresolve
 %attr(755,root,root) %{_sbindir}/rotatelogs
+%attr(755,root,root) %{_sbindir}/envvars*
 
 %dir %attr(770,root,http) /var/run/apache
 
 %{_mandir}/man1/htdigest.1*
 %{_mandir}/man8/*
-%lang(hu) %{_mandir}/hu/man8/*
-%lang(ko) %{_mandir}/ko/man8/*
-%lang(pl) %{_mandir}/pl/man8/*
 
 %attr(750,root,root) %dir /var/log/httpd
 %attr(750,root,root) %dir /var/log/archiv/httpd
 %attr(640,root,root) %ghost /var/log/httpd/*
 
 %dir %{_datadir}
-%dir %{_datadir}/manual
-%dir %{_datadir}/manual/images/
-%{_datadir}/manual/images/apache_header.gif
-%{_datadir}/manual/images/custom_errordocs.gif
-%{_datadir}/manual/images/home.gif
-%{_datadir}/manual/images/index.gif
-%{_datadir}/manual/images/pixel.gif
-%{_datadir}/manual/images/sub.gif
-%{_datadir}/manual/misc
-%dir %{_datadir}/manual/search
-%attr(755,root,root) %{_datadir}/manual/search/manual-index.cgi
-%{_datadir}/manual/LICENSE
-%{_datadir}/manual/bind.html.html
-%lang(en) %{_datadir}/manual/bind.html.en
-%lang(fr) %{_datadir}/manual/bind.html.fr
-%{_datadir}/manual/cgi_path.html.html
-%lang(en) %{_datadir}/manual/cgi_path.html.en
-%lang(fr) %{_datadir}/manual/cgi_path.html.fr
-%{_datadir}/manual/configuring.html.html
-%lang(en) %{_datadir}/manual/configuring.html.en
-%lang(fr) %{_datadir}/manual/configuring.html.fr
-%lang(ja) %{_datadir}/manual/configuring.html.ja.jis
-%{_datadir}/manual/content-negotiation.html
-%{_datadir}/manual/custom-error.html.html
-%lang(en) %{_datadir}/manual/custom-error.html.en
-%lang(fr) %{_datadir}/manual/custom-error.html.fr
-%lang(ja) %{_datadir}/manual/custom-error.html.ja.jis
-%{_datadir}/manual/dns-caveats.html.html
-%lang(en) %{_datadir}/manual/dns-caveats.html.en
-%lang(fr) %{_datadir}/manual/dns-caveats.html.fr
-%{_datadir}/manual/dso.html
-%{_datadir}/manual/env.html.html
-%lang(en) %{_datadir}/manual/env.html.en
-%lang(ja) %{_datadir}/manual/env.html.ja.jis
-%{_datadir}/manual/footer.html
-%{_datadir}/manual/handler.html.html
-%lang(en) %{_datadir}/manual/handler.html.en
-%lang(ja) %{_datadir}/manual/handler.html.ja.jis
-%{_datadir}/manual/header.html
-%{_datadir}/manual/index.html.html
-%lang(en) %{_datadir}/manual/index.html.en
-%lang(fr) %{_datadir}/manual/index.html.fr
-%lang(ja) %{_datadir}/manual/index.html.ja.jis
-%{_datadir}/manual/install.html.html
-%lang(en) %{_datadir}/manual/install.html.en
-%lang(es) %{_datadir}/manual/install.html.es
-%lang(fr) %{_datadir}/manual/install.html.fr
-%lang(ja) %{_datadir}/manual/install.html.ja.jis
-%{_datadir}/manual/invoking.html.html
-%lang(en) %{_datadir}/manual/invoking.html.en
-%lang(fr) %{_datadir}/manual/invoking.html.fr
-%{_datadir}/manual/keepalive.html.html
-%lang(en) %{_datadir}/manual/keepalive.html.en
-%lang(ja) %{_datadir}/manual/keepalive.html.ja.jis
-%{_datadir}/manual/location.html
-%{_datadir}/manual/logs.html
-%{_datadir}/manual/multilogs.html
-%{_datadir}/manual/new_features_1_3.html.html
-%lang(en) %{_datadir}/manual/new_features_1_3.html.en
-%lang(ja) %{_datadir}/manual/new_features_1_3.html.ja.jis
-%{_datadir}/manual/process-model.html
-%{_datadir}/manual/sections.html
-%{_datadir}/manual/server-wide.html.html
-%lang(en) %{_datadir}/manual/server-wide.html.en
-%lang(fr) %{_datadir}/manual/server-wide.html.fr
-%lang(ja) %{_datadir}/manual/server-wide.html.ja.jis
-%{_datadir}/manual/sitemap.html
-%{_datadir}/manual/sourcereorg.html
-%{_datadir}/manual/stopping.html.html
-%lang(en) %{_datadir}/manual/stopping.html.en
-%lang(fr) %{_datadir}/manual/stopping.html.fr
-%{_datadir}/manual/upgrading_to_1_3.html
-%{_datadir}/manual/urlmapping.html
-%dir %{_datadir}/manual/howto
-%{_datadir}/manual/howto/cgi.html.html
-%lang(en) %{_datadir}/manual/howto/cgi.html.en
-%lang(ja) %{_datadir}/manual/howto/cgi.html.ja.jis
-%{_datadir}/manual/howto/footer.html
-%{_datadir}/manual/howto/header.html
-%{_datadir}/manual/howto/ssi.html.html
-%lang(en) %{_datadir}/manual/howto/ssi.html.en
-%lang(ja) %{_datadir}/manual/howto/ssi.html.ja.jis
-%dir %{_datadir}/manual/mod
-%{_datadir}/manual/mod/core.html.html
-%lang(en) %{_datadir}/manual/mod/core.html.en
-%lang(fr) %{_datadir}/manual/mod/core.html.fr
-%{_datadir}/manual/mod/directive-dict.html.html
-%lang(en) %{_datadir}/manual/mod/directive-dict.html.en
-%lang(fr) %{_datadir}/manual/mod/directive-dict.html.fr
-%lang(ja) %{_datadir}/manual/mod/directive-dict.html.ja.jis
-%{_datadir}/manual/mod/directives.html.html
-%lang(de) %{_datadir}/manual/mod/directives.html.de
-%lang(en) %{_datadir}/manual/mod/directives.html.en
-%lang(fr) %{_datadir}/manual/mod/directives.html.fr
-%lang(ja) %{_datadir}/manual/mod/directives.html.ja.jis
-%{_datadir}/manual/mod/footer.html
-%{_datadir}/manual/mod/header.html
-%{_datadir}/manual/mod/index-bytype.html.html
-%lang(en) %{_datadir}/manual/mod/index-bytype.html.en
-%lang(fr) %{_datadir}/manual/mod/index-bytype.html.fr
-%{_datadir}/manual/mod/index.html.html
-%lang(en) %{_datadir}/manual/mod/index.html.en
-%lang(fr) %{_datadir}/manual/mod/index.html.fr
-%lang(ja) %{_datadir}/manual/mod/index.html.ja.jis
-%{_datadir}/manual/mod/mod_access.html
-%{_datadir}/manual/mod/mod_alias.html
-%{_datadir}/manual/mod/mod_asis.html
-%{_datadir}/manual/mod/mod_autoindex.html
-%{_datadir}/manual/mod/mod_cgi.html
-%{_datadir}/manual/mod/mod_cern_meta.html
-%{_datadir}/manual/mod/mod_env.html.html
-%lang(en) %{_datadir}/manual/mod/mod_env.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_env.html.ja.jis
-%{_datadir}/manual/mod/mod_include.html
-%{_datadir}/manual/mod/mod_log_agent.html
-%{_datadir}/manual/mod/mod_log_config.html
-%{_datadir}/manual/mod/mod_log_referer.html
-%{_datadir}/manual/mod/mod_mime.html.html
-%lang(en) %{_datadir}/manual/mod/mod_mime.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_mime.html.ja.jis
-%{_datadir}/manual/mod/mod_mime_magic.html
-%{_datadir}/manual/mod/mod_negotiation.html.html
-%lang(en) %{_datadir}/manual/mod/mod_negotiation.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_negotiation.html.ja.jis
-%{_datadir}/manual/mod/mod_setenvif.html.html
-%lang(en) %{_datadir}/manual/mod/mod_setenvif.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_setenvif.html.ja.jis
-%{_datadir}/manual/mod/mod_so.html
-%{_datadir}/manual/mod/mod_speling.html
-%{_datadir}/manual/mod/mod_userdir.html
-%{_datadir}/manual/mod/module-dict.html.html
-%lang(en) %{_datadir}/manual/mod/module-dict.html.en
-%lang(ja) %{_datadir}/manual/mod/module-dict.html.ja.jis
-%dir %{_datadir}/manual/programs
-%{_datadir}/manual/programs/ab.html
-%{_datadir}/manual/programs/apachectl.html
-%{_datadir}/manual/programs/apxs.html
-%{_datadir}/manual/programs/dbmmanage.html
-%{_datadir}/manual/programs/footer.html
-%{_datadir}/manual/programs/header.html
-%{_datadir}/manual/programs/htdigest.html
-%{_datadir}/manual/programs/htpasswd.html
-%{_datadir}/manual/programs/httpd.html
-%{_datadir}/manual/programs/index.html.html
-%lang(en) %{_datadir}/manual/programs/index.html.en
-%lang(ja) %{_datadir}/manual/programs/index.html.ja.jis
-%{_datadir}/manual/programs/logresolve.html
-%{_datadir}/manual/programs/other.html
-%{_datadir}/manual/programs/rotatelogs.html
-%dir %{_datadir}/manual/vhosts
-%{_datadir}/manual/vhosts/details.html
-%{_datadir}/manual/vhosts/examples.html
-%{_datadir}/manual/vhosts/fd-limits.html
-%{_datadir}/manual/vhosts/footer.html
-%{_datadir}/manual/vhosts/header.html
-%{_datadir}/manual/vhosts/host.html
-%{_datadir}/manual/vhosts/index.html.html
-%lang(en) %{_datadir}/manual/vhosts/index.html.en
-%lang(ja) %{_datadir}/manual/vhosts/index.html.ja.jis
-%{_datadir}/manual/vhosts/ip-based.html
-%{_datadir}/manual/vhosts/mass.html
-%{_datadir}/manual/vhosts/name-based.html.html
-%lang(en) %{_datadir}/manual/vhosts/name-based.html.en
-%lang(ja) %{_datadir}/manual/vhosts/name-based.html.ja.jis
-%{_datadir}/manual/vhosts/vhosts-in-depth.html
-%{_datadir}/manual/vhosts/virtual-host.html
 
 %attr(755,root,root) %dir %{_datadir}/html
-%config(noreplace,missingok) %{_datadir}/html/index.html
-# note: html extensions are not the same as (g)libc locale names
-%lang(ca) %{_datadir}/html/index.html.ca
-%lang(cs) %{_datadir}/html/index.html.cz
-%lang(de) %{_datadir}/html/index.html.de
-%lang(da) %{_datadir}/html/index.html.dk
-%lang(et) %{_datadir}/html/index.html.ee
-%lang(el) %{_datadir}/html/index.html.el
-%{_datadir}/html/index.html.en
-%lang(es) %{_datadir}/html/index.html.es
-%lang(fr) %{_datadir}/html/index.html.fr
-%lang(he) %{_datadir}/html/index.html.he.iso8859-8
-%lang(it) %{_datadir}/html/index.html.it
-%lang(ja) %{_datadir}/html/index.html.ja.jis
-%lang(ko) %{_datadir}/html/index.html.kr.iso-kr
-%lang(de_LU) %{_datadir}/html/index.html.lu
-%lang(nl) %{_datadir}/html/index.html.nl
-%lang(nn) %{_datadir}/html/index.html.nn
-%lang(no) %{_datadir}/html/index.html.no
-%lang(pl) %{_datadir}/html/index.html.po.iso-pl
-%lang(pt_PT) %{_datadir}/html/index.html.pt
-%lang(pt_BR) %{_datadir}/html/index.html.pt-br
-%lang(ru) %{_datadir}/html/index.html.ru.cp-1251
-%lang(ru) %{_datadir}/html/index.html.ru.cp866
-%lang(ru) %{_datadir}/html/index.html.ru.iso-ru
-%lang(ru) %{_datadir}/html/index.html.ru.koi8-r
-%lang(ru) %{_datadir}/html/index.html.ru.ucs2
-%lang(ru) %{_datadir}/html/index.html.ru.ucs4
-%lang(ru) %{_datadir}/html/index.html.ru.utf8
-%lang(se) %{_datadir}/html/index.html.se
-%lang(zh_TW) %{_datadir}/html/index.html.zh.Big5
-
-%{_datadir}/html/*.gif
-%{_datadir}/errordocs
-%dir %{_datadir}/icons
-%{_datadir}/icons/*.gif
-%dir %{_datadir}/icons/small
-%{_datadir}/icons/small/*.gif
+%{_datadir}/icons
 %attr(755,root,root) %{_datadir}/cgi-bin
+
+%{_datadir}/error
+%dir %{_datadir}/manual
+
+%files doc
+%defattr(644,root,root,755)
+%{_datadir}/manual/LICENSE
+%{_datadir}/manual/*.xml
+%{_datadir}/manual/*.html.en
+%lang(ja) %{_datadir}/manual/*.html.ja.jis
+%lang(ja) %{_datadir}/manual/*.xml.ja
+%lang(ko) %{_datadir}/manual/*.html.ko.euc-kr
+%lang(de) %{_datadir}/manual/*.html.de
+%lang(fr) %{_datadir}/manual/*.html.fr
+%{_datadir}/manual/developer
+%{_datadir}/manual/faq
+%dir %{_datadir}/manual/howto
+%doc %{_datadir}/manual/howto/*.en
+%lang(ja) %{_datadir}/manual/howto/*.ja.jis
+%dir %{_datadir}/manual/images
+%{_datadir}/manual/images/[achips]*
+%{_datadir}/manual/misc
+%dir %{_datadir}/manual/mod
+%{_datadir}/manual/mod/[cdfhipw]*.html.en
+%{_datadir}/manual/mod/[acd]*.xml
+%lang(ja) %{_datadir}/manual/mod/[ad]*.xml.ja*
+%lang(ja) %{_datadir}/manual/mod/index.html.ja.jis
+%lang(ja) %{_datadir}/manual/mod/index.xml.ja
+%{_datadir}/manual/mod/index.xml
+%{_datadir}/manual/mod/mpm*.html.en
+%{_datadir}/manual/mod/mod_access.html.en
+%{_datadir}/manual/mod/mod_alias.html.en
+%{_datadir}/manual/mod/mod_asis.html.en
+%{_datadir}/manual/mod/mod_autoindex.html.en
+%{_datadir}/manual/mod/mod_cern_meta.html.en
+%{_datadir}/manual/mod/mod_cgi.html.en
+%{_datadir}/manual/mod/mod_env.html.en
+%{_datadir}/manual/mod/mod_include.html.en
+%{_datadir}/manual/mod/mod_log_config.html.en
+%{_datadir}/manual/mod/mod_mime*.html.en
+%{_datadir}/manual/mod/mod_negotiation.html.en
+%{_datadir}/manual/mod/mod_setenvif.html.en
+%{_datadir}/manual/mod/mod_speling.html.en
+%{_datadir}/manual/mod/mod_userdir.html.en
+%{_datadir}/manual/platform
+%{_datadir}/manual/programs
+%{_datadir}/manual/style
+
+%{_datadir}/manual/mod/mod_suexec.html.en
+%{_datadir}/manual/mod/mod_actions.html.en
+%{_datadir}/manual/mod/mod_auth.html.en
+%{_datadir}/manual/mod/mod_auth_anon.html.en
+%{_datadir}/manual/mod/mod_auth_ldap.html.en
+%{_datadir}/manual/mod/mod_ldap.html.en
+%{_datadir}/manual/mod/mod_auth_dbm.html.en
+%{_datadir}/manual/mod/mod_auth_digest.html.en
+%{_datadir}/manual/mod/mod_cache.html.en
+%{_datadir}/manual/mod/mod_cgid.html.en
+%{_datadir}/manual/mod/mod_charset_lite.html.en
+%{_datadir}/manual/mod/mod_dav*.html.en
+%{_datadir}/manual/mod/mod_deflate.html.en
+%{_datadir}/manual/mod/mod_dir.html.en
+%{_datadir}/manual/mod/mod_expires.html.en
+%{_datadir}/manual/mod/mod_file_cache.html.en
+%{_datadir}/manual/mod/mod_headers.html.en
+%{_datadir}/manual/mod/mod_imap.html.en
+%{_datadir}/manual/mod/mod_info.html.en
+%{_datadir}/manual/mod/mod_proxy*.html.en
+%{_datadir}/manual/mod/mod_rewrite.html.en
+%{_datadir}/manual/images/mod_rewrite*
+%{_datadir}/manual/ssl
+%{_datadir}/manual/mod/mod_ssl.html.en
+%{_datadir}/manual/mod/mod_status.html.en
+%{_datadir}/manual/mod/mod_usertrack.html.en
+%{_datadir}/manual/mod/mod_unique_id.html.en
+%{_datadir}/manual/mod/mod_vhost_alias.html.en
+%{_datadir}/manual/vhosts
 
 %files suexec
 %defattr(644,root,root,755)
 %attr(4755,root,root) %{_sbindir}/suexec
-%{_datadir}/manual/suexec.html.html
-%lang(en) %{_datadir}/manual/suexec.html.en
-%lang(ja) %{_datadir}/manual/suexec.html.ja.jis
-%{_datadir}/manual/programs/suexec.html
+%attr(755,root,root) %{_libexecdir}/mod_suexec.so
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_suexec.conf
+
+%files index
+%defattr(644,root,root,755)
+%config(noreplace,missingok) %{_datadir}/html/index.html*
+%{_datadir}/html/*.gif
+%{_datadir}/html/*.png
 
 %files devel
 %defattr(644,root,root,755)
 %{_includedir}
+%{_libexecdir}/*.exp
+%attr(750,root,root) %dir %{_sysconfdir}/build
+%attr(755,root,root) %dir %{_libexecdir}/build
+%attr(644,root,root) %{_libexecdir}/build/*.mk
+%attr(755,root,root) %{_libexecdir}/build/*.sh
+%attr(755,root,root) %{_libexecdir}/build/libtool
 
 %files mod_actions
 %defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_actions.conf
 %attr(755,root,root) %{_libexecdir}/mod_actions.so
-%{_datadir}/manual/mod/mod_actions.html
 
 %files mod_auth
 %defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_auth.conf
 %attr(755,root,root) %{_libexecdir}/mod_auth.so
-%attr(755,root,root) %{_bindir}/htpasswd
-%{_datadir}/manual/mod/mod_auth.html
+%attr(755,root,root) %{_sbindir}/htpasswd
+%{_mandir}/man1/htpasswd.1*
 
 %files mod_auth_anon
 %defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_auth_anon.conf
 %attr(755,root,root) %{_libexecdir}/mod_auth_anon.so
-%{_datadir}/manual/mod/mod_auth_anon.html
 
-%files mod_auth_db
+%if %{with ldap}
+%files mod_auth_ldap
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libexecdir}/mod_auth_db.so
-%attr(755,root,root) %{_bindir}/dbmmanage
-%{_datadir}/manual/mod/mod_auth_db.html
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_auth_ldap.conf
+%attr(755,root,root) %{_libexecdir}/mod_auth_ldap.so
+%endif
+
+%if %{with ldap}
+%files mod_ldap
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_ldap.conf
+%attr(755,root,root) %{_libexecdir}/mod_ldap.so
+%endif
+
+%files mod_auth_dbm
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_auth_dbm.conf
+%attr(755,root,root) %{_libexecdir}/mod_auth_dbm.so
+%attr(755,root,root) %{_sbindir}/dbmmanage
+%attr(755,root,root) %{_sbindir}/htdbm
 %{_mandir}/man1/dbmmanage.1*
-%{_mandir}/man1/htpasswd.1*
 
 %files mod_auth_digest
 %defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_auth_digest.conf
 %attr(755,root,root) %{_libexecdir}/mod_auth_digest.so
-%{_datadir}/manual/mod/mod_auth_digest.html
 
-%files mod_define
+%files mod_cache
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libexecdir}/mod_define.so
-%{_datadir}/manual/mod/mod_define.html
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_cache.conf
+%attr(755,root,root) %{_libexecdir}/mod_cache.so
+%attr(755,root,root) %{_libexecdir}/mod_disk_cache.so
+%attr(755,root,root) %{_libexecdir}/mod_mem_cache.so
 
-%files mod_digest
+%files mod_cgid
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libexecdir}/mod_digest.so
-%{_datadir}/manual/mod/mod_digest.html
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_cgid.conf
+%attr(755,root,root) %{_libexecdir}/mod_cgid.so
+
+%files mod_charset_lite
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_charset_lite.conf
+%attr(755,root,root) %{_libexecdir}/mod_charset_lite.so
+
+%files mod_dav
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_dav.conf
+%attr(755,root,root) %{_libexecdir}/mod_dav*.so
+
+%files mod_deflate
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_deflate.conf
+%attr(755,root,root) %{_libexecdir}/mod_deflate.so
 
 %files mod_dir
 %defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_dir.conf
 %attr(755,root,root) %{_libexecdir}/mod_dir.so
-%{_datadir}/manual/mod/mod_dir.html.html
-%lang(en) %{_datadir}/manual/mod/mod_dir.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_dir.html.ja.jis
 
 %files mod_expires
 %defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_expires.conf
 %attr(755,root,root) %{_libexecdir}/mod_expires.so
-%{_datadir}/manual/mod/mod_expires.html
+
+%files mod_file_cache
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_file_cache.conf
+%attr(755,root,root) %{_libexecdir}/mod_file_cache.so
 
 %files mod_headers
 %defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_headers.conf
 %attr(755,root,root) %{_libexecdir}/mod_headers.so
-%{_datadir}/manual/mod/mod_headers.html
-
-%files mod_mmap_static
-%defattr(644,root,root,755)
-%attr(755,root,root) %{_libexecdir}/mod_mmap_static.so
-%{_datadir}/manual/mod/mod_mmap_static.html
 
 %files mod_imap
 %defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_imap.conf
 %attr(755,root,root) %{_libexecdir}/mod_imap.so
-%{_datadir}/manual/mod/mod_imap.html
 
 %files mod_info
 %defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_info.conf
 %attr(755,root,root) %{_libexecdir}/mod_info.so
-%{_datadir}/manual/mod/mod_info.html
 
 %files mod_proxy
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/mod_proxy.conf
-%attr(755,root,root) %{_libexecdir}/libproxy.so
-%{_datadir}/manual/mod/mod_proxy.html
-%dir %attr(770,root,http) /var/cache/apache
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_proxy.conf
+%attr(755,root,root) %{_libexecdir}/mod_proxy*.so
+%attr(770,root,http) /var/cache/apache
 
 %files mod_rewrite
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_rewrite.so
-%{_datadir}/manual/mod/mod_rewrite.html
-%{_datadir}/manual/images/mod_rewrite*
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_rewrite.conf
+
+%if %{with ssl}
+%files mod_ssl
+%defattr(644,root,root,755)
+%attr(750,root,root) %dir %{_sysconfdir}/ssl
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/ssl/server.*
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_ssl.conf
+%attr(755,root,root) %{_libexecdir}/mod_ssl.so
+%endif
 
 %files mod_status
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/mod_status.conf
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_status.conf
 %attr(755,root,root) %{_libexecdir}/mod_status.so
-%{_datadir}/manual/mod/mod_status.html
 
 %files mod_usertrack
 %defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_usertrack.conf
 %attr(755,root,root) %{_libexecdir}/mod_usertrack.so
-%{_datadir}/manual/mod/mod_cookies.html
-%{_datadir}/manual/mod/mod_usertrack.html
 
 %files mod_unique_id
 %defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_unique_id.conf
 %attr(755,root,root) %{_libexecdir}/mod_unique_id.so
-%{_datadir}/manual/mod/mod_unique_id.html
 
 %files mod_vhost_alias
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_vhost_alias.so
-%{_datadir}/manual/mod/mod_vhost_alias.html
-%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/mod_vhost_alias.conf
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_vhost_alias.conf
