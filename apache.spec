@@ -580,10 +580,25 @@ ln -sf index.html.en $RPM_BUILD_ROOT%{_datadir}/html/index.html
 gzip -9nf ABOUT_APACHE src/CHANGES KEYS README
 
 %pre
-GROUP=http; GID=51; %groupadd
-USER=http; UID=51; HOMEDIR=/home/httpd; COMMENT="HTTP User"; %useradd
+if [ -n "`getgid http`" ]; then
+	if [ "`getgid http`" != "51" ]; then
+		echo "Warning: group http haven't gid=51. Correct this before installing apache" 1>&2
+		exit 1
+	fi
+else
+	/usr/sbin/groupadd -g 51 -r -f http
+fi
+if [ -n "`id -u http 2>/dev/null`" ]; then
+	if [ "`id -u http`" != "51" ]; then
+		echo "Warning: user http haven't uid=51. Correct this before installing apache" 1>&2
+		exit 1
+	fi
+else
+	/usr/sbin/useradd -u 51 -r -d /home/httpd -s /bin/false -c "HTTP User" -g http http 1>&2
+fi
 
 %post
+/sbin/chkconfig --add httpd
 %{_sbindir}/apxs -e -a -n access %{_libexecdir}/mod_access.so 1>&2
 %{_sbindir}/apxs -e -a -n alias %{_libexecdir}/mod_alias.so 1>&2
 %{_sbindir}/apxs -e -a -n asis %{_libexecdir}/mod_asis.so 1>&2
@@ -603,7 +618,11 @@ USER=http; UID=51; HOMEDIR=/home/httpd; COMMENT="HTTP User"; %useradd
 %{_sbindir}/apxs -e -a -n userdir %{_libexecdir}/mod_userdir.so 1>&2
 umask 137
 touch /var/log/httpd/{access,error,agent,referer}_log
-NAME=httpd; DESC="apache http daemon"; %chkconfig_add
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+fi
 
 %preun
 if [ "$1" = "0" ]; then
@@ -624,12 +643,17 @@ if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n setenvif %{_libexecdir}/mod_setenvif.so 1>&2
 	%{_sbindir}/apxs -e -A -n speling %{_libexecdir}/mod_speling.so 1>&2
 	%{_sbindir}/apxs -e -A -n userdir %{_libexecdir}/mod_userdir.so 1>&2
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd stop 1>&2
+	fi
+	/sbin/chkconfig --del httpd
 fi
-NAME=httpd; %chkconfig_del
 
 %postun
-USER=http; %userdel
-GROUP=http; %groupdel
+if [ "$1" = "0" ]; then
+	/usr/sbin/userdel http
+	/usr/sbin/groupdel http
+fi
 
 %post mod_actions
 %{_sbindir}/apxs -e -a -n actions %{_libexecdir}/mod_actions.so 1>&2
