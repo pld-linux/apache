@@ -1,0 +1,13 @@
+--- apache_1.3.26/src/support/htdigest.c	2002-10-23 09:22:02.000000000 +0200
++++ apache_1.3.26/src/support/htdigest.c	2002-10-26 09:33:54.000000000 +0200
+@@ -255,8 +255,8 @@
+ 	fprintf(stderr, "Use -c option to create new one.\n");
+ 	exit(1);
+     }
+-    strcpy(user, argv[3]);
+-    strcpy(realm, argv[2]);
++    strncpy(user, argv[3], sizeof (user));
++    strncpy(realm, argv[2], sizeof (realm));
+ 
+     found = 0;
+     while (!(getline(line, MAX_STRING_LEN, f))) {

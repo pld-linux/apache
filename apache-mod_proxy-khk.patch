@@ -1,0 +1,365 @@
+--- apache_1.3.26/src/modules/proxy/mod_proxy.c	Mon Jun 17 20:59:59 2002
++++ apache_1.3.26-patched/src/modules/proxy/mod_proxy.c	Sun Jun 23 19:25:57 2002
+@@ -460,6 +525,11 @@
+     ps->cache.dirlength_set = 0;
+     ps->cache.cache_completion = (float)DEFAULT_CACHE_COMPLETION;
+     ps->cache.cache_completion_set = 0;
++    /* header manipulation */
++    ps->freshen_date = ap_make_array(p, 10, sizeof(hdr_actions_entry));
++    ps->resp_exp_vector = ap_make_array(p, 10, sizeof(resp_exp_vector_entry));
++    ps->req_headers = ap_make_array(p, 10, sizeof(hdr_actions_entry));
++    ps->resp_headers = ap_make_array(p, 10, sizeof(hdr_actions_entry));
+ 
+     return ps;
+ }
+@@ -496,6 +566,18 @@
+     ps->cache.dirlevels = (overrides->cache.dirlevels_set == 0) ? base->cache.dirlevels : overrides->cache.dirlevels;
+     ps->cache.dirlength = (overrides->cache.dirlength_set == 0) ? base->cache.dirlength : overrides->cache.dirlength;
+     ps->cache.cache_completion = (overrides->cache.cache_completion_set == 0) ? base->cache.cache_completion : overrides->cache.cache_completion;
++    /* put freshen_date and resp_exp_vector from the overriding config
++       in front of the base config arrays, the semantics being that
++       virtual server configs should be checked first */
++    ps->freshen_date = ap_append_arrays(p,overrides->freshen_date,base->freshen_date);
++    ps->resp_exp_vector = ap_append_arrays(p,overrides->resp_exp_vector,base->resp_exp_vector);
++    /* add req_ and resp_headers from the overriding config after
++       those from the base config arrays, the semantics being that the
++       directives are applied in declaration order, with those
++       specific to a virtual server coming after and therefore
++       overriding those from the root config */
++    ps->req_headers = ap_append_arrays(p,base->req_headers,overrides->req_headers);
++    ps->resp_headers = ap_append_arrays(p,base->resp_headers,overrides->resp_headers);
+ 
+     return ps;
+ }
+@@ -920,6 +1002,120 @@
+     return NULL;
+ }
+ 
++static const char* 
++    set_freshen_date(cmd_parms *parms, void *mconfig, char *one, char *two) 
++{
++    proxy_server_conf *psf =
++      ap_get_module_config(parms->server->module_config, &proxy_module);
++    hdr_actions_entry *f = 
++      (hdr_actions_entry *)ap_push_array(psf->freshen_date);
++    /* set action */
++    if (strcasecmp(one, "Off") == 0)
++      f->action = hdr_off;
++    else if (strcasecmp(one, "On") == 0)
++      f->action = hdr_on;
++    else 
++      return "CacheFreshenDate must be either On or Off";
++    /* set pattern (null is okay, will be dealt with at match time) */
++    if (two) {
++      f->pattern = ap_pregcomp(parms->pool,two,REG_EXTENDED|REG_NOSUB);
++      if (f->pattern == NULL)
++        return ap_psprintf
++          (parms->pool,"Regular expression could not be compiled: %s", two);
++    } else {
++      f->pattern = NULL;
++    }
++    return NULL;
++}
++
++static const char* 
++    set_resp_exp_vector(cmd_parms *parms, void *mconfig, char *one, char *two) 
++{
++    proxy_server_conf *psf =
++      ap_get_module_config(parms->server->module_config, &proxy_module);
++    resp_exp_vector_entry *rev = 
++      (resp_exp_vector_entry *)ap_push_array(psf->resp_exp_vector);
++    int i = atoi(one);
++    /* set seconds number */
++    if (i < -1)
++      return "ProxyResponseExpiresVector must be a number of seconds (0 for \"immediately), or -1 to explicitly disable\"";
++    rev->vector = i;
++    /* set pattern (again, null is okay) */
++    if (two) {
++      rev->pattern = ap_pregcomp(parms->pool,two,REG_EXTENDED|REG_NOSUB);
++      if (rev->pattern == NULL)
++        return ap_psprintf
++          (parms->pool,"Regular expression could not be compiled: %s", two);
++    } else {
++      rev->pattern = NULL;
++    }
++    return NULL;
++}
++
++static const char*
++    set_header_directive(cmd_parms *parms, void *mconfig, const char *args)
++{
++  char *one = ap_getword_conf(parms->pool,&args); 
++  char *two = ap_getword_conf(parms->pool,&args); 
++  char *three = ap_getword_conf(parms->pool,&args); 
++  char *four = ap_getword_conf(parms->pool,&args); 
++  proxy_server_conf *psf =
++    ap_get_module_config(parms->server->module_config, &proxy_module);
++  hdr_actions_entry *h;
++  /* push onto the correct array */
++  if (strcmp("ProxyRequestHeader",(char*)parms->info) == 0)
++    h = (hdr_actions_entry *)ap_push_array(psf->req_headers);
++  else
++    h = (hdr_actions_entry *)ap_push_array(psf->resp_headers);
++  /* set action */
++  if (strcasecmp(one,"set") == 0)
++    h->action = hdr_set;
++  else if (strcasecmp(one,"unset") == 0)
++    h->action = hdr_unset;
++  else if (strcasecmp(one,"add") == 0)
++    h->action = hdr_add;
++  else if (strcasecmp(one,"append") == 0)
++    h->action = hdr_append;
++  else 
++    return ap_psprintf
++      (parms->pool, "Argument to %s must be one of set | unset | add | append",
++       (char*)parms->info);
++  /* set which header */
++  h->header = ap_pstrdup(parms->pool,two);
++  /* unset only takes 2/3 arguments -- so set its pattern and return */
++  if (h->action == hdr_unset) {
++    if (strcmp(three,"")!=0) {
++        h->pattern = ap_pregcomp(parms->pool,three,REG_EXTENDED|REG_NOSUB);
++        if (h->pattern == NULL)
++          return ap_psprintf
++            (parms->pool,"Regular expression could not be compiled: %s", three);
++    } else {
++      h->pattern = NULL;
++    }
++    if (!strcmp(four,"")==0)
++      return ap_psprintf
++        (parms->pool,"%s 'unset' only takes two or three arguments", 
++         (char*)parms->info);
++    return NULL;
++  }
++  /* set value string */
++  if (strcmp(three,"")==0)
++    return ap_psprintf
++      (parms->pool,"%s requires at least three arguments", (char*)parms->info);
++  h->value = ap_pstrdup(parms->pool,three);
++  /* set pattern */
++  if (strcmp(four,"")!=0) {
++    h->pattern = ap_pregcomp(parms->pool,four,REG_EXTENDED|REG_NOSUB);
++    if (h->pattern == NULL)
++      return ap_psprintf
++        (parms->pool,"Regular expression could not be compiled: %s", four);
++  } else {
++    h->pattern = NULL;
++  }
++
++  return NULL;
++}
++
+ static const handler_rec proxy_handlers[] =
+ {
+     {"proxy-server", proxy_handler},
+@@ -970,6 +1166,16 @@
+     "Force a http cache completion after this percentage is loaded"},
+     {"ProxyVia", set_via_opt, NULL, RSRC_CONF, TAKE1,
+     "Configure Via: proxy header header to one of: on | off | block | full"},
++    {"CacheFreshenDate", set_freshen_date, NULL, RSRC_CONF, TAKE12,
++     "Whether to update the Date header when returning cached proxy responses"},
++    {"ProxyResponseExpiresVector", set_resp_exp_vector, NULL, RSRC_CONF, TAKE12,
++     "A constant to add to current time for expires headers on proxy response"},
++    {"ProxyRequestHeader", set_header_directive, (void*)"ProxyRequestHeader", 
++     RSRC_CONF,RAW_ARGS, 
++     "A directive for headers to be sent with proxy requests"},
++    {"ProxyResponseHeader", set_header_directive, (void*)"ProxyResponseHeader", 
++     RSRC_CONF,RAW_ARGS, 
++     "A directive for headers that are returned with responses"},
+     {NULL}
+ };
+ 
+--- apache_1.3.26/src/modules/proxy/mod_proxy.h	Sun Apr 21 07:35:07 2002
++++ apache_1.3.26-patched/src/modules/proxy/mod_proxy.h	Sun Jun 23 18:36:11 2002
+@@ -145,6 +145,23 @@
+     struct in_addr addr;
+ };
+ 
++/* for configurable headers */
++typedef enum { 
++  hdr_on, hdr_off, hdr_set, hdr_unset, hdr_add, hdr_append 
++} hdr_actions;
++
++typedef struct {
++  hdr_actions action;
++  char       *header;
++  char       *value;
++  regex_t    *pattern;
++} hdr_actions_entry;
++
++typedef struct {
++  int         vector;
++  regex_t    *pattern;
++} resp_exp_vector_entry;
++
+ #define DEFAULT_CACHE_SPACE 5
+ #define DEFAULT_CACHE_MAXEXPIRE SEC_ONE_DAY
+ #define DEFAULT_CACHE_EXPIRE    SEC_ONE_HR
+@@ -203,6 +220,10 @@
+     char recv_buffer_size_set;
+     size_t io_buffer_size;
+     char io_buffer_size_set;
++    array_header *freshen_date;
++    array_header *resp_exp_vector;
++    array_header *req_headers;
++    array_header *resp_headers;
+ } proxy_server_conf;
+ 
+ struct hdr_entry {
+@@ -299,6 +320,10 @@
+ table *ap_proxy_read_headers(request_rec *r, char *buffer, int size, BUFF *f);
+ long int ap_proxy_send_fb(BUFF *f, request_rec *r, cache_req *c, off_t len, int nowrite, int chunked, size_t recv_buffer_size);
+ void ap_proxy_write_headers(cache_req *c, const char *respline, table *t);
++void ap_proxy_freshen_date(request_rec *r, proxy_server_conf *psf, table* t);
++void ap_proxy_vectored_exp(request_rec *r, proxy_server_conf *psf, table* t);
++void ap_proxy_header_fixup(request_rec *r, proxy_server_conf *psf, table* t,
++                           array_header *directives);
+ int ap_proxy_liststr(const char *list, const char *key, char **val);
+ void ap_proxy_hash(const char *it, char *val, int ndepth, int nlength);
+ int ap_proxy_hex2sec(const char *x);
+diff -u apache_1.3.26/src/modules/proxy/proxy_cache.c apache_1.3.26-patched/src/modules/proxy/proxy_cache.c
+--- apache_1.3.26/src/modules/proxy/proxy_cache.c	Mon Jun  3 08:28:27 2002
++++ apache_1.3.26-patched/src/modules/proxy/proxy_cache.c	Sun Jun 23 19:59:20 2002
+@@ -747,6 +747,8 @@
+ int ap_proxy_cache_conditional(request_rec *r, cache_req *c, BUFF *cachefp)
+ {
+     const char *etag, *wetag = NULL;
++    proxy_server_conf *psf = (proxy_server_conf *)
++      ap_get_module_config(r->server->module_config,&proxy_module);
+ 
+     /* get etag */
+     if ((etag = ap_table_get(c->hdrs, "Etag"))) {
+@@ -905,6 +907,11 @@
+     /* content type is already set in the headers */
+     r->content_type = ap_table_get(r->headers_out, "Content-Type");
+ 
++    /* handle the cases where we need to modify the date and expires
++       outgoing headers */
++    ap_proxy_freshen_date(r,psf,r->headers_out);
++    ap_proxy_vectored_exp(r,psf,r->headers_out);
++
+     ap_send_http_header(r);
+ 
+     /* are we rewriting the cache file? */
+--- apache_1.3.26/src/modules/proxy/proxy_http.c	Mon Jun 17 20:59:59 2002
++++ apache_1.3.26-patched/src/modules/proxy/proxy_http.c	Sun Jun 23 20:14:14 2002
+@@ -317,6 +317,9 @@
+     else
+         ap_bvputs(f, "Host: ", desthost, CRLF, NULL);
+ #endif /* EAPI */
++
++    /* run fixup for the request header directives */
++    ap_proxy_header_fixup(r,conf,req_hdrs,conf->req_headers);
+ 
+     if (conf->viaopt == via_block) {
+         /* Block all outgoing Via: headers */
+--- apache_1.3.26/src/modules/proxy/proxy_util.c	Mon Jun 17 20:59:59 2002
++++ apache_1.3.26-patched/src/modules/proxy/proxy_util.c	Sun Jun 23 20:03:54 2002
+@@ -712,7 +712,10 @@
+  */
+ void ap_proxy_write_headers(cache_req *c, const char *respline, table *t)
+ {
+-    /* write status line */
++    proxy_server_conf *psf = (proxy_server_conf *)
++      ap_get_module_config(c->req->server->module_config,&proxy_module);
++
++   /* write status line */
+     if (respline && c->fp != NULL &&
+         ap_bvputs(c->fp, respline, CRLF, NULL) == -1) {
+         ap_log_rerror(APLOG_MARK, APLOG_ERR, c->req,
+@@ -721,6 +724,17 @@
+         return;
+     }
+ 
++    /* Set extra response headers. We can set whatever we want here
++     *  (including Expires and family) because we've already written
++     *  the hex header line for the cache file. But the rest of the
++     *  cache file, including the HTTP headers, will include whatever
++     *  we adjust here. This is good, in general, but it does mean we
++     *  have to adjust any running-vector Expires headers in the
++     *  ap_proxy_send_headers, so even cached files get nice clean
++     *  headers with times set correctly in the future. */
++    ap_proxy_vectored_exp(c->req,psf,t);
++    ap_proxy_header_fixup(c->req,psf,t,psf->resp_headers);
++
+     /* write response headers to the cache file */
+     ap_table_do(ap_proxy_send_hdr_line, c, t, NULL);
+ 
+@@ -732,6 +746,77 @@
+     }
+ }
+ 
++void ap_proxy_freshen_date(request_rec *r, proxy_server_conf *psf, table* t)
++{
++  int i;
++  hdr_actions_entry *list = (hdr_actions_entry*)psf->freshen_date->elts;
++  for(i=0; i < psf->freshen_date->nelts; i++) {
++    if(((list+i)->pattern == NULL) || 
++       (regexec((list+i)->pattern,r->uri,0,NULL,0) != REG_NOMATCH)) {
++      if ((list+i)->action == hdr_on) {
++        ap_table_set(t, "Date", 
++                     ap_ht_time(r->pool, time(NULL), "%a %d %b %Y %T %Z", 1));
++      }
++      return;
++    }
++  }
++}
++
++/* see whether there are ProxyVectoredExpire directives to apply to
++   this request. (Don't do anything unless there is already an Expires
++   header here.) */
++void ap_proxy_vectored_exp(request_rec *r, proxy_server_conf *psf, table* t)
++{
++  int i;
++  resp_exp_vector_entry *list;
++  /* don't do anything to a doc that doesn't *already* have an Expires */
++  if (! ap_table_get(t,"Expires")) return;
++  /* okay, loop through directives */
++  list = (resp_exp_vector_entry*)psf->resp_exp_vector->elts;
++  for(i=0; i < psf->resp_exp_vector->nelts; i++) {
++    if(((list+i)->pattern == NULL) ||
++       (regexec((list+i)->pattern,r->uri,0,NULL,0) != REG_NOMATCH)) {
++      if ((list+i)->vector == -1) {
++      } else if ((list+i)->vector == 0) {
++        ap_table_setn(t, "Expires", "0");
++        ap_table_setn(t, "Cache-Control", "max-age=0");
++      } else {
++        ap_table_set(t, "Expires", 
++                     ap_ht_time(r->pool, time(NULL)+(list+i)->vector, 
++                                "%a %d %b %Y %T %Z", 1));
++        ap_table_set(t, "Cache-Control", 
++                     ap_psprintf(r->pool,"max-age=%d",(list+i)->vector)); 
++      }
++      return;
++    }
++  }
++}
++
++void ap_proxy_header_fixup(request_rec *r, proxy_server_conf *psf,
++                           table *t, array_header *directives)
++{
++  int i;
++  hdr_actions_entry *list = (hdr_actions_entry *)directives->elts;
++  for (i=0; i < directives->nelts; i++) {
++    if(((list+i)->pattern == NULL) ||
++       (regexec((list+i)->pattern,r->uri,0,NULL,0) != REG_NOMATCH)) {
++      switch ((list+i)->action) {
++      case hdr_set:
++        ap_table_setn(t,(list+i)->header,(list+i)->value);
++        break;
++      case hdr_unset:
++        ap_table_unset(t,(list+i)->header);
++        break;
++      case hdr_add:
++        ap_table_addn(t,(list+i)->header,(list+i)->value);
++        break;
++      case hdr_append:
++        ap_table_mergen(t,(list+i)->header,(list+i)->value);
++        break;
++      }
++    }
++  }
++}
+ 
+ /*
+  * list is a comma-separated list of case-insensitive tokens, with

@@ -3,9 +3,9 @@
 @@ -1,4 +1,4 @@
 -#!/usr/local/bin/perl
 +#!/usr/bin/perl
- ## ====================================================================
- ## Copyright (c) 1998-1999 The Apache Group.  All rights reserved.
- ##
+ #
+ # Copyright 1999-2004 The Apache Software Foundation
+ #
 @@ -220,15 +220,15 @@
  ##  Initial DSO support check
  ##
