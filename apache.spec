@@ -26,12 +26,12 @@ Summary(tr):	Lider WWW tarayýcý
 Summary(uk):	îÁÊÐÏÐÕÌÑÒÎ¦ÛÉÊ Web-Server
 Summary(zh_CN):	Internet ÉÏÓ¦ÓÃ×î¹ã·ºµÄ Web ·þÎñ³ÌÐò¡£
 Name:		apache
-Version:	1.3.32
+Version:	1.3.33
 Release:	1
 License:	Apache Group
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/%{name}_%{version}.tar.gz
-# Source0-md5:	45164531fb57bfa18af4b9efd0850dd3
+# Source0-md5:	3dfd2c3778f37a2dfc22b97417a61407
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}-icons.tar.gz
@@ -80,6 +80,7 @@ Requires(pre):	/usr/sbin/useradd
 Requires(post,preun):	/sbin/chkconfig
 Requires(postun):	/usr/sbin/groupdel
 Requires(postun):	/usr/sbin/userdel
+Requires:	apache-mod_autoindex
 Requires:	/etc/mime.types
 Requires:	mailcap
 Requires:	psmisc >= 20.1
