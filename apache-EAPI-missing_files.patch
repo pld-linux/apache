@@ -1,0 +1,2796 @@
+diff -Nru apache_1.3.17/src/include/ap_ctx.h apache_1.3.17.new/src/include/ap_ctx.h
+--- apache_1.3.17/src/include/ap_ctx.h	Thu Jan  1 01:00:00 1970
++++ apache_1.3.17.new/src/include/ap_ctx.h	Thu Dec 30 22:02:59 1999
+@@ -0,0 +1,110 @@
++/* ====================================================================
++ * Copyright (c) 1998-2000 The Apache Group.  All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer. 
++ *
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in
++ *    the documentation and/or other materials provided with the
++ *    distribution.
++ *
++ * 3. All advertising materials mentioning features or use of this
++ *    software must display the following acknowledgment:
++ *    "This product includes software developed by the Apache Group
++ *    for use in the Apache HTTP server project (http://www.apache.org/)."
++ *
++ * 4. The names "Apache Server" and "Apache Group" must not be used to
++ *    endorse or promote products derived from this software without
++ *    prior written permission. For written permission, please contact
++ *    apache@apache.org.
++ *
++ * 5. Products derived from this software may not be called "Apache"
++ *    nor may "Apache" appear in their names without prior written
++ *    permission of the Apache Group.
++ *
++ * 6. Redistributions of any form whatsoever must retain the following
++ *    acknowledgment:
++ *    "This product includes software developed by the Apache Group
++ *    for use in the Apache HTTP server project (http://www.apache.org/)."
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE APACHE GROUP ``AS IS'' AND ANY
++ * EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
++ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE APACHE GROUP OR
++ * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
++ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
++ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
++ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
++ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
++ * OF THE POSSIBILITY OF SUCH DAMAGE.
++ * ====================================================================
++ *
++ * This software consists of voluntary contributions made by many
++ * individuals on behalf of the Apache Group and was originally based
++ * on public domain software written at the National Center for
++ * Supercomputing Applications, University of Illinois, Urbana-Champaign.
++ * For more information on the Apache Group and the Apache HTTP server
++ * project, please see <http://www.apache.org/>.
++ *
++ */
++
++/*
++**  Generic Context Interface for Apache
++**  Written by Ralf S. Engelschall <rse@engelschall.com> 
++*/
++
++#ifdef EAPI
++
++#ifndef AP_CTX_H
++#define AP_CTX_H
++
++#ifndef FALSE
++#define FALSE 0
++#define TRUE  !FALSE
++#endif
++
++/*
++ * Internal Context Record Definition
++ */
++
++#define AP_CTX_MAX_ENTRIES 1024
++
++typedef struct {
++    char *ce_key;
++    void *ce_val;
++} ap_ctx_entry;
++
++typedef struct {
++    pool          *cr_pool;
++    ap_ctx_entry **cr_entry;
++} ap_ctx_rec;
++
++typedef ap_ctx_rec ap_ctx;
++
++/*
++ * Some convinience macros for storing _numbers_ 0...n in contexts, i.e.
++ * treating numbers as pointers but keeping track of the NULL return code of
++ * ap_ctx_get.
++ */
++#define AP_CTX_NUM2PTR(n) (void *)((unsigned int)(n)+1)
++#define AP_CTX_PTR2NUM(p) (unsigned int)(((char *)(p))-1)
++
++/*
++ * Prototypes for Context Handling Functions
++ */
++
++API_EXPORT(ap_ctx *)ap_ctx_new(pool *p);
++API_EXPORT(void)    ap_ctx_set(ap_ctx *ctx, char *key, void *val);
++API_EXPORT(void *)  ap_ctx_get(ap_ctx *ctx, char *key);
++API_EXPORT(ap_ctx *)ap_ctx_overlay(pool *p, ap_ctx *over, ap_ctx *base);
++
++#endif /* AP_CTX_H */
++
++#endif /* EAPI */
+diff -Nru apache_1.3.17/src/include/ap_hook.h apache_1.3.17.new/src/include/ap_hook.h
+--- apache_1.3.17/src/include/ap_hook.h	Thu Jan  1 01:00:00 1970
++++ apache_1.3.17.new/src/include/ap_hook.h	Thu Dec 30 22:02:59 1999
+@@ -0,0 +1,710 @@
++#if 0
++=cut
++#endif
++/* ====================================================================
++ * Copyright (c) 1998-2000 The Apache Group.  All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer. 
++ *
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in
++ *    the documentation and/or other materials provided with the
++ *    distribution.
++ *
++ * 3. All advertising materials mentioning features or use of this
++ *    software must display the following acknowledgment:
++ *    "This product includes software developed by the Apache Group
++ *    for use in the Apache HTTP server project (http://www.apache.org/)."
++ *
++ * 4. The names "Apache Server" and "Apache Group" must not be used to
++ *    endorse or promote products derived from this software without
++ *    prior written permission. For written permission, please contact
++ *    apache@apache.org.
++ *
++ * 5. Products derived from this software may not be called "Apache"
++ *    nor may "Apache" appear in their names without prior written
++ *    permission of the Apache Group.
++ *
++ * 6. Redistributions of any form whatsoever must retain the following
++ *    acknowledgment:
++ *    "This product includes software developed by the Apache Group
++ *    for use in the Apache HTTP server project (http://www.apache.org/)."
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE APACHE GROUP ``AS IS'' AND ANY
++ * EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
++ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE APACHE GROUP OR
++ * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
++ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
++ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
++ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
++ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
++ * OF THE POSSIBILITY OF SUCH DAMAGE.
++ * ====================================================================
++ *
++ * This software consists of voluntary contributions made by many
++ * individuals on behalf of the Apache Group and was originally based
++ * on public domain software written at the National Center for
++ * Supercomputing Applications, University of Illinois, Urbana-Champaign.
++ * For more information on the Apache Group and the Apache HTTP server
++ * project, please see <http://www.apache.org/>.
++ *
++ */
++
++/*
++**  Implementation of a Generic Hook Interface for Apache
++**  Written by Ralf S. Engelschall <rse@engelschall.com> 
++**
++**  See POD document at end of this file for description.
++**  View it with the command ``pod2man ap_hook.h | nroff -man | more''
++**
++**  Attention: This header file is a little bit tricky.
++**             It's a combination of a C source and an embedded POD document
++**             The purpose of this is to have both things together at one
++**             place. So you can both pass this file to the C compiler and 
++**             the pod2man translater.
++*/
++
++#ifdef EAPI
++
++#ifndef AP_HOOK_H
++#define AP_HOOK_H
++
++/*
++ * Function Signature Specification:
++ *
++ * We encode the complete signature ingredients as a bitfield
++ * stored in a single unsigned long integer value, which can be
++ * constructed with AP_HOOK_SIGx(...)
++ */
++
++/* the type of the signature bitfield */
++typedef unsigned long int ap_hook_sig;
++
++/* the mask (bin) 111 (hex 0x7) for the triples in the bitfield */
++#define AP_HOOK_SIG_TRIPLE_MASK  0x7
++
++/* the position of the triple */
++#define AP_HOOK_SIG_TRIPLE_POS(n) ((n)*3)
++
++/* the constructor for triple #n with value v */
++#define AP_HOOK_SIG_TRIPLE(n,v) \
++        (((ap_hook_sig)(v))<<((AP_HOOK_##n)*3))
++
++/* the check whether triple #n in sig contains value v */
++#define AP_HOOK_SIG_HAS(sig,n,v) \
++        ((((ap_hook_sig)(sig))&AP_HOOK_SIG_TRIPLE(n, AP_HOOK_SIG_TRIPLE_MASK)) == (AP_HOOK_##n##_##v))
++
++/* utility function to get triple #n in sig */
++#define AP_HOOK_SIG_TRIPLE_GET(sig,n) \
++        ((((ap_hook_sig)(sig))>>AP_HOOK_SIG_TRIPLE_POS(n))&(AP_HOOK_SIG_TRIPLE_MASK))
++
++/* utility function to set triple #n in sig to value v */
++#define AP_HOOK_SIG_TRIPLE_SET(sig,n,v) \
++        ((((ap_hook_sig)(sig))&~(AP_HOOK_SIG_TRIPLE_MASK<<AP_HOOK_SIG_TRIPLE_POS(n)))|((v)<<AP_HOOK_SIG_TRIPLE_POS(n)))
++
++/* define the ingredients for the triple #0: id stuff */
++#define AP_HOOK_ID          0
++#define AP_HOOK_ID_ok       AP_HOOK_SIG_TRIPLE(ID,0)
++#define AP_HOOK_ID_undef    AP_HOOK_SIG_TRIPLE(ID,1)
++
++/* define the ingredients for the triple #1: return code */
++#define AP_HOOK_RC          1
++#define AP_HOOK_RC_void     AP_HOOK_SIG_TRIPLE(RC,0)
++#define AP_HOOK_RC_char     AP_HOOK_SIG_TRIPLE(RC,1)
++#define AP_HOOK_RC_int      AP_HOOK_SIG_TRIPLE(RC,2)
++#define AP_HOOK_RC_long     AP_HOOK_SIG_TRIPLE(RC,3)
++#define AP_HOOK_RC_float    AP_HOOK_SIG_TRIPLE(RC,4)
++#define AP_HOOK_RC_double   AP_HOOK_SIG_TRIPLE(RC,5)
++#define AP_HOOK_RC_ptr      AP_HOOK_SIG_TRIPLE(RC,6)
++
++/* define the ingredients for the triple #2: argument 1 */
++#define AP_HOOK_A1          2
++#define AP_HOOK_A1_ctx      AP_HOOK_SIG_TRIPLE(A1,0)
++#define AP_HOOK_A1_char     AP_HOOK_SIG_TRIPLE(A1,1)
++#define AP_HOOK_A1_int      AP_HOOK_SIG_TRIPLE(A1,2)
++#define AP_HOOK_A1_long     AP_HOOK_SIG_TRIPLE(A1,3)
++#define AP_HOOK_A1_float    AP_HOOK_SIG_TRIPLE(A1,4)
++#define AP_HOOK_A1_double   AP_HOOK_SIG_TRIPLE(A1,5)
++#define AP_HOOK_A1_ptr      AP_HOOK_SIG_TRIPLE(A1,6)
++
++/* define the ingredients for the triple #3: argument 2 */
++#define AP_HOOK_A2          3
++#define AP_HOOK_A2_ctx      AP_HOOK_SIG_TRIPLE(A2,0)
++#define AP_HOOK_A2_char     AP_HOOK_SIG_TRIPLE(A2,1)
++#define AP_HOOK_A2_int      AP_HOOK_SIG_TRIPLE(A2,2)
++#define AP_HOOK_A2_long     AP_HOOK_SIG_TRIPLE(A2,3)
++#define AP_HOOK_A2_float    AP_HOOK_SIG_TRIPLE(A2,4)
++#define AP_HOOK_A2_double   AP_HOOK_SIG_TRIPLE(A2,5)
++#define AP_HOOK_A2_ptr      AP_HOOK_SIG_TRIPLE(A2,6)
++
++/* define the ingredients for the triple #4: argument 3 */
++#define AP_HOOK_A3          4
++#define AP_HOOK_A3_ctx      AP_HOOK_SIG_TRIPLE(A3,0)
++#define AP_HOOK_A3_char     AP_HOOK_SIG_TRIPLE(A3,1)
++#define AP_HOOK_A3_int      AP_HOOK_SIG_TRIPLE(A3,2)
++#define AP_HOOK_A3_long     AP_HOOK_SIG_TRIPLE(A3,3)
++#define AP_HOOK_A3_float    AP_HOOK_SIG_TRIPLE(A3,4)
++#define AP_HOOK_A3_double   AP_HOOK_SIG_TRIPLE(A3,5)
++#define AP_HOOK_A3_ptr      AP_HOOK_SIG_TRIPLE(A3,6)
++
++/* define the ingredients for the triple #5: argument 4 */
++#define AP_HOOK_A4          5
++#define AP_HOOK_A4_ctx      AP_HOOK_SIG_TRIPLE(A4,0)
++#define AP_HOOK_A4_char     AP_HOOK_SIG_TRIPLE(A4,1)
++#define AP_HOOK_A4_int      AP_HOOK_SIG_TRIPLE(A4,2)
++#define AP_HOOK_A4_long     AP_HOOK_SIG_TRIPLE(A4,3)
++#define AP_HOOK_A4_float    AP_HOOK_SIG_TRIPLE(A4,4)
++#define AP_HOOK_A4_double   AP_HOOK_SIG_TRIPLE(A4,5)
++#define AP_HOOK_A4_ptr      AP_HOOK_SIG_TRIPLE(A4,6)
++
++/* define the ingredients for the triple #6: argument 5 */
++#define AP_HOOK_A5          6
++#define AP_HOOK_A5_ctx      AP_HOOK_SIG_TRIPLE(A5,0)
++#define AP_HOOK_A5_char     AP_HOOK_SIG_TRIPLE(A5,1)
++#define AP_HOOK_A5_int      AP_HOOK_SIG_TRIPLE(A5,2)
++#define AP_HOOK_A5_long     AP_HOOK_SIG_TRIPLE(A5,3)
++#define AP_HOOK_A5_float    AP_HOOK_SIG_TRIPLE(A5,4)
++#define AP_HOOK_A5_double   AP_HOOK_SIG_TRIPLE(A5,5)
++#define AP_HOOK_A5_ptr      AP_HOOK_SIG_TRIPLE(A5,6)
++
++/* define the ingredients for the triple #7: argument 6 */
++#define AP_HOOK_A6          7
++#define AP_HOOK_A6_ctx      AP_HOOK_SIG_TRIPLE(A6,0)
++#define AP_HOOK_A6_char     AP_HOOK_SIG_TRIPLE(A6,1)
++#define AP_HOOK_A6_int      AP_HOOK_SIG_TRIPLE(A6,2)
++#define AP_HOOK_A6_long     AP_HOOK_SIG_TRIPLE(A6,3)
++#define AP_HOOK_A6_float    AP_HOOK_SIG_TRIPLE(A6,4)
++#define AP_HOOK_A6_double   AP_HOOK_SIG_TRIPLE(A6,5)
++#define AP_HOOK_A6_ptr      AP_HOOK_SIG_TRIPLE(A6,6)
++
++/* define the ingredients for the triple #8: argument 7 */
++#define AP_HOOK_A7          8
++#define AP_HOOK_A7_ctx      AP_HOOK_SIG_TRIPLE(A7,0)
++#define AP_HOOK_A7_char     AP_HOOK_SIG_TRIPLE(A7,1)
++#define AP_HOOK_A7_int      AP_HOOK_SIG_TRIPLE(A7,2)
++#define AP_HOOK_A7_long     AP_HOOK_SIG_TRIPLE(A7,3)
++#define AP_HOOK_A7_float    AP_HOOK_SIG_TRIPLE(A7,4)
++#define AP_HOOK_A7_double   AP_HOOK_SIG_TRIPLE(A7,5)
++#define AP_HOOK_A7_ptr      AP_HOOK_SIG_TRIPLE(A7,6)
++
++/* define the ingredients for the triple #9: argument 8 */
++#define AP_HOOK_A8          9
++#define AP_HOOK_A8_ctx      AP_HOOK_SIG_TRIPLE(9,0)
++#define AP_HOOK_A8_char     AP_HOOK_SIG_TRIPLE(9,1)
++#define AP_HOOK_A8_int      AP_HOOK_SIG_TRIPLE(9,2)
++#define AP_HOOK_A8_long     AP_HOOK_SIG_TRIPLE(9,3)
++#define AP_HOOK_A8_float    AP_HOOK_SIG_TRIPLE(9,4)
++#define AP_HOOK_A8_double   AP_HOOK_SIG_TRIPLE(9,5)
++#define AP_HOOK_A8_ptr      AP_HOOK_SIG_TRIPLE(9,6)
++  
++/* the constructor for unknown signatures */
++#define AP_HOOK_SIG_UNKNOWN AP_HOOK_ID_undef
++
++/* the constructor for signatures with 1 type */
++#define AP_HOOK_SIG1(rc) \
++        (AP_HOOK_RC_##rc)
++
++/* the constructor for signatures with 2 types */
++#define AP_HOOK_SIG2(rc,a1) \
++        (AP_HOOK_RC_##rc|AP_HOOK_A1_##a1)
++
++/* the constructor for signatures with 3 types */
++#define AP_HOOK_SIG3(rc,a1,a2) \
++        (AP_HOOK_RC_##rc|AP_HOOK_A1_##a1|AP_HOOK_A2_##a2)
++
++/* the constructor for signatures with 4 types */
++#define AP_HOOK_SIG4(rc,a1,a2,a3) \
++        (AP_HOOK_RC_##rc|AP_HOOK_A1_##a1|AP_HOOK_A2_##a2|AP_HOOK_A3_##a3)
++
++/* the constructor for signatures with 5 types */
++#define AP_HOOK_SIG5(rc,a1,a2,a3,a4) \
++        (AP_HOOK_RC_##rc|AP_HOOK_A1_##a1|AP_HOOK_A2_##a2|AP_HOOK_A3_##a3|AP_HOOK_A4_##a4)
++
++/* the constructor for signatures with 6 types */
++#define AP_HOOK_SIG6(rc,a1,a2,a3,a4,a5) \
++        (AP_HOOK_RC_##rc|AP_HOOK_A1_##a1|AP_HOOK_A2_##a2|AP_HOOK_A3_##a3|AP_HOOK_A4_##a4|AP_HOOK_A5_##a5)
++
++/* the constructor for signatures with 7 types */
++#define AP_HOOK_SIG7(rc,a1,a2,a3,a4,a5,a6) \
++        (AP_HOOK_RC_##rc|AP_HOOK_A1_##a1|AP_HOOK_A2_##a2|AP_HOOK_A3_##a3|AP_HOOK_A4_##a4|AP_HOOK_A5_##a5|AP_HOOK_A6_##a6)
++
++/* the constructor for signatures with 8 types */
++#define AP_HOOK_SIG8(rc,a1,a2,a3,a4,a5,a6,a7) \
++        (AP_HOOK_RC_##rc|AP_HOOK_A1_##a1|AP_HOOK_A2_##a2|AP_HOOK_A3_##a3|AP_HOOK_A4_##a4|AP_HOOK_A5_##a5|AP_HOOK_A6_##a6|AP_HOOK_A7_##a7)
++
++/* the constructor for signatures with 9 types */
++#define AP_HOOK_SIG9(rc,a1,a2,a3,a4,a5,a6,a7,a8) \
++        (AP_HOOK_RC_##rc|AP_HOOK_A1_##a1|AP_HOOK_A2_##a2|AP_HOOK_A3_##a3|AP_HOOK_A4_##a4|AP_HOOK_A5_##a5|AP_HOOK_A6_##a6|AP_HOOK_A7_##a7|AP_HOOK_A8_##a8)
++
++/*
++ * Return Value Mode Identification
++ */
++
++/* the type of the return value modes */
++typedef unsigned int ap_hook_mode;
++
++/* the mode of the return value */
++#define AP_HOOK_MODE_UNKNOWN  0
++#define AP_HOOK_MODE_TOPMOST  1
++#define AP_HOOK_MODE_DECLINE  2
++#define AP_HOOK_MODE_DECLTMP  3
++#define AP_HOOK_MODE_ALL      4
++
++/* the constructors for the return value modes */
++#define AP_HOOK_TOPMOST       AP_HOOK_MODE_TOPMOST
++#define AP_HOOK_DECLINE(val)  AP_HOOK_MODE_DECLINE, (val)   
++#define AP_HOOK_DECLTMP(val)  AP_HOOK_MODE_DECLTMP, (val)   
++#define AP_HOOK_ALL           AP_HOOK_MODE_ALL
++
++/*
++ * Hook State Identification
++ */
++
++/* the type of the hook state */
++typedef unsigned short int ap_hook_state;
++
++/* the values of the hook state */
++#define AP_HOOK_STATE_UNDEF       0
++#define AP_HOOK_STATE_NOTEXISTANT 1
++#define AP_HOOK_STATE_ESTABLISHED 2
++#define AP_HOOK_STATE_CONFIGURED  3
++#define AP_HOOK_STATE_REGISTERED  4
++
++/*
++ * Hook Context Identification
++ *
++ * Notice: Null is ok here, because AP_HOOK_NOCTX is just a dummy argument
++ *         because we know from the signature whether the argument is a
++ *         context value or just the dummy value.
++ */
++
++#define AP_HOOK_NOCTX  (void *)(0)
++#define AP_HOOK_CTX(v) (void *)(v)
++
++/*
++ * Internal Hook Record Definition
++ */
++
++/* the union holding the arbitrary decline values */
++typedef union {
++    char   v_char;
++    int    v_int;
++    long   v_long;
++    float  v_float;
++    double v_double;
++    void  *v_ptr;
++} ap_hook_value;
++
++/* the structure holding one hook function and its context */
++typedef struct {
++    void *hf_ptr;              /* function pointer       */
++    void *hf_ctx;              /* function context       */
++} ap_hook_func;
++
++/* the structure holding one hook entry with all its registered functions */
++typedef struct {
++    char          *he_hook;    /* hook name (=unique id) */
++    ap_hook_sig    he_sig;     /* hook signature         */
++    int            he_modeid;  /* hook mode id           */
++    ap_hook_value  he_modeval; /* hook mode value        */
++    ap_hook_func **he_func;    /* hook registered funcs  */
++} ap_hook_entry;
++
++/* the maximum number of hooks and functions per hook */
++#define AP_HOOK_MAX_ENTRIES 512
++#define AP_HOOK_MAX_FUNCS   128
++
++/*
++ * Extended Variable Argument (vararg) Support
++ *
++ * In ANSI C varargs exists, but because the prototypes of function with
++ * varargs cannot reflect the types of the varargs, K&R argument passing
++ * conventions have to apply for the compiler.  This means mainly a conversion
++ * of shorter type variants to the maximum variant (according to sizeof). The
++ * above va_type() macro provides this mapping from the wanted types to the
++ * physically used ones.
++ */
++
++/* the mapping */
++#define VA_TYPE_char   int
++#define VA_TYPE_short  int
++#define VA_TYPE_int    int
++#define VA_TYPE_long   long
++#define VA_TYPE_float  double
++#define VA_TYPE_double double
++#define VA_TYPE_ptr    void *
++#define VA_TYPE_ctx    void *
++
++/* the constructor */
++#ifdef  va_type
++#undef  va_type
++#endif
++#define va_type(type)  VA_TYPE_ ## type
++
++/*
++ * Miscellaneous stuff
++ */
++
++#ifndef FALSE
++#define FALSE 0
++#define TRUE  !FALSE
++#endif
++
++/*
++ * Wrapper macros for the callback-function register/unregister calls.  
++ * 
++ * Background: Strict ANSI C doesn't allow a function pointer to be treated as
++ * a void pointer on argument passing, but we cannot declare the argument as a
++ * function prototype, because the functions can have arbitrary signatures. So
++ * we have to use a void pointer here. But to not require explicit casts on
++ * function pointers for every register/unregister call, we smooth the API a
++ * little bit by providing these macros.
++ */
++
++#define ap_hook_register(hook,func,ctx) ap_hook_register_I(hook,(void *)(func),ctx)
++#define ap_hook_unregister(hook,func)   ap_hook_unregister_I(hook,(void *)(func))
++
++/*
++ * Prototypes for the hook API functions
++ */
++
++API_EXPORT(void)          ap_hook_init         (void);
++API_EXPORT(void)          ap_hook_kill         (void);
++API_EXPORT(int)           ap_hook_configure    (char *hook, ap_hook_sig sig, ap_hook_mode modeid, ...);
++API_EXPORT(int)           ap_hook_register_I   (char *hook, void *func, void *ctx);
++API_EXPORT(int)           ap_hook_unregister_I (char *hook, void *func);
++API_EXPORT(ap_hook_state) ap_hook_status       (char *hook);
++API_EXPORT(int)           ap_hook_use          (char *hook, ap_hook_sig sig, ap_hook_mode modeid, ...);
++API_EXPORT(int)           ap_hook_call         (char *hook, ...);
++
++#endif /* AP_HOOK_H */
++
++#endif /* EAPI */
++/*
++=pod
++##
++##  Embedded POD document
++##
++
++=head1 NAME
++
++B<ap_hook> - B<Generic Hook Interface for Apache>
++
++=head1 SYNOPSIS
++
++B<Hook Library Setup:>
++
++ void ap_hook_init(void);
++ void ap_hook_kill(void);
++
++B<Hook Configuration and Registration:>
++
++ int ap_hook_configure(char *hook, ap_hook_sig sig, ap_hook_mode mode);
++ int ap_hook_register(char *hook, void *func, void *ctx);
++ int ap_hook_unregister(char *hook, void *func);
++
++B<Hook Usage:>
++
++ ap_hook_state ap_hook_status(char *hook);
++ int ap_hook_use(char *hook, ap_hook_sig sig, ap_hook_mode mode, ...);
++ int ap_hook_call(char *hook, ...);
++
++B<Hook Signature Constructors> (ap_hook_sig):
++
++ AP_HOOK_SIG1(rc)
++ AP_HOOK_SIG2(rc,a1)
++ AP_HOOK_SIG3(rc,a1,a2)
++ AP_HOOK_SIG4(rc,a1,a2,a3)
++ AP_HOOK_SIG5(rc,a1,a2,a3,a4)
++ AP_HOOK_SIG6(rc,a1,a2,a3,a4,a5)
++ AP_HOOK_SIG7(rc,a1,a2,a3,a4,a5,a6)
++ AP_HOOK_SIG8(rc,a1,a2,a3,a4,a5,a6,a7)
++
++B<Hook Modes Constructors> (ap_hook_mode):
++
++ AP_HOOK_TOPMOST
++ AP_HOOK_DECLINE(value)
++ AP_HOOK_DECLTMP(value)
++ AP_HOOK_ALL
++
++B<Hook States> (ap_hook_state):
++
++ AP_HOOK_STATE_UNDEF
++ AP_HOOK_STATE_NOTEXISTANT
++ AP_HOOK_STATE_ESTABLISHED
++ AP_HOOK_STATE_CONFIGURED 
++ AP_HOOK_STATE_REGISTERED
++
++=head1 DESCRIPTION
++
++This library implements a generic hook interface for Apache which can be used
++to loosely couple code through arbitrary hooks. There are two use cases for
++this mechanism:
++
++=over 3
++
++=item B<1. Extension and Overrides>
++
++Inside a specific code section you want to perform a specific function call
++for extension reasons.  But you want to allow one or more modules to implement
++this function by registering hooks. Those hooks are registered on a stack and
++can be even configured to have a I<decline> return value. As long as there are
++functions which return the decline value the next function on the stack is
++tried. When the first function doesn't return the decline value the hook call
++stops. 
++
++The original intent of this use case is to provide a flexible extension
++mechanism where modules can override functionality.
++
++=item B<2. Intercommunication>
++
++Inside a specific code you have a function you want to export. But you first
++want to allow other code to override this function.  And second you want to
++export this function without real object file symbol references. Instead you
++want to register the function and let the users call this function by name. 
++
++The original intent of this use case is to allow inter-module communication
++without direct symbol references, which are a big I<no-no> for the I<Dynamic
++Shared Object> (DSO) situation.
++
++=back
++
++And the following design goals existed:
++
++=over 3
++
++=item B<1. Minimum code changes>
++
++The hook calls should look very similar to the corresponding direct function
++call to allow one to easily translate it. And the total amount of changes for
++the hook registration, hook configuration and hook usage should be as small as
++possible to minimize the total code changes. Additionally a shorthand API
++function (ap_hook_use) should be provided which lets one trivially add a hook
++by just changing the code at a single location.
++
++=item B<2. The hook call has to be maximum flexible>
++
++In order to avoid nasty hacks, maximum flexiblity for the hook calls is
++needed, i.e. any function signature (the set of types for the return value and
++the arguments) should be supported.  And it should be possible to
++register always a context (ctx) variable with a function which is passed to
++the corresponding function when the hook call is performed.
++
++=back
++
++The implementation of this library directly followed these two design goals.
++
++=head1 USAGE
++
++Using this hook API is a four-step process:
++
++=over 3
++
++=item B<1. Initialization>
++
++Initialize or destroy the hook mechanism inside your application program:
++
++ ap_hook_init();
++    :
++ ap_hook_kill();
++
++=item B<2. Configuration>
++
++Configure a particular hook by specifing its name, signature and return type
++semantic:
++
++ ap_hook_configure("lookup", AP_HOOK_SIG2(ptr,ptr,ctx), AP_HOOK_DECLINE(NULL));
++ ap_hook_configure("setup", AP_HOOK_SIG2(int,ptr,char), AP_HOOK_DECLTMP(FALSE));
++ ap_hook_configure("read", AP_HOOK_SIG2(void,ptr), AP_HOOK_TOPMOST);
++ ap_hook_configure("logit", AP_HOOK_SIG2(void,ptr), AP_HOOK_ALL);
++
++This configures four hooks: 
++
++A hook named C<lookup> with the signature C<void *lookup(void *, void *)>
++(where the second argument is C<NULL> or the private context pointer of the
++hook function which can be optionally provided at the registration step
++later) and a return code semantic which says: Proceed as long as the
++registered lookup functions return C<NULL> or no more registered functions
++exists. A call for this hook has to provide 2 argument only (a pointer to the
++return variable and the first argument), because the context is
++implicitly provided by the hook mechanism. Sample idea: I<The first function
++who was successful in looking up a variable provides the value>.
++
++A hook named C<setup> with the signature C<int setup(void *, char)" and a
++return code semantic equal to the one of the C<lookup> hook. But the decline
++return value is implemented by a temporay variable of the hook mechanism and
++only used for the decline decision. So a call to this hook has to provide 2
++arguments only (the first and second argument, but no address to a return
++value). Sample idea: I<Any function can handle the setup and when one
++function handled it stops the processing by indicating this with the return
++value>.
++
++A hook named C<read> with the signature C<void read(void *)> and a return code
++semantic which says: Only the top most function on the registered function
++stack is tried (and independet of a possible return value in non-void
++context). A call to this hook has to provide exactly 1 argument (the
++single argument to the hook function). Sample idea: I<We want to
++use a read function and allow others to override it, but independent how much
++registered functions exists, only top most (= last registered) function
++overrides and is used>.
++
++A hook named C<logit> with the signature C<void logit(void *)> and a return
++code semantic which says: All registered functions on the hook functioin stack
++are tried. Sample idea: I<We pass a FILE pointer to the logging functions and
++any function can log whatever it wants>.
++
++=item B<3. Registration>
++
++Register the actual functions which should be used by the hook:
++
++ ap_hook_register("lookup", mylookup, mycontext);
++ ap_hook_register("setup", mysetup);
++ ap_hook_register("read", myread);
++ ap_hook_register("logit", mylogit);
++
++This registers the function C<mylookup()> under the C<lookup> hook with the
++private context given by the variable C<mycontext>. And it registers the
++function C<mysetup()> under the C<setup> hook without any context. Same for
++C<myread> and C<mylogit>.
++
++=item B<4. Usage>
++
++Finally use the hooks, i.e. instead of using direct function calls like
++        
++ rc = mylookup(a1, a2);
++ rc = mysetup(a1, a2);
++ myread(a1);
++ mylogit(a1);
++
++you now use:
++
++ ap_hook_call("lookup", &rc, a1, a2);
++ ap_hook_call("setup", &rc, a1, a2);
++ ap_hook_call("read", a1);
++ ap_hook_call("logit", a1);
++
++which are internally translated to:
++
++ rc = mylookup(a1, a2, mycontext);
++ rc = mysetup(a1, a2);
++ myread(a1);
++ mylogit(a1);
++
++Notice two things here: First the context (C<mycontext>) for the C<mylookup()>
++function is automatically added by the hook mechanism. And it is a different
++(and not fixed) context for each registered function, of course.  Second,
++return values always have to be pushed into variables and a pointer to them
++has to be given as the second argument to C<ap_hook_call> (except for
++functions which have a void return type, of course).
++
++BTW, the return value of C<ap_hook_call()> is always C<TRUE> or C<FALSE>.
++C<TRUE> when at least one function call was successful (always the case for
++C<AP_HOOK_TOPMOST> and C<AP_HOOK_ALL>). C<FALSE> when all functions
++returned the decline value or no functions are registered at all.
++
++=back
++
++=head1 RESTRICTIONS
++
++To make the hook implementation efficient and to not bloat up the code too
++much a few restrictions have to make:
++
++=over 3
++
++=item 1.
++
++Only function calls with up to 4 arguments are implemented. When more are
++needed you can either extend the hook implementation by using more bits for
++the signature configuration or you can do a workaround when the function is
++your own one: Put the remaining (N-4-1) arguments into a structure and pass
++only a pointer (one argument) as the forth argument.
++
++=item 2.
++
++Only the following ANSI C variable types are supported:
++
++ - For the return value: 
++   void (= none), char, int, float, double, ptr (= void *)
++ - For the arguments:
++   ctx  (= context), char, int, float, double, ptr (= void *)
++
++This means in theory that 6^5 (=7776) signature combinations are possible. But
++because we don't need all of them inside Apache and it would bloat up the code
++too dramatically we implement only a subset of those combinations. The
++implemented signatures can be specified inside C<ap_hook.c> and the
++corresponding code can be automatically generated by running ``C<perl
++ap_hook.c>'' (yeah, no joke ;-).  So when you need a hook with a different
++still not implemented signature you either have to again use a workaround as
++above (i.e. use a structure) or just add the signature to the C<ap_hook.c>
++file.
++
++=head1 EXAMPLE
++
++We want to call `C<ssize_t read(int, void *, size_t)>' through hooks in order
++to allow modules to override this call.  So, somewhere we have a replacement
++function for C<read()> defined (same signature, of course):
++
++ ssize_t my_read(int, void *, size_t);
++
++We now configure a C<read> hook. Here the C<AP_HOOK_SIGx()> macro defines the
++signature of the C<read()>-like callback functions and has to match the
++prototype of C<read()>. But we have to replace typedefs with the physical
++underlaying ANSI C types. And C<AP_HOOK_DECLINE()> sets the return value of
++the read()-like functions which forces the next hook to be called (here -1).
++And we register the original C<read()> function as the default hook.
++
++ ap_hook_configure("read", 
++                   AP_HOOK_SIG4(int,int,ptr,int), 
++                   AP_HOOK_DECLINE(-1));
++ ap_hook_register("read", read);
++
++Now a module wants to override the C<read()> call and registers the
++C<my_read()> function:
++
++ ap_hook_register("read", my_read);
++
++The function logically gets pushed onto a stack, so the execution order is the
++reverse registering order, i.e. I<last registered - first called>. Now we can
++replace the standard C<read()> call
++
++ bytes = read(fd, buf, bufsize);
++ if (bytes == -1)
++    ...error...
++
++with the hook based call:
++
++  rc = ap_hook_call("read", &bytes, fd, buf, bufsize);
++  if (rc == FALSE)
++     ...error...
++
++Now internally the following is done: The call `C<bytes = my_read(fd, buf,
++bufsize)>' is done. When it returns not -1 (the decline value) nothing
++more is done. But when C<my_read()> returns -1 the next function is tried:
++`C<bytes = read(fd, buf, bufsize)>'. When this one also returns -1 you get
++`rc == FALSE'. When it finally returns not -1 you get `rc == TRUE'.
++
++=head1 SEE ALSO
++
++ap_ctx(3)
++
++=head1 HISTORY
++
++The ap_hook(3) interface was originally designed and 
++implemented in October 1998 by Ralf S. Engelschall.
++
++=head1 AUTHOR
++
++ Ralf S. Engelschall
++ rse@engelschall.com
++ www.engelschall.com
++
++=cut
++*/
+diff -Nru apache_1.3.17/src/include/ap_mm.h apache_1.3.17.new/src/include/ap_mm.h
+--- apache_1.3.17/src/include/ap_mm.h	Thu Jan  1 01:00:00 1970
++++ apache_1.3.17.new/src/include/ap_mm.h	Thu Dec 30 22:02:59 1999
+@@ -0,0 +1,130 @@
++/* ====================================================================
++ * Copyright (c) 1999-2000 The Apache Group.  All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer. 
++ *
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in
++ *    the documentation and/or other materials provided with the
++ *    distribution.
++ *
++ * 3. All advertising materials mentioning features or use of this
++ *    software must display the following acknowledgment:
++ *    "This product includes software developed by the Apache Group
++ *    for use in the Apache HTTP server project (http://www.apache.org/)."
++ *
++ * 4. The names "Apache Server" and "Apache Group" must not be used to
++ *    endorse or promote products derived from this software without
++ *    prior written permission. For written permission, please contact
++ *    apache@apache.org.
++ *
++ * 5. Products derived from this software may not be called "Apache"
++ *    nor may "Apache" appear in their names without prior written
++ *    permission of the Apache Group.
++ *
++ * 6. Redistributions of any form whatsoever must retain the following
++ *    acknowledgment:
++ *    "This product includes software developed by the Apache Group
++ *    for use in the Apache HTTP server project (http://www.apache.org/)."
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE APACHE GROUP ``AS IS'' AND ANY
++ * EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
++ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE APACHE GROUP OR
++ * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
++ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
++ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
++ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
++ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
++ * OF THE POSSIBILITY OF SUCH DAMAGE.
++ * ====================================================================
++ *
++ * This software consists of voluntary contributions made by many
++ * individuals on behalf of the Apache Group and was originally based
++ * on public domain software written at the National Center for
++ * Supercomputing Applications, University of Illinois, Urbana-Champaign.
++ * For more information on the Apache Group and the Apache HTTP server
++ * project, please see <http://www.apache.org/>.
++ */
++
++/*
++**
++** ap_mm.h -- wrapper code for MM shared memory library
++**
++*/
++
++#ifdef EAPI
++
++#ifndef AP_MM_H 
++#define AP_MM_H 1
++
++#ifndef FALSE
++#define FALSE 0
++#define TRUE  !FALSE
++#endif
++
++API_EXPORT(int) ap_mm_useable(void);
++
++typedef void AP_MM;
++typedef enum { AP_MM_LOCK_RD, AP_MM_LOCK_RW } ap_mm_lock_mode;
++
++/* Global Malloc-Replacement API */
++API_EXPORT(int)     ap_MM_create(size_t size, char *file);
++API_EXPORT(int)     ap_MM_permission(mode_t mode, uid_t owner, gid_t group);
++API_EXPORT(void)    ap_MM_destroy(void);
++API_EXPORT(int)     ap_MM_lock(ap_mm_lock_mode mode);
++API_EXPORT(int)     ap_MM_unlock(void);
++API_EXPORT(void *)  ap_MM_malloc(size_t size);
++API_EXPORT(void *)  ap_MM_realloc(void *ptr, size_t size);
++API_EXPORT(void)    ap_MM_free(void *ptr);
++API_EXPORT(void *)  ap_MM_calloc(size_t number, size_t size);
++API_EXPORT(char *)  ap_MM_strdup(const char *str);
++API_EXPORT(size_t)  ap_MM_sizeof(void *ptr);
++API_EXPORT(size_t)  ap_MM_maxsize(void);
++API_EXPORT(size_t)  ap_MM_available(void);
++API_EXPORT(char *)  ap_MM_error(void);
++
++/* Standard Malloc-Style API */
++API_EXPORT(AP_MM *) ap_mm_create(size_t size, char *file);
++API_EXPORT(int)     ap_mm_permission(AP_MM *mm, mode_t mode, uid_t owner, gid_t group);
++API_EXPORT(void)    ap_mm_destroy(AP_MM *mm);
++API_EXPORT(int)     ap_mm_lock(AP_MM *mm, ap_mm_lock_mode mode);
++API_EXPORT(int)     ap_mm_unlock(AP_MM *mm);
++API_EXPORT(void *)  ap_mm_malloc(AP_MM *mm, size_t size);
++API_EXPORT(void *)  ap_mm_realloc(AP_MM *mm, void *ptr, size_t size);
++API_EXPORT(void)    ap_mm_free(AP_MM *mm, void *ptr);
++API_EXPORT(void *)  ap_mm_calloc(AP_MM *mm, size_t number, size_t size);
++API_EXPORT(char *)  ap_mm_strdup(AP_MM *mm, const char *str);
++API_EXPORT(size_t)  ap_mm_sizeof(AP_MM *mm, void *ptr);
++API_EXPORT(size_t)  ap_mm_maxsize(void);
++API_EXPORT(size_t)  ap_mm_available(AP_MM *mm);
++API_EXPORT(char *)  ap_mm_error(void);
++API_EXPORT(void)    ap_mm_display_info(AP_MM *mm);
++
++/* Low-Level Shared Memory API */
++API_EXPORT(void *)  ap_mm_core_create(size_t size, char *file);
++API_EXPORT(int)     ap_mm_core_permission(void *core, mode_t mode, uid_t owner, gid_t group);
++API_EXPORT(void)    ap_mm_core_delete(void *core);
++API_EXPORT(size_t)  ap_mm_core_size(void *core);
++API_EXPORT(int)     ap_mm_core_lock(void *core, ap_mm_lock_mode mode);
++API_EXPORT(int)     ap_mm_core_unlock(void *core);
++API_EXPORT(size_t)  ap_mm_core_maxsegsize(void);
++API_EXPORT(size_t)  ap_mm_core_align2page(size_t size);
++API_EXPORT(size_t)  ap_mm_core_align2word(size_t size);
++
++/* Internal Library API */
++API_EXPORT(void)    ap_mm_lib_error_set(unsigned int, const char *str);
++API_EXPORT(char *)  ap_mm_lib_error_get(void);
++API_EXPORT(int)     ap_mm_lib_version(void);
++
++#endif /* AP_MM_H */
++
++#endif /* EAPI */
++
+diff -Nru apache_1.3.17/htdocs/manual/mod/mod_define.html apache_1.3.17.new/htdocs/manual/mod/mod_define.html
+--- apache_1.3.17/htdocs/manual/mod/mod_define.html	Thu Jan  1 01:00:00 1970
++++ apache_1.3.17.new/htdocs/manual/mod/mod_define.html	Fri Aug 27 11:23:39 1999
+@@ -0,0 +1,135 @@
++<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
++<!--%hypertext -->
++<!-- mod_define.html                                  -->
++<!-- Documentation for the mod_define Apache module   -->
++<HTML>
++<HEAD>
++<TITLE>Apache module mod_define</TITLE>
++</HEAD>
++
++<!-- Background white, links blue (unvisited), navy (visited), red (active) -->
++<BODY
++ BGCOLOR="#FFFFFF"
++ TEXT="#000000"
++ LINK="#0000FF"
++ VLINK="#000080"
++ ALINK="#FF0000"
++>
++<BLOCKQUOTE><!-- page indentation -->
++<!--#include virtual="header.html" -->
++
++<BR>
++<H1 ALIGN="CENTER">Module mod_define</H1>
++<H2 ALIGN="CENTER">Variable Definition For Arbitrary Directives</H2>
++
++This module is contained in the <CODE>mod_define.c</CODE> file.  It provides
++the definition variables for arbitrary directives, i.e. variables which can be
++expanded on any(!) directive line. It needs Extended API (EAPI). It is not
++compiled into the server by default. To use <CODE>mod_define</CODE> you have
++to enable the following line in the server build <CODE>Configuration</CODE>
++file:
++
++<P>
++<PRE>
++    AddModule  modules/extra/mod_define.o
++</PRE>
++
++<P>
++<HR NOSHADE SIZE=1>
++
++<H3><A NAME="Define">Define</A></H3>
++<A
++ HREF="directive-dict.html#Syntax"
++ REL="Help"
++><STRONG>Syntax:</STRONG></A>
++    <CODE>Define</CODE> <EM>variable</EM> <EM>value</EM><BR>
++<A
++ HREF="directive-dict.html#Default"
++ REL="Help"
++><STRONG>Default:</STRONG></A>
++    <EM>none</EM><BR>
++<A
++ HREF="directive-dict.html#Context"
++ REL="Help"
++><STRONG>Context:</STRONG></A>
++    server config, virtual host, directory, .htaccess<BR>
++<A
++ HREF="directive-dict.html#Override"
++ REL="Help"
++><STRONG>Override:</STRONG></A> none<BR>
++<A
++ HREF="directive-dict.html#Status"
++ REL="Help"
++><STRONG>Status:</STRONG></A> Extension<BR>
++<A
++ HREF="directive-dict.html#Module"
++ REL="Help"
++><STRONG>Module:</STRONG></A> mod_define.c<BR>
++<A
++ HREF="directive-dict.html#Compatibility"
++ REL="Help"
++><STRONG>Compatibility:</STRONG></A> Apache+EAPI<BR>
++
++<P>
++The <CODE>Define</CODE> directive defines a variable which later can be
++expanded with the unsafe but short construct
++``<CODE>$</CODE><EM>variable</EM>'' or the safe but longer construct
++``<CODE>${</CODE><EM>variable</EM><CODE>}</CODE>'' on any configuration line.
++Do not intermix this with the third-party module <CODE>mod_macro</CODE>. The
++<CODE>mod_define</CODE> module doesn't provide a general macro mechanism,
++although one can consider variable substitutions as a special form of macros.
++Because the value of to which ``<CODE>$</CODE><EM>variable</EM>'' expands has
++to fit into one line. When you need macros which can span more lines, you've
++to use <CODE>mod_macro</CODE>. OTOH <CODE>mod_macro</CODE> cannot be used to
++expand a variable/macro on an arbitrary directive line.  So, the typical use
++case of <CODE>mod_define</CODE> is to make strings <EM>variable</EM> (and this
++way easily changeable at one location) and not to <EM>bundle</EM> things
++together (as it's the typical use case for macros).
++
++<P>
++The syntax of the expansion construct (
++``<CODE>${</CODE><EM>variable</EM><CODE>}</CODE>'') follows the Perl and Shell
++syntax, but can be changed via the <CODE>Define</CODE> directive, too. Four
++internal variables can be used for this. The default is:
++
++<BLOCKQUOTE>
++<PRE>
++Define mod_define::escape "\\"
++Define mod_define::dollar "$"
++Define mod_define::open   "{"
++Define mod_define::close  "}"
++</PRE>
++</BLOCKQUOTE>
++
++<P>
++When you need to escape some of the expansion constructs you place the
++mod_define::escape character in front of it.  The default is the backslash as
++in Perl or the Shell.
++
++<P>
++<STRONG>Example:</STRONG>
++<BLOCKQUOTE>
++<PRE>
++Define master     "Joe Average &lt;joe@average.dom&gt;"
++Define docroot    /usr/local/apache/htdocs
++Define hostname   foo
++Define domainname bar.dom
++Define portnumber 80
++  :
++&lt;VirtualHost $hostname.$domainname:$portnumber&gt;
++SetEnv       SERVER_MASTER "$master"
++ServerName   $hostname.$domainname
++ServerAlias  $hostname
++Port         $portnumber
++DocumentRoot $docroot
++&lt;Directory $docroot&gt;
++  :
++&lt;Directory&gt;
++</PRE>
++</BLOCKQUOTE>
++
++<!--#include virtual="footer.html" -->
++</BLOCKQUOTE><!-- page indentation -->
++</BODY>
++</HTML>
++<!--/%hypertext -->
+diff -Nru apache_1.3.17/src/ap/ap_ctx.c apache_1.3.17.new/src/ap/ap_ctx.c
+--- apache_1.3.17/src/ap/ap_ctx.c	Thu Jan  1 01:00:00 1970
++++ apache_1.3.17.new/src/ap/ap_ctx.c	Thu Dec 30 22:02:56 1999
+@@ -0,0 +1,155 @@
++/* ====================================================================
++ * Copyright (c) 1998-2000 The Apache Group.  All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer. 
++ *
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in
++ *    the documentation and/or other materials provided with the
++ *    distribution.
++ *
++ * 3. All advertising materials mentioning features or use of this
++ *    software must display the following acknowledgment:
++ *    "This product includes software developed by the Apache Group
++ *    for use in the Apache HTTP server project (http://www.apache.org/)."
++ *
++ * 4. The names "Apache Server" and "Apache Group" must not be used to
++ *    endorse or promote products derived from this software without
++ *    prior written permission. For written permission, please contact
++ *    apache@apache.org.
++ *
++ * 5. Products derived from this software may not be called "Apache"
++ *    nor may "Apache" appear in their names without prior written
++ *    permission of the Apache Group.
++ *
++ * 6. Redistributions of any form whatsoever must retain the following
++ *    acknowledgment:
++ *    "This product includes software developed by the Apache Group
++ *    for use in the Apache HTTP server project (http://www.apache.org/)."
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE APACHE GROUP ``AS IS'' AND ANY
++ * EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
++ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE APACHE GROUP OR
++ * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
++ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
++ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
++ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
++ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
++ * OF THE POSSIBILITY OF SUCH DAMAGE.
++ * ====================================================================
++ *
++ * This software consists of voluntary contributions made by many
++ * individuals on behalf of the Apache Group and was originally based
++ * on public domain software written at the National Center for
++ * Supercomputing Applications, University of Illinois, Urbana-Champaign.
++ * For more information on the Apache Group and the Apache HTTP server
++ * project, please see <http://www.apache.org/>.
++ *
++ */
++
++/*
++**  Generic Context Interface for Apache
++**  Written by Ralf S. Engelschall <rse@engelschall.com> 
++*/
++
++#ifdef EAPI
++
++#include "httpd.h"
++#include "ap_config.h"
++#include "ap_ctx.h"
++
++API_EXPORT(ap_ctx *) ap_ctx_new(pool *p)
++{
++    ap_ctx *ctx;
++    int i;
++
++    if (p != NULL) {
++        ctx = (ap_ctx *)ap_palloc(p, sizeof(ap_ctx_rec));
++        ctx->cr_pool = p;
++        ctx->cr_entry = (ap_ctx_entry **)
++            ap_palloc(p, sizeof(ap_ctx_entry *)*(AP_CTX_MAX_ENTRIES+1));
++    }
++    else {
++        ctx = (ap_ctx *)malloc(sizeof(ap_ctx_rec));
++        ctx->cr_pool = NULL;
++        ctx->cr_entry = (ap_ctx_entry **)
++            malloc(sizeof(ap_ctx_entry *)*(AP_CTX_MAX_ENTRIES+1));
++    }
++    for (i = 0; i < AP_CTX_MAX_ENTRIES+1; i++) 
++        ctx->cr_entry[i] = NULL;
++    return ctx;
++}
++
++API_EXPORT(void) ap_ctx_set(ap_ctx *ctx, char *key, void *val)
++{
++    int i;
++    ap_ctx_entry *ce;
++
++    ce = NULL;
++    for (i = 0; ctx->cr_entry[i] != NULL; i++) {
++        if (strcmp(ctx->cr_entry[i]->ce_key, key) == 0) {
++            ce = ctx->cr_entry[i];
++            break;
++        }
++    }
++    if (ce == NULL) {
++        if (i == AP_CTX_MAX_ENTRIES)
++            return;
++        if (ctx->cr_pool != NULL) {
++            ce = (ap_ctx_entry *)ap_palloc(ctx->cr_pool, sizeof(ap_ctx_entry));
++            ce->ce_key = ap_pstrdup(ctx->cr_pool, key);
++        }
++        else {
++            ce = (ap_ctx_entry *)malloc(sizeof(ap_ctx_entry));
++            ce->ce_key = strdup(key);
++        }
++        ctx->cr_entry[i] = ce;
++        ctx->cr_entry[i+1] = NULL;
++    }
++    ce->ce_val = val;
++    return;
++}
++
++API_EXPORT(void *) ap_ctx_get(ap_ctx *ctx, char *key)
++{
++    int i;
++
++    for (i = 0; ctx->cr_entry[i] != NULL; i++)
++        if (strcmp(ctx->cr_entry[i]->ce_key, key) == 0)
++            return ctx->cr_entry[i]->ce_val;
++    return NULL;
++}
++
++API_EXPORT(ap_ctx *) ap_ctx_overlay(pool *p, ap_ctx *over, ap_ctx *base)
++{
++    ap_ctx *new;
++    int i;
++
++#ifdef POOL_DEBUG
++    if (p != NULL) {
++        if (!ap_pool_is_ancestor(over->cr_pool, p))
++            ap_log_assert("ap_ctx_overlay: overlay's pool is not an ancestor of p", 
++                          __FILE__, __LINE__);
++        if (!ap_pool_is_ancestor(base->cr_pool, p))
++            ap_log_assert("ap_ctx_overlay: base's pool is not an ancestor of p",
++                          __FILE__, __LINE__);
++    }
++#endif
++    if ((new = ap_ctx_new(p)) == NULL)
++        return NULL;
++    memcpy(new->cr_entry, base->cr_entry, 
++           sizeof(ap_ctx_entry *)*(AP_CTX_MAX_ENTRIES+1));
++    for (i = 0; over->cr_entry[i] != NULL; i++)
++        ap_ctx_set(new, over->cr_entry[i]->ce_key, over->cr_entry[i]->ce_val);
++    return new;
++}
++
++#endif /* EAPI */
+diff -Nru apache_1.3.17/src/ap/ap_hook.c apache_1.3.17.new/src/ap/ap_hook.c
+--- apache_1.3.17/src/ap/ap_hook.c	Thu Jan  1 01:00:00 1970
++++ apache_1.3.17.new/src/ap/ap_hook.c	Thu Dec 30 22:02:56 1999
+@@ -0,0 +1,930 @@
++#if 0
++=pod
++#endif
++/* ====================================================================
++ * Copyright (c) 1998-2000 The Apache Group.  All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer. 
++ *
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in
++ *    the documentation and/or other materials provided with the
++ *    distribution.
++ *
++ * 3. All advertising materials mentioning features or use of this
++ *    software must display the following acknowledgment:
++ *    "This product includes software developed by the Apache Group
++ *    for use in the Apache HTTP server project (http://www.apache.org/)."
++ *
++ * 4. The names "Apache Server" and "Apache Group" must not be used to
++ *    endorse or promote products derived from this software without
++ *    prior written permission. For written permission, please contact
++ *    apache@apache.org.
++ *
++ * 5. Products derived from this software may not be called "Apache"
++ *    nor may "Apache" appear in their names without prior written
++ *    permission of the Apache Group.
++ *
++ * 6. Redistributions of any form whatsoever must retain the following
++ *    acknowledgment:
++ *    "This product includes software developed by the Apache Group
++ *    for use in the Apache HTTP server project (http://www.apache.org/)."
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE APACHE GROUP ``AS IS'' AND ANY
++ * EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
++ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE APACHE GROUP OR
++ * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
++ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
++ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
++ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
++ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
++ * OF THE POSSIBILITY OF SUCH DAMAGE.
++ * ====================================================================
++ *
++ * This software consists of voluntary contributions made by many
++ * individuals on behalf of the Apache Group and was originally based
++ * on public domain software written at the National Center for
++ * Supercomputing Applications, University of Illinois, Urbana-Champaign.
++ * For more information on the Apache Group and the Apache HTTP server
++ * project, please see <http://www.apache.org/>.
++ *
++ */
++
++/*
++**  Implementation of a Generic Hook Interface for Apache
++**  Written by Ralf S. Engelschall <rse@engelschall.com> 
++**
++**  See POD document at end of ap_hook.h for description.
++**  View it with the command ``pod2man ap_hook.h | nroff -man | more''
++**
++**  Attention: This source file is a little bit tricky.
++**             It's a combination of a C source and an embedded Perl script
++**             (which updates the C source). The purpose of this is to have
++**             both things together at one place. So you can both pass
++**             this file to the C compiler and the Perl interpreter.
++*/
++
++                                      /*
++                                       * Premature optimization is 
++                                       * the root of all evil.
++                                       *       -- D. E. Knuth
++                                       */
++
++#ifdef EAPI
++
++#include "httpd.h"
++#include "http_log.h"
++#include "ap_config.h"
++#include "ap_hook.h"
++
++/* 
++ * the internal hook pool
++ */
++static ap_hook_entry **ap_hook_pool = NULL;
++
++/* 
++ * forward prototypes for internal functions
++ */
++static int            ap_hook_call_func(va_list ap, ap_hook_entry *he, ap_hook_func *hf);
++static ap_hook_entry *ap_hook_create(char *hook);
++static ap_hook_entry *ap_hook_find(char *hook);
++static void           ap_hook_destroy(ap_hook_entry *he);
++
++/*
++ * Initialize the hook mechanism
++ */
++API_EXPORT(void) ap_hook_init(void)
++{
++    int i;
++
++    if (ap_hook_pool != NULL)
++        return;
++    ap_hook_pool = (ap_hook_entry **)malloc(sizeof(ap_hook_entry *)
++                                            *(AP_HOOK_MAX_ENTRIES+1));
++    for (i = 0; i < AP_HOOK_MAX_ENTRIES; i++)
++        ap_hook_pool[i] = NULL;
++    return;
++}
++
++/*
++ * Kill the hook mechanism
++ */
++API_EXPORT(void) ap_hook_kill(void)
++{
++    int i;
++
++    if (ap_hook_pool == NULL)
++        return;
++    for (i = 0; ap_hook_pool[i] != NULL; i++)
++        ap_hook_destroy(ap_hook_pool[i]);
++    free(ap_hook_pool);
++    ap_hook_pool = NULL;
++    return;
++}
++    
++/*
++ * Smart creation of a hook (when it exist this is the same as
++ * ap_hook_find, when it doesn't exists it is created)
++ */
++static ap_hook_entry *ap_hook_create(char *hook)
++{
++    int i;
++    ap_hook_entry *he;
++
++    for (i = 0; ap_hook_pool[i] != NULL; i++)
++        if (strcmp(ap_hook_pool[i]->he_hook, hook) == 0)
++            return ap_hook_pool[i];
++
++    if (i >= AP_HOOK_MAX_ENTRIES)
++        return NULL;
++
++    if ((he = (ap_hook_entry *)malloc(sizeof(ap_hook_entry))) == NULL)
++        return NULL;
++    ap_hook_pool[i] = he;
++
++    he->he_hook          = strdup(hook);
++    he->he_sig           = AP_HOOK_SIG_UNKNOWN;
++    he->he_modeid        = AP_HOOK_MODE_UNKNOWN;
++    he->he_modeval.v_int = 0;
++
++    he->he_func = (ap_hook_func **)malloc(sizeof(ap_hook_func *)
++                                          *(AP_HOOK_MAX_FUNCS+1));
++    if (he->he_func == NULL)
++        return FALSE;
++
++    for (i = 0; i < AP_HOOK_MAX_FUNCS; i++)
++        he->he_func[i] = NULL;
++    return he;
++}
++
++/*
++ * Find a particular hook
++ */
++static ap_hook_entry *ap_hook_find(char *hook)
++{
++    int i;
++
++    for (i = 0; ap_hook_pool[i] != NULL; i++)
++        if (strcmp(ap_hook_pool[i]->he_hook, hook) == 0)
++            return ap_hook_pool[i];
++    return NULL;
++}
++
++/*
++ * Destroy a particular hook
++ */
++static void ap_hook_destroy(ap_hook_entry *he)
++{
++    int i;
++
++    if (he == NULL)
++        return;
++    free(he->he_hook);
++    for (i = 0; he->he_func[i] != NULL; i++)
++        free(he->he_func[i]);
++    free(he->he_func);
++    free(he);
++    return;
++}
++
++/*
++ * Configure a particular hook, 
++ * i.e. remember its signature and return value mode
++ */
++API_EXPORT(int) ap_hook_configure(char *hook, ap_hook_sig sig, ap_hook_mode modeid, ...)
++{
++    ap_hook_entry *he;
++    va_list ap;
++    int rc;
++
++    va_start(ap, modeid);
++    if ((he = ap_hook_create(hook)) == NULL)
++        rc = FALSE;
++    else {
++        he->he_sig = sig;
++        he->he_modeid = modeid;
++        if (modeid == AP_HOOK_MODE_DECLINE || modeid == AP_HOOK_MODE_DECLTMP) {
++            if (AP_HOOK_SIG_HAS(sig, RC, char))
++                he->he_modeval.v_char = va_arg(ap, va_type(char));
++            else if (AP_HOOK_SIG_HAS(sig, RC, int))
++                he->he_modeval.v_int = va_arg(ap, va_type(int));
++            else if (AP_HOOK_SIG_HAS(sig, RC, long))
++                he->he_modeval.v_long = va_arg(ap, va_type(long));
++            else if (AP_HOOK_SIG_HAS(sig, RC, float))
++                he->he_modeval.v_float = va_arg(ap, va_type(float));
++            else if (AP_HOOK_SIG_HAS(sig, RC, double))
++                he->he_modeval.v_double = va_arg(ap, va_type(double));
++            else if (AP_HOOK_SIG_HAS(sig, RC, ptr))
++                he->he_modeval.v_ptr = va_arg(ap, va_type(ptr));
++        }
++        rc = TRUE;
++    }
++    va_end(ap);
++    return rc;
++}
++
++/*
++ * Register a function to call for a hook
++ */
++API_EXPORT(int) ap_hook_register_I(char *hook, void *func, void *ctx)
++{
++    int i, j;
++    ap_hook_entry *he;
++    ap_hook_func *hf;
++
++    if ((he = ap_hook_create(hook)) == NULL)
++        return FALSE;
++
++    for (i = 0; he->he_func[i] != NULL; i++)
++        if (he->he_func[i]->hf_ptr == func)
++            return FALSE;
++
++    if (i == AP_HOOK_MAX_FUNCS)
++        return FALSE;
++
++    if ((hf = (ap_hook_func *)malloc(sizeof(ap_hook_func))) == NULL)
++        return FALSE;
++
++    for (j = i; j >= 0; j--)
++        he->he_func[j+1] = he->he_func[j];
++    he->he_func[0] = hf;
++
++    hf->hf_ptr = func;
++    hf->hf_ctx = ctx;
++
++    return TRUE;
++}
++
++/*
++ * Unregister a function to call for a hook
++ */
++API_EXPORT(int) ap_hook_unregister_I(char *hook, void *func)
++{
++    int i, j;
++    ap_hook_entry *he;
++
++    if ((he = ap_hook_find(hook)) == NULL)
++        return FALSE;
++    for (i = 0; he->he_func[i] != NULL; i++) {
++        if (he->he_func[i]->hf_ptr == func) {
++            free(he->he_func[i]);
++            for (j = i; he->he_func[j] != NULL; j++)
++                he->he_func[j] = he->he_func[j+1];
++            return TRUE;
++        }
++    }
++    return FALSE;
++}
++
++/*
++ * Retrieve the status of a particular hook
++ */
++API_EXPORT(ap_hook_state) ap_hook_status(char *hook)
++{
++    ap_hook_entry *he;
++
++    if ((he = ap_hook_find(hook)) == NULL)
++        return AP_HOOK_STATE_NOTEXISTANT;
++    if (   he->he_func[0] != NULL 
++        && he->he_sig != AP_HOOK_SIG_UNKNOWN
++        && he->he_modeid != AP_HOOK_MODE_UNKNOWN)
++        return AP_HOOK_STATE_REGISTERED;
++    if (   he->he_sig != AP_HOOK_SIG_UNKNOWN 
++        && he->he_modeid != AP_HOOK_MODE_UNKNOWN)
++        return AP_HOOK_STATE_CONFIGURED;
++    return AP_HOOK_STATE_ESTABLISHED;
++}
++
++/*
++ * Use a hook, i.e. optional on-the-fly configure it before calling it
++ */
++API_EXPORT(int) ap_hook_use(char *hook, ap_hook_sig sig, ap_hook_mode modeid, ...)
++{
++    int i;
++    ap_hook_value modeval;
++    ap_hook_entry *he;
++    va_list ap;
++    int rc;
++
++    va_start(ap, modeid);
++
++    if (modeid == AP_HOOK_MODE_DECLINE || modeid == AP_HOOK_MODE_DECLTMP) {
++        if (AP_HOOK_SIG_HAS(sig, RC, char))
++            modeval.v_char = va_arg(ap, va_type(char));
++        else if (AP_HOOK_SIG_HAS(sig, RC, int))
++            modeval.v_int = va_arg(ap, va_type(int));
++        else if (AP_HOOK_SIG_HAS(sig, RC, long))
++            modeval.v_long = va_arg(ap, va_type(long));
++        else if (AP_HOOK_SIG_HAS(sig, RC, float))
++            modeval.v_float = va_arg(ap, va_type(float));
++        else if (AP_HOOK_SIG_HAS(sig, RC, double))
++            modeval.v_double = va_arg(ap, va_type(double));
++        else if (AP_HOOK_SIG_HAS(sig, RC, ptr))
++            modeval.v_ptr = va_arg(ap, va_type(ptr));
++    }
++
++    if ((he = ap_hook_create(hook)) == NULL)
++        return FALSE;
++
++    if (he->he_sig == AP_HOOK_SIG_UNKNOWN)
++        he->he_sig = sig;
++    if (he->he_modeid == AP_HOOK_MODE_UNKNOWN) {
++        he->he_modeid  = modeid;
++        he->he_modeval = modeval;
++    }
++
++    for (i = 0; he->he_func[i] != NULL; i++)
++        if (ap_hook_call_func(ap, he, he->he_func[i]))
++            break;
++
++    if (i > 0 && he->he_modeid == AP_HOOK_MODE_ALL)
++        rc = TRUE;
++    else if (i == AP_HOOK_MAX_FUNCS || he->he_func[i] == NULL)
++        rc = FALSE;
++    else
++        rc = TRUE;
++
++    va_end(ap);
++    return rc;
++}
++
++/*
++ * Call a hook
++ */
++API_EXPORT(int) ap_hook_call(char *hook, ...)
++{
++    int i;
++    ap_hook_entry *he;
++    va_list ap;
++    int rc;
++    
++    va_start(ap, hook);
++
++    if ((he = ap_hook_find(hook)) == NULL) {
++        va_end(ap);
++        return FALSE;
++    }
++    if (   he->he_sig == AP_HOOK_SIG_UNKNOWN
++        || he->he_modeid == AP_HOOK_MODE_UNKNOWN) {
++        va_end(ap);
++        return FALSE;
++    }
++
++    for (i = 0; he->he_func[i] != NULL; i++)
++        if (ap_hook_call_func(ap, he, he->he_func[i]))
++            break;
++
++    if (i > 0 && he->he_modeid == AP_HOOK_MODE_ALL)
++        rc = TRUE;
++    else if (i == AP_HOOK_MAX_FUNCS || he->he_func[i] == NULL)
++        rc = FALSE;
++    else
++        rc = TRUE;
++
++    va_end(ap);
++    return rc;
++}
++
++static int ap_hook_call_func(va_list ap, ap_hook_entry *he, ap_hook_func *hf)
++{
++    void *v_rc;
++    ap_hook_value v_tmp;
++    int rc;
++
++    /*
++     * Now we dispatch the various function calls. We support function
++     * signatures with up to 9 types (1 return type, 8 argument types) where
++     * each argument can have 7 different types (ctx, char, int, long, float,
++     * double, ptr), so theoretically there are 9^7 (=4782969) combinations
++     * possible.  But because we don't need all of them, of course, we
++     * implement only the following well chosen subset (duplicates are ok):
++     *
++     * 1. `The basic hook'.
++     *
++     *    void func()
++     *
++     * 2. The standard set of signatures which form all combinations of
++     *    int&ptr based signatures for up to 3 arguments. We provide
++     *    them per default for module authors.
++     *
++     *    int func()
++     *    ptr func()
++     *    int func(int)
++     *    int func(ptr)
++     *    ptr func(int)
++     *    ptr func(ptr)
++     *    int func(int,int)
++     *    int func(int,ptr)
++     *    int func(ptr,int)
++     *    int func(ptr,ptr)
++     *    ptr func(int,int)
++     *    ptr func(int,ptr)
++     *    ptr func(ptr,int)
++     *    ptr func(ptr,ptr)
++     *    int func(int,int,int)
++     *    int func(int,int,ptr)
++     *    int func(int,ptr,int)
++     *    int func(int,ptr,ptr)
++     *    int func(ptr,int,int)
++     *    int func(ptr,int,ptr)
++     *    int func(ptr,ptr,int)
++     *    int func(ptr,ptr,ptr)
++     *    ptr func(int,int,int)
++     *    ptr func(int,int,ptr)
++     *    ptr func(int,ptr,int)
++     *    ptr func(int,ptr,ptr)
++     *    ptr func(ptr,int,int)
++     *    ptr func(ptr,int,ptr)
++     *    ptr func(ptr,ptr,int)
++     *    ptr func(ptr,ptr,ptr)
++     *
++     * 3. Actually currently used hooks.
++     *
++     *    int   func(ptr)                          [2x]
++     *    int   func(ptr,ptr)                      [2x]
++     *    int   func(ptr,ptr,int)                  [5x]
++     *    int   func(ptr,ptr,ptr,int)              [1x]
++     *    int   func(ptr,ptr,ptr,int,ptr)          [1x]
++     *    int   func(ptr,ptr,ptr,ptr,int)          [1x]
++     *    int   func(ptr,ptr,ptr,ptr,int,ptr)      [1x]
++     *    ptr   func(ptr,ptr)                      [3x]
++     *    ptr   func(ptr,ptr,ptr,ptr,ptr)          [1x]
++     *    void  func(ptr)                          [2x]
++     *    void  func(ptr,int,int)                  [1x]
++     *    void  func(ptr,ptr)                      [5x]
++     *    void  func(ptr,ptr,ptr)                  [3x]
++     *    void  func(ptr,ptr,ptr,ptr)              [2x]
++     *
++     * To simplify the programming task we generate the actual dispatch code
++     * for these calls via the embedded Perl script at the end of this source
++     * file. This script parses the above lines and generates the section
++     * below.  So, when you need more signature variants just add them to the
++     * above list and run
++     *
++     *     $ perl ap_hook.c
++     *
++     * This automatically updates the above code.
++     */
++
++    rc = TRUE;
++    v_rc = NULL;
++    if (!AP_HOOK_SIG_HAS(he->he_sig, RC, void)) {
++        if (he->he_modeid == AP_HOOK_MODE_DECLTMP) {
++            /* the return variable is a temporary one */ 
++            if (AP_HOOK_SIG_HAS(he->he_sig, RC, char))
++                v_rc = &v_tmp.v_char;
++            else if (AP_HOOK_SIG_HAS(he->he_sig, RC, int))
++                v_rc = &v_tmp.v_int;
++            else if (AP_HOOK_SIG_HAS(he->he_sig, RC, long))
++                v_rc = &v_tmp.v_long;
++            else if (AP_HOOK_SIG_HAS(he->he_sig, RC, float))
++                v_rc = &v_tmp.v_float;
++            else if (AP_HOOK_SIG_HAS(he->he_sig, RC, double))
++                v_rc = &v_tmp.v_double;
++            else if (AP_HOOK_SIG_HAS(he->he_sig, RC, ptr))
++                v_rc = &v_tmp.v_ptr;
++        }
++        else {
++            /* the return variable is provided by caller */ 
++            v_rc = va_arg(ap, void *);
++        }
++    }
++
++    /* ----BEGIN GENERATED SECTION-------- */
++    if (he->he_sig == AP_HOOK_SIG1(void)) {
++        /* Call: void func() */
++        ((void(*)())(hf->hf_ptr))();
++    }
++    else if (he->he_sig == AP_HOOK_SIG1(int)) {
++        /* Call: int func() */
++        *((int *)v_rc) = ((int(*)())(hf->hf_ptr))();
++        rc = (*((int *)v_rc) != he->he_modeval.v_int);
++    }
++    else if (he->he_sig == AP_HOOK_SIG1(ptr)) {
++        /* Call: ptr func() */
++        *((void * *)v_rc) = ((void *(*)())(hf->hf_ptr))();
++        rc = (*((void * *)v_rc) != he->he_modeval.v_ptr);
++    }
++    else if (he->he_sig == AP_HOOK_SIG2(int, int)) {
++        /* Call: int func(int) */
++        int   v1 = va_arg(ap, va_type(int));
++        *((int *)v_rc) = ((int(*)(int))(hf->hf_ptr))(v1);
++        rc = (*((int *)v_rc) != he->he_modeval.v_int);
++    }
++    else if (he->he_sig == AP_HOOK_SIG2(int, ptr)) {
++        /* Call: int func(ptr) */
++        void *v1 = va_arg(ap, va_type(ptr));
++        *((int *)v_rc) = ((int(*)(void *))(hf->hf_ptr))(v1);
++        rc = (*((int *)v_rc) != he->he_modeval.v_int);
++    }
++    else if (he->he_sig == AP_HOOK_SIG2(ptr, int)) {
++        /* Call: ptr func(int) */
++        int   v1 = va_arg(ap, va_type(int));
++        *((void * *)v_rc) = ((void *(*)(int))(hf->hf_ptr))(v1);
++        rc = (*((void * *)v_rc) != he->he_modeval.v_ptr);
++    }
++    else if (he->he_sig == AP_HOOK_SIG2(ptr, ptr)) {
++        /* Call: ptr func(ptr) */
++        void *v1 = va_arg(ap, va_type(ptr));
++        *((void * *)v_rc) = ((void *(*)(void *))(hf->hf_ptr))(v1);
++        rc = (*((void * *)v_rc) != he->he_modeval.v_ptr);
++    }
++    else if (he->he_sig == AP_HOOK_SIG3(int, int, int)) {
++        /* Call: int func(int,int) */
++        int   v1 = va_arg(ap, va_type(int));
++        int   v2 = va_arg(ap, va_type(int));
++        *((int *)v_rc) = ((int(*)(int, int))(hf->hf_ptr))(v1, v2);
++        rc = (*((int *)v_rc) != he->he_modeval.v_int);
++    }
++    else if (he->he_sig == AP_HOOK_SIG3(int, int, ptr)) {
++        /* Call: int func(int,ptr) */
++        int   v1 = va_arg(ap, va_type(int));
++        void *v2 = va_arg(ap, va_type(ptr));
++        *((int *)v_rc) = ((int(*)(int, void *))(hf->hf_ptr))(v1, v2);
++        rc = (*((int *)v_rc) != he->he_modeval.v_int);
++    }
++    else if (he->he_sig == AP_HOOK_SIG3(int, ptr, int)) {
++        /* Call: int func(ptr,int) */
++        void *v1 = va_arg(ap, va_type(ptr));
++        int   v2 = va_arg(ap, va_type(int));
++        *((int *)v_rc) = ((int(*)(void *, int))(hf->hf_ptr))(v1, v2);
++        rc = (*((int *)v_rc) != he->he_modeval.v_int);
++    }
++    else if (he->he_sig == AP_HOOK_SIG3(int, ptr, ptr)) {
++        /* Call: int func(ptr,ptr) */
++        void *v1 = va_arg(ap, va_type(ptr));
++        void *v2 = va_arg(ap, va_type(ptr));
++        *((int *)v_rc) = ((int(*)(void *, void *))(hf->hf_ptr))(v1, v2);
++        rc = (*((int *)v_rc) != he->he_modeval.v_int);
++    }
++    else if (he->he_sig == AP_HOOK_SIG3(ptr, int, int)) {
++        /* Call: ptr func(int,int) */
++        int   v1 = va_arg(ap, va_type(int));
++        int   v2 = va_arg(ap, va_type(int));
++        *((void * *)v_rc) = ((void *(*)(int, int))(hf->hf_ptr))(v1, v2);
++        rc = (*((void * *)v_rc) != he->he_modeval.v_ptr);
++    }
++    else if (he->he_sig == AP_HOOK_SIG3(ptr, int, ptr)) {
++        /* Call: ptr func(int,ptr) */
++        int   v1 = va_arg(ap, va_type(int));
++        void *v2 = va_arg(ap, va_type(ptr));
++        *((void * *)v_rc) = ((void *(*)(int, void *))(hf->hf_ptr))(v1, v2);
++        rc = (*((void * *)v_rc) != he->he_modeval.v_ptr);
++    }
++    else if (he->he_sig == AP_HOOK_SIG3(ptr, ptr, int)) {
++        /* Call: ptr func(ptr,int) */
++        void *v1 = va_arg(ap, va_type(ptr));
++        int   v2 = va_arg(ap, va_type(int));
++        *((void * *)v_rc) = ((void *(*)(void *, int))(hf->hf_ptr))(v1, v2);
++        rc = (*((void * *)v_rc) != he->he_modeval.v_ptr);
++    }
++    else if (he->he_sig == AP_HOOK_SIG3(ptr, ptr, ptr)) {
++        /* Call: ptr func(ptr,ptr) */
++        void *v1 = va_arg(ap, va_type(ptr));
++        void *v2 = va_arg(ap, va_type(ptr));
++        *((void * *)v_rc) = ((void *(*)(void *, void *))(hf->hf_ptr))(v1, v2);
++        rc = (*((void * *)v_rc) != he->he_modeval.v_ptr);
++    }
++    else if (he->he_sig == AP_HOOK_SIG4(int, int, int, int)) {
++        /* Call: int func(int,int,int) */
++        int   v1 = va_arg(ap, va_type(int));
++        int   v2 = va_arg(ap, va_type(int));
++        int   v3 = va_arg(ap, va_type(int));
++        *((int *)v_rc) = ((int(*)(int, int, int))(hf->hf_ptr))(v1, v2, v3);
++        rc = (*((int *)v_rc) != he->he_modeval.v_int);
++    }
++    else if (he->he_sig == AP_HOOK_SIG4(int, int, int, ptr)) {
++        /* Call: int func(int,int,ptr) */
++        int   v1 = va_arg(ap, va_type(int));
++        int   v2 = va_arg(ap, va_type(int));
++        void *v3 = va_arg(ap, va_type(ptr));
++        *((int *)v_rc) = ((int(*)(int, int, void *))(hf->hf_ptr))(v1, v2, v3);
++        rc = (*((int *)v_rc) != he->he_modeval.v_int);
++    }
++    else if (he->he_sig == AP_HOOK_SIG4(int, int, ptr, int)) {
++        /* Call: int func(int,ptr,int) */
++        int   v1 = va_arg(ap, va_type(int));
++        void *v2 = va_arg(ap, va_type(ptr));
++        int   v3 = va_arg(ap, va_type(int));
++        *((int *)v_rc) = ((int(*)(int, void *, int))(hf->hf_ptr))(v1, v2, v3);
++        rc = (*((int *)v_rc) != he->he_modeval.v_int);
++    }
++    else if (he->he_sig == AP_HOOK_SIG4(int, int, ptr, ptr)) {
++        /* Call: int func(int,ptr,ptr) */
++        int   v1 = va_arg(ap, va_type(int));
++        void *v2 = va_arg(ap, va_type(ptr));
++        void *v3 = va_arg(ap, va_type(ptr));
++        *((int *)v_rc) = ((int(*)(int, void *, void *))(hf->hf_ptr))(v1, v2, v3);
++        rc = (*((int *)v_rc) != he->he_modeval.v_int);
++    }
++    else if (he->he_sig == AP_HOOK_SIG4(int, ptr, int, int)) {
++        /* Call: int func(ptr,int,int) */
++        void *v1 = va_arg(ap, va_type(ptr));
++        int   v2 = va_arg(ap, va_type(int));
++        int   v3 = va_arg(ap, va_type(int));
++        *((int *)v_rc) = ((int(*)(void *, int, int))(hf->hf_ptr))(v1, v2, v3);
++        rc = (*((int *)v_rc) != he->he_modeval.v_int);
++    }
++    else if (he->he_sig == AP_HOOK_SIG4(int, ptr, int, ptr)) {
++        /* Call: int func(ptr,int,ptr) */
++        void *v1 = va_arg(ap, va_type(ptr));
++        int   v2 = va_arg(ap, va_type(int));
++        void *v3 = va_arg(ap, va_type(ptr));
++        *((int *)v_rc) = ((int(*)(void *, int, void *))(hf->hf_ptr))(v1, v2, v3);
++        rc = (*((int *)v_rc) != he->he_modeval.v_int);
++    }
++    else if (he->he_sig == AP_HOOK_SIG4(int, ptr, ptr, int)) {
++        /* Call: int func(ptr,ptr,int) */
++        void *v1 = va_arg(ap, va_type(ptr));
++        void *v2 = va_arg(ap, va_type(ptr));
++        int   v3 = va_arg(ap, va_type(int));
++        *((int *)v_rc) = ((int(*)(void *, void *, int))(hf->hf_ptr))(v1, v2, v3);
++        rc = (*((int *)v_rc) != he->he_modeval.v_int);
++    }
++    else if (he->he_sig == AP_HOOK_SIG4(int, ptr, ptr, ptr)) {
++        /* Call: int func(ptr,ptr,ptr) */
++        void *v1 = va_arg(ap, va_type(ptr));
++        void *v2 = va_arg(ap, va_type(ptr));
++        void *v3 = va_arg(ap, va_type(ptr));
++        *((int *)v_rc) = ((int(*)(void *, void *, void *))(hf->hf_ptr))(v1, v2, v3);
++        rc = (*((int *)v_rc) != he->he_modeval.v_int);
++    }
++    else if (he->he_sig == AP_HOOK_SIG4(ptr, int, int, int)) {
++        /* Call: ptr func(int,int,int) */
++        int   v1 = va_arg(ap, va_type(int));
++        int   v2 = va_arg(ap, va_type(int));
++        int   v3 = va_arg(ap, va_type(int));
++        *((void * *)v_rc) = ((void *(*)(int, int, int))(hf->hf_ptr))(v1, v2, v3);
++        rc = (*((void * *)v_rc) != he->he_modeval.v_ptr);
++    }
++    else if (he->he_sig == AP_HOOK_SIG4(ptr, int, int, ptr)) {
++        /* Call: ptr func(int,int,ptr) */
++        int   v1 = va_arg(ap, va_type(int));
++        int   v2 = va_arg(ap, va_type(int));
++        void *v3 = va_arg(ap, va_type(ptr));
++        *((void * *)v_rc) = ((void *(*)(int, int, void *))(hf->hf_ptr))(v1, v2, v3);
++        rc = (*((void * *)v_rc) != he->he_modeval.v_ptr);
++    }
++    else if (he->he_sig == AP_HOOK_SIG4(ptr, int, ptr, int)) {
++        /* Call: ptr func(int,ptr,int) */
++        int   v1 = va_arg(ap, va_type(int));
++        void *v2 = va_arg(ap, va_type(ptr));
++        int   v3 = va_arg(ap, va_type(int));
++        *((void * *)v_rc) = ((void *(*)(int, void *, int))(hf->hf_ptr))(v1, v2, v3);
++        rc = (*((void * *)v_rc) != he->he_modeval.v_ptr);
++    }
++    else if (he->he_sig == AP_HOOK_SIG4(ptr, int, ptr, ptr)) {
++        /* Call: ptr func(int,ptr,ptr) */
++        int   v1 = va_arg(ap, va_type(int));
++        void *v2 = va_arg(ap, va_type(ptr));
++        void *v3 = va_arg(ap, va_type(ptr));
++        *((void * *)v_rc) = ((void *(*)(int, void *, void *))(hf->hf_ptr))(v1, v2, v3);
++        rc = (*((void * *)v_rc) != he->he_modeval.v_ptr);
++    }
++    else if (he->he_sig == AP_HOOK_SIG4(ptr, ptr, int, int)) {
++        /* Call: ptr func(ptr,int,int) */
++        void *v1 = va_arg(ap, va_type(ptr));
++        int   v2 = va_arg(ap, va_type(int));
++        int   v3 = va_arg(ap, va_type(int));
++        *((void * *)v_rc) = ((void *(*)(void *, int, int))(hf->hf_ptr))(v1, v2, v3);
++        rc = (*((void * *)v_rc) != he->he_modeval.v_ptr);
++    }
++    else if (he->he_sig == AP_HOOK_SIG4(ptr, ptr, int, ptr)) {
++        /* Call: ptr func(ptr,int,ptr) */
++        void *v1 = va_arg(ap, va_type(ptr));
++        int   v2 = va_arg(ap, va_type(int));
++        void *v3 = va_arg(ap, va_type(ptr));
++        *((void * *)v_rc) = ((void *(*)(void *, int, void *))(hf->hf_ptr))(v1, v2, v3);
++        rc = (*((void * *)v_rc) != he->he_modeval.v_ptr);
++    }
++    else if (he->he_sig == AP_HOOK_SIG4(ptr, ptr, ptr, int)) {
++        /* Call: ptr func(ptr,ptr,int) */
++        void *v1 = va_arg(ap, va_type(ptr));
++        void *v2 = va_arg(ap, va_type(ptr));
++        int   v3 = va_arg(ap, va_type(int));
++        *((void * *)v_rc) = ((void *(*)(void *, void *, int))(hf->hf_ptr))(v1, v2, v3);
++        rc = (*((void * *)v_rc) != he->he_modeval.v_ptr);
++    }
++    else if (he->he_sig == AP_HOOK_SIG4(ptr, ptr, ptr, ptr)) {
++        /* Call: ptr func(ptr,ptr,ptr) */
++        void *v1 = va_arg(ap, va_type(ptr));
++        void *v2 = va_arg(ap, va_type(ptr));
++        void *v3 = va_arg(ap, va_type(ptr));
++        *((void * *)v_rc) = ((void *(*)(void *, void *, void *))(hf->hf_ptr))(v1, v2, v3);
++        rc = (*((void * *)v_rc) != he->he_modeval.v_ptr);
++    }
++    else if (he->he_sig == AP_HOOK_SIG5(int, ptr, ptr, ptr, int)) {
++        /* Call: int func(ptr,ptr,ptr,int) */
++        void *v1 = va_arg(ap, va_type(ptr));
++        void *v2 = va_arg(ap, va_type(ptr));
++        void *v3 = va_arg(ap, va_type(ptr));
++        int   v4 = va_arg(ap, va_type(int));
++        *((int *)v_rc) = ((int(*)(void *, void *, void *, int))(hf->hf_ptr))(v1, v2, v3, v4);
++        rc = (*((int *)v_rc) != he->he_modeval.v_int);
++    }
++    else if (he->he_sig == AP_HOOK_SIG6(int, ptr, ptr, ptr, int, ptr)) {
++        /* Call: int func(ptr,ptr,ptr,int,ptr) */
++        void *v1 = va_arg(ap, va_type(ptr));
++        void *v2 = va_arg(ap, va_type(ptr));
++        void *v3 = va_arg(ap, va_type(ptr));
++        int   v4 = va_arg(ap, va_type(int));
++        void *v5 = va_arg(ap, va_type(ptr));
++        *((int *)v_rc) = ((int(*)(void *, void *, void *, int, void *))(hf->hf_ptr))(v1, v2, v3, v4, v5);
++        rc = (*((int *)v_rc) != he->he_modeval.v_int);
++    }
++    else if (he->he_sig == AP_HOOK_SIG6(int, ptr, ptr, ptr, ptr, int)) {
++        /* Call: int func(ptr,ptr,ptr,ptr,int) */
++        void *v1 = va_arg(ap, va_type(ptr));
++        void *v2 = va_arg(ap, va_type(ptr));
++        void *v3 = va_arg(ap, va_type(ptr));
++        void *v4 = va_arg(ap, va_type(ptr));
++        int   v5 = va_arg(ap, va_type(int));
++        *((int *)v_rc) = ((int(*)(void *, void *, void *, void *, int))(hf->hf_ptr))(v1, v2, v3, v4, v5);
++        rc = (*((int *)v_rc) != he->he_modeval.v_int);
++    }
++    else if (he->he_sig == AP_HOOK_SIG7(int, ptr, ptr, ptr, ptr, int, ptr)) {
++        /* Call: int func(ptr,ptr,ptr,ptr,int,ptr) */
++        void *v1 = va_arg(ap, va_type(ptr));
++        void *v2 = va_arg(ap, va_type(ptr));
++        void *v3 = va_arg(ap, va_type(ptr));
++        void *v4 = va_arg(ap, va_type(ptr));
++        int   v5 = va_arg(ap, va_type(int));
++        void *v6 = va_arg(ap, va_type(ptr));
++        *((int *)v_rc) = ((int(*)(void *, void *, void *, void *, int, void *))(hf->hf_ptr))(v1, v2, v3, v4, v5, v6);
++        rc = (*((int *)v_rc) != he->he_modeval.v_int);
++    }
++    else if (he->he_sig == AP_HOOK_SIG6(ptr, ptr, ptr, ptr, ptr, ptr)) {
++        /* Call: ptr func(ptr,ptr,ptr,ptr,ptr) */
++        void *v1 = va_arg(ap, va_type(ptr));
++        void *v2 = va_arg(ap, va_type(ptr));
++        void *v3 = va_arg(ap, va_type(ptr));
++        void *v4 = va_arg(ap, va_type(ptr));
++        void *v5 = va_arg(ap, va_type(ptr));
++        *((void * *)v_rc) = ((void *(*)(void *, void *, void *, void *, void *))(hf->hf_ptr))(v1, v2, v3, v4, v5);
++        rc = (*((void * *)v_rc) != he->he_modeval.v_ptr);
++    }
++    else if (he->he_sig == AP_HOOK_SIG2(void, ptr)) {
++        /* Call: void func(ptr) */
++        void *v1 = va_arg(ap, va_type(ptr));
++        ((void(*)(void *))(hf->hf_ptr))(v1);
++    }
++    else if (he->he_sig == AP_HOOK_SIG4(void, ptr, int, int)) {
++        /* Call: void func(ptr,int,int) */
++        void *v1 = va_arg(ap, va_type(ptr));
++        int   v2 = va_arg(ap, va_type(int));
++        int   v3 = va_arg(ap, va_type(int));
++        ((void(*)(void *, int, int))(hf->hf_ptr))(v1, v2, v3);
++    }
++    else if (he->he_sig == AP_HOOK_SIG3(void, ptr, ptr)) {
++        /* Call: void func(ptr,ptr) */
++        void *v1 = va_arg(ap, va_type(ptr));
++        void *v2 = va_arg(ap, va_type(ptr));
++        ((void(*)(void *, void *))(hf->hf_ptr))(v1, v2);
++    }
++    else if (he->he_sig == AP_HOOK_SIG4(void, ptr, ptr, ptr)) {
++        /* Call: void func(ptr,ptr,ptr) */
++        void *v1 = va_arg(ap, va_type(ptr));
++        void *v2 = va_arg(ap, va_type(ptr));
++        void *v3 = va_arg(ap, va_type(ptr));
++        ((void(*)(void *, void *, void *))(hf->hf_ptr))(v1, v2, v3);
++    }
++    else if (he->he_sig == AP_HOOK_SIG5(void, ptr, ptr, ptr, ptr)) {
++        /* Call: void func(ptr,ptr,ptr,ptr) */
++        void *v1 = va_arg(ap, va_type(ptr));
++        void *v2 = va_arg(ap, va_type(ptr));
++        void *v3 = va_arg(ap, va_type(ptr));
++        void *v4 = va_arg(ap, va_type(ptr));
++        ((void(*)(void *, void *, void *, void *))(hf->hf_ptr))(v1, v2, v3, v4);
++    }
++    /* ----END GENERATED SECTION---------- */
++    else
++        ap_log_assert("hook signature not implemented", __FILE__, __LINE__);
++
++    if (he->he_modeid == AP_HOOK_MODE_ALL)
++        rc = FALSE;
++    else if (he->he_modeid == AP_HOOK_MODE_TOPMOST)
++        rc = TRUE;
++
++    return rc;
++}
++
++#endif /* EAPI */
++
++/*
++=cut
++##
++##  Embedded Perl script for generating the dispatch section
++##
++
++require 5.003;
++use strict;
++
++#   configuration
++my $file  = $0;
++my $begin = '----BEGIN GENERATED SECTION--------';
++my $end   = '----END GENERATED SECTION----------';
++
++#   special command: find used signatures
++if ($ARGV[0] eq 'used') {
++    my @S = `find .. -type f -name "*.c" -print`;
++    my $s;
++    my %T = ();
++    foreach $s (@S) {
++        $s =~ s|\n$||;
++        open(FP, "<$s") || die;
++        my $source = '';
++        $source .= $_ while (<FP>);
++        close(FP);
++        my %seen = ();
++        sub printme {
++            my ($src, $hook, $sig) = @_;
++            return if ($seen{$hook} == 1);
++            $seen{$hook} = 1;
++            my ($rc, $args) = ($sig =~ m|^([^,]+)(.*)$|);
++            $args =~ s|^,||;
++            $src =~ s|^.+/||;
++            my $sig = sprintf("%-6sfunc(%s)", $rc, $args);
++            $T{$sig}++; 
++        }
++        $source =~ s|\("([^"]+)",\s*AP_HOOK_SIG[0-9]\((.+?)\)|&printme($s, $1, $2), ''|sge;
++    }
++    my $t;
++    foreach $t (sort(keys(%T))) {
++        printf("     *    %-40s [%dx]\n", $t, $T{$t});
++    }
++    exit(0);
++}
++
++#   read ourself and keep a backup
++open(FP, "<$file") || die;
++my $source = '';
++$source .= $_ while (<FP>);
++close(FP);
++open(FP, ">$file.bak") || die;
++print FP $source;
++close(FP);
++
++#   now parse the signature lines and update the code
++my $o = '';
++my $next = 0;
++my $line;
++my %seen = ();
++foreach $line (split(/\n/, $source)) {
++    next if (not $line =~ m|\*\s+\S+\s+func\(.*\)|);
++    my ($sig, $rc, $param) = ($line =~ m|\*\s+((\S+)\s+func\((.*?)\))|);
++    $sig =~ s|\s+| |g;
++
++    next if ($seen{$sig} == 1);
++    $seen{$sig} = 1;
++
++    print "Generating code for `$sig'\n";
++
++    my @S = ($rc, split(/[\s,]+/, $param));
++    my @RS = @S;
++    my $i;
++    for ($i = 0; $i <= $#RS; $i++) {
++        $RS[$i] = 'void *' if ($RS[$i] eq 'ptr');
++        $RS[$i] = 'void *' if ($RS[$i] eq 'ctx');
++    }
++
++    $o .= "else " if ($next); $next++;
++    $o .= sprintf("if (he->he_sig == AP_HOOK_SIG%d(%s)) {\n", $#S+1, join(', ',@S));
++    $o .= sprintf("    \/\* Call: %s \*\/\n", $sig);
++    for ($i = 1; $i <= $#S; $i++) {
++        $o .= sprintf("    %-6sv%d = va_arg(ap, va_type(%s));\n", $RS[$i], $i, $S[$i]);
++    }
++    $o .= "    ";
++    $o .= sprintf("*((%s *)v_rc) = ", $RS[0]) if ($S[0] ne 'void');
++    $o .= sprintf("((%s(*)(%s))(hf->hf_ptr))", $RS[0], join(', ', @RS[1..$#RS]));
++    $o .= "(";
++    for ($i = 1; $i <= $#S; $i++) {
++        $o .= "hf->hf_ctx" if ($S[$i] eq 'ctx');
++        $o .= sprintf("v%d", $i) if ($S[$i] ne 'ctx');
++        $o .= ", " if ($i < $#S);
++    }
++    $o .= ");\n";
++    $o .= sprintf("    rc = (*((%s *)v_rc) != he->he_modeval.v_%s);\n", 
++                  $RS[0], $S[0]) if ($S[0] ne 'void');
++    $o .= "}\n";
++}
++
++#   insert the generated code at the target location
++$o =~ s|^|    |mg;
++$source =~ s|(\/\* $begin.+?\n).*\n(.*?\/\* $end)|$1$o$2|s;
++
++#   and update the source on disk
++print "Updating file `$file'\n";
++open(FP, ">$file") || die;
++print FP $source;
++close(FP);
++
++=pod
++*/
+diff -Nru apache_1.3.17/src/ap/ap_mm.c apache_1.3.17.new/src/ap/ap_mm.c
+--- apache_1.3.17/src/ap/ap_mm.c	Thu Jan  1 01:00:00 1970
++++ apache_1.3.17.new/src/ap/ap_mm.c	Thu Dec 30 22:02:56 1999
+@@ -0,0 +1,178 @@
++/* ====================================================================
++ * Copyright (c) 1999-2000 The Apache Group.  All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer. 
++ *
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in
++ *    the documentation and/or other materials provided with the
++ *    distribution.
++ *
++ * 3. All advertising materials mentioning features or use of this
++ *    software must display the following acknowledgment:
++ *    "This product includes software developed by the Apache Group
++ *    for use in the Apache HTTP server project (http://www.apache.org/)."
++ *
++ * 4. The names "Apache Server" and "Apache Group" must not be used to
++ *    endorse or promote products derived from this software without
++ *    prior written permission. For written permission, please contact
++ *    apache@apache.org.
++ *
++ * 5. Products derived from this software may not be called "Apache"
++ *    nor may "Apache" appear in their names without prior written
++ *    permission of the Apache Group.
++ *
++ * 6. Redistributions of any form whatsoever must retain the following
++ *    acknowledgment:
++ *    "This product includes software developed by the Apache Group
++ *    for use in the Apache HTTP server project (http://www.apache.org/)."
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE APACHE GROUP ``AS IS'' AND ANY
++ * EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
++ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE APACHE GROUP OR
++ * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
++ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
++ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
++ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
++ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
++ * OF THE POSSIBILITY OF SUCH DAMAGE.
++ * ====================================================================
++ *
++ * This software consists of voluntary contributions made by many
++ * individuals on behalf of the Apache Group and was originally based
++ * on public domain software written at the National Center for
++ * Supercomputing Applications, University of Illinois, Urbana-Champaign.
++ * For more information on the Apache Group and the Apache HTTP server
++ * project, please see <http://www.apache.org/>.
++ */
++
++/*
++**  ap_mm.c -- wrapper for MM shared memory library
++**
++**  This file has two reason:
++**
++**  1. Under DSO context we need stubs inside the Apache core code
++**     to make sure the MM library's code is actually available
++**     to the module DSOs.
++**
++**  2. When the MM library cannot be built on the current platform
++**     still provide dummy stubs so modules using the ap_mm_xxx()
++**     functions can be still built. But modules should use
++**     ap_mm_useable() to find out whether they really can use
++**     the MM stuff.
++*/
++                                       /*
++                                        * "What you see is all you get."
++                                        *     -- Brian Kernighan
++                                        */
++#ifdef EAPI
++
++#include "httpd.h"
++#include "ap_mm.h"
++
++#ifdef EAPI_MM
++#include "mm.h"
++API_EXPORT(int) ap_mm_useable(void) { return TRUE;  }
++#define STUB(val,nul)               { return val;   }
++#define STUB_STMT(stmt)             { stmt; return; }
++#else
++API_EXPORT(int) ap_mm_useable(void) { return FALSE; }
++#define STUB(val,nul)               { return nul;   }
++#define STUB_STMT(stmt)             { return;       }
++#endif
++
++API_EXPORT(int) ap_MM_create(size_t size, char *file) 
++    STUB(MM_create(size, file), FALSE)
++API_EXPORT(int) ap_MM_permission(mode_t mode, uid_t owner, gid_t group) 
++    STUB(MM_permission(mode, owner, group), -1)
++API_EXPORT(void) ap_MM_destroy(void)
++    STUB_STMT(MM_destroy())
++API_EXPORT(int) ap_MM_lock(ap_mm_lock_mode mode)
++    STUB(MM_lock(mode), FALSE)
++API_EXPORT(int) ap_MM_unlock(void)
++    STUB(MM_unlock(), FALSE)
++API_EXPORT(void *) ap_MM_malloc(size_t size)
++    STUB(MM_malloc(size), NULL)
++API_EXPORT(void *) ap_MM_realloc(void *ptr, size_t size)
++    STUB(MM_realloc(ptr, size), NULL)
++API_EXPORT(void) ap_MM_free(void *ptr)
++    STUB_STMT(MM_free(ptr))
++API_EXPORT(void *) ap_MM_calloc(size_t number, size_t size)
++    STUB(MM_calloc(number, size), NULL)
++API_EXPORT(char *) ap_MM_strdup(const char *str)
++    STUB(MM_strdup(str), NULL)
++API_EXPORT(size_t) ap_MM_sizeof(void *ptr)
++    STUB(MM_sizeof(ptr), 0)
++API_EXPORT(size_t) ap_MM_maxsize(void)
++    STUB(MM_maxsize(), 0)
++API_EXPORT(size_t) ap_MM_available(void)
++    STUB(MM_available(), 0)
++API_EXPORT(char *) ap_MM_error(void)
++    STUB(MM_error(), NULL)
++
++API_EXPORT(AP_MM *) ap_mm_create(size_t size, char *file)
++    STUB(mm_create(size, file), NULL)
++API_EXPORT(int) ap_mm_permission(AP_MM *mm, mode_t mode, uid_t owner, gid_t group) 
++    STUB(mm_permission(mm, mode, owner, group), -1)
++API_EXPORT(void) ap_mm_destroy(AP_MM *mm)
++    STUB_STMT(mm_destroy(mm))
++API_EXPORT(int) ap_mm_lock(AP_MM *mm, ap_mm_lock_mode mode)
++    STUB(mm_lock(mm, mode), FALSE)
++API_EXPORT(int) ap_mm_unlock(AP_MM *mm)
++    STUB(mm_unlock(mm), FALSE)
++API_EXPORT(void *) ap_mm_malloc(AP_MM *mm, size_t size)
++    STUB(mm_malloc(mm, size), NULL)
++API_EXPORT(void *) ap_mm_realloc(AP_MM *mm, void *ptr, size_t size)
++    STUB(mm_realloc(mm, ptr, size), NULL)
++API_EXPORT(void) ap_mm_free(AP_MM *mm, void *ptr)
++    STUB_STMT(mm_free(mm, ptr))
++API_EXPORT(void *) ap_mm_calloc(AP_MM *mm, size_t number, size_t size)
++    STUB(mm_calloc(mm, number, size), NULL)
++API_EXPORT(char *) ap_mm_strdup(AP_MM *mm, const char *str)
++    STUB(mm_strdup(mm, str), NULL)
++API_EXPORT(size_t) ap_mm_sizeof(AP_MM *mm, void *ptr)
++    STUB(mm_sizeof(mm, ptr), 0)
++API_EXPORT(size_t) ap_mm_maxsize(void)
++    STUB(mm_maxsize(), 0)
++API_EXPORT(size_t) ap_mm_available(AP_MM *mm)
++    STUB(mm_available(mm), 0)
++API_EXPORT(char *) ap_mm_error(void)
++    STUB(mm_error(), NULL)
++API_EXPORT(void) ap_mm_display_info(AP_MM *mm)
++    STUB_STMT(mm_display_info(mm))
++
++API_EXPORT(void *) ap_mm_core_create(size_t size, char *file)
++    STUB(mm_core_create(size, file), NULL)
++API_EXPORT(int) ap_mm_core_permission(void *core, mode_t mode, uid_t owner, gid_t group) 
++    STUB(mm_core_permission(core, mode, owner, group), -1)
++API_EXPORT(void) ap_mm_core_delete(void *core)
++    STUB_STMT(mm_core_delete(core))
++API_EXPORT(size_t) ap_mm_core_size(void *core)
++    STUB(mm_core_size(core), 0)
++API_EXPORT(int) ap_mm_core_lock(void *core, ap_mm_lock_mode mode)
++    STUB(mm_core_lock(core, mode), FALSE)
++API_EXPORT(int) ap_mm_core_unlock(void *core)
++    STUB(mm_core_unlock(core), FALSE)
++API_EXPORT(size_t) ap_mm_core_maxsegsize(void)
++    STUB(mm_core_maxsegsize(), 0)
++API_EXPORT(size_t) ap_mm_core_align2page(size_t size)
++    STUB(mm_core_align2page(size), 0)
++API_EXPORT(size_t) ap_mm_core_align2word(size_t size)
++    STUB(mm_core_align2word(size), 0)
++
++API_EXPORT(void) ap_mm_lib_error_set(unsigned int type, const char *str)
++    STUB_STMT(mm_lib_error_set(type, str))
++API_EXPORT(char *) ap_mm_lib_error_get(void)
++    STUB(mm_lib_error_get(), NULL)
++API_EXPORT(int) ap_mm_lib_version(void)
++    STUB(mm_lib_version(), 0)
++
++#endif /* EAPI */
+diff -Nru apache_1.3.17/src/modules/extra/mod_define.c apache_1.3.17.new/src/modules/extra/mod_define.c
+--- apache_1.3.17/src/modules/extra/mod_define.c	Thu Jan  1 01:00:00 1970
++++ apache_1.3.17.new/src/modules/extra/mod_define.c	Thu Dec 30 22:00:58 1999
+@@ -0,0 +1,416 @@
++/*
++**  mod_define.c - Apache module for configuration defines ($xxx)
++**
++**  Copyright (c) 1998-2000 Ralf S. Engelschall <rse@engelschall.com>
++**  Copyright (c) 1998-2000 Christian Reiber <chrei@en.muc.de>
++**
++**  Permission to use, copy, modify, and distribute this software for
++**  any purpose with or without fee is hereby granted, provided that
++**  the above copyright notice and this permission notice appear in all
++**  copies.
++**
++**  THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
++**  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
++**  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
++**  IN NO EVENT SHALL THE AUTHORS AND COPYRIGHT HOLDERS AND THEIR
++**  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++**  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++**  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
++**  USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
++**  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
++**  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
++**  OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++**  SUCH DAMAGE.
++*/
++
++/*
++ *  HISTORY
++ *
++ *  v1.0: Originally written in December 1998 by
++ *        Ralf S. Engelschall <rse@engelschall.com> and
++ *        Christian Reiber <chrei@en.muc.de>
++ *
++ *  v1.1: Completely Overhauled in August 1999 by
++ *        Ralf S. Engelschall <rse@engelschall.com>
++ */
++
++#include "ap_config.h"
++#include "ap_ctype.h"
++#include "httpd.h"
++#include "http_config.h"
++#include "http_conf_globals.h"
++#include "http_core.h"
++#include "http_log.h"
++
++#ifndef EAPI
++#error "This module requires the Extended API (EAPI) facilities."
++#endif
++
++/*
++ * The global table of defines
++ */
++
++static table *tDefines         = NULL;   /* global table of defines */
++static int    bOnceSeenADefine = FALSE;  /* optimization flag */
++
++/*
++ * Forward declaration
++ */
++static int   DefineIndex      (pool *, char *, int *, int *, char **);
++static char *DefineFetch      (pool *, char *);
++static char *DefineExpand     (pool *, char *, int, char *);
++static void  DefineInit       (pool *);
++static void  DefineCleanup    (void *);
++static char *DefineRewriteHook(cmd_parms *, void *, const char *);
++
++/*
++ * Character classes for scanner function
++ */
++typedef enum {
++    CC_ESCAPE, CC_DOLLAR, CC_BRACEOPEN, CC_BRACECLOSE,
++    CC_IDCHAR1, CC_IDCHAR, CC_OTHER, CC_EOS
++} CharClass;
++
++/*
++ * Scanner states for scanner function
++ */
++typedef enum {
++    SS_NONE, SS_SKIP, SS_DOLLAR, SS_TOKEN_BRACED,
++    SS_TOKEN_UNBRACED, SS_ERROR, SS_FOUND
++} ScanState;
++
++/*
++ * Default meta characters
++ */
++#define DEFAULT_MC_ESCAPE      "\\"
++#define DEFAULT_MC_DOLLAR      "$"
++#define DEFAULT_MC_BRACEOPEN   "{"
++#define DEFAULT_MC_BRACECLOSE  "}"
++
++/*
++ * Scanner for variable constructs $xxx and ${xxx}
++ */
++static int DefineIndex(pool *p, char *cpLine, int *pos, int *len, char **cpVar)
++{
++    int rc;
++    char *cp;
++    char *cp2;
++    CharClass cc;
++    char cEscape;
++    char cDefine;
++    char cBraceOpen;
++    char cBraceClose;
++    char *cpError;
++    ScanState s;
++
++    cEscape = DEFAULT_MC_ESCAPE[0];
++    if ((cp = DefineFetch(p, "mod_define::escape")) != NULL)
++        cEscape = cp[0];
++    cDefine = DEFAULT_MC_DOLLAR[0];
++    if ((cp = DefineFetch(p, "mod_define::dollar")) != NULL)
++        cDefine = cp[0];
++    cBraceOpen = DEFAULT_MC_BRACEOPEN[0];
++    if ((cp = DefineFetch(p, "mod_define::braceopen")) != NULL)
++        cBraceOpen = cp[0];
++    cBraceClose = DEFAULT_MC_BRACECLOSE[0];
++    if ((cp = DefineFetch(p, "mod_define::braceclose")) != NULL)
++        cBraceClose = cp[0];
++
++    rc = 0;
++    *len = 0;
++    cc = CC_OTHER;
++    s = SS_NONE;
++    for (cp = cpLine+(*pos); cc != CC_EOS; cp++) {
++        if (*cp == cEscape)
++            cc = CC_ESCAPE;
++        else if (*cp == cDefine)
++            cc = CC_DOLLAR;
++        else if (*cp == cBraceOpen)
++            cc = CC_BRACEOPEN;
++        else if (*cp == cBraceClose)
++            cc = CC_BRACECLOSE;
++        else if (ap_isalpha(*cp))
++            cc = CC_IDCHAR1;
++        else if (ap_isdigit(*cp) || *cp == '_' || *cp == ':')
++            cc = CC_IDCHAR;
++        else if (*cp == '\0')
++            cc = CC_EOS;
++        else
++            cc = CC_OTHER;
++        switch (s) {
++            case SS_NONE:
++                switch (cc) {
++                    case CC_ESCAPE:
++                        s = SS_SKIP;
++                        break;
++                    case CC_DOLLAR:
++                        s = SS_DOLLAR;
++                        break;
++                    default:
++                        break;
++                }
++                break;
++            case SS_SKIP:
++                s = SS_NONE;
++                continue;
++                break;
++            case SS_DOLLAR:
++                switch (cc) {
++                    case CC_BRACEOPEN:
++                        s = SS_TOKEN_BRACED;
++                        *pos = cp-cpLine-1;
++                        (*len) = 2;
++                        *cpVar = cp+1;
++                        break;
++                    case CC_IDCHAR1:
++                        s = SS_TOKEN_UNBRACED;
++                        *pos = cp-cpLine-1;
++                        (*len) = 2;
++                        *cpVar = cp;
++                        break;
++                    case CC_ESCAPE:
++                        s = SS_SKIP;
++                        break;
++                    default:
++                        s = SS_NONE;
++                        break;
++                }
++                break;
++            case SS_TOKEN_BRACED:
++                switch (cc) {
++                    case CC_IDCHAR1:
++                    case CC_IDCHAR:
++                        (*len)++;
++                        break;
++                    case CC_BRACECLOSE:
++                        (*len)++;
++                        cp2 = ap_palloc(p, cp-*cpVar+1);
++                        ap_cpystrn(cp2, *cpVar, cp-*cpVar+1);
++                        *cpVar = cp2;
++                        s = SS_FOUND;
++                        break;
++                    default:
++                        cpError = ap_psprintf(p, "Illegal character '%c' in identifier", *cp);
++                        s = SS_ERROR;
++                        break;
++                }
++                break;
++            case SS_TOKEN_UNBRACED:
++                switch (cc) {
++                    case CC_IDCHAR1:
++                    case CC_IDCHAR:
++                        (*len)++;
++                        break;
++                    default:
++                        cp2 = ap_palloc(p, cp-*cpVar+1);
++                        ap_cpystrn(cp2, *cpVar, cp-*cpVar+1);
++                        *cpVar = cp2;
++                        s = SS_FOUND;
++                        break;
++                }
++                break;
++            case SS_FOUND:
++            case SS_ERROR:
++                break;
++        }
++        if (s == SS_ERROR) {
++            fprintf(stderr, "Error\n");
++            break;
++        }
++        else if (s == SS_FOUND) {
++            rc = 1;
++            break;
++        }
++    }
++    return rc;
++}
++
++/*
++ * Determine the value of a variable
++ */
++static char *DefineFetch(pool *p, char *cpVar)
++{
++    char *cpVal;
++
++    /* first try out table */
++    if ((cpVal = (char *)ap_table_get(tDefines, (char *)cpVar)) != NULL)
++        return cpVal;
++    /* second try the environment */
++    if ((cpVal = getenv(cpVar)) != NULL)
++        return cpVal;
++    return NULL;
++}
++
++/*
++ * Expand a variable
++ */
++static char *DefineExpand(pool *p, char *cpToken, int tok_len, char *cpVal)
++{
++    char *cp;
++    int val_len, rest_len;
++
++    val_len  = strlen(cpVal);
++    rest_len = strlen(cpToken+tok_len);
++    if (val_len < tok_len)
++        memcpy(cpToken+val_len, cpToken+tok_len, rest_len+1);
++    else if (val_len > tok_len)
++        for (cp = cpToken+strlen(cpToken); cp > cpToken+tok_len-1; cp--)
++            *(cp+(val_len-tok_len)) = *cp;
++    memcpy(cpToken, cpVal, val_len);
++    return NULL;
++}
++
++/*
++ * The EAPI hook which is called after Apache has read a
++ * configuration line and before it's actually processed
++ */
++static char *DefineRewriteHook(cmd_parms *cmd, void *config, const char *line)
++{
++    pool *p;
++    char *cpBuf;
++    char *cpLine;
++    int pos;
++    int len;
++    char *cpError;
++    char *cpVar;
++    char *cpVal;
++    server_rec *s;
++
++    /* runtime optimization */
++    if (!bOnceSeenADefine)
++        return NULL;
++
++    p  = cmd->pool;
++    s  = cmd->server;
++
++    /*
++     * Search for:
++     *  ....\$[a-zA-Z][:_a-zA-Z0-9]*....
++     *  ....\${[a-zA-Z][:_a-zA-Z0-9]*}....
++     */
++    cpBuf = NULL;
++    cpLine = (char *)line;
++    pos = 0;
++    while (DefineIndex(p, cpLine, &pos, &len, &cpVar)) {
++#ifdef DEFINE_DEBUG
++        {
++        char prefix[1024];
++        char marker[1024];
++        int i;
++        for (i = 0; i < pos; i++)
++            prefix[i] = ' ';
++        prefix[i] = '\0';
++        for (i = 0; i < len; i++)
++            marker[i] = '^';
++        marker[i] = '\0';
++        fprintf(stderr,
++                "Found variable `%s' (pos: %d, len: %d)\n"
++                "  %s\n"
++                "  %s%s\n",
++                cpVar, pos, len, cpLine, prefix, marker);
++        }
++#endif
++        if (cpBuf == NULL) {
++            cpBuf = ap_palloc(p, MAX_STRING_LEN);
++            ap_cpystrn(cpBuf, line, MAX_STRING_LEN);
++            cpLine = cpBuf;
++        }
++        if ((cpVal = DefineFetch(p, cpVar)) == NULL) {
++            ap_log_error(APLOG_MARK, APLOG_ERR, s,
++                         "mod_define: Variable '%s' not defined: file %s, line %d",
++                         cpVar, cmd->config_file->name,
++                         cmd->config_file->line_number);
++            cpBuf = NULL;
++            break;
++        }
++        if ((cpError = DefineExpand(p, cpLine+pos, len, cpVal)) != NULL) {
++            ap_log_error(APLOG_MARK, APLOG_ERR, s,
++                         "mod_define: %s: file %s, line %d",
++                         cpError, cmd->config_file->name,
++                         cmd->config_file->line_number);
++            cpBuf = NULL;
++            break;
++        }
++    }
++    return cpBuf;
++}
++
++/*
++ * Implementation of the `Define' configuration directive
++ */
++static const char *cmd_define(cmd_parms *cmd, void *config,
++                              char *cpVar, char *cpVal)
++{
++    if (tDefines == NULL)
++        DefineInit(cmd->pool);
++    ap_table_set(tDefines, cpVar, cpVal);
++    bOnceSeenADefine = TRUE;
++    return NULL;
++}
++
++/*
++ * Module Initialization
++ */
++
++static void DefineInit(pool *p)
++{
++    tDefines = ap_make_table(p, 10);
++    /* predefine delimiters */
++    ap_table_set(tDefines, "mod_define::escape", DEFAULT_MC_ESCAPE);
++    ap_table_set(tDefines, "mod_define::dollar", DEFAULT_MC_DOLLAR);
++    ap_table_set(tDefines, "mod_define::open",   DEFAULT_MC_BRACEOPEN);
++    ap_table_set(tDefines, "mod_define::close",  DEFAULT_MC_BRACECLOSE);
++    ap_register_cleanup(p, NULL, DefineCleanup, ap_null_cleanup);
++    return;
++}
++
++/*
++ * Module Cleanup
++ */
++
++static void DefineCleanup(void *data)
++{
++    /* reset private variables when config pool is cleared */
++    tDefines         = NULL;
++    bOnceSeenADefine = FALSE;
++    return;
++}
++
++/*
++ * Module Directive lists
++ */
++static const command_rec DefineDirectives[] = {
++    { "Define", cmd_define, NULL, RSRC_CONF|ACCESS_CONF, TAKE2,
++      "Define a configuration variable" },
++    { NULL }
++};
++
++/*
++ * Module API dispatch list
++ */
++module MODULE_VAR_EXPORT define_module = {
++    STANDARD_MODULE_STUFF,
++    NULL,                  /* module initializer                  */
++    NULL,                  /* create per-dir    config structures */
++    NULL,                  /* merge  per-dir    config structures */
++    NULL,                  /* create per-server config structures */
++    NULL,                  /* merge  per-server config structures */
++    DefineDirectives,      /* table of config file commands       */
++    NULL,                  /* [#8] MIME-typed-dispatched handlers */
++    NULL,                  /* [#1] URI to filename translation    */
++    NULL,                  /* [#4] validate user id from request  */
++    NULL,                  /* [#5] check if the user is ok _here_ */
++    NULL,                  /* [#2] check access by host address   */
++    NULL,                  /* [#6] determine MIME type            */
++    NULL,                  /* [#7] pre-run fixups                 */
++    NULL,                  /* [#9] log a transaction              */
++    NULL,                  /* [#3] header parser                  */
++    NULL,                  /* child_init                          */
++    NULL,                  /* child_exit                          */
++    NULL,                  /* [#0] post read-request              */
++    NULL,                  /* EAPI: add_module                    */
++    NULL,                  /* EAPI: del_module                    */
++    DefineRewriteHook,     /* EAPI: rewrite_command               */
++    NULL                   /* EAPI: new_connection                */
++};
++
