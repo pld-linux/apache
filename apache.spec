@@ -1,9 +1,11 @@
+cvs server: [21:06:10] waiting for kloczek's lock in /cvsroot/SOURCES
+cvs server: [21:06:40] waiting for walker's lock in /cvsroot/SOURCES
+cvs server: [21:07:10] obtained lock in /cvsroot/SOURCES
 # TODO:
 # - mod_case_filter
 # - mod_case_filter_in
 # - mod_optional_fn_{export,import}
 # - mod_optional_hook_{export,import}
-# - devel subpackage, apr maybe?
 # - config examples for mod_*
 %include	/usr/lib/rpm/macros.perl
 Summary:	The most widely used Web server on the Internet
@@ -28,10 +30,11 @@ Source6:	%{name}-httpd.conf
 Source8:	%{name}-mod_vhost_alias.conf
 Source9:	%{name}-mod_status.conf
 Source10:	%{name}-mod_proxy.conf
+Patch0:		%{name}-apxs.patch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 BuildRequires:	automake
 BuildRequires:	openssl-devel
-BuildRequires:	db3-devel
+BuildRequires:	db4-devel
 BuildRequires:	zlib-devel
 BuildRequires:	expat-static
 BuildRequires:	perl-devel >= 5.004
@@ -45,7 +48,6 @@ Prereq:		/usr/bin/getgid
 Prereq:		/bin/id
 Prereq:		sh-utils
 Prereq:		rc-scripts
-Prereq:		mm
 Prereq:		perl
 Requires:	mailcap
 Requires:	/etc/mime.types
@@ -123,7 +125,7 @@ Summary(pl):	Pliki nag³ówkowe do tworzenai modu³ów rozszerzeñ do serwera www Apa
 Summary(pt_BR):	Arquivos de inclusão do Apache para desenvolvimento de módulos
 Group:		Networking/Utilities
 Requires:	%{name}(EAPI) = %{version}
-Provides:	%{name}(EAPI)-devel
+Provides:	%{name}(EAPI)-devel = %{version}
 
 %description devel
 The apache-devel package contains header files for Apache.
@@ -147,6 +149,19 @@ Este pacote contem os arquivos de inclusão para o Apache, bem como o
 utilitário apxs para a construção de objetos compartilhados dinâmicos
 (DSOs). Este pacote precisa ser instalado se você deseja compilar ou
 desenvolver módulos adicionais para o Apache.
+
+%package static
+Summary:	Static Apache web server libraries
+Summary(pl):	Statyczne biblioteki serwera www Apache
+Group:		Development/Libraries
+Requires:	%{name}(EAPI)-devel = %{version}
+Provides:	%{name}(EAPI)-static = %{version}
+
+%description static
+The apache-static package contains static libraries for Apache.
+
+%description static -l pl
+Styatyczne biblioteki serwera Apache.
 
 %package mod_actions
 Summary:	Apache module for run CGI whenever a file of a certain type is requested
@@ -549,6 +564,7 @@ Modu³ cacheuj±cy statyczn± listê plików w pamiêci.
 
 %prep
 %setup -q -n httpd-%{version}
+%patch0 -p1
 
 %build
 cp -f %{_prefix}/share/automake/config.* srclib/pcre/
@@ -633,6 +649,11 @@ install -d $RPM_BUILD_ROOT%{_var}/{run,cache}/apache
 	logdir=$RPM_BUILD_ROOT%{_var}/log/httpd \
 	proxycachedir=$RPM_BUILD_ROOT%{_var}/cache/httpd
 
+cp $RPM_BUILD_ROOT%{_sysconfdir}/build/config_vars.mk \
+	$RPM_BUILD_ROOT%{_sysconfdir}/build/config_vars.mk.old
+sed -e "s#$RPM_BUILD_ROOT##g" $RPM_BUILD_ROOT%{_sysconfdir}/build/config_vars.mk.old \
+	> $RPM_BUILD_ROOT%{_sysconfdir}/build/config_vars.mk
+
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/apache
 install %{SOURCE4} $RPM_BUILD_ROOT/etc/sysconfig/apache
@@ -670,6 +691,7 @@ else
 fi
 
 %post
+/sbin/ldconfig
 /sbin/chkconfig --add httpd
 %{_sbindir}/apxs -e -a -n access %{_libexecdir}/mod_access.so 1>&2
 %{_sbindir}/apxs -e -a -n alias %{_libexecdir}/mod_alias.so 1>&2
@@ -718,6 +740,7 @@ if [ "$1" = "0" ]; then
 fi
 
 %postun
+/sbin/ldconfig
 if [ "$1" = "0" ]; then
 	/usr/sbin/userdel http
 	/usr/sbin/groupdel http
@@ -1129,6 +1152,9 @@ fi
 %attr(750,root,root) %dir %{_sysconfdir}
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf
 %attr(640,root,root) %{_sysconfdir}/magic
+%attr(750,root,root) %dir %{_sysconfdir}/build
+%{_sysconfdir}/build/*.mk
+%attr(755,root,root) %{_sysconfdir}/build/*.sh
 
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/sysconfig/*
 %attr(640,root,root) %config(noreplace) /etc/logrotate.d/*
@@ -1155,9 +1181,12 @@ fi
 %attr(755,root,root) %{_sbindir}/ab
 %attr(755,root,root) %{_sbindir}/apachectl
 %attr(755,root,root) %{_sbindir}/apxs
+%attr(755,root,root) %{_sbindir}/checkgid
 %attr(755,root,root) %{_sbindir}/httpd
 %attr(755,root,root) %{_sbindir}/logresolve
 %attr(755,root,root) %{_sbindir}/rotatelogs
+
+%attr(755,root,root) %{_libdir}/lib*.so.*
 
 %dir %attr(770,root,http) /var/run/apache
 
@@ -1226,7 +1255,14 @@ fi
 
 %files devel
 %defattr(644,root,root,755)
+%attr(755,root,root) %{_bindir}/*-config
 %{_includedir}
+%attr(755,root,root) %{_libdir}/lib*.so
+%attr(755,root,root) %{_libdir}/lib*.la
+
+%files static
+%defattr(644,root,root,755)
+%{_libdir}/lib*.a
 
 %files mod_actions
 %defattr(644,root,root,755)
@@ -1249,6 +1285,7 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_auth_dbm.so
 %attr(755,root,root) %{_bindir}/dbmmanage
+%attr(755,root,root) %{_bindir}/htdbm
 %{_datadir}/manual/mod/mod_auth_dbm.html
 %{_mandir}/man1/dbmmanage.1*
 
