@@ -1,21 +1,23 @@
-Summary:	HTTP server daemon to provide WWW services
+Summary:	HTTP server daemon to provide WWW services with IPv6 support
 Summary(de):	Leading World Wide Web-Server
 Summary(fr):	Serveur Web leader du marché
-Summary(pl):	Serwer WWW (World Wide Web)
+Summary(pl):	Serwer WWW (World Wide Web) ze wsparciem dla IPv6
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
-Version:	1.3.4
-Release:	6d
+Version:	1.3.6
+Release:	1
 Group:		Networking/Daemons
 Group(pl):	Sieci/Demony
 Source0:	ftp://ftp.apache.org/apache/dist/%{name}_%{version}.tar.gz
-Source1:	httpd.init
-Source2:	%{name}.log
+Source1:	apache.init
+Source2:	%{name}.logrotate
 Source3:	%{name}-extra.tar.bz2
 ########	http://stonecold.unity.ncsu.edu/software/mod_auth_kerb/index.html
-Source5:	mod_auth_kerb-3.6.tar.gz
-Patch0:		%{name}-1.3.2-suexec.patch
-Patch1:		%{name}-ndbm.patch
+Source5:	mod_auth_kerb-4.3.tar.gz
+Source6:	apache_1.3.6.tar.gz.asc
+Source7:	apache_1.3.6.tar.gz.md5
+Patch0:		%{name}-suexec.patch
+Patch1:		%{name}_1.3.6.ipv6.patch
 Copyright:	BSD-like
 Obsoletes:	apache-extra
 Obsoletes:	apache6
@@ -27,7 +29,7 @@ BuildRoot:	/tmp/%{name}-%{version}-root
 
 %description
 Apache is a full featured web server that is freely available, and also
-happens to be the most widely used.
+happens to be the most widely used. This version supports IPv6.
 
 %description -l de
 Apache ist ein voll funktionsfähiger Web-Server, der kostenlos
@@ -40,7 +42,7 @@ aussi le plus utilisé à travers le monde.
 %description -l pl
 Apache jest serwerem WWW (World Wide Web). Instaluj±c ten pakiet bêdziesz 
 móg³ prezentowaæ w³asne strony WWW w sieci internet. Apache umo¿liwia równie¿
-konfigurowanie serwerów wirtualnych.
+konfigurowanie serwerów wirtualnych. Ta wersja wspiera IPv6.
 
 %description -l tr
 Apache serbest daðýtýlan ve çok kullanýlan yetenekli bir web sunucusudur.
@@ -97,7 +99,7 @@ Dokumentacja do Apache w formacie HTML
 
 %build
 OPTIM=$RPM_OPT_FLAGS LDFLAGS=-s\
-    ./configure %{_target} \
+    ./configure \
 	--prefix=/usr \
 	--sysconfdir=/etc/httpd/conf \
 	--datadir=/home/httpd \
@@ -116,7 +118,8 @@ OPTIM=$RPM_OPT_FLAGS LDFLAGS=-s\
 	--suexec-uidmin=500 \
 	--suexec-gidmin=500 \
 	--sbindir=%{_sbindir} \
-	--includedir=%{_includedir}/apache
+	--includedir=%{_includedir}/apache \
+	--enable-rule=INET6
 
 make
 
