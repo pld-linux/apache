@@ -530,7 +530,7 @@ rm -f src/modules/standard/mod_rewrite.so
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig} \
 	$RPM_BUILD_ROOT%{_datadir}/errordocs \
-	$RPM_BUILD_ROOT/var/{log/{httpd,archiv/httpd},lib/apache/mm}
+	$RPM_BUILD_ROOT/var/{log/{httpd,archiv/httpd},run/apache}
 
 %{__make} install-quiet root="$RPM_BUILD_ROOT"
 
@@ -946,6 +946,53 @@ rm -rf $RPM_BUILD_ROOT
 %doc ABOUT_APACHE.gz src/CHANGES.gz KEYS.gz README.gz
 %doc conf/mime.types
 
+%attr(754,root,root) /etc/rc.d/init.d/httpd
+
+%attr(750,root,root) %dir %{_sysconfdir}
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf
+%attr(640,root,root) %{_sysconfdir}/magic
+
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/sysconfig/*
+%attr(640,root,root) %config(noreplace) /etc/logrotate.d/*
+
+%dir %{_libexecdir}
+%attr(755,root,root) %{_libexecdir}/mod_access.so
+%attr(755,root,root) %{_libexecdir}/mod_alias.so
+%attr(755,root,root) %{_libexecdir}/mod_asis.so
+%attr(755,root,root) %{_libexecdir}/mod_autoindex.so
+%attr(755,root,root) %{_libexecdir}/mod_cern_meta.so
+%attr(755,root,root) %{_libexecdir}/mod_cgi.so
+%attr(755,root,root) %{_libexecdir}/mod_env.so
+%attr(755,root,root) %{_libexecdir}/mod_include.so
+%attr(755,root,root) %{_libexecdir}/mod_log_agent.so
+%attr(755,root,root) %{_libexecdir}/mod_log_config.so
+%attr(755,root,root) %{_libexecdir}/mod_log_referer.so
+%attr(755,root,root) %{_libexecdir}/mod_mime.so
+%attr(755,root,root) %{_libexecdir}/mod_mime_magic.so
+%attr(755,root,root) %{_libexecdir}/mod_negotiation.so
+%attr(755,root,root) %{_libexecdir}/mod_setenvif.so
+%attr(755,root,root) %{_libexecdir}/mod_speling.so
+%attr(755,root,root) %{_libexecdir}/mod_userdir.so
+
+%attr(755,root,root) %{_bindir}/htdigest
+
+%attr(755,root,root) %{_sbindir}/ab
+%attr(755,root,root) %{_sbindir}/apachectl
+%attr(755,root,root) %{_sbindir}/apxs
+%attr(755,root,root) %{_sbindir}/httpd
+%attr(755,root,root) %{_sbindir}/logresolve
+%attr(755,root,root) %{_sbindir}/rotatelogs
+
+%dir %attr(770,root,http) /var/lib/apache
+%dir %attr(770,root,http) /var/run/apache
+
+%{_mandir}/man1/htdigest.1*
+%{_mandir}/man8/*
+
+%attr(750,root,root) %dir /var/log/httpd
+%attr(750,root,root) %dir /var/log/archiv/httpd
+%attr(640,root,root) %ghost /var/log/httpd/*
+
 %dir %{_datadir}
 %dir %{_datadir}/manual
 %dir %{_datadir}/manual/images/
@@ -1040,15 +1087,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/manual/vhosts/vhosts-in-depth.html
 %{_datadir}/manual/vhosts/virtual-host.html
 
-%attr(754,root,root) /etc/rc.d/init.d/httpd
-
-%attr(750,root,root) %dir %{_sysconfdir}
-%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf
-%attr(640,root,root) %{_sysconfdir}/magic
-
-%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/sysconfig/*
-%attr(640,root,root) %config(noreplace) /etc/logrotate.d/*
-
 %attr(755,root,root) %dir %{_datadir}/html
 %config(noreplace) %{_datadir}/html/index.html
 %lang(ca) %{_datadir}/html/index.html.ca
@@ -1072,43 +1110,6 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_datadir}/icons/small
 %{_datadir}/icons/small/*.gif
 %attr(755,root,root) %{_datadir}/cgi-bin
-
-%dir %{_libexecdir}
-%attr(755,root,root) %{_libexecdir}/mod_access.so
-%attr(755,root,root) %{_libexecdir}/mod_alias.so
-%attr(755,root,root) %{_libexecdir}/mod_asis.so
-%attr(755,root,root) %{_libexecdir}/mod_autoindex.so
-%attr(755,root,root) %{_libexecdir}/mod_cern_meta.so
-%attr(755,root,root) %{_libexecdir}/mod_cgi.so
-%attr(755,root,root) %{_libexecdir}/mod_env.so
-%attr(755,root,root) %{_libexecdir}/mod_include.so
-%attr(755,root,root) %{_libexecdir}/mod_log_agent.so
-%attr(755,root,root) %{_libexecdir}/mod_log_config.so
-%attr(755,root,root) %{_libexecdir}/mod_log_referer.so
-%attr(755,root,root) %{_libexecdir}/mod_mime.so
-%attr(755,root,root) %{_libexecdir}/mod_mime_magic.so
-%attr(755,root,root) %{_libexecdir}/mod_negotiation.so
-%attr(755,root,root) %{_libexecdir}/mod_setenvif.so
-%attr(755,root,root) %{_libexecdir}/mod_speling.so
-%attr(755,root,root) %{_libexecdir}/mod_userdir.so
-
-%attr(755,root,root) %{_bindir}/htdigest
-
-%attr(755,root,root) %{_sbindir}/ab
-%attr(755,root,root) %{_sbindir}/apachectl
-%attr(755,root,root) %{_sbindir}/apxs
-%attr(755,root,root) %{_sbindir}/httpd
-%attr(755,root,root) %{_sbindir}/logresolve
-%attr(755,root,root) %{_sbindir}/rotatelogs
-
-%dir %attr(770,root,http) /var/lib/apache
-
-%{_mandir}/man1/htdigest.1*
-%{_mandir}/man8/*
-
-%attr(750,root,root) %dir /var/log/httpd
-%attr(750,root,root) %dir /var/log/archiv/httpd
-%attr(640,root,root) %ghost /var/log/httpd/*
 
 %files suexec
 %defattr(644,root,root,755)
