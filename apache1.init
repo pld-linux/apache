@@ -63,21 +63,23 @@ case "$1" in
 	RETVAL=$?
 	/usr/sbin/httpd -S
 	;;
-  reload)
-  	if [ -f /var/lock/subsys/httpd ]; then
-		msg_reloading httpd
-		kill -HUP `pidof httpd`
-	else
-		msg_not_running httpd
-	fi
-	;;
-  restart|force-reload)
+  restart)
 	$0 stop
 	$0 start
 	exit $?
 	;;
+  reload|force-reload)
+  	if [ -f /var/lock/subsys/httpd ]; then
+		msg_reloading httpd
+		killproc httpd -HUP
+		RETVAL=$?
+	else
+		msg_not_running httpd >&2
+		RETVAL=7
+	fi
+	;;
   *)
-	msg_usage "$0 {start|stop|restart|force-reload|status}"
+	msg_usage "$0 {start|stop|restart|reload|force-reload|status}"
 	exit 3
 	;;
 esac
