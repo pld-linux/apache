@@ -940,7 +940,6 @@ rm -rf $RPM_BUILD_ROOT
 %attr(644,root,root) %{_datadir}/manual/mod/mod_info.html
 
 %files mod_proxy
-%config(noreplace) %{_sysconfdir}/mod_proxy.conf
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/mod_proxy.conf
 %attr(755,root,root) %{_libexecdir}/libproxy.so
 %attr(644,root,root) %{_datadir}/manual/mod/mod_proxy.html
