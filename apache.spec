@@ -19,6 +19,7 @@ Source6:	apache-httpd.conf
 Source7:	apache-srm.conf
 Source8:	apache-virtual-host.conf
 Source9:	apache-mod_status.conf
+Source10:	apache-mod_proxy.conf
 Patch0:		apache-PLD.patch
 Patch1:		apache-suexec.patch
 Patch2:		apache-htdocs.patch
@@ -364,6 +365,9 @@ install %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/access.conf
 install %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
 install %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/srm.conf
 install %{SOURCE8} $RPM_BUILD_ROOT%{_sysconfdir}/virtual-host.conf
+
+install %{SOURCE9}  $RPM_BUILD_ROOT%{_sysconfdir}/mod_status.conf
+install %{SOURCE10} $RPM_BUILD_ROOT%{_sysconfdir}/mod_proxy.conf
 
 ln -sf index.html.en $RPM_BUILD_ROOT/home/httpd/html/index.html
 
@@ -787,6 +791,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(644,root,root) %{_datadir}/manual/mod/mod_info.html
 
 %files mod_proxy
+%config(noreplace) %{_sysconfdir}/mod_proxy.conf
 %attr(755,root,root) %{_libexecdir}/libproxy.so
 %attr(644,root,root) %{_datadir}/manual/mod/mod_proxy.html
 %dir %attr(750,http,http) /var/cache/apache
@@ -796,6 +801,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(644,root,root) %{_datadir}/manual/mod/mod_rewrite.html
 
 %files mod_status
+%config(noreplace) %{_sysconfdir}/mod_status.conf
 %attr(755,root,root) %{_libexecdir}/mod_status.so
 %attr(644,root,root) %{_datadir}/manual/mod/mod_status.html
 
