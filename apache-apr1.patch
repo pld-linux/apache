@@ -1075,35 +1075,6 @@ diff -ur httpd-2.0.52.org/server/core.c httpd-2.0.52/server/core.c
  
                  if (logio_add_bytes_out && bytes_sent > 0)
                      logio_add_bytes_out(c, bytes_sent);
-diff -ur httpd-2.0.52.org/server/core.c.orig httpd-2.0.52/server/core.c.orig
---- httpd-2.0.52.org/server/core.c.orig	2004-10-02 18:25:57.296940230 +0200
-+++ httpd-2.0.52/server/core.c.orig	2004-10-02 18:26:13.667433236 +0200
-@@ -4298,6 +4298,25 @@
- 
-     ap_set_version(pconf);
-     ap_setup_make_content_type(pconf);
-+
-+#ifdef RLIMIT_CORE
-+    if (ap_coredumpdir_configured) {
-+        struct rlimit lim;
-+
-+        if (getrlimit(RLIMIT_CORE, &lim) == 0 && lim.rlim_cur == 0) {
-+            lim.rlim_cur = lim.rlim_max;
-+            if (setrlimit(RLIMIT_CORE, &lim) == 0) {
-+                ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
-+                             "core dump file size limit raised to %lu bytes",
-+                             lim.rlim_cur);
-+            } else {
-+                ap_log_error(APLOG_MARK, APLOG_NOTICE, errno, NULL,
-+                             "core dump file size is zero, setrlimit failed");
-+            }
-+        }
-+    }
-+#endif
-+
-     return OK;
- }
- 
 diff -ur httpd-2.0.52.org/server/listen.c httpd-2.0.52/server/listen.c
 --- httpd-2.0.52.org/server/listen.c	2004-10-02 18:25:57.304938516 +0200
 +++ httpd-2.0.52/server/listen.c	2004-10-02 18:26:13.670432593 +0200
