@@ -1,5 +1,6 @@
---- httpd-2.0.40/config.layout.wiget	Mon Aug 12 19:33:25 2002
-+++ httpd-2.0.40/config.layout	Mon Aug 12 19:46:26 2002
+diff -urN httpd-2.0.45.org/config.layout httpd-2.0.45/config.layout
+--- httpd-2.0.45.org/config.layout	Thu Apr  3 09:27:42 2003
++++ httpd-2.0.45/config.layout	Thu Apr  3 09:27:59 2003
 @@ -298,3 +298,28 @@
      installbuilddir: ${prefix}/etc/apache2/build
      errordir:      ${datadir}/error
@@ -29,3 +30,70 @@
 +    proxycachedir: /var/cache/apache
 +    installbuilddir: ${exec_prefix}/lib/apache/build
 +</Layout>
+diff -urN httpd-2.0.45.org/srclib/apr/config.layout httpd-2.0.45/srclib/apr/config.layout
+--- httpd-2.0.45.org/srclib/apr/config.layout	Thu Apr  3 09:27:43 2003
++++ httpd-2.0.45/srclib/apr/config.layout	Thu Apr  3 09:30:15 2003
+@@ -229,3 +229,30 @@
+     infodir:       ${exec_prefix}/share/info
+     libsuffix:    -${APR_MAJOR_VERSION}
+ </Layout>
++
++
++# PLD layout
++<Layout PLD>
++    prefix:        /usr
++    exec_prefix:   ${prefix}
++    bindir:        ${exec_prefix}/bin
++    sbindir:       ${exec_prefix}/sbin
++    libdir:        ${exec_prefix}/lib
++    libexecdir:    ${exec_prefix}/lib/apache/modules
++    mandir:        /usr/share/man
++    infodir:       /usr/share/info
++    sysconfdir:    /etc/httpd
++    datadir:       ${exec_prefix}/share/apache
++    iconsdir:      /home/services/httpd/icons
++    htdocsdir:     /home/services/httpd/html
++    manualdir:     /home/services/httpd/manual
++    errordir:      /home/services/httpd/error
++    cgidir:        /home/services/httpd/cgi-bin
++    includedir:    ${exec_prefix}/include/apache
++    localstatedir: /var/lib/httpd
++    runtimedir:    /var/run
++    logfiledir:    /var/log/httpd
++    proxycachedir: /var/cache/apache
++    installbuilddir: ${exec_prefix}/lib/apache/build
++</Layout>
++
+diff -urN httpd-2.0.45.org/srclib/apr-util/config.layout httpd-2.0.45/srclib/apr-util/config.layout
+--- httpd-2.0.45.org/srclib/apr-util/config.layout	Thu Apr  3 09:27:44 2003
++++ httpd-2.0.45/srclib/apr-util/config.layout	Thu Apr  3 09:30:28 2003
+@@ -229,3 +229,29 @@
+     infodir:       ${exec_prefix}/share/info
+     libsuffix     -${APRUTIL_MAJOR_VERSION}
+ </Layout>
++
++# PLD layout
++<Layout PLD>
++    prefix:        /usr
++    exec_prefix:   ${prefix}
++    bindir:        ${exec_prefix}/bin
++    sbindir:       ${exec_prefix}/sbin
++    libdir:        ${exec_prefix}/lib
++    libexecdir:    ${exec_prefix}/lib/apache/modules
++    mandir:        /usr/share/man
++    infodir:       /usr/share/info
++    sysconfdir:    /etc/httpd
++    datadir:       ${exec_prefix}/share/apache
++    iconsdir:      /home/services/httpd/icons
++    htdocsdir:     /home/services/httpd/html
++    manualdir:     /home/services/httpd/manual
++    errordir:      /home/services/httpd/error
++    cgidir:        /home/services/httpd/cgi-bin
++    includedir:    ${exec_prefix}/include/apache
++    localstatedir: /var/lib/httpd
++    runtimedir:    /var/run
++    logfiledir:    /var/log/httpd
++    proxycachedir: /var/cache/apache
++    installbuilddir: ${exec_prefix}/lib/apache/build
++</Layout>
++
