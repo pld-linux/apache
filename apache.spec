@@ -37,10 +37,12 @@ License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 # Source0-md5:	eba528fa8613dc5bfb0615a69c11f053
+# Source0-size:	6918995
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}-icons.tar.gz
 # Source3-md5:	2b085cbc19fd28536dc883f0b864cd83
+# Source3-size:	46320
 Source4:	%{name}.sysconfig
 Source5:	%{name}.monitrc
 Source6:	%{name}-httpd.conf
