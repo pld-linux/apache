@@ -27,7 +27,7 @@ Summary(uk):	îÁÊĞÏĞÕÌÑÒÎ¦ÛÉÊ Web-Server
 Summary(zh_CN):	Internet ÉÏÓ¦ÓÃ×î¹ã·ºµÄ Web ·şÎñ³ÌĞò¡£
 Name:		apache
 Version:	1.3.23
-Release:	1
+Release:	2
 License:	Apache Group License
 Group:		Networking/Daemons
 Group(cs):	Sí»ové/Démoni
