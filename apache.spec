@@ -1031,7 +1031,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_sbindir}/logresolve
 %attr(755,root,root) %{_sbindir}/rotatelogs
 
-%dir %attr(750,http,http) /var/lib/apache
+%dir %attr(770,root,http) /var/lib/apache
 
 %{_mandir}/man1/htdigest.1*
 %{_mandir}/man8/*
@@ -1119,7 +1119,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/mod_proxy.conf
 %attr(755,root,root) %{_libexecdir}/libproxy.so
 %{_datadir}/manual/mod/mod_proxy.html
-%dir %attr(750,http,http) /var/cache/apache
+%dir %attr(770,root,http) /var/cache/apache
 
 %files mod_rewrite
 %defattr(644,root,root,755)
