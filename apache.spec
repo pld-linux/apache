@@ -17,7 +17,7 @@ Source3:	apache-extra1.tar.bz2
 Source8:	apache.sysconfig
 Patch0:		apache-suexec.patch
 #Patch1:		apache-136-v6-19990616-PLD.diff
-Patch1:		apache-ipv6.patch
+Patch1:		apache-139-v6-19990820-PLD.diff
 Patch2:		apache-htdocs.patch
 #Patch3:		apache-release.patch
 Patch4:		apache-pld.patch
