@@ -12,7 +12,7 @@ Source0:	ftp://ftp.apache.org/apache/dist/%{name}_%{version}.tar.gz
 Source1:	httpd.init
 Source2:	%{name}.log
 Source3:	%{name}-extra.tar.bz2
-########	http://www.eos.ncsu.edu/apache
+########	http://stonecold.unity.ncsu.edu/software/mod_auth_kerb/index.html
 Source5:	mod_auth_kerb-3.6.tar.gz
 Patch0:		%{name}-1.3.2-suexec.patch
 Patch1:		%{name}-ndbm.patch
