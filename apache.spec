@@ -27,7 +27,7 @@ Summary(uk):	Ó¡ –œ–’Ã—“Œ¶€…  Web-Server
 Summary(zh_CN):	Internet …œ”¶”√◊Óπ„∑∫µƒ Web ∑˛ŒÒ≥Ã–Ú°£
 Name:		apache
 Version:	1.3.27
-Release:	4
+Release:	5
 License:	Apache Group 
 Group:		Networking/Daemons
 URL:		http://www.apache.org/
@@ -675,7 +675,7 @@ waøno∂ci moøe byÊ ustalana w zaleøno∂ci od czasu modyfikacji plikÛw
 %patch22 -p1
 
 %build
-OPTIM="%{rpmcflags}" \
+OPTIM="%{rpmcflags} -DHARD_SERVER_LIMIT=2048" \
 ./configure \
 	--prefix=%{_prefix} \
 	--sysconfdir=%{_sysconfdir} \
