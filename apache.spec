@@ -18,6 +18,7 @@
 # Conditional build:
 %bcond_without	ssl		# build without SSL support
 %bcond_without	ldap		# build without LDAP support
+%bcond_with	external_pcre	# build with external PCRE support (Apache bug #27550)
 #
 %include	/usr/lib/rpm/macros.perl
 # this is internal macro, don't change to %%apache_modules_api
@@ -86,6 +87,8 @@ Patch22:	httpd-2.0.50-peruser-r3.patch
 Patch23:	%{name}-apr1.patch
 Patch24:	%{name}-normalize-path.patch
 Patch25:	%{name}-CAN-2004-0942.patch
+# http://issues.apache.org/bugzilla/attachment.cgi?id=13377 external pcre
+Patch26:	%{name}2-pcre-patch.diff         
 URL:		http://httpd.apache.org/
 BuildRequires:	automake
 BuildRequires:	apr-devel >= 1:1.0.0
@@ -97,6 +100,7 @@ BuildRequires:	libtool >= 2:1.5
 %{?with_ldap:BuildRequires:	openldap-devel}
 %{?with_ssl:BuildRequires:	openssl-devel >= 0.9.7d}
 %{?with_ssl:BuildRequires:	openssl-tools >= 0.9.7d}
+%{?with_external_pcre:BuildRequires:	pcre-devel}
 BuildRequires:	perl-devel >= 1:5.6
 BuildRequires:	rpm-perlprov >= 4.1-13
 BuildRequires:	rpmbuild(macros) >= 1.159
@@ -694,6 +698,7 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 %patch23 -p1
 %patch24 -p1
 %patch25 -p1
+%{?with_external_pcre:%patch26 -p2}
 
 %{__perl} -pi -e "s@/usr/local/bin/perl@%{__perl}@" $(grep -rl "/usr/local/bin/perl" *)
 %{__perl} -pi -e "s@BUILD_SUBDIRS.*@BUILD_SUBDIRS =@g" srclib/Makefile.in
@@ -780,7 +785,8 @@ install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
 	--with-suexec-gidmin=500 \
 	--with-suexec-umask=077 \
 	--with-apr=%{_bindir}/apr-1-config \
-	--with-apr-util=%{_bindir}/apu-1-config
+	--with-apr-util=%{_bindir}/apu-1-config \
+	%{?_with_external_pcre:--with-external-pcre}
 %{__make}
 ./httpd.${mpm} -l | grep -v "${mpm}" > modules-inside
 
