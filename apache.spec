@@ -31,7 +31,7 @@ Summary(ru):	óÁÍÙÊ ĞÏĞÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.0.52
-Release:	4
+Release:	5
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -316,6 +316,7 @@ Summary:	Apache module with LDAP user access authentication
 Summary(pl):	Modu³ Apache'a oferuj±cy autoryzacjê u¿ytkowników poprzez LDAP
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}-%{release}
+Requires:	%{name}-mod_ldap = %{version}-%{release}
 
 %description mod_auth_ldap
 Apache module with LDAP user access authentication.
