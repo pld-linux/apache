@@ -1,0 +1,25 @@
+
+__FILE__ expands to the full pathname during VPATH builds; this
+clutters up the debug log (and also bloats binaries very slightly).
+The -pie patch defines AP_FNAME during build which is equivalent
+to basename(__FILE__); use that for debug logging where available.
+
+AP_FNAME uses $(notdir ...), a GNU make extension, so this can't
+go upstream.
+
+Note this patch depends on the pie patch.
+
+--- httpd-2.0.48/include/http_log.h.debuglog
++++ httpd-2.0.48/include/http_log.h
+@@ -130,7 +130,11 @@
+ 
+ extern int AP_DECLARE_DATA ap_default_loglevel;
+ 
++#ifdef AP_FNAME
++#define APLOG_MARK      AP_FNAME,__LINE__
++#else
+ #define APLOG_MARK	__FILE__,__LINE__
++#endif
+ 
+ /**
+  * Set up for logging to stderr.

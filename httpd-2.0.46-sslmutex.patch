@@ -1,0 +1,11 @@
+--- httpd-2.0.46/modules/ssl/ssl_engine_mutex.c.sslmutex
++++ httpd-2.0.46/modules/ssl/ssl_engine_mutex.c
+@@ -73,6 +73,8 @@
+     if (mc->nMutexMode == SSL_MUTEXMODE_NONE) 
+         return TRUE;
+ 
++    if (mc->szMutexFile) apr_file_remove(mc->szMutexFile, p);
++
+     if ((rv = apr_global_mutex_create(&mc->pMutex, mc->szMutexFile,
+                                 mc->nMutexMech, p)) != APR_SUCCESS) {
+         if (mc->szMutexFile)

@@ -1,0 +1,34 @@
+
+mod_ssl:
+- wording tweaks for pphrase prompting
+- upstream: workaround for UI_process dumping error stack during pphrase prompts
+
+--- httpd-2.0.48/modules/ssl/ssl_engine_pphrase.c.sslpphrase
++++ httpd-2.0.48/modules/ssl/ssl_engine_pphrase.c
+@@ -374,6 +374,8 @@
+                 cpPassPhraseCur = NULL;
+                 ssl_pphrase_server_rec = s; /* to make up for sslc flaw */
+ 
++                ERR_clear_error();
++
+                 bReadable = ((pPrivateKey = SSL_read_PrivateKey(szPath, NULL,
+                             ssl_pphrase_Handle_CB, s)) != NULL ? TRUE : FALSE);
+ 
+@@ -553,7 +555,7 @@
+         sc = mySrvConfig(s);
+         if (writetty) {
+             apr_file_printf(writetty, "\n");
+-            apr_file_printf(writetty, "Ok: Pass Phrase Dialog successful.\n");
++            apr_file_printf(writetty, "OK: Pass Phrase Dialog successful.\n");
+         }
+     }
+ 
+@@ -747,7 +749,7 @@
+             apr_file_printf(writetty, "%s mod_ssl/%s (Pass Phrase Dialog)\n",
+                             AP_SERVER_BASEVERSION, MOD_SSL_VERSION);
+             apr_file_printf(writetty, "Some of your private key files are encrypted for security reasons.\n");
+-            apr_file_printf(writetty, "In order to read them you have to provide us with the pass phrases.\n");
++            apr_file_printf(writetty, "In order to read them you have to provide the pass phrases.\n");
+         }
+         if (*pbPassPhraseDialogOnce) {
+             *pbPassPhraseDialogOnce = FALSE;

@@ -1,0 +1,15 @@
+
+Increas the dynamic module limit: a full OS install now
+includes 57 DSOs alone.
+
+--- httpd-2.0.48/include/httpd.h.dynlimit
++++ httpd-2.0.48/include/httpd.h
+@@ -138,7 +138,7 @@
+ 
+ /* Maximum number of dynamically loaded modules */
+ #ifndef DYNAMIC_MODULE_LIMIT
+-#define DYNAMIC_MODULE_LIMIT 64
++#define DYNAMIC_MODULE_LIMIT 128
+ #endif
+ 
+ /* Default administrator's address */

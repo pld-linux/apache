@@ -1,0 +1,18 @@
+
+Ensure that when mod_ssl is unloaded, libcrypto doesn't
+still have the thread_id callback pointing at a mod_ssl
+function.
+
+This can cause headaches like #97207
+
+--- httpd-2.0.47/modules/ssl/ssl_util.c.sslcleanup
++++ httpd-2.0.47/modules/ssl/ssl_util.c
+@@ -455,6 +455,8 @@
+ {
+     CRYPTO_set_locking_callback(NULL);
+ 
++    CRYPTO_set_id_callback(NULL);
++
+     /* Let the registered mutex cleanups do their own thing 
+      */
+     return APR_SUCCESS;

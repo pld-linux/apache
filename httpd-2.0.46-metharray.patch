@@ -1,0 +1,15 @@
+
+Build array of allowed methods with proper dimensions, fixing
+possible memory corruption.  [Jeff Trawick]
+
+--- httpd-2.0.46/modules/http/http_protocol.c.metharray
++++ httpd-2.0.46/modules/http/http_protocol.c
+@@ -2436,7 +2436,7 @@
+ 
+     ml = (ap_method_list_t *) apr_palloc(p, sizeof(ap_method_list_t));
+     ml->method_mask = 0;
+-    ml->method_list = apr_array_make(p, sizeof(char *), nelts);
++    ml->method_list = apr_array_make(p, nelts, sizeof(char *));
+     return ml;
+ }
+ 

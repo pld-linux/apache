@@ -1,0 +1,32 @@
+
+Automatically raise the core file size limit if CoreDumpDirectory
+is configured.
+
+--- httpd-2.0.48/server/core.c.corelimit
++++ httpd-2.0.48/server/core.c
+@@ -4233,6 +4233,25 @@
+ 
+     ap_set_version(pconf);
+     ap_setup_make_content_type(pconf);
++
++#ifdef RLIMIT_CORE
++    if (ap_coredumpdir_configured) {
++        struct rlimit lim;
++
++        if (getrlimit(RLIMIT_CORE, &lim) == 0 && lim.rlim_cur == 0) {
++            lim.rlim_cur = lim.rlim_max;
++            if (setrlimit(RLIMIT_CORE, &lim) == 0) {
++                ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL,
++                             "core dump file size limit raised to %lu bytes",
++                             lim.rlim_cur);
++            } else {
++                ap_log_error(APLOG_MARK, APLOG_NOTICE, errno, NULL,
++                             "core dump file size is zero, setrlimit failed");
++            }
++        }
++    }
++#endif
++
+     return OK;
+ }
+ 

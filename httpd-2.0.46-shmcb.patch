@@ -1,0 +1,27 @@
+
+Use anonymous rather than name-based shm for shmcb.
+Name-based shm is overeager in use of _EXCL so causes
+startup failures after unclean shutdown; #80520.
+
+--- httpd-2.0.46/modules/ssl/ssl_scache_shmcb.c.shmcb
++++ httpd-2.0.46/modules/ssl/ssl_scache_shmcb.c
+@@ -364,18 +364,9 @@
+     apr_size_t shm_segsize;
+     apr_status_t rv;
+ 
+-    /*
+-     * Create shared memory segment
+-     */
+-    if (mc->szSessionCacheDataFile == NULL) {
+-        ap_log_error(APLOG_MARK, APLOG_ERR, 0, s,
+-                     "SSLSessionCache required");
+-        ssl_die();
+-    }
+-
+     if ((rv = apr_shm_create(&(mc->pSessionCacheDataMM), 
+                              mc->nSessionCacheDataSize, 
+-                             mc->szSessionCacheDataFile,
++                             NULL,
+                              mc->pPool)) != APR_SUCCESS) {
+         char buf[100];
+         ap_log_error(APLOG_MARK, APLOG_ERR, 0, s,

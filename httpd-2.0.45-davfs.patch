@@ -1,0 +1,22 @@
+
+Fix for http://nagoya.apache.org/bugzilla/show_bug.cgi?id=14969
+
+--- httpd-2.0.45/modules/dav/fs/dbm.c.davfs	2003-05-19 14:33:22.000000000 +0100
++++ httpd-2.0.45/modules/dav/fs/dbm.c	2003-05-19 14:33:33.000000000 +0100
+@@ -599,7 +599,7 @@
+     ** we don't know the namespace yet, then add it to the map and to our
+     ** table of known namespaces.
+     */
+-    pmap = apr_palloc(db->pool, namespaces->nelts * sizeof(*pmap));
++    m->ns_map = pmap = apr_palloc(db->pool, namespaces->nelts * sizeof(*pmap));
+     for (i = namespaces->nelts, puri = (const char **)namespaces->elts;
+          i-- > 0;
+          ++puri, ++pmap) {
+@@ -627,7 +627,6 @@
+         }
+     }
+ 
+-    m->ns_map = pmap;
+     *mapping = m;
+     return NULL;
+ }

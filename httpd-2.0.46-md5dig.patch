@@ -1,0 +1,27 @@
+
+- use a sensibly % 64 sized buffer
+- cope with short reads properly
+- remove redundant variable
+
+--- httpd-2.0.46/server/util_md5.c.md5dig
++++ httpd-2.0.46/server/util_md5.c
+@@ -198,16 +198,14 @@
+ AP_DECLARE(char *) ap_md5digest(apr_pool_t *p, apr_file_t *infile)
+ {
+     apr_md5_ctx_t context;
+-    unsigned char buf[1000];
+-    long length = 0;
+-    apr_size_t nbytes;
++    unsigned char buf[4096];
++    apr_size_t nbytes = sizeof buf;
+     apr_off_t offset = 0L;
+ 
+     apr_md5_init(&context);
+-    nbytes = sizeof(buf);
+     while (apr_file_read(infile, buf, &nbytes) == APR_SUCCESS) {
+-	length += nbytes;
+ 	apr_md5_update(&context, buf, nbytes);
++        nbytes = sizeof(buf);
+     }
+     apr_file_seek(infile, APR_SET, &offset);
+     return ap_md5contextTo64(p, &context);

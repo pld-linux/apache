@@ -1,0 +1,20 @@
+
+https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=105725
+
+The number of connections to make to the POD on a graceful restart
+should be equal to the number of children which have ever been
+started; not the number of children there *could* be.
+
+Otherwise the parent is bound to get connect() timeouts. 
+
+--- httpd-2.0.46/server/mpm/prefork/prefork.c.graceful
++++ httpd-2.0.46/server/mpm/prefork/prefork.c
+@@ -1167,7 +1167,7 @@
+ 		    "Graceful restart requested, doing restart");
+ 
+ 	/* kill off the idle ones */
+-        ap_mpm_pod_killpg(pod, ap_daemons_limit);
++        ap_mpm_pod_killpg(pod, ap_max_daemons_limit);
+ 
+ 	/* This is mostly for debugging... so that we know what is still
+ 	    * gracefully dealing with existing request.  This will break

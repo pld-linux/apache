@@ -1,0 +1,39 @@
+--- httpd-2.0.48/modules/generators/mod_autoindex.c.autoindex
++++ httpd-2.0.48/modules/generators/mod_autoindex.c
+@@ -1329,14 +1329,6 @@
+         return (NULL);
+     }
+ 
+-    if (rr->finfo.filetype == APR_DIR) {
+-        /* ap_sub_req_lookup_dirent() adds '/' to end of any directory,
+-         * but that messes up our attempt to find relevant
+-         * AddDescription directives.
+-         */
+-        rr->filename[strlen(rr->filename) - 1] = '\0';
+-    }
+-
+     p = (struct ent *) apr_pcalloc(r->pool, sizeof(struct ent));
+     if (dirent->filetype == APR_DIR) {
+         p->name = apr_pstrcat(r->pool, dirent->name, "/", NULL);
+@@ -1362,6 +1354,10 @@
+                 p->isdir = 1;
+             }
+             rr->filename = ap_make_dirstr_parent (rr->pool, rr->filename);
++
++            /* omit the trailing slash (1.3 compat) */
++            rr->filename[strlen(rr->filename) - 1] = '\0';
++
+             if (!(p->icon = find_icon(d, rr, 1))) {
+                 p->icon = find_default_icon(d, "^^DIRECTORY^^");
+             }
+@@ -1650,8 +1646,9 @@
+         }
+ 
+         if (autoindex_opts & TABLE_INDEXING) {
++            ap_rputs("<tr>", r);
+             if (!(autoindex_opts & SUPPRESS_ICON)) {
+-                ap_rputs("<tr><td valign=\"top\">", r);
++                ap_rputs("<td valign=\"top\">", r);
+                 if (autoindex_opts & ICONS_ARE_LINKS) {
+                     ap_rvputs(r, "<a href=\"", anchor, "\">", NULL);
+                 }

@@ -1,0 +1,46 @@
+
+There is no need to "suck in" the apr/apr-util symbols when using
+a shared libapr{,util}, it just bloats the symbol table; so don't.
+
+--- httpd-2.0.48/server/main.c.export
++++ httpd-2.0.48/server/main.c
+@@ -669,28 +669,6 @@
+     return 0; /* Termination 'ok' */
+ }
+ 
+-/* force Expat to be linked into the server executable */
+-#if defined(USE_EXPAT) && !defined(SHARED_CORE_BOOTSTRAP)
+-#include "xmlparse.h"
+-const XML_LChar *suck_in_expat(void);
+-const XML_LChar *suck_in_expat(void)
+-{
+-    return XML_ErrorString(XML_ERROR_NONE);
+-}
+-#endif /* USE_EXPAT */
+-
+-#ifndef SHARED_CORE_BOOTSTRAP
+-/*
+- * Force apr_password_validate() into the image so that modules like
+- * mod_auth can use it even if they're dynamically loaded.
+- */
+-void suck_in_apr_password_validate(void);
+-void suck_in_apr_password_validate(void)
+-{
+-    apr_password_validate("a", "b");
+-}
+-#endif
+-
+ #ifdef AP_USING_AUTOCONF
+ /* This ugly little hack pulls any function referenced in exports.c into
+  * the web server.  exports.c is generated during the build, and it
+--- httpd-2.0.48/server/Makefile.in.export
++++ httpd-2.0.48/server/Makefile.in
+@@ -30,7 +30,7 @@
+ 
+ util.lo: test_char.h
+ 
+-EXPORT_DIRS = $(top_srcdir)/include $(top_srcdir)/os/$(OS_DIR) $(APR_INCLUDEDIR) $(APU_INCLUDEDIR) $(top_srcdir)/modules/http
++EXPORT_DIRS = $(top_srcdir)/include $(top_srcdir)/os/$(OS_DIR) $(top_srcdir)/modules/http
+ 
+ # If export_files is a dependency here, but we remove it during this stage,
+ # when exports.c is generated, make will not detect that export_files is no

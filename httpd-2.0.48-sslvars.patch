@@ -1,0 +1,87 @@
+
+Fixes for SSL variable handling from 2.0.49/HEAD.
+
+--- httpd-2.0.48/modules/ssl/ssl_engine_vars.c.sslvars
++++ httpd-2.0.48/modules/ssl/ssl_engine_vars.c
+@@ -87,9 +87,9 @@
+     return;
+ }
+ 
++/* This function must remain safe to use for a non-SSL connection. */
+ char *ssl_var_lookup(apr_pool_t *p, server_rec *s, conn_rec *c, request_rec *r, char *var)
+ {
+-    SSLConnRec *sslconn;
+     SSLModConfigRec *mc = myModConfig(s);
+     char *result;
+     BOOL resdup;
+@@ -169,17 +169,18 @@
+      * Connection stuff
+      */
+     if (result == NULL && c != NULL) {
+-        sslconn = myConnConfig(c);
++        SSLConnRec *sslconn = myConnConfig(c);
+         if (strcEQ(var, "REMOTE_ADDR"))
+             result = c->remote_ip;
+         else if (strcEQ(var, "REMOTE_USER"))
+             result = r->user;
+         else if (strcEQ(var, "AUTH_TYPE"))
+             result = r->ap_auth_type;
+-        else if (strlen(var) > 4 && strcEQn(var, "SSL_", 4))
++        else if (strlen(var) > 4 && strcEQn(var, "SSL_", 4) 
++                 && sslconn && sslconn->ssl)
+             result = ssl_var_lookup_ssl(p, c, var+4);
+         else if (strcEQ(var, "HTTPS")) {
+-            if (sslconn->ssl != NULL)
++            if (sslconn && sslconn->ssl)
+                 result = "on";
+             else
+                 result = "off";
+@@ -280,10 +281,12 @@
+     else if (ssl != NULL && strcEQ(var, "SESSION_ID")) {
+         char buf[SSL_SESSION_ID_STRING_LEN];
+         SSL_SESSION *pSession = SSL_get_session(ssl);
+-        result = apr_pstrdup(p, SSL_SESSION_id2sz(
+-                                SSL_SESSION_get_session_id(pSession),
+-                                SSL_SESSION_get_session_id_length(pSession),
+-                                buf, sizeof(buf)));
++        if (pSession) {
++            result = apr_pstrdup(p, SSL_SESSION_id2sz(
++                                     SSL_SESSION_get_session_id(pSession),
++                                     SSL_SESSION_get_session_id_length(pSession),
++                                     buf, sizeof(buf)));
++        }
+     }
+     else if (ssl != NULL && strlen(var) >= 6 && strcEQn(var, "CIPHER", 6)) {
+         result = ssl_var_lookup_ssl_cipher(p, c, var+6);
+@@ -608,7 +611,7 @@
+         result = apr_psprintf(p, "mod_ssl/%s", MOD_SSL_VERSION);
+     }
+     else if (strEQ(var, "LIBRARY")) {
+-        result = apr_pstrdup(p, SSL_LIBRARY_TEXT);
++        result = apr_pstrdup(p, SSLeay_version(SSLEAY_VERSION));
+         if ((cp = strchr(result, ' ')) != NULL) {
+             *cp = '/';
+             if ((cp2 = strchr(cp, ' ')) != NULL)
+@@ -655,7 +658,7 @@
+     SSLConnRec *sslconn = myConnConfig(r->connection);
+     char *result;
+ 
+-    if (sslconn->ssl == NULL)
++    if (sslconn == NULL || sslconn->ssl == NULL)
+         return NULL;
+     result = NULL;
+     if (strEQ(a, "version"))
+@@ -681,12 +684,9 @@
+  */
+ static const char *ssl_var_log_handler_x(request_rec *r, char *a)
+ {
+-    SSLConnRec *sslconn = myConnConfig(r->connection);
+     char *result;
+ 
+-    result = NULL;
+-    if (sslconn && sslconn->ssl)
+-        result = ssl_var_lookup(r->pool, r->server, r->connection, r, a);
++    result = ssl_var_lookup(r->pool, r->server, r->connection, r, a);
+     if (result != NULL && result[0] == NUL)
+         result = NULL;
+     return result;
