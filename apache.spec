@@ -119,7 +119,7 @@ sunucusudur.
 
 %package suexec
 Summary:	Apache suexec wrapper
-Summary(pl):	Suexec wrapper do serwera www Apache
+Summary(pl):	Suexec wrapper do serwera WWW Apache
 Group:		Development/Tools
 Requires:	%{name} = %{version}
 
@@ -138,7 +138,7 @@ wykonywane jako taki sam u¿ytkownik jak serwer WWW.
 Summary:	Module development tools for the Apache web server
 Summary(es):	Archivos de inclusión del Apache para desarrollo de módulos
 Summary(fr):	Les outils de developpement de modules pour le serveur web Apache
-Summary(pl):	Pliki nag³ówkowe do tworzenai modu³ów rozszerzeñ do serwera www Apache
+Summary(pl):	Pliki nag³ówkowe do tworzenia modu³ów rozszerzeñ do serwera WWW Apache
 Summary(pt_BR):	Arquivos de inclusão do Apache para desenvolvimento de módulos
 Group:		Networking/Utilities
 Requires:	%{name} = %{version}
@@ -169,7 +169,7 @@ desenvolver módulos adicionais para o Apache.
 
 %package static
 Summary:	Static Apache web server libraries
-Summary(pl):	Statyczne biblioteki serwera www Apache
+Summary(pl):	Statyczne biblioteki serwera WWW Apache
 Group:		Development/Libraries
 Requires:	%{name}-devel = %{version}
 
@@ -181,7 +181,7 @@ Styatyczne biblioteki serwera Apache.
 
 %package mod_actions
 Summary:	Apache module for run CGI whenever a file of a certain type is requested
-Summary(pl):	Modu³ dla apache do uruchamiania skryptów cgi
+Summary(pl):	Modu³ Apache'a do uruchamiania skryptów CGI
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}
 
@@ -196,6 +196,7 @@ Ten modu³ pozwala na uruchamianie skryptów w momencie gdy nadchodzi
 
 %package mod_auth
 Summary:	Apache module with user authentication using textual files
+Summary(pl):	Modu³ Apache'a identyfikuj±cy u¿ytkowników na podstawie plików tekstowych
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}
 
@@ -204,12 +205,12 @@ This package contains mod_auth module. It provides for user
 authentication using textual files.
 
 %description mod_auth -l pl
-Ten pakiet zawiera modu³ mod_auth. S³u¿y on do autentykacji przy
-u¿yciu plików tekstowych.
+Ten pakiet zawiera modu³ mod_auth. S³u¿y on do sprawdzania to¿samo¶ci
+u¿ytkowników na podstawie plików tekstowych.
 
 %package mod_auth_anon
 Summary:	Apache module with "anonymous" user access authentication
-Summary(pl):	Modu³ apache oferuj±cy anonimow± autoryzacjê u¿ytkownia
+Summary(pl):	Modu³ Apache'a oferuj±cy autoryzacjê u¿ytkownika "anonimowego"
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}
 
@@ -226,13 +227,13 @@ magic-cookies and funny URL pre/postfixes, it is completely browser
 independent and it allows users to share URLs.
 
 %description mod_auth_anon -l pl
-Ten modu³ oferuje anonimow± autoryzacjê u¿ytkownia podobnie do
-anonimowych serwerów ftp (u¿ytkownik ,,anonymous'' oraz has³o w
-postaci adresu pocztowego u¿ytkownika).
+Ten modu³ oferuje autoryzacjê u¿ytkownika "anonimowego" podobnie do
+anonimowych serwerów FTP (u¿ytkownik "anonymous" oraz has³o w postaci
+adresu pocztowego u¿ytkownika).
 
 %package mod_auth_dbm
 Summary:	Apache module with user authentication which uses DBM files
-Summary(pl):	Modu³ apache z mechanizmem autentykacji u¿ywaj±cym plików DBM
+Summary(pl):	Modu³ Apache'a z mechanizmem identyfikacji korzystaj±cym z plików DBM
 Group:		Networking/Daemons
 Obsoletes:	%{name}-mod_auth_db
 Requires:	%{name} = %{version}
@@ -243,12 +244,12 @@ usernames and passwords are stored in DBM type database files. It is
 an alternative to the plain text password files provided by mod_auth.
 
 %description mod_auth_dbm -l pl
-Ten modu³ dostarcza Pros± Autoryzacjê HTTP gdzie u¿ytkownicy oraz ich
-has³a s± trzymane w plikach bazy typu DBM.
+Ten modu³ udostêpnia Prost± Autoryzacjê HTTP, gdzie u¿ytkownicy oraz
+ich has³a s± trzymane w plikach bazy typu DBM.
 
 %package mod_auth_digest
 Summary:	Apache user authentication module using MD5 Digest Authentication
-Summary(pl):	Modu³ apache do autoryzacji MD5
+Summary(pl):	Modu³ Apache'a do autoryzacji MD5
 Group:		Networking/Daemons
 Obsoletes:	apache-mod_digest
 Requires:	%{name} = %{version}
@@ -292,7 +293,7 @@ Requires:	%{name} = %{version}
 Execution of CGI scripts using an external CGI daemon.
 
 %description mod_cgid -l pl
-Uruchamianie zewnêtrznych skryptów CGI za pomoc± daemona CGI
+Uruchamianie zewnêtrznych skryptów CGI za pomoc± demona CGI.
 
 %package mod_charset_lite
 Summary:	Specify character set translation or recoding
@@ -308,7 +309,7 @@ Translacja lub przekodowywanie znaków.
 
 %package mod_dav
 Summary:	Apache module - Distributed Authoring and Versioning
-Summary(pl):	Modu³ apache - Rozdzielone Autorstwo i Wersjonowanie
+Summary(pl):	Modu³ Apache'a - Rozproszone autorstwo i wersjonowanie
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}
 
@@ -319,10 +320,10 @@ extension to the HTTP protocol allows creating, moving, copying, and
 deleting resources and collections on a remote web server.
 
 %description mod_dav -l pl
-Modu³ dostarcza klasê 1 oraz klasê 2 WebDAV (Bazuj±cy na WWWW
-Rozdzielone Autorstwo i Wersjonowanie). To rozszerzenie HTTP pozwala
+Modu³ udostêpnia klasê 1 oraz klasê 2 WebDAV (Bazuj±cego na WWW
+rozproszonego autorstwa i wersjonowania). To rozszerzenie HTTP pozwala
 na tworzenie, przesuwanie, kopiowanie oraz kasowanie zasobów na
-zdalnym serwerze www.
+zdalnym serwerze WWW.
 
 %package mod_deflate
 Summary:	Apache module: Compress content before it is delivered to the client
@@ -338,7 +339,7 @@ Modu³ kompresuj±cy dane przed przes³aniem ich do klienta.
 
 %package mod_dir
 Summary:	Apache module for "trailing slash" redirects and serving directory index files
-Summary(pl):	Modu³ oferuj±cy przekierowania i serwowanie indeksu katalogu
+Summary(pl):	Modu³ oferuj±cy przekierowania i udostêpnianie informacji o zawarto¶ci katalogu
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}
 
@@ -347,7 +348,8 @@ This package contains mod_dir which provides "trailing slash"
 redirects and serving directory index files.
 
 %description mod_dir -l pl
-Modu³ oferuj±cy przekierowania i serwowanie indeksu katalogu.
+Modu³ oferuj±cy przekierowania i udostêpnianie informacji o zawarto¶ci
+katalogu.
 
 %package mod_headers
 Summary:	Apache module allows for the customization of HTTP response headers
@@ -380,7 +382,7 @@ Modu³ umozliwiaj±cy obs³ugê plików .map (imap-file handler)
 
 %package mod_info
 Summary:	Apache module with comprehensive overview of the server configuration
-Summary(pl):	Modu³ dostarczaj±cy informacji na temat serwera
+Summary(pl):	Modu³ udostêpniaj±cy informacje o serwerze
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}
 
@@ -390,8 +392,8 @@ overview of the server configuration including all installed modules
 and directives in the configuration files.
 
 %description mod_info -l pl
-Modu³ dostarczaj±cy informacji o konfiguracji serwera, zainstalowanych
-modu³ach itp.
+Modu³ udostêpniaj±cy informacje o konfiguracji serwera,
+zainstalowanych modu³ach itp.
 
 %package mod_proxy
 Summary:	Apache module with Web proxy
@@ -413,7 +415,7 @@ HTTP/1.0 i HTTP/1.1.
 
 %package mod_rewrite
 Summary:	Apache module with rule-based engine for rewrite requested URLs on the fly
-Summary(pl):	Modu³ do ,,przepisywania'' adresów URL w locie
+Summary(pl):	Modu³ do "przepisywania" adresów URL w locie
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}
 
@@ -422,11 +424,11 @@ This package contains It provides a rule-based rewriting engine to
 rewrite requested URLs on the fly.
 
 %description mod_rewrite -l pl
-Modu³ oferuj±cy mo¿liwo¶æ ,,przepisywania'' adresów URL w locie.
+Modu³ oferuj±cy mo¿liwo¶æ "przepisywania" adresów URL w locie.
 
 %package mod_ssl
 Summary:	Apache module: Strong cryptography using the Secure Sockets Layer (SSL)
-Summary(pl):	Modu³ apache: Silna kryptografia z u¿yciem SSL
+Summary(pl):	Modu³ Apache'a: Silna kryptografia z u¿yciem SSL
 Group:		Networking/Daemons
 Epoch:		1
 Requires:	%{name} = %{version}
@@ -439,7 +441,7 @@ Silna kryptografia z u¿yciem SSL.
 
 %package mod_status
 Summary:	Server status report module for apache
-Summary(pl):	Modu³ dostarczaj±cy informacje statystyczne o serwerze
+Summary(pl):	Modu³ udostêpniaj±cy informacje statystyczne z serwera
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}
 
@@ -456,7 +458,7 @@ pracy serwera apache (w postaci strony HTML).
 
 %package mod_usertrack
 Summary:	Apache module for user tracking using cookies
-Summary(pl):	Modu³ s³u¿±cy do ¶ledzenia ,,ciasteczek''
+Summary(pl):	Modu³ s³u¿±cy do ¶ledzenia "ciasteczek"
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}
 
@@ -466,7 +468,7 @@ logging using CookieLog directory. This module allow multiple log
 files.
 
 %description mod_usertrack -l pl
-Modu³ pozwalaj±cy na ¶ledzenie ,,ciasteczek''.
+Modu³ pozwalaj±cy na ¶ledzenie "ciasteczek".
 
 %package mod_vhost_alias
 Summary:	Apache module for dynamically configured mass virtual hosting
@@ -484,7 +486,7 @@ wirtualnych.
 
 %package mod_unique_id
 Summary:	Apache module which provides a magic token for each request
-Summary(pl):	Modu³ nadaj±cy ka¿demu ¿±daniu unikalny token
+Summary(pl):	Modu³ nadaj±cy ka¿demu zapytaniu unikalny token
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}
 
@@ -498,9 +500,9 @@ for each request. Unique identifiers are useful for various reasons
 which are beyond the scope of this document.
 
 %description mod_unique_id -l pl
-Modu³ nadaje przy ka¿dym ¿±daniu token unikalny w ramach wszystkich
-¿±dañ, nawet w ramach poprawnie skonfigurowanego klastra z wielu
-maszyn. Modu³ ustawia przy ka¿dym ¿±daniu zmienn± ¶rodowiskow±
+Modu³ nadaje ka¿demu zapytaniu token unikalny w ramach wszystkich
+zapytañ, nawet w ramach poprawnie skonfigurowanego klastra z wielu
+maszyn. Modu³ ustawia przy ka¿dym zapytaniu zmienn± ¶rodowiskow±
 UNIQUE_ID.
 
 %package mod_expires
@@ -522,7 +524,7 @@ wa¿no¶ci mo¿e byæ ustalana w zale¿no¶ci od czasu modyfikacji plików
 
 %package mod_file_cache
 Summary:	Apache module: Caches a static list of files in memory
-Summary(pl):	Modu³ cacheuj±cy statyczn± listê plików w pamiêci
+Summary(pl):	Modu³ cache'uj±cy statyczn± listê plików w pamiêci
 Group:		Networking/Daemons
 Obsoletes:	%{name}-mmap_static
 Requires:	%{name} = %{version}
@@ -531,7 +533,7 @@ Requires:	%{name} = %{version}
 Caches a static list of files in memory.
 
 %description mod_file_cache -l pl
-Modu³ cacheuj±cy statyczn± listê plików w pamiêci.
+Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 
 %package -n apr
 Summary:	The Apache Portable Runtime library
@@ -543,13 +545,13 @@ The Apache Portable Run-time libraries have been designed to provide a
 common interface to low level routines across any platform.
 
 %description -n apr -l pl
-Przeno¶na biblioteka Apache zosta³a zaprojektowana w celu dostarczania
-popularnego i jednolitego interfejsu do niskopoziomowych funkcji na
-dowolnej platformie.
+Przeno¶na biblioteka Apache zosta³a zaprojektowana w celu
+udostêpnienia popularnego i jednolitego interfejsu do niskopoziomowych
+funkcji na dowolnej platformie.
 
 %package -n apr-devel
 Summary:	The includes and linker libraries for development with APR
-Summary(pl):	Pliki nag³ówkowe, biblioteki dla linkera APR
+Summary(pl):	Pliki nag³ówkowe, biblioteki dla konsolidatora APR
 Group:		Development/Libraries
 Requires:	apr = %{version}
 
@@ -557,7 +559,7 @@ Requires:	apr = %{version}
 The includes and linker libraries for development with APR.
 
 %description -n apr-devel -l pl
-Pliki nag³ówkowe, biblioteki dla linkera APR.
+Pliki nag³ówkowe, biblioteki dla konsolidatora APR.
 
 %package -n apr-static
 Summary:	Static APR libraries
