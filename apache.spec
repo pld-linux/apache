@@ -17,6 +17,7 @@ Patch1:      apache-1.3b8-suexec.patch
 Patch2:      apache-1.3b7-perlpath.patch
 Patch3:      apache-1.3b8-config.patch
 Patch4:      apache-1.3b8-mimetypes.patch
+Patch5:      apache-1.3-headerdos.patch
 Copyright:   BSD-like
 Obsoletes:   apache-suexec apache-extra apache-doc
 Requires:    /etc/mime.types
@@ -39,7 +40,7 @@ aussi le plus utilisé à travers le monde.
 
 %description -l pl
 Apache jest serwerem WWW (World Wide Web). Instaluj±c ten
-pakiet bêziesz móg³ prezentowaæ w³asne strony WWW w sieci internet
+pakiet bêdziesz móg³ prezentowaæ w³asne strony WWW w sieci internet
 Apache umozliwia równie¿ konfigurowanie serwerów wirtualnych.
 
 %description -l tr
@@ -65,6 +66,7 @@ Pliki nag³owkowe do serwera www Apache.
 %patch2 -p1
 %patch3 -p1
 #%patch4 -p1
+%patch5 -p1
 
 %build
 OPTIM="$RPM_OPT_FLAGS" ./configure --prefix=/usr --sysconfdir=/etc/httpd/conf \
@@ -182,8 +184,9 @@ fi
 - added /etc/rc.d/rc*.d/* symlinks as a %config(missingok),
 - changed permidssion on logrotate config file to 600,
 - changed permidssion on /var/log/httpd to 700,
-- added %ghost /var/log/httpd/*
-- added striping modules.
+- added %ghost /var/log/httpd/*,
+- added striping modules,
+- added patch to defeat header dos attack.
 
 * Sat Jul 18 1998 Manoj Kasichainula <manojk@io.com>
   [1.3.1-1]
