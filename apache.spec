@@ -5,7 +5,7 @@ Summary(pl):	Serwer WWW (World Wide Web) ze wsparciem dla IPv6
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	1.3.9
-Release:	2
+Release:	3
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Source0:	ftp://ftp.apache.org/apache/dist/%{name}_%{version}.tar.gz
