@@ -33,7 +33,7 @@ Summary(ru):	óÁÍÙÊ ÐÏÐÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.0.48
-Release:	0.5
+Release:	0.6
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -63,8 +63,8 @@ Patch4:		%{name}-apr.patch
 Patch5:		httpd-2.0.47-metuxmpm-r7.diff
 Patch6:		%{name}-posix_syntax
 Patch7:		httpd-2.0.40-xfsz.patch
-Patch8: 	httpd-2.0.45-davetag.patch
-Patch9: 	httpd-2.0.45-davfs.patch
+Patch8:		httpd-2.0.45-davetag.patch
+Patch9:		httpd-2.0.45-davfs.patch
 Patch10:	httpd-2.0.45-encode.patch
 Patch11:	httpd-2.0.45-export.patch
 Patch12:	httpd-2.0.45-proxy.patch
@@ -200,16 +200,28 @@ innym UID ni¿ wywo³uj±cy je serwer. Normalnie programy CGI i SSI s±
 wykonywane jako taki sam u¿ytkownik jak serwer WWW.
 
 %package index
-Summary:        Apache index.html* files
-Summary(pl):    Pliki Apache index.html*
-Group:          Documentation
-Requires:       %{name} = %{version}-%{release}
+Summary:	Apache index.html* files
+Summary(pl):	Pliki Apache index.html*
+Group:		Documentation
+Requires:	%{name} = %{version}-%{release}
 
 %description index
 Apache index.html* files.
 
 %description index -l pl
 Pliki Apache index.html*.
+
+%package doc
+Summary:	Apache manual
+Summary(pl):	Podrêcznik Apache'a
+Group:		Documentation
+Requires:	%{name} = %{version}-%{release}
+
+%description doc
+Apache manual.
+
+%description doc -l pl
+Podrêcznik Apache'a.
 
 %package devel
 Summary:	Module development tools for the Apache web server
@@ -694,7 +706,7 @@ fi
 ./buildconf
 # Before configure; fix location of build dir in generated apxs
 %{__perl} -pi -e "s:\@exp_installbuilddir\@:%{_libdir}/apache/build:g" \
-        support/apxs.in
+	support/apxs.in
 install /usr/share/automake/config.* build/
 CPPFLAGS="-DBIG_SECURITY_HOLE=1"
 %configure \
@@ -702,7 +714,7 @@ CPPFLAGS="-DBIG_SECURITY_HOLE=1"
 	--enable-layout=PLD \
 	--enable-modules=all \
 	--enable-mods-shared=all \
-	--enable-auth-anon	 \
+	--enable-auth-anon \
 	--enable-auth-dbm \
 	--enable-auth-digest \
 	--enable-file-cache \
@@ -806,35 +818,35 @@ install %{SOURCE21} $RPM_BUILD_ROOT%{_sysconfdir}/ssl/server.key
 
 CFG="$RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf/"
 
-install %{SOURCE6}  $CFG/10_httpd.conf
-install %{SOURCE8}  $CFG/20_mod_vhost_alias.conf
-install %{SOURCE9}  $CFG/25_mod_status.conf
+install %{SOURCE6} $CFG/10_httpd.conf
+install %{SOURCE8} $CFG/20_mod_vhost_alias.conf
+install %{SOURCE9} $CFG/25_mod_status.conf
 install %{SOURCE10} $CFG/30_mod_proxy.conf
 install %{SOURCE11} $CFG/35_mod_info.conf
 install %{SOURCE12} $CFG/40_mod_ssl.conf
 install %{SOURCE13} $CFG/45_mod_dav.conf
 install %{SOURCE14} $CFG/59_mod_dir.conf
 
-echo "LoadModule ldap_module       %{_libexecdir}/mod_ldap.so" > $CFG/49_mod_ldap.conf
-echo "LoadModule actions_module       %{_libexecdir}/mod_actions.so" > $CFG/50_mod_actions.conf
-echo "LoadModule auth_module          %{_libexecdir}/mod_auth.so" > $CFG/51_mod_auth.conf
-echo "LoadModule auth_anon_module     %{_libexecdir}/mod_auth_anon.so" > $CFG/52_mod_auth_anon.conf
-echo "LoadModule auth_dbm_module      %{_libexecdir}/mod_auth_dbm.so" > $CFG/53_mod_auth_dbm.conf
-echo "LoadModule auth_digest_module   %{_libexecdir}/mod_auth_digest.so" > $CFG/54_mod_auth_digest.conf
-echo "LoadModule cache_module         %{_libexecdir}/mod_cache.so
-LoadModule mem_cache_module     %{_libexecdir}/mod_mem_cache.so
-LoadModule disk_cache_module    %{_libexecdir}/mod_disk_cache.so" > $CFG/55_mod_cache.conf
-echo "LoadModule cgid_module          %{_libexecdir}/mod_cgid.so" > $CFG/56_mod_cgid.conf
-echo "LoadModule charset_lite_module  %{_libexecdir}/mod_charset_lite.so" > $CFG/57_mod_charset_lite.conf
-echo "LoadModule deflate_module       %{_libexecdir}/mod_deflate.so" > $CFG/58_mod_deflate.conf
-echo "LoadModule auth_ldap_module     %{_libexecdir}/mod_auth_ldap.so" > $CFG/59_mod_auth_ldap.conf
-echo "LoadModule expires_module       %{_libexecdir}/mod_expires.so" > $CFG/60_mod_expires.conf
-echo "LoadModule file_cache_module    %{_libexecdir}/mod_file_cache.so" > $CFG/61_mod_file_cache.conf
-echo "LoadModule headers_module       %{_libexecdir}/mod_headers.so" > $CFG/62_mod_headers.conf
-echo "LoadModule imap_module          %{_libexecdir}/mod_imap.so" > $CFG/63_mod_imap.conf
-echo "LoadModule rewrite_module       %{_libexecdir}/mod_rewrite.so" > $CFG/64_mod_rewrite.conf
-echo "LoadModule usertrack_module     %{_libexecdir}/mod_usertrack.so" > $CFG/65_mod_usertrack.conf
-echo "LoadModule unique_id_module     %{_libexecdir}/mod_unique_id.so" > $CFG/66_mod_unique_id.conf
+echo "LoadModule ldap_module	%{_libexecdir}/mod_ldap.so" > $CFG/49_mod_ldap.conf
+echo "LoadModule actions_module	%{_libexecdir}/mod_actions.so" > $CFG/50_mod_actions.conf
+echo "LoadModule auth_module	%{_libexecdir}/mod_auth.so" > $CFG/51_mod_auth.conf
+echo "LoadModule auth_anon_module	%{_libexecdir}/mod_auth_anon.so" > $CFG/52_mod_auth_anon.conf
+echo "LoadModule auth_dbm_module	%{_libexecdir}/mod_auth_dbm.so" > $CFG/53_mod_auth_dbm.conf
+echo "LoadModule auth_digest_module	%{_libexecdir}/mod_auth_digest.so" > $CFG/54_mod_auth_digest.conf
+echo "LoadModule cache_module	%{_libexecdir}/mod_cache.so
+LoadModule mem_cache_module	%{_libexecdir}/mod_mem_cache.so
+LoadModule disk_cache_module	%{_libexecdir}/mod_disk_cache.so" > $CFG/55_mod_cache.conf
+echo "LoadModule cgid_module	%{_libexecdir}/mod_cgid.so" > $CFG/56_mod_cgid.conf
+echo "LoadModule charset_lite_module	%{_libexecdir}/mod_charset_lite.so" > $CFG/57_mod_charset_lite.conf
+echo "LoadModule deflate_module	%{_libexecdir}/mod_deflate.so" > $CFG/58_mod_deflate.conf
+echo "LoadModule auth_ldap_module	%{_libexecdir}/mod_auth_ldap.so" > $CFG/59_mod_auth_ldap.conf
+echo "LoadModule expires_module	%{_libexecdir}/mod_expires.so" > $CFG/60_mod_expires.conf
+echo "LoadModule file_cache_module	%{_libexecdir}/mod_file_cache.so" > $CFG/61_mod_file_cache.conf
+echo "LoadModule headers_module	%{_libexecdir}/mod_headers.so" > $CFG/62_mod_headers.conf
+echo "LoadModule imap_module	%{_libexecdir}/mod_imap.so" > $CFG/63_mod_imap.conf
+echo "LoadModule rewrite_module	%{_libexecdir}/mod_rewrite.so" > $CFG/64_mod_rewrite.conf
+echo "LoadModule usertrack_module	%{_libexecdir}/mod_usertrack.so" > $CFG/65_mod_usertrack.conf
+echo "LoadModule unique_id_module	%{_libexecdir}/mod_unique_id.so" > $CFG/66_mod_unique_id.conf
 
 ln -sf index.html.en $RPM_BUILD_ROOT%{_datadir}/html/index.html
 
@@ -1269,6 +1281,14 @@ fi
 %attr(640,root,root) %ghost /var/log/httpd/*
 
 %dir %{_datadir}
+
+%attr(755,root,root) %dir %{_datadir}/html
+%{_datadir}/icons
+%attr(755,root,root) %{_datadir}/cgi-bin
+
+%{_datadir}/error
+
+%files doc
 %dir %{_datadir}/manual
 %{_datadir}/manual/LICENSE
 %{_datadir}/manual/*.xml
@@ -1311,14 +1331,8 @@ fi
 %{_datadir}/manual/platform
 %{_datadir}/manual/programs
 %dir %{_datadir}/manual/search
-%doc%attr(755,root,root) %{_datadir}/manual/search/manual-index.cgi
+%doc %attr(755,root,root) %{_datadir}/manual/search/manual-index.cgi
 %{_datadir}/manual/style
-
-%attr(755,root,root) %dir %{_datadir}/html
-%{_datadir}/icons
-%attr(755,root,root) %{_datadir}/cgi-bin
-
-%{_datadir}/error
 
 %files suexec
 %defattr(644,root,root,755)
