@@ -656,6 +656,7 @@ ln -s %{_libexecdir}/build $RPM_BUILD_ROOT%{_sysconfdir}/build
 
 perl -pi -e "s#$RPM_BUILD_ROOT##g" $RPM_BUILD_ROOT%{_libexecdir}/build/config_vars.mk
 perl -pi -e "s#dlname=''#dlname='libapr.so.0'#g" $RPM_BUILD_ROOT%{_libdir}/libapr.la
+perl -pi -e "s#dlname=''#dlname='libaprutil.so.0'#g" $RPM_BUILD_ROOT%{_libdir}/libapr.la
 
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/apache
