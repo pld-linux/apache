@@ -1,0 +1,5904 @@
+diff -Nru apache_1.3.20/README.v6 apache_1.3.20.new/README.v6
+--- apache_1.3.20/README.v6	Thu Jan  1 01:00:00 1970
++++ apache_1.3.20.new/README.v6	Mon May 21 10:54:52 2001
+@@ -0,0 +1,166 @@
++IPv6-ready apache 1.3.x
++KAME Project
++$Id$
++
++This patchkit enables apache 1.3.x to perform HTTP connection over IPv6.
++Most of optional modules are left unchanged, i.e. it won't support IPv6,
++and it may not compile.
++
++Basically you can write IPv6 address where IPv4 address fits.
++
++extra command-line argument:
++	-4	Assume IPv4 address on ambiguous directives
++	-6	Assume IPv6 address on ambiguous directives (default)
++
++	The above two can be used, for example, to disambiguate
++	"BindAddress *".
++
++base commands:
++    Listen
++	Listen is expanded to take one or two arguments.
++		Listen port
++		Listen address:port
++		Listen address port
++	This is to let you specify "Listen :: 80", since "Listen :::80"
++	won't work.
++
++mod_access:
++    deny from
++    allow from
++	"deny from" and "allow from" supports IPv6 addresses, under the
++	following forms:
++		{deny,allow} from v6addr
++		{deny,allow} from v6addr/v6mask
++		{deny,allow} from v6addr/prefixlen
++	Also, wildcard ("*") and string hostname matches IPv6 hosts as well.
++
++mod_proxy:
++    ProxyRequests on
++	http/ftp proxying for both IPv4 and IPv6 is possible.
++	Access control functions (NoProxy) are not updated yet.
++
++	NOTE: for security reasons, we recommend you to filter out
++	outsider's access to your proxy, by directives like below:
++		<Directory proxy:*>
++		order deny,allow
++		deny from all
++		allow from 10.0.0.0/8
++		allow from 3ffe:9999:8888:7777::/64
++		</Directory>
++
++virtual host:
++	If you would like to this feature, you must describe 'Listen'
++	part on configuration file explicitly. like below:
++		Listen :: 80
++		Listen 0.0.0.0 80
++
++    NameVirtualHost
++	NameVirtualHost is expanded to take one more two arguments.
++		NameVirtualHost address
++		NameVirtualHost address:port
++		NameVirtualHost address port
++	This is to let you specify IPv6 address into address part.
++
++	Note that, if colon is found in the specified address string,
++	the code will to resolve the address in the following way:
++	1. try to resolve as address:port (most of IPv6 address fails)
++	2. if (1) is failed, try to resolve as address only
++	If there's ambiguity, i.e. 3ffe:0501::1:2, the address may not be
++	parsed as you expect (3ffe:0501::1 with port 2, or 3ffe:0501::1:2
++	with default port).  To get the right effect you are encouraged
++	to specify it without ambiguity.  In IPv6 case "address port"
++	(specify address and port separated by a space) is the safest way.
++
++    <VirtualHost host:port [host:port ...]>
++	If you would like to specify IPv6 numeric address in host part,
++	use bracketed format like below:
++		<VirtualHost [::1]:80>
++	Note: Now we DO NOT handle old non-bracketed format, 
++		<VirtualHost 0:0:0:0:0:0:0:1:80>
++	      so configuration file must be updated.
++	Note: The following is bad example to specify host ::1 port 80.
++	      This will treated as host ::1:80.
++		<VirtualHost ::1:80>
++
++logresolve (src/support)
++	error statistics in nameserver cache code is omitted.
++
++mod_unique_id
++	Originally mod_unique_id used IPv4 address as a seed for UNIQUE_ID,
++	and took IPv4 address registered onto DNS for the hostname (UNIX
++	hostname taken by gethostname(3)).  Therefore, this does not work
++	for IPv6-only hosts as they do not have IPv4 address for them.
++
++	Now, UNIQUE_ID can be generated using IPv6 address.  IPv6 address can
++	be used as the seed for UNIQUE_ID.
++	Because of this, UNIQUE_ID will be longer than normal apache.  This
++	may cause problem with some of the CGI scripts.
++	The preference of the addresses is based on the order returned
++	by getaddrinfo().  If your getaddrinfo() returns IPv4 address, IPv4
++	adderss will be used as a seed.
++	Note that some of IPv6 addresses are "scoped"; If you happened to use
++	link-local or site-local address as a seed, the UNIQUE_ID may not be
++	worldwide unique.
++
++	If longer UNIQUE_ID causes a problem, define SHORT_UNIQUE_ID in
++	mod_unique_id.c.  In this case, length of UNIQUE_ID will be kept the
++	same.  However, for IPv6 addresses mod_unique_id.c will use the last
++	32bit (not the whole 128bit) as the seed.  Therefore, there can be
++	collision in UNIQUE_ID.
++
++	The behavior should be improved in the near future; we welcome your
++	inputs.
++
++Modules known to be incompatible with IPv6
++	(please report us)
++
++configure
++	Configure has extra option, --enable-rule=INET6.  if the option
++	is specified, IPv6 code will be enabled.
++
++configuration file
++	We do not support IPv4 mapped address (IPv6 address format like
++	::ffff:10.1.1.1) in configuration file. 
++
++This kit assumes that you have working(*) getaddrinfo() and getnameinfo()
++library functions.  Even if you don't have one, don't panic.  We have
++included last-resort version (which support IPv4 only) into the kit.
++For more complete implementation you might want to check BIND 8.2.
++(*) NOTE: we have noticed that some of IPv6 stack is shipped with broken
++getaddrinfo().  In such cases, you should get and install BIND 8.2.
++
++When compiling this kit onto IPv6, you may need to specify some additional
++library paths or cpp defs (like -linet6 or -DINET6).
++Now you don't have to specify --enable-rule=INET6.  The "configure" script
++will give you some warnings if the IPv6 stack is not known to the 
++"configure" script.  Currently, the following IPv6 stacks are supported:
++- KAME IPv6 stack, http://www.kame.net/
++	use configure.v6 for convenience,
++- Linux IPv6 stack, http://www.linux.org/
++	use configure.v6 for convenience.
++- Solaris 8 IPv6 stack, http://www.sun.com/
++	use configure.v6 for convenience.
++To disable IPv6 support, specify --disable-rule=INET6 to the "configure"
++script.
++
++CAVEAT: This patchkit may change some of apache module API, to avoid
++IPv4-dependent structure member variable.  Please let us know if there's
++any troubles as we know very little about the apache module API.
++
++Acknowledgements
++	Thanks to all people submitted patches/fixes for this patch kit,
++	including:
++		"Chris P. Ross" <cross@eng.us.uu.net>
++
++Author contacts
++	Jun-ichiro itojun Hagino, KAME project
++	 http://www.kame.net/
++	 mailto:core@kame.net
++Linux Port
++	Arkadiusz Miskiewicz, Polish Linux Distribution project (IPv6)
++	 http://www.pld.org.pl/
++	 mailto:pld-list@pld.org.pl
++	Satoshi SHIDA, Linux IPv6 Users Group JP
++	 http://www.v6.linux.or.jp/
++	YOSHIFUJI Hideaki, USAGI Project
++	 http://www.linux-ipv6.org/
+diff -Nru apache_1.3.20/conf/httpd.conf-dist apache_1.3.20.new/conf/httpd.conf-dist
+--- apache_1.3.20/conf/httpd.conf-dist	Sun May 13 19:59:49 2001
++++ apache_1.3.20.new/conf/httpd.conf-dist	Mon May 21 10:54:52 2001
+@@ -174,6 +174,11 @@
+ #Listen 3000
+ #Listen 12.34.56.78:80
+ 
++# Listen can take two arguments.
++# (this is an extension for supporting IPv6 addresses)
++#Listen :: 80
++#Listen 0.0.0.0 80
++
+ #
+ # BindAddress: You can support virtual hosts with this option. This directive
+ # is used to tell the server which IP address to listen to. It can either
+diff -Nru apache_1.3.20/configure.v6 apache_1.3.20.new/configure.v6
+--- apache_1.3.20/configure.v6	Thu Jan  1 01:00:00 1970
++++ apache_1.3.20.new/configure.v6	Mon May 21 10:54:52 2001
+@@ -0,0 +1,3 @@
++#! /bin/sh
++
++./configure --enable-rule=INET6 --enable-module=proxy $*
+diff -Nru apache_1.3.20/src/Configuration.tmpl apache_1.3.20.new/src/Configuration.tmpl
+--- apache_1.3.20/src/Configuration.tmpl	Mon May 21 11:02:04 2001
++++ apache_1.3.20.new/src/Configuration.tmpl	Mon May 21 10:54:52 2001
+@@ -184,6 +184,9 @@
+ #  directory is present. This rule will always be interpreted as "no"
+ #  if the directory is not present.
+ #
++# INET6:
++#  IPv6 support.
++#
+ 
+ Rule SOCKS4=no
+ Rule SOCKS5=no
+@@ -191,6 +194,7 @@
+ Rule IRIXN32=yes
+ Rule PARANOID=no
+ Rule EXPAT=default
++Rule INET6=no
+ 
+ # DEV_RANDOM:
+ #  Note: this rule is only used when compiling mod_auth_digest.
+diff -Nru apache_1.3.20/src/Configure apache_1.3.20.new/src/Configure
+--- apache_1.3.20/src/Configure	Mon May 21 11:02:03 2001
++++ apache_1.3.20.new/src/Configure	Mon May 21 10:54:52 2001
+@@ -237,6 +237,7 @@
+ RULE_EXPAT=`./helpers/CutRule EXPAT $file`
+ RULE_SHARED_CORE=`./helpers/CutRule SHARED_CORE $file`
+ RULE_SHARED_CHAIN=`./helpers/CutRule SHARED_CHAIN $file`
++RULE_INET6=`./helpers/CutRule INET6 $file`
+ 
+ ####################################################################
+ ## Rule SHARED_CORE implies required DSO support
+@@ -1661,6 +1662,124 @@
+     esac
+ fi
+ 
++# INET6 support.
++if [ "$RULE_INET6" = "yes" ]; then
++    echo " + enabling INET6 support"
++    CFLAGS="$CFLAGS -DINET6"
++    CFLAGS="$CFLAGS -Dss_family=__ss_family -Dss_len=__ss_len"
++    IPV6_STACKTYPE="UNKNOWN"
++    for i in KAME Linux Solaris; do
++	case "$i" in
++	KAME)
++	    if [ -f /usr/include/netinet6/in6.h -a "x`egrep '__KAME__' /usr/include/netinet6/in6.h 2>/dev/null`" != "x" ]; then
++		IPV6_STACKTYPE=$i
++	    fi
++	    ;;
++	Linux)
++	    if [ /usr/include/netinet/ip6.h -a -d /usr/include/linux ]; then
++		IPV6_STACKTYPE=$i
++	    fi
++	    ;;
++	Solaris)
++	    SOL_VERSION=`(uname -v) 2>/dev/null` || SOL_VERSION="unknown"
++	    case "${PLAT}-${SOL_VERSION}" in
++		*-solaris2.27*-*IPv6*)
++		    if [ -f /etc/hostname -o -f /etc/hostname.[a-z]*[0-9] ]; then
++			IPV6_STACKTYPE="Solaris 7 (${SOL_VERSION})"
++		    fi
++		    ;;
++	    esac
++	    ;;
++	esac
++	if [ "$IPV6_STACKTYPE" != "UNKNOWN" ]; then
++	    break
++	fi
++    done
++    if [ "$IPV6_STACKTYPE" != "UNKNOWN" ]; then
++	echo " + You seem to be using $IPV6_STACKTYPE stack"
++	if ./helpers/TestCompile func getaddrinfo; then
++	    echo "   - Assuming you have working getaddrinfo in libc" 
++	else
++	    if [ -f /usr/local/v6/lib/libinet6.a -a "x`egrep '^EXTRA_L' Makefile.config | grep linet6`" = "x" ]; then
++		LIBS="$LIBS -L/usr/local/v6/lib -linet6"
++		echo "   - using getaddrinfo in libinet6" 
++	    elif [ -f /usr/local/lib/libinet6.a -a "x`egrep '^EXTRA_L' Makefile.config | grep linet6`" = "x" ]; then
++		LIBS="$LIBS -L/usr/local/lib -linet6"
++		echo "   - using getaddrinfo in libinet6"
++	    elif [ -f /usr/inet6/lib/libinet6.a -a "x`egrep '^EXTRA_L' Makefile.config | grep linet6`" = "x" ]; then
++		echo "   - using getaddrinfo in libinet6"
++	    else
++		echo "** WARNING: No getaddrinfo found, linkage may fail" 
++	    fi
++	fi
++    else
++	echo ""
++	echo "** WARNING: We have no explicit knowledge about the IPv6"
++	echo "** implementation on this host.  You may need to specify"
++	echo "** EXTRA_LIBS so that we can find getaddrinfo() and"
++	echo "** getnameinfo() library functions."
++	echo ""
++    fi
++    case $PLAT in
++	*-solaris2* )
++	    LIBS="$LIBS -lresolv"
++	    ;;
++    esac
++else
++    CFLAGS="$CFLAGS -DNEED_GETADDRINFO -DNEED_GETNAMEINFO"
++    if [ -f /usr/include/netdb.h -a "x`egrep 'addrinfo' /usr/include/netdb.h`" = "x" ]; then
++	CFLAGS="$CFLAGS -DNEED_ADDRINFO"
++    fi
++fi
++
++echo '#include <sys/types.h>' >testfunc.c
++echo '#include <sys/socket.h>' >>testfunc.c
++echo 'int testfunc(){ struct sockaddr sa; int i = sa.sa_len; };' >>testfunc.c
++rm -f testfunc.o
++eval "${MAKE-make} -f Makefile.config testfunc.o >/dev/null 2>/dev/null"
++if [ -f testfunc.o ]; then
++    echo " + you have sa_len in struct sockaddr."
++    CFLAGS="$CFLAGS -DHAVE_SOCKADDR_LEN"
++else
++    echo " + you don't have sa_len in struct sockaddr."
++fi
++rm -f testfunc.c testfunc.o
++
++echo '#include <sys/types.h>' >testfunc.c
++echo '#include <sys/socket.h>' >>testfunc.c
++echo 'struct sockaddr_storage sockaddr_storage;' >>testfunc.c
++rm -f testfunc.o
++eval "${MAKE-make} -f Makefile.config testfunc.o >/dev/null 2>/dev/null"
++if [ -f testfunc.o ]; then
++    echo " + assuming you have struct sockaddr_storage"
++else
++    CFLAGS="$CFLAGS -DNEED_SOCKADDR_STORAGE"
++    echo " + you need struct sockaddr_storage"
++fi
++rm -f testfunc.c testfunc.o
++
++echo '#include <sys/types.h>' >testfunc.c
++echo '#include <sys/socket.h>' >>testfunc.c
++echo 'int testfunc(){ socklen_t t; }' >>testfunc.c
++rm -f testfunc.o
++eval "${MAKE-make} -f Makefile.config testfunc.o >/dev/null 2>/dev/null"
++if [ ! -f testfunc.o ]; then
++    CFLAGS="$CFLAGS -Dsocklen_t=int"
++fi
++rm -f testfunc.c testfunc.o
++
++echo '#include <sys/types.h>' >testfunc.c
++echo '#include <sys/socket.h>' >>testfunc.c
++echo 'struct sockaddr_in sin;' >>testfunc.c
++echo 'int main(){ int i = sin.sin_len; }' >>testfunc.c
++rm -f testfunc.o
++eval "${MAKE-make} -f Makefile.config testfunc.o >/dev/null 2>/dev/null"
++if [ -f testfunc.o ]; then
++    CFLAGS="$CFLAGS -DSIN_LEN"
++fi
++rm -f testfunc.c testfunc.o
++
++
+ ####################################################################
+ ## Find out what modules we want and try and configure things for them
+ ## Module lines can look like this:
+@@ -2252,6 +2371,38 @@
+ echo "#ifndef AP_LONGEST_LONG" >>$AP_CONFIG_AUTO_H
+ echo "#define AP_LONGEST_LONG $AP_LONGEST_LONG" >>$AP_CONFIG_AUTO_H
+ echo "#endif" >>$AP_CONFIG_AUTO_H
++
++if [ x`./helpers/TestCompile -r sizeof 'uint32_t'` != x"" ]; then
++    echo "" >>$AP_CONFIG_AUTO_H
++    echo "/* determine: use uint32_t as 32bit unsigned int */" >>$AP_CONFIG_AUTO_H
++    echo "#ifndef ap_uint32_t" >>$AP_CONFIG_AUTO_H
++    echo "#define ap_uint32_t uint32_t" >>$AP_CONFIG_AUTO_H
++    echo "#endif" >>$AP_CONFIG_AUTO_H
++    echo "   - use uint32_t as 32bit unsigned int"
++elif [ x`./helpers/TestCompile -r sizeof 'u_int32_t'` != x"" ]; then
++    echo "" >>$AP_CONFIG_AUTO_H
++    echo "/* determine: use u_int32_t as 32bit unsigned int */" >>$AP_CONFIG_AUTO_H
++    echo "#ifndef ap_uint32_t" >>$AP_CONFIG_AUTO_H
++    echo "#define ap_uint32_t u_int32_t" >>$AP_CONFIG_AUTO_H
++    echo "#endif" >>$AP_CONFIG_AUTO_H
++    echo "   - use u_int32_t as 32bit unsigned int"
++elif [ x`./helpers/TestCompile -r sizeof 'unsigned int'` = x"4" ]; then
++    echo "" >>$AP_CONFIG_AUTO_H
++    echo "/* determine: use unsigned int as 32bit unsigned int */" >>$AP_CONFIG_AUTO_H
++    echo "#ifndef ap_uint32_t" >>$AP_CONFIG_AUTO_H
++    echo "#define ap_uint32_t unsigned int" >>$AP_CONFIG_AUTO_H
++    echo "#endif" >>$AP_CONFIG_AUTO_H
++    echo "   - use unsigned int as 32bit unsigned int"
++elif [ x`./helpers/TestCompile -r sizeof 'unsigned long int'` = x"4" ]; then
++    echo "" >>$AP_CONFIG_AUTO_H
++    echo "/* determine: use unsigned long int as 32bit unsigned int */" >>$AP_CONFIG_AUTO_H
++    echo "#ifndef uint32_t" >>$AP_CONFIG_AUTO_H
++    echo "#define uint32_t unsigned long int" >>$AP_CONFIG_AUTO_H
++    echo "#endif" >>$AP_CONFIG_AUTO_H
++    echo "   - use unsigned long int as 32bit unsigned int"
++else
++    echo "  - Warning: cannot determine what type should we use as 32bit unsigned int"
++fi
+ 
+ ####################################################################
+ ## More building ap_config_auto.h
+diff -Nru apache_1.3.20/src/ap/ap_snprintf.c apache_1.3.20.new/src/ap/ap_snprintf.c
+--- apache_1.3.20/src/ap/ap_snprintf.c	Thu May 10 16:04:22 2001
++++ apache_1.3.20.new/src/ap/ap_snprintf.c	Mon May 21 10:55:24 2001
+@@ -73,6 +73,7 @@
+ #include <string.h>
+ #include <stdlib.h>
+ #include <math.h>
++#include "sa_len.h"
+ #ifdef WIN32
+ #include <float.h>
+ #endif
+@@ -504,6 +505,42 @@
+ 
+ 
+ 
++#ifdef INET6
++static char *conv_sockaddr(struct sockaddr *sa, char *buf_end, int *len)
++{
++    char *p = buf_end;
++    char hostnamebuf[MAXHOSTNAMELEN];
++    char portnamebuf[MAXHOSTNAMELEN];
++    char *q;
++    int salen;
++
++#ifndef SIN6_LEN
++    salen = SA_LEN(sa);
++#else
++    salen = sa->sa_len;
++#endif
++    if (getnameinfo(sa, salen, hostnamebuf, sizeof(hostnamebuf),
++	    portnamebuf, sizeof(portnamebuf), NI_NUMERICHOST | NI_NUMERICSERV)) {
++	strcpy(hostnamebuf, "???");
++	strcpy(portnamebuf, "???");
++    }
++    if (strcmp(portnamebuf,"0") == 0)
++	strcpy(portnamebuf, "*");
++    q = portnamebuf + strlen(portnamebuf);
++    while (portnamebuf < q)
++	*--p = *--q;
++    *--p = ':';
++    q = hostnamebuf + strlen(hostnamebuf);
++    while (hostnamebuf < q)
++	*--p = *--q;
++
++    *len = buf_end - p;
++    return (p);
++}
++#endif /*INET6*/
++
++
++
+ /*
+  * Convert a floating point number to a string formats 'f', 'e' or 'E'.
+  * The result is placed in buf, and len denotes the length of the string
+@@ -1055,6 +1092,7 @@
+ 		    /* print a struct sockaddr_in as a.b.c.d:port */
+ 		case 'I':
+ 		    {
++#ifndef INET6
+ 			struct sockaddr_in *si;
+ 
+ 			si = va_arg(ap, struct sockaddr_in *);
+@@ -1063,6 +1101,16 @@
+ 			    if (adjust_precision && precision < s_len)
+ 				s_len = precision;
+ 			}
++#else
++			struct sockaddr *sa;
++
++			sa = va_arg(ap, struct sockaddr *);
++			if (sa != NULL) {
++			    s = conv_sockaddr(sa, &num_buf[NUM_BUF_SIZE], &s_len);
++			    if (adjust_precision && precision < s_len)
++				s_len = precision;
++			}
++#endif
+ 			else {
+ 			    s = S_NULL;
+ 			    s_len = S_NULL_LEN;
+diff -Nru apache_1.3.20/src/ap/ap_snprintf.c~ apache_1.3.20.new/src/ap/ap_snprintf.c~
+--- apache_1.3.20/src/ap/ap_snprintf.c~	Thu Jan  1 01:00:00 1970
++++ apache_1.3.20.new/src/ap/ap_snprintf.c~	Mon May 21 10:54:52 2001
+@@ -0,0 +1,1256 @@
++/* ====================================================================
++ * The Apache Software License, Version 1.1
++ *
++ * Copyright (c) 2000 The Apache Software Foundation.  All rights
++ * reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ *
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in
++ *    the documentation and/or other materials provided with the
++ *    distribution.
++ *
++ * 3. The end-user documentation included with the redistribution,
++ *    if any, must include the following acknowledgment:
++ *       "This product includes software developed by the
++ *        Apache Software Foundation (http://www.apache.org/)."
++ *    Alternately, this acknowledgment may appear in the software itself,
++ *    if and wherever such third-party acknowledgments normally appear.
++ *
++ * 4. The names "Apache" and "Apache Software Foundation" must
++ *    not be used to endorse or promote products derived from this
++ *    software without prior written permission. For written
++ *    permission, please contact apache@apache.org.
++ *
++ * 5. Products derived from this software may not be called "Apache",
++ *    nor may "Apache" appear in their name, without prior written
++ *    permission of the Apache Software Foundation.
++ *
++ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
++ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
++ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
++ * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
++ * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
++ * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
++ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
++ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
++ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++ * SUCH DAMAGE.
++ * ====================================================================
++ *
++ * This software consists of voluntary contributions made by many
++ * individuals on behalf of the Apache Software Foundation.  For more
++ * information on the Apache Software Foundation, please see
++ * <http://www.apache.org/>.
++ *
++ * Portions of this software are based upon public domain software
++ * originally written at the National Center for Supercomputing Applications,
++ * University of Illinois, Urbana-Champaign.
++ */
++
++/*
++ * This code is based on, and used with the permission of, the
++ * SIO stdio-replacement strx_* functions by Panos Tsirigotis
++ * <panos@alumni.cs.colorado.edu> for xinetd.
++ */
++
++#include "httpd.h"
++
++#include <stdio.h>
++#include <ctype.h>
++#ifndef NETWARE
++#include <sys/types.h>
++#endif
++#include <stdarg.h>
++#include <string.h>
++#include <stdlib.h>
++#include <math.h>
++#ifdef WIN32
++#include <float.h>
++#endif
++
++typedef enum {
++    NO = 0, YES = 1
++} boolean_e;
++
++#ifndef FALSE
++#define FALSE			0
++#endif
++#ifndef TRUE
++#define TRUE			1
++#endif
++#ifndef AP_LONGEST_LONG
++#define AP_LONGEST_LONG		long
++#endif
++#define NUL			'\0'
++#define WIDE_INT		long
++#define WIDEST_INT		AP_LONGEST_LONG
++
++typedef WIDE_INT wide_int;
++typedef unsigned WIDE_INT u_wide_int;
++typedef WIDEST_INT widest_int;
++#ifdef __TANDEM
++/* Although Tandem supports "long long" there is no unsigned variant. */
++typedef unsigned long       u_widest_int;
++#else
++typedef unsigned WIDEST_INT u_widest_int;
++#endif
++typedef int bool_int;
++
++#define S_NULL			"(null)"
++#define S_NULL_LEN		6
++
++#define FLOAT_DIGITS		6
++#define EXPONENT_LENGTH		10
++
++/*
++ * NUM_BUF_SIZE is the size of the buffer used for arithmetic conversions
++ *
++ * XXX: this is a magic number; do not decrease it
++ */
++#define NUM_BUF_SIZE		512
++
++/*
++ * cvt.c - IEEE floating point formatting routines for FreeBSD
++ * from GNU libc-4.6.27.  Modified to be thread safe.
++ */
++
++/*
++ *    ap_ecvt converts to decimal
++ *      the number of digits is specified by ndigit
++ *      decpt is set to the position of the decimal point
++ *      sign is set to 0 for positive, 1 for negative
++ */
++
++#define	NDIG	80
++
++/* buf must have at least NDIG bytes */
++static char *ap_cvt(double arg, int ndigits, int *decpt, int *sign, int eflag, char *buf)
++{
++    register int r2;
++    double fi, fj;
++    register char *p, *p1;
++    
++    if (ndigits >= NDIG - 1)
++	ndigits = NDIG - 2;
++    r2 = 0;
++    *sign = 0;
++    p = &buf[0];
++    if (arg < 0) {
++	*sign = 1;
++	arg = -arg;
++    }
++    arg = modf(arg, &fi);
++    p1 = &buf[NDIG];
++    /*
++     * Do integer part
++     */
++    if (fi != 0) {
++	p1 = &buf[NDIG];
++	while (p1 > &buf[0] && fi != 0) {
++	    fj = modf(fi / 10, &fi);
++	    *--p1 = (int) ((fj + .03) * 10) + '0';
++	    r2++;
++	}
++	while (p1 < &buf[NDIG])
++	    *p++ = *p1++;
++    }
++    else if (arg > 0) {
++	while ((fj = arg * 10) < 1) {
++	    arg = fj;
++	    r2--;
++	}
++    }
++    p1 = &buf[ndigits];
++    if (eflag == 0)
++	p1 += r2;
++    *decpt = r2;
++    if (p1 < &buf[0]) {
++	buf[0] = '\0';
++	return (buf);
++    }
++    while (p <= p1 && p < &buf[NDIG]) {
++	arg *= 10;
++	arg = modf(arg, &fj);
++	*p++ = (int) fj + '0';
++    }
++    if (p1 >= &buf[NDIG]) {
++	buf[NDIG - 1] = '\0';
++	return (buf);
++    }
++    p = p1;
++    *p1 += 5;
++    while (*p1 > '9') {
++	*p1 = '0';
++	if (p1 > buf)
++	    ++ * --p1;
++	else {
++	    *p1 = '1';
++	    (*decpt)++;
++	    if (eflag == 0) {
++		if (p > buf)
++		    *p = '0';
++		p++;
++	    }
++	}
++    }
++    *p = '\0';
++    return (buf);
++}
++
++static char *ap_ecvt(double arg, int ndigits, int *decpt, int *sign, char *buf)
++{
++    return (ap_cvt(arg, ndigits, decpt, sign, 1, buf));
++}
++
++static char *ap_fcvt(double arg, int ndigits, int *decpt, int *sign, char *buf)
++{
++    return (ap_cvt(arg, ndigits, decpt, sign, 0, buf));
++}
++
++/*
++ * ap_gcvt  - Floating output conversion to
++ * minimal length string
++ */
++
++static char *ap_gcvt(double number, int ndigit, char *buf, boolean_e altform)
++{
++    int sign, decpt;
++    register char *p1, *p2;
++    register int i;
++    char buf1[NDIG];
++
++    p1 = ap_ecvt(number, ndigit, &decpt, &sign, buf1);
++    p2 = buf;
++    if (sign)
++	*p2++ = '-';
++    for (i = ndigit - 1; i > 0 && p1[i] == '0'; i--)
++	ndigit--;
++    if ((decpt >= 0 && decpt - ndigit > 4)
++	|| (decpt < 0 && decpt < -3)) {		/* use E-style */
++	decpt--;
++	*p2++ = *p1++;
++	*p2++ = '.';
++	for (i = 1; i < ndigit; i++)
++	    *p2++ = *p1++;
++	*p2++ = 'e';
++	if (decpt < 0) {
++	    decpt = -decpt;
++	    *p2++ = '-';
++	}
++	else
++	    *p2++ = '+';
++	if (decpt / 100 > 0)
++	    *p2++ = decpt / 100 + '0';
++	if (decpt / 10 > 0)
++	    *p2++ = (decpt % 100) / 10 + '0';
++	*p2++ = decpt % 10 + '0';
++    }
++    else {
++	if (decpt <= 0) {
++	    if (*p1 != '0')
++		*p2++ = '.';
++	    while (decpt < 0) {
++		decpt++;
++		*p2++ = '0';
++	    }
++	}
++	for (i = 1; i <= ndigit; i++) {
++	    *p2++ = *p1++;
++	    if (i == decpt)
++		*p2++ = '.';
++	}
++	if (ndigit < decpt) {
++	    while (ndigit++ < decpt)
++		*p2++ = '0';
++	    *p2++ = '.';
++	}
++    }
++    if (p2[-1] == '.' && !altform)
++	p2--;
++    *p2 = '\0';
++    return (buf);
++}
++
++/*
++ * The INS_CHAR macro inserts a character in the buffer and writes
++ * the buffer back to disk if necessary
++ * It uses the char pointers sp and bep:
++ *      sp points to the next available character in the buffer
++ *      bep points to the end-of-buffer+1
++ * While using this macro, note that the nextb pointer is NOT updated.
++ *
++ * NOTE: Evaluation of the c argument should not have any side-effects
++ */
++#define INS_CHAR(c, sp, bep, cc)				\
++	    {							\
++		if (sp >= bep) {				\
++		    vbuff->curpos = sp;                         \
++		    if (flush_func(vbuff))			\
++			return -1;				\
++		    sp = vbuff->curpos;				\
++		    bep = vbuff->endpos;			\
++		} 						\
++		*sp++ = (c);					\
++		cc++; 						\
++	    }
++
++#define NUM( c )			( c - '0' )
++
++#define STR_TO_DEC( str, num )		\
++    num = NUM( *str++ ) ;		\
++    while ( ap_isdigit( *str ) )		\
++    {					\
++	num *= 10 ;			\
++	num += NUM( *str++ ) ;		\
++    }
++
++/*
++ * This macro does zero padding so that the precision
++ * requirement is satisfied. The padding is done by
++ * adding '0's to the left of the string that is going
++ * to be printed.
++ */
++#define FIX_PRECISION( adjust, precision, s, s_len )	\
++    if ( adjust )					\
++	while ( s_len < precision )			\
++	{						\
++	    *--s = '0' ;				\
++	    s_len++ ;					\
++	}
++
++/*
++ * Macro that does padding. The padding is done by printing
++ * the character ch.
++ */
++#define PAD( width, len, ch )	do		\
++	{					\
++	    INS_CHAR( ch, sp, bep, cc ) ;	\
++	    width-- ;				\
++	}					\
++	while ( width > len )
++
++/*
++ * Prefix the character ch to the string str
++ * Increase length
++ * Set the has_prefix flag
++ */
++#define PREFIX( str, length, ch )	 *--str = ch ; length++ ; has_prefix = YES
++
++
++/*
++ * Convert num to its decimal format.
++ * Return value:
++ *   - a pointer to a string containing the number (no sign)
++ *   - len contains the length of the string
++ *   - is_negative is set to TRUE or FALSE depending on the sign
++ *     of the number (always set to FALSE if is_unsigned is TRUE)
++ *
++ * The caller provides a buffer for the string: that is the buf_end argument
++ * which is a pointer to the END of the buffer + 1 (i.e. if the buffer
++ * is declared as buf[ 100 ], buf_end should be &buf[ 100 ])
++ *
++ * Note: we have 2 versions. One is used when we need to use quads
++ * (conv_10_quad), the other when we don't (conv_10). We're assuming the
++ * latter is faster.
++ */
++static char *conv_10(register wide_int num, register bool_int is_unsigned,
++		     register bool_int *is_negative, char *buf_end,
++		     register int *len)
++{
++    register char *p = buf_end;
++    register u_wide_int magnitude;
++
++    if (is_unsigned) {
++	magnitude = (u_wide_int) num;
++	*is_negative = FALSE;
++    }
++    else {
++	*is_negative = (num < 0);
++
++	/*
++	 * On a 2's complement machine, negating the most negative integer 
++	 * results in a number that cannot be represented as a signed integer.
++	 * Here is what we do to obtain the number's magnitude:
++	 *      a. add 1 to the number
++	 *      b. negate it (becomes positive)
++	 *      c. convert it to unsigned
++	 *      d. add 1
++	 */
++	if (*is_negative) {
++	    wide_int t = num + 1;
++
++	    magnitude = ((u_wide_int) -t) + 1;
++	}
++	else
++	    magnitude = (u_wide_int) num;
++    }
++
++    /*
++     * We use a do-while loop so that we write at least 1 digit 
++     */
++    do {
++	register u_wide_int new_magnitude = magnitude / 10;
++
++	*--p = (char) (magnitude - new_magnitude * 10 + '0');
++	magnitude = new_magnitude;
++    }
++    while (magnitude);
++
++    *len = buf_end - p;
++    return (p);
++}
++
++static char *conv_10_quad(widest_int num, register bool_int is_unsigned,
++		     register bool_int *is_negative, char *buf_end,
++		     register int *len)
++{
++    register char *p = buf_end;
++    u_widest_int magnitude;
++
++    /*
++     * We see if we can use the faster non-quad version by checking the
++     * number against the largest long value it can be. If <=, we
++     * punt to the quicker version.
++     */
++    if ((num <= ULONG_MAX && is_unsigned) || (num <= LONG_MAX && !is_unsigned))
++    	return(conv_10( (wide_int)num, is_unsigned, is_negative,
++	       buf_end, len));
++
++    if (is_unsigned) {
++	magnitude = (u_widest_int) num;
++	*is_negative = FALSE;
++    }
++    else {
++	*is_negative = (num < 0);
++
++	/*
++	 * On a 2's complement machine, negating the most negative integer 
++	 * results in a number that cannot be represented as a signed integer.
++	 * Here is what we do to obtain the number's magnitude:
++	 *      a. add 1 to the number
++	 *      b. negate it (becomes positive)
++	 *      c. convert it to unsigned
++	 *      d. add 1
++	 */
++	if (*is_negative) {
++	    widest_int t = num + 1;
++
++	    magnitude = ((u_widest_int) -t) + 1;
++	}
++	else
++	    magnitude = (u_widest_int) num;
++    }
++
++    /*
++     * We use a do-while loop so that we write at least 1 digit 
++     */
++    do {
++	u_widest_int new_magnitude = magnitude / 10;
++
++	*--p = (char) (magnitude - new_magnitude * 10 + '0');
++	magnitude = new_magnitude;
++    }
++    while (magnitude);
++
++    *len = buf_end - p;
++    return (p);
++}
++
++
++
++static char *conv_in_addr(struct in_addr *ia, char *buf_end, int *len)
++{
++    unsigned addr = ntohl(ia->s_addr);
++    char *p = buf_end;
++    bool_int is_negative;
++    int sub_len;
++
++    p = conv_10((addr & 0x000000FF)      , TRUE, &is_negative, p, &sub_len);
++    *--p = '.';
++    p = conv_10((addr & 0x0000FF00) >>  8, TRUE, &is_negative, p, &sub_len);
++    *--p = '.';
++    p = conv_10((addr & 0x00FF0000) >> 16, TRUE, &is_negative, p, &sub_len);
++    *--p = '.';
++    p = conv_10((addr & 0xFF000000) >> 24, TRUE, &is_negative, p, &sub_len);
++
++    *len = buf_end - p;
++    return (p);
++}
++
++
++
++static char *conv_sockaddr_in(struct sockaddr_in *si, char *buf_end, int *len)
++{
++    char *p = buf_end;
++    bool_int is_negative;
++    int sub_len;
++
++    p = conv_10(ntohs(si->sin_port), TRUE, &is_negative, p, &sub_len);
++    *--p = ':';
++    p = conv_in_addr(&si->sin_addr, p, &sub_len);
++
++    *len = buf_end - p;
++    return (p);
++}
++
++
++
++#ifdef INET6
++static char *conv_sockaddr(struct sockaddr *sa, char *buf_end, int *len)
++{
++    char *p = buf_end;
++    char hostnamebuf[MAXHOSTNAMELEN];
++    char portnamebuf[MAXHOSTNAMELEN];
++    char *q;
++    int salen;
++
++#ifndef SIN6_LEN
++    salen = SA_LEN(sa);
++#else
++    salen = sa->sa_len;
++#endif
++    if (getnameinfo(sa, salen, hostnamebuf, sizeof(hostnamebuf),
++	    portnamebuf, sizeof(portnamebuf), NI_NUMERICHOST | NI_NUMERICSERV)) {
++	strcpy(hostnamebuf, "???");
++	strcpy(portnamebuf, "???");
++    }
++    if (strcmp(portnamebuf,"0") == 0)
++	strcpy(portnamebuf, "*");
++    q = portnamebuf + strlen(portnamebuf);
++    while (portnamebuf < q)
++	*--p = *--q;
++    *--p = ':';
++    q = hostnamebuf + strlen(hostnamebuf);
++    while (hostnamebuf < q)
++	*--p = *--q;
++
++    *len = buf_end - p;
++    return (p);
++}
++#endif /*INET6*/
++
++
++
++/*
++ * Convert a floating point number to a string formats 'f', 'e' or 'E'.
++ * The result is placed in buf, and len denotes the length of the string
++ * The sign is returned in the is_negative argument (and is not placed
++ * in buf).
++ */
++static char *conv_fp(register char format, register double num,
++    boolean_e add_dp, int precision, bool_int *is_negative,
++    char *buf, int *len)
++{
++    register char *s = buf;
++    register char *p;
++    int decimal_point;
++    char buf1[NDIG];
++
++    if (format == 'f')
++	p = ap_fcvt(num, precision, &decimal_point, is_negative, buf1);
++    else			/* either e or E format */
++	p = ap_ecvt(num, precision + 1, &decimal_point, is_negative, buf1);
++
++    /*
++     * Check for Infinity and NaN
++     */
++    if (ap_isalpha(*p)) {
++	*len = strlen(strcpy(buf, p));
++	*is_negative = FALSE;
++	return (buf);
++    }
++
++    if (format == 'f') {
++	if (decimal_point <= 0) {
++	    *s++ = '0';
++	    if (precision > 0) {
++		*s++ = '.';
++		while (decimal_point++ < 0)
++		    *s++ = '0';
++	    }
++	    else if (add_dp)
++		*s++ = '.';
++	}
++	else {
++	    while (decimal_point-- > 0)
++		*s++ = *p++;
++	    if (precision > 0 || add_dp)
++		*s++ = '.';
++	}
++    }
++    else {
++	*s++ = *p++;
++	if (precision > 0 || add_dp)
++	    *s++ = '.';
++    }
++
++    /*
++     * copy the rest of p, the NUL is NOT copied
++     */
++    while (*p)
++	*s++ = *p++;
++
++    if (format != 'f') {
++	char temp[EXPONENT_LENGTH];	/* for exponent conversion */
++	int t_len;
++	bool_int exponent_is_negative;
++
++	*s++ = format;		/* either e or E */
++	decimal_point--;
++	if (decimal_point != 0) {
++	    p = conv_10((wide_int) decimal_point, FALSE, &exponent_is_negative,
++			&temp[EXPONENT_LENGTH], &t_len);
++	    *s++ = exponent_is_negative ? '-' : '+';
++
++	    /*
++	     * Make sure the exponent has at least 2 digits
++	     */
++	    if (t_len == 1)
++		*s++ = '0';
++	    while (t_len--)
++		*s++ = *p++;
++	}
++	else {
++	    *s++ = '+';
++	    *s++ = '0';
++	    *s++ = '0';
++	}
++    }
++
++    *len = s - buf;
++    return (buf);
++}
++
++
++/*
++ * Convert num to a base X number where X is a power of 2. nbits determines X.
++ * For example, if nbits is 3, we do base 8 conversion
++ * Return value:
++ *      a pointer to a string containing the number
++ *
++ * The caller provides a buffer for the string: that is the buf_end argument
++ * which is a pointer to the END of the buffer + 1 (i.e. if the buffer
++ * is declared as buf[ 100 ], buf_end should be &buf[ 100 ])
++ *
++ * As with conv_10, we have a faster version which is used when
++ * the number isn't quad size.
++ */
++static char *conv_p2(register u_wide_int num, register int nbits,
++		     char format, char *buf_end, register int *len)
++{
++    register int mask = (1 << nbits) - 1;
++    register char *p = buf_end;
++    static const char low_digits[] = "0123456789abcdef";
++    static const char upper_digits[] = "0123456789ABCDEF";
++    register const char *digits = (format == 'X') ? upper_digits : low_digits;
++
++    do {
++	*--p = digits[num & mask];
++	num >>= nbits;
++    }
++    while (num);
++
++    *len = buf_end - p;
++    return (p);
++}
++
++static char *conv_p2_quad(u_widest_int num, register int nbits,
++		     char format, char *buf_end, register int *len)
++{
++    register int mask = (1 << nbits) - 1;
++    register char *p = buf_end;
++    static const char low_digits[] = "0123456789abcdef";
++    static const char upper_digits[] = "0123456789ABCDEF";
++    register const char *digits = (format == 'X') ? upper_digits : low_digits;
++
++    if (num <= ULONG_MAX)
++    	return(conv_p2( (u_wide_int)num, nbits, format, buf_end, len));
++
++    do {
++	*--p = digits[num & mask];
++	num >>= nbits;
++    }
++    while (num);
++
++    *len = buf_end - p;
++    return (p);
++}
++
++
++/*
++ * Do format conversion placing the output in buffer
++ */
++API_EXPORT(int) ap_vformatter(int (*flush_func)(ap_vformatter_buff *),
++    ap_vformatter_buff *vbuff, const char *fmt, va_list ap)
++{
++    register char *sp;
++    register char *bep;
++    register int cc = 0;
++    register int i;
++
++    register char *s = NULL;
++    char *q;
++    int s_len;
++
++    register int min_width = 0;
++    int precision = 0;
++    enum {
++	LEFT, RIGHT
++    } adjust;
++    char pad_char;
++    char prefix_char;
++
++    double fp_num;
++    widest_int i_quad = (widest_int) 0;
++    u_widest_int ui_quad;
++    wide_int i_num = (wide_int) 0;
++    u_wide_int ui_num;
++
++    char num_buf[NUM_BUF_SIZE];
++    char char_buf[2];		/* for printing %% and %<unknown> */
++
++    enum var_type_enum {
++    	IS_QUAD, IS_LONG, IS_SHORT, IS_INT
++    };
++    enum var_type_enum var_type = IS_INT;
++
++    /*
++     * Flag variables
++     */
++    boolean_e alternate_form;
++    boolean_e print_sign;
++    boolean_e print_blank;
++    boolean_e adjust_precision;
++    boolean_e adjust_width;
++    bool_int is_negative;
++
++    sp = vbuff->curpos;
++    bep = vbuff->endpos;
++
++    while (*fmt) {
++	if (*fmt != '%') {
++	    INS_CHAR(*fmt, sp, bep, cc);
++	}
++	else {
++	    /*
++	     * Default variable settings
++	     */
++	    adjust = RIGHT;
++	    alternate_form = print_sign = print_blank = NO;
++	    pad_char = ' ';
++	    prefix_char = NUL;
++
++	    fmt++;
++
++	    /*
++	     * Try to avoid checking for flags, width or precision
++	     */
++	    if (!ap_islower(*fmt)) {
++		/*
++		 * Recognize flags: -, #, BLANK, +
++		 */
++		for (;; fmt++) {
++		    if (*fmt == '-')
++			adjust = LEFT;
++		    else if (*fmt == '+')
++			print_sign = YES;
++		    else if (*fmt == '#')
++			alternate_form = YES;
++		    else if (*fmt == ' ')
++			print_blank = YES;
++		    else if (*fmt == '0')
++			pad_char = '0';
++		    else
++			break;
++		}
++
++		/*
++		 * Check if a width was specified
++		 */
++		if (ap_isdigit(*fmt)) {
++		    STR_TO_DEC(fmt, min_width);
++		    adjust_width = YES;
++		}
++		else if (*fmt == '*') {
++		    min_width = va_arg(ap, int);
++		    fmt++;
++		    adjust_width = YES;
++		    if (min_width < 0) {
++			adjust = LEFT;
++			min_width = -min_width;
++		    }
++		}
++		else
++		    adjust_width = NO;
++
++		/*
++		 * Check if a precision was specified
++		 *
++		 * XXX: an unreasonable amount of precision may be specified
++		 * resulting in overflow of num_buf. Currently we
++		 * ignore this possibility.
++		 */
++		if (*fmt == '.') {
++		    adjust_precision = YES;
++		    fmt++;
++		    if (ap_isdigit(*fmt)) {
++			STR_TO_DEC(fmt, precision);
++		    }
++		    else if (*fmt == '*') {
++			precision = va_arg(ap, int);
++			fmt++;
++			if (precision < 0)
++			    precision = 0;
++		    }
++		    else
++			precision = 0;
++		}
++		else
++		    adjust_precision = NO;
++	    }
++	    else
++		adjust_precision = adjust_width = NO;
++
++	    /*
++	     * Modifier check
++	     */
++	    if (*fmt == 'q') {
++		var_type = IS_QUAD;
++		fmt++;
++	    }
++	    else if (*fmt == 'l') {
++		var_type = IS_LONG;
++		fmt++;
++	    }
++	    else if (*fmt == 'h') {
++		var_type = IS_SHORT;
++		fmt++;
++	    }
++	    else {
++		var_type = IS_INT;
++	    }
++
++	    /*
++	     * Argument extraction and printing.
++	     * First we determine the argument type.
++	     * Then, we convert the argument to a string.
++	     * On exit from the switch, s points to the string that
++	     * must be printed, s_len has the length of the string
++	     * The precision requirements, if any, are reflected in s_len.
++	     *
++	     * NOTE: pad_char may be set to '0' because of the 0 flag.
++	     *   It is reset to ' ' by non-numeric formats
++	     */
++	    switch (*fmt) {
++	    case 'u':
++	    	if (var_type == IS_QUAD) {
++		    i_quad = va_arg(ap, u_widest_int);
++		    s = conv_10_quad(i_quad, 1, &is_negative,
++			    &num_buf[NUM_BUF_SIZE], &s_len);
++		}
++		else {
++		    if (var_type == IS_LONG)
++			i_num = (wide_int) va_arg(ap, u_wide_int);
++		    else if (var_type == IS_SHORT)
++			i_num = (wide_int) (unsigned short) va_arg(ap, unsigned int);
++		    else
++			i_num = (wide_int) va_arg(ap, unsigned int);
++		    s = conv_10(i_num, 1, &is_negative,
++			    &num_buf[NUM_BUF_SIZE], &s_len);
++		}
++		FIX_PRECISION(adjust_precision, precision, s, s_len);
++		break;
++
++	    case 'd':
++	    case 'i':
++	    	if (var_type == IS_QUAD) {
++		    i_quad = va_arg(ap, widest_int);
++		    s = conv_10_quad(i_quad, 0, &is_negative,
++			    &num_buf[NUM_BUF_SIZE], &s_len);
++		}
++		else {
++		    if (var_type == IS_LONG)
++			i_num = (wide_int) va_arg(ap, wide_int);
++		    else if (var_type == IS_SHORT)
++			i_num = (wide_int) (short) va_arg(ap, int);
++		    else
++			i_num = (wide_int) va_arg(ap, int);
++		    s = conv_10(i_num, 0, &is_negative,
++			    &num_buf[NUM_BUF_SIZE], &s_len);
++		}
++		FIX_PRECISION(adjust_precision, precision, s, s_len);
++
++		if (is_negative)
++		    prefix_char = '-';
++		else if (print_sign)
++		    prefix_char = '+';
++		else if (print_blank)
++		    prefix_char = ' ';
++		break;
++
++
++	    case 'o':
++		if (var_type == IS_QUAD) {
++		    ui_quad = va_arg(ap, u_widest_int);
++		    s = conv_p2_quad(ui_quad, 3, *fmt,
++			    &num_buf[NUM_BUF_SIZE], &s_len);
++		}
++		else {
++		    if (var_type == IS_LONG)
++			ui_num = (u_wide_int) va_arg(ap, u_wide_int);
++		    else if (var_type == IS_SHORT)
++			ui_num = (u_wide_int) (unsigned short) va_arg(ap, unsigned int);
++		    else
++			ui_num = (u_wide_int) va_arg(ap, unsigned int);
++		    s = conv_p2(ui_num, 3, *fmt,
++			    &num_buf[NUM_BUF_SIZE], &s_len);
++		}
++		FIX_PRECISION(adjust_precision, precision, s, s_len);
++		if (alternate_form && *s != '0') {
++		    *--s = '0';
++		    s_len++;
++		}
++		break;
++
++
++	    case 'x':
++	    case 'X':
++		if (var_type == IS_QUAD) {
++		    ui_quad = va_arg(ap, u_widest_int);
++		    s = conv_p2_quad(ui_quad, 4, *fmt,
++			    &num_buf[NUM_BUF_SIZE], &s_len);
++		}
++		else {
++		    if (var_type == IS_LONG)
++			ui_num = (u_wide_int) va_arg(ap, u_wide_int);
++		    else if (var_type == IS_SHORT)
++			ui_num = (u_wide_int) (unsigned short) va_arg(ap, unsigned int);
++		    else
++			ui_num = (u_wide_int) va_arg(ap, unsigned int);
++		    s = conv_p2(ui_num, 4, *fmt,
++			    &num_buf[NUM_BUF_SIZE], &s_len);
++		}
++		FIX_PRECISION(adjust_precision, precision, s, s_len);
++		if (alternate_form && i_num != 0) {
++		    *--s = *fmt;	/* 'x' or 'X' */
++		    *--s = '0';
++		    s_len += 2;
++		}
++		break;
++
++
++	    case 's':
++		s = va_arg(ap, char *);
++		if (s != NULL) {
++		    s_len = strlen(s);
++		    if (adjust_precision && precision < s_len)
++			s_len = precision;
++		}
++		else {
++		    s = S_NULL;
++		    s_len = S_NULL_LEN;
++		}
++		pad_char = ' ';
++		break;
++
++
++	    case 'f':
++	    case 'e':
++	    case 'E':
++		fp_num = va_arg(ap, double);
++		/*
++		 * * We use &num_buf[ 1 ], so that we have room for the sign
++		 */
++#ifdef HAVE_ISNAN
++		if (isnan(fp_num)) {
++		    s = "nan";
++		    s_len = 3;
++		}
++		else
++#endif
++#ifdef HAVE_ISINF
++		if (isinf(fp_num)) {
++		    s = "inf";
++		    s_len = 3;
++		}
++		else
++#endif
++		{
++		    s = conv_fp(*fmt, fp_num, alternate_form,
++			    (adjust_precision == NO) ? FLOAT_DIGITS : precision,
++				&is_negative, &num_buf[1], &s_len);
++		    if (is_negative)
++			prefix_char = '-';
++		    else if (print_sign)
++			prefix_char = '+';
++		    else if (print_blank)
++			prefix_char = ' ';
++		}
++	        break;
++
++
++	    case 'g':
++	    case 'G':
++		if (adjust_precision == NO)
++		    precision = FLOAT_DIGITS;
++		else if (precision == 0)
++		    precision = 1;
++		/*
++		 * * We use &num_buf[ 1 ], so that we have room for the sign
++		 */
++		s = ap_gcvt(va_arg(ap, double), precision, &num_buf[1],
++		            alternate_form);
++		if (*s == '-')
++		    prefix_char = *s++;
++		else if (print_sign)
++		    prefix_char = '+';
++		else if (print_blank)
++		    prefix_char = ' ';
++
++		s_len = strlen(s);
++
++		if (alternate_form && (q = strchr(s, '.')) == NULL) {
++		    s[s_len++] = '.';
++		    s[s_len] = '\0'; /* delimit for following strchr() */
++		}
++		if (*fmt == 'G' && (q = strchr(s, 'e')) != NULL)
++		    *q = 'E';
++		break;
++
++
++	    case 'c':
++		char_buf[0] = (char) (va_arg(ap, int));
++		s = &char_buf[0];
++		s_len = 1;
++		pad_char = ' ';
++		break;
++
++
++	    case '%':
++		char_buf[0] = '%';
++		s = &char_buf[0];
++		s_len = 1;
++		pad_char = ' ';
++		break;
++
++
++	    case 'n':
++	    	if (var_type == IS_QUAD)
++		    *(va_arg(ap, widest_int *)) = cc;
++		else if (var_type == IS_LONG)
++		    *(va_arg(ap, long *)) = cc;
++		else if (var_type == IS_SHORT)
++		    *(va_arg(ap, short *)) = cc;
++		else
++		    *(va_arg(ap, int *)) = cc;
++		break;
++
++		/*
++		 * This is where we extend the printf format, with a second
++		 * type specifier
++		 */
++	    case 'p':
++		switch(*++fmt) {
++		    /*
++		     * If the pointer size is equal to or smaller than the size
++		     * of the largest unsigned int, we convert the pointer to a
++		     * hex number, otherwise we print "%p" to indicate that we
++		     * don't handle "%p".
++		     */
++		case 'p':
++#ifdef AP_VOID_P_IS_QUAD
++		    if (sizeof(void *) <= sizeof(u_widest_int)) {
++		    	ui_quad = (u_widest_int) va_arg(ap, void *);
++			s = conv_p2_quad(ui_quad, 4, 'x',
++				&num_buf[NUM_BUF_SIZE], &s_len);
++		    }
++#else
++		    if (sizeof(void *) <= sizeof(u_wide_int)) {
++		    	ui_num = (u_wide_int) va_arg(ap, void *);
++			s = conv_p2(ui_num, 4, 'x',
++				&num_buf[NUM_BUF_SIZE], &s_len);
++		    }
++#endif
++		    else {
++			s = "%p";
++			s_len = 2;
++			prefix_char = NUL;
++		    }
++		    pad_char = ' ';
++		    break;
++
++		    /* print a struct sockaddr_in as a.b.c.d:port */
++		case 'I':
++		    {
++#ifndef INET6
++			struct sockaddr_in *si;
++
++			si = va_arg(ap, struct sockaddr_in *);
++			if (si != NULL) {
++			    s = conv_sockaddr_in(si, &num_buf[NUM_BUF_SIZE], &s_len);
++			    if (adjust_precision && precision < s_len)
++				s_len = precision;
++			}
++#else
++			struct sockaddr *sa;
++
++			sa = va_arg(ap, struct sockaddr *);
++			if (sa != NULL) {
++			    s = conv_sockaddr(sa, &num_buf[NUM_BUF_SIZE], &s_len);
++			    if (adjust_precision && precision < s_len)
++				s_len = precision;
++			}
++#endif
++			else {
++			    s = S_NULL;
++			    s_len = S_NULL_LEN;
++			}
++			pad_char = ' ';
++		    }
++		    break;
++
++		    /* print a struct in_addr as a.b.c.d */
++		case 'A':
++		    {
++			struct in_addr *ia;
++
++			ia = va_arg(ap, struct in_addr *);
++			if (ia != NULL) {
++			    s = conv_in_addr(ia, &num_buf[NUM_BUF_SIZE], &s_len);
++			    if (adjust_precision && precision < s_len)
++				s_len = precision;
++			}
++			else {
++			    s = S_NULL;
++			    s_len = S_NULL_LEN;
++			}
++			pad_char = ' ';
++		    }
++		    break;
++
++		case NUL:
++		    /* if %p ends the string, oh well ignore it */
++		    continue;
++
++		default:
++		    s = "bogus %p";
++		    s_len = 8;
++		    prefix_char = NUL;
++		    break;
++		}
++		break;
++
++	    case NUL:
++		/*
++		 * The last character of the format string was %.
++		 * We ignore it.
++		 */
++		continue;
++
++
++		/*
++		 * The default case is for unrecognized %'s.
++		 * We print %<char> to help the user identify what
++		 * option is not understood.
++		 * This is also useful in case the user wants to pass
++		 * the output of format_converter to another function
++		 * that understands some other %<char> (like syslog).
++		 * Note that we can't point s inside fmt because the
++		 * unknown <char> could be preceded by width etc.
++		 */
++	    default:
++		char_buf[0] = '%';
++		char_buf[1] = *fmt;
++		s = char_buf;
++		s_len = 2;
++		pad_char = ' ';
++		break;
++	    }
++
++	    if (prefix_char != NUL && s != S_NULL && s != char_buf) {
++		*--s = prefix_char;
++		s_len++;
++	    }
++
++	    if (adjust_width && adjust == RIGHT && min_width > s_len) {
++		if (pad_char == '0' && prefix_char != NUL) {
++		    INS_CHAR(*s, sp, bep, cc);
++		    s++;
++		    s_len--;
++		    min_width--;
++		}
++		PAD(min_width, s_len, pad_char);
++	    }
++
++	    /*
++	     * Print the string s. 
++	     */
++	    for (i = s_len; i != 0; i--) {
++		INS_CHAR(*s, sp, bep, cc);
++		s++;
++	    }
++
++	    if (adjust_width && adjust == LEFT && min_width > s_len)
++		PAD(min_width, s_len, pad_char);
++	}
++	fmt++;
++    }
++    vbuff->curpos = sp;
++    return cc;
++}
++
++
++static int snprintf_flush(ap_vformatter_buff *vbuff)
++{
++    /* if the buffer fills we have to abort immediately, there is no way
++     * to "flush" an ap_snprintf... there's nowhere to flush it to.
++     */
++    return -1;
++}
++
++
++API_EXPORT(int) ap_snprintf(char *buf, size_t len, const char *format,...)
++{
++    int cc;
++    va_list ap;
++    ap_vformatter_buff vbuff;
++
++    if (len == 0)
++	return 0;
++
++    /* save one byte for nul terminator */
++    vbuff.curpos = buf;
++    vbuff.endpos = buf + len - 1;
++    va_start(ap, format);
++    cc = ap_vformatter(snprintf_flush, &vbuff, format, ap);
++    va_end(ap);
++    *vbuff.curpos = '\0';
++    return (cc == -1) ? len : cc;
++}
++
++
++API_EXPORT(int) ap_vsnprintf(char *buf, size_t len, const char *format,
++			     va_list ap)
++{
++    int cc;
++    ap_vformatter_buff vbuff;
++
++    if (len == 0)
++	return 0;
++
++    /* save one byte for nul terminator */
++    vbuff.curpos = buf;
++    vbuff.endpos = buf + len - 1;
++    cc = ap_vformatter(snprintf_flush, &vbuff, format, ap);
++    *vbuff.curpos = '\0';
++    return (cc == -1) ? len : cc;
++}
+diff -Nru apache_1.3.20/src/include/ap.h apache_1.3.20.new/src/include/ap.h
+--- apache_1.3.20/src/include/ap.h	Mon Jan 15 18:04:22 2001
++++ apache_1.3.20.new/src/include/ap.h	Mon May 21 10:54:52 2001
+@@ -91,7 +91,8 @@
+  * with some extensions.  The extensions are:
+  *
+  * %pA	takes a struct in_addr *, and prints it as a.b.c.d
+- * %pI	takes a struct sockaddr_in * and prints it as a.b.c.d:port
++ * %pI	takes a struct sockaddr * and prints it as a.b.c.d:port, or
++ *	ipv6-numeric-addr:port
+  * %pp  takes a void * and outputs it in hex
+  *
+  * The %p hacks are to force gcc's printf warning code to skip
+diff -Nru apache_1.3.20/src/include/ap_config.h apache_1.3.20.new/src/include/ap_config.h
+--- apache_1.3.20/src/include/ap_config.h	Fri Apr  6 05:13:11 2001
++++ apache_1.3.20.new/src/include/ap_config.h	Mon May 21 10:54:52 2001
+@@ -395,6 +395,10 @@
+ #endif
+ #ifndef S_IWOTH
+ #define S_IWOTH 000002
++#ifndef rlim_t
++typedef int rlim_t;
++#endif
++typedef u_long n_long;
+ #endif
+ 
+ #define STDIN_FILENO  0
+@@ -1413,6 +1417,70 @@
+ 
+ #ifndef ap_wait_t
+ #define ap_wait_t int
++#endif
++
++#ifndef INET6
++#define sockaddr_storage	sockaddr
++#define ss_family		sa_family
++#define ss_len			sa_len
++#else
++#include "sockaddr_storage.h"	/* sshida@st.rim.or.jp */
++#endif
++
++#ifndef INET6_ADDRSTRLEN
++#define INET6_ADDRSTRLEN	46
++#endif
++#ifndef INET_ADDRSTRLEN
++#define INET_ADDRSTRLEN		16
++#endif
++#ifndef NI_MAXHOST
++#define NI_MAXHOST		1025
++#endif
++#ifndef NI_MAXSERV
++#define	NI_MAXSERV		32
++#endif
++
++#if defined(NEED_GETADDRINFO) || defined(NEED_GETNAMEINFO)
++/*
++ * minimal definitions for fake getaddrinfo()/getnameinfo().
++ */
++#ifndef EAI_NODATA
++#define EAI_NODATA	1
++#define EAI_MEMORY	2
++#endif
++
++#ifndef AI_PASSIVE
++#define AI_PASSIVE	1
++#define AI_CANONNAME	2
++#define AI_NUMERICHOST	4
++#define NI_NUMERICHOST	8
++#define NI_NAMEREQD	16
++#define NI_NUMERICSERV	32
++#endif
++#endif
++
++#ifdef NEED_GETADDRINFO
++#ifdef NEED_ADDRINFO
++struct addrinfo {
++	int	ai_flags;	/* AI_PASSIVE, AI_CANONNAME */
++	int	ai_family;	/* PF_xxx */
++	int	ai_socktype;	/* SOCK_xxx */
++	int	ai_protocol;	/* 0 or IPPROTO_xxx for IPv4 and IPv6 */
++	size_t	ai_addrlen;	/* length of ai_addr */
++	char	*ai_canonname;	/* canonical name for hostname */
++	struct sockaddr *ai_addr;	/* binary address */
++	struct addrinfo *ai_next;	/* next structure in linked list */
++};
++#endif
++extern char *gai_strerror(int ecode);
++extern void freeaddrinfo(struct addrinfo *ai);
++extern int getaddrinfo(const char *hostname, const char *servname,
++	const struct addrinfo *hints, struct addrinfo **res);
++#endif
++#ifdef NEED_GETNAMEINFO
++extern int getnameinfo(const struct sockaddr *sa, size_t salen,
++	char *host, size_t hostlen, char *serv, size_t servlen,
++	int flag);
+ #endif
+ 
+ #ifdef __cplusplus
+diff -Nru apache_1.3.20/src/include/http_conf_globals.h apache_1.3.20.new/src/include/http_conf_globals.h
+--- apache_1.3.20/src/include/http_conf_globals.h	Mon May 21 11:02:03 2001
++++ apache_1.3.20.new/src/include/http_conf_globals.h	Mon May 21 10:54:52 2001
+@@ -82,7 +82,8 @@
+ extern API_VAR_EXPORT int ap_max_requests_per_child;
+ extern API_VAR_EXPORT int ap_threads_per_child;
+ extern API_VAR_EXPORT int ap_excess_requests_per_child;
+-extern struct in_addr ap_bind_address;
++extern struct sockaddr_storage ap_bind_address;
++extern API_VAR_EXPORT int ap_default_family;
+ extern listen_rec *ap_listeners;
+ extern API_VAR_EXPORT int ap_daemons_to_start;
+ extern API_VAR_EXPORT int ap_daemons_min_free;
+diff -Nru apache_1.3.20/src/include/http_vhost.h apache_1.3.20.new/src/include/http_vhost.h
+--- apache_1.3.20/src/include/http_vhost.h	Mon Jan 15 18:04:37 2001
++++ apache_1.3.20.new/src/include/http_vhost.h	Mon May 21 10:54:52 2001
+@@ -73,7 +73,7 @@
+ const char *ap_parse_vhost_addrs(pool *p, const char *hostname, server_rec *s);
+ 
+ /* handle NameVirtualHost directive */
+-const char *ap_set_name_virtual_host (cmd_parms *cmd, void *dummy, char *arg);
++const char *ap_set_name_virtual_host (cmd_parms *cmd, void *dummy, char *h, char *p);
+ 
+ /* given an ip address only, give our best guess as to what vhost it is */
+ void ap_update_vhost_given_ip(conn_rec *conn);
+diff -Nru apache_1.3.20/src/include/httpd.h apache_1.3.20.new/src/include/httpd.h
+--- apache_1.3.20/src/include/httpd.h	Mon May 21 11:02:04 2001
++++ apache_1.3.20.new/src/include/httpd.h	Mon May 21 10:54:52 2001
+@@ -908,8 +908,8 @@
+ 
+     /* Who is the client? */
+ 
+-    struct sockaddr_in local_addr;	/* local address */
+-    struct sockaddr_in remote_addr;	/* remote address */
++    struct sockaddr_storage local_addr;	/* local address */
++    struct sockaddr_storage remote_addr; /* remote address */
+     char *remote_ip;		/* Client's IP address */
+     char *remote_host;		/* Client's DNS name, if known.
+ 				 * NULL if DNS hasn't been checked,
+@@ -951,8 +951,8 @@
+ typedef struct server_addr_rec server_addr_rec;
+ struct server_addr_rec {
+     server_addr_rec *next;
+-    struct in_addr host_addr;	/* The bound address, for this server */
+-    unsigned short host_port;	/* The bound port, for this server */
++    struct sockaddr_storage host_addr;	/* The bound address, for this server */
++    unsigned short host_port;	/* The bound port, for this server XXX */
+     char *virthost;		/* The name given in <VirtualHost> */
+ };
+ 
+@@ -1020,7 +1020,7 @@
+ /* These are more like real hosts than virtual hosts */
+ struct listen_rec {
+     listen_rec *next;
+-    struct sockaddr_in local_addr;	/* local IP address and port */
++    struct sockaddr_storage local_addr;	/* local IP address and port */
+     int fd;
+     int used;			/* Only used during restart */        
+ /* more stuff here, like which protocol is bound to the port */
+@@ -1180,7 +1180,7 @@
+ #endif /*#ifdef CHARSET_EBCDIC*/
+ 
+ char *ap_get_local_host(pool *);
+-unsigned long ap_get_virthost_addr(char *hostname, unsigned short *port);
++struct sockaddr *ap_get_virthost_addr(char *hostname, unsigned short *port);
+ 
+ extern API_VAR_EXPORT time_t ap_restart_time;
+ 
+diff -Nru apache_1.3.20/src/include/sa_len.h apache_1.3.20.new/src/include/sa_len.h
+--- apache_1.3.20/src/include/sa_len.h	Thu Jan  1 01:00:00 1970
++++ apache_1.3.20.new/src/include/sa_len.h	Mon May 21 10:54:52 2001
+@@ -0,0 +1,41 @@
++/* sa_len.h : tiny version of SA_LEN (written by <yoshfuji@ecei.tohoku.ac.jp>) */
++ 
++#include <sys/types.h>
++#include <sys/socket.h>
++#include <netinet/in.h>
++#include <sys/un.h>
++
++#ifndef HAVE_SOCKADDR_LEN
++#ifndef SA_LEN
++#define SA_LEN(s_)	ap_sa_len((s_)->sa_family)
++
++static NET_SIZE_T ap_sa_len (sa_family_t af)
++{
++    switch (af){
++#if defined(AF_INET)
++    case AF_INET:
++	return (sizeof(struct sockaddr_in));
++#endif /* AF_INET */
++#if defined(AF_INET6)
++    case AF_INET6:
++	return (sizeof(struct sockaddr_in6));
++#endif
++#ifdef AF_LOCAL
++    case AF_LOCAL:
++#endif /* AF_LOCAL */
++#if defined(AF_UNIX) && (AF_UNIX != AF_LOCAL)
++    case AF_UNIX:
++#endif /* AF_UNIX */
++#if defined(AF_FILE) && (AF_FILE != AF_LOCAL || AF_FILE != AF_UNIX)
++    case AF_FILE:
++#endif /* AF_FILE */
++#if defined(AF_LOCAL) || defined(AF_UNIX) || defined(AF_FILE)
++	return (sizeof(struct sockaddr_un));
++#endif /* defined(AF_LOCAL) || defined(AF_UNIX) || defined(AF_FILE) */
++    default:
++	return 0;
++    }
++    return 0;
++}
++#endif /* SA_LEN */
++#endif /* HAVE_SOCKADDR_LEN */
+diff -Nru apache_1.3.20/src/include/sockaddr_storage.h apache_1.3.20.new/src/include/sockaddr_storage.h
+--- apache_1.3.20/src/include/sockaddr_storage.h	Thu Jan  1 01:00:00 1970
++++ apache_1.3.20.new/src/include/sockaddr_storage.h	Mon May 21 10:54:52 2001
+@@ -0,0 +1,53 @@
++/*
++struct sockaddr_storage
++
++   RFC2553 proposes struct sockaddr_storage.
++   This is a placeholder for all sockaddr-variant structures. This is
++   implemented like follows:
++
++   You should use this structure to hold any of sockaddr-variant
++   structures.
++*/
++#ifdef NEED_SOCKADDR_STORAGE
++
++struct sockaddr_storage {
++#ifdef HAVE_SOCKADDR_LEN
++	u_char ss_len;
++	u_char ss_family;
++#else
++	u_short ss_family;
++#endif
++	u_char __padding[128 - 2];
++};
++
++/*
++union sockunion
++
++   Alternatively, you may want to implement sockunion.h, with the
++   following content:
++
++   NOTE: For better portability, struct sockaddr_storage should be used.
++   union sockunion is okay, but is not really portable enough.
++*/
++union sockunion {
++	struct sockinet {
++#ifdef HAVE_SOCKADDR_LEN
++		u_char si_len;
++		u_char si_family;
++#else
++		u_short si_family;
++#endif
++		u_short si_port;
++	} su_si;
++	struct sockaddr_in  su_sin;
++#ifdef INET6
++	struct sockaddr_in6 su_sin6;
++#endif
++};
++#ifdef HAVE_SOCKADDR_LEN
++#define su_len		su_si.si_len
++#endif
++#define su_family	su_si.si_family
++#define su_port		su_si.si_port
++
++#endif /* NEED_SOCKADDR_STORAGE */
+diff -Nru apache_1.3.20/src/main/getaddrinfo.c apache_1.3.20.new/src/main/getaddrinfo.c
+--- apache_1.3.20/src/main/getaddrinfo.c	Thu Jan  1 01:00:00 1970
++++ apache_1.3.20.new/src/main/getaddrinfo.c	Mon May 21 10:54:52 2001
+@@ -0,0 +1,162 @@
++/*
++ * Copyright (C) 1995, 1996, 1997, 1998, and 1999 WIDE Project.
++ * All rights reserved.
++ * 
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ * 3. Neither the name of the project nor the names of its contributors
++ *    may be used to endorse or promote products derived from this software
++ *    without specific prior written permission.
++ * 
++ * THIS SOFTWARE IS PROVIDED BY THE PROJECT AND CONTRIBUTORS ``AS IS'' AND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++ * ARE DISCLAIMED.  IN NO EVENT SHALL THE PROJECT OR CONTRIBUTORS BE LIABLE
++ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++ * SUCH DAMAGE.
++ */
++/*
++ * fake library for ssh v6 enabler patch
++ *
++ * This file includes getaddrinfo(), freeaddrinfo() and gai_strerror().
++ * These funtions are defined in rfc2133.
++ *
++ * But these functions are not implemented correctly. The minimum subset
++ * is implemented for ssh use only. For exapmle, this routine assumes
++ * that ai_family is AF_INET. Don't use it for another purpose.
++ * 
++ * In the case not using 'configure --enable-ipv6', this getaddrinfo.c
++ * will be used if you have broken getaddrinfo or no getaddrinfo.
++ */
++
++#if 0
++#include <stdlib.h>
++#include <sys/types.h>
++#include <sys/socket.h>
++#include <netinet/in.h>
++#include <arpa/inet.h>
++#include <netdb.h>
++#include "gai.h"
++#endif
++
++static struct addrinfo *
++malloc_ai(port, addr, socktype, protocol)
++int port;
++u_long addr;
++int socktype;
++int protocol;
++{
++  struct addrinfo *ai;
++
++  if (ai = (struct addrinfo *)malloc(sizeof(struct addrinfo) +
++				     sizeof(struct sockaddr_in))) {
++    memset(ai, 0, sizeof(struct addrinfo) + sizeof(struct sockaddr_in));
++    ai->ai_addr = (struct sockaddr *)(ai + 1);
++#if defined(HAVE_SOCKADDR_LEN)
++    ai->ai_addr->sa_len = 
++#endif
++      ai->ai_addrlen = sizeof(struct sockaddr_in);
++    ai->ai_addr->sa_family = ai->ai_family = AF_INET;
++    ai->ai_socktype = socktype;
++    ai->ai_protocol = protocol;
++    ((struct sockaddr_in *)(ai)->ai_addr)->sin_port = port;
++    ((struct sockaddr_in *)(ai)->ai_addr)->sin_addr.s_addr = addr;
++    return ai;
++  } else {
++    return NULL;
++  }
++}
++
++char *
++gai_strerror(ecode)
++int ecode;
++{
++  switch (ecode) {
++  case EAI_NODATA:
++    return "no address associated with hostname.";
++  case EAI_MEMORY:
++    return "memory allocation failure.";
++  default:
++    return "unknown error.";
++  }
++}    
++
++void
++freeaddrinfo(ai)
++struct addrinfo *ai;
++{
++  struct addrinfo *next;
++  
++  do {
++    next = ai->ai_next;
++    free(ai);
++  } while (ai = next);
++}
++
++int
++getaddrinfo(hostname, servname, hints, res)
++const char *hostname, *servname;
++const struct addrinfo *hints;
++struct addrinfo **res;
++{
++  struct addrinfo *cur, *prev = NULL;
++  struct hostent *hp;
++  int i, port;
++  
++  if (servname)
++    port = htons(atoi(servname));
++  else
++    port = 0;
++  if (hints && hints->ai_flags & AI_PASSIVE)
++    if (*res = malloc_ai(port, htonl(0x00000000), 
++			 (*res)->ai_socktype ? (*res)->ai_socktype : SOCK_STREAM,
++			 (*res)->ai_protocol))
++      return 0;
++    else
++      return EAI_MEMORY;
++  if (!hostname)
++    if (*res = malloc_ai(port, htonl(0x7f000001),
++			 (*res)->ai_socktype ? (*res)->ai_socktype : SOCK_STREAM,
++			 (*res)->ai_protocol))
++      return 0;
++    else
++      return EAI_MEMORY;
++  if (inet_addr(hostname) != -1)
++    if (*res = malloc_ai(port, inet_addr(hostname),
++			 (*res)->ai_socktype ? (*res)->ai_socktype : SOCK_STREAM,
++			 (*res)->ai_protocol))
++      return 0;
++    else
++      return EAI_MEMORY;
++  if ((hp = gethostbyname(hostname)) &&
++      hp->h_name && hp->h_name[0] && hp->h_addr_list[0]) {
++    for (i = 0; hp->h_addr_list[i]; i++)
++      if (cur = malloc_ai(port,
++			  ((struct in_addr *)hp->h_addr_list[i])->s_addr,
++			  (*res)->ai_socktype ? (*res)->ai_socktype : SOCK_STREAM,
++			  (*res)->ai_protocol)) {
++	if (prev)
++	  prev->ai_next = cur;
++	else
++	  *res = cur;
++	prev = cur;
++      } else {
++	if (*res)
++	  freeaddrinfo(*res);
++	return EAI_MEMORY;
++      }
++    return 0;
++  }
++  return EAI_NODATA;
++}
+diff -Nru apache_1.3.20/src/main/getnameinfo.c apache_1.3.20.new/src/main/getnameinfo.c
+--- apache_1.3.20/src/main/getnameinfo.c	Thu Jan  1 01:00:00 1970
++++ apache_1.3.20.new/src/main/getnameinfo.c	Mon May 21 10:54:52 2001
+@@ -0,0 +1,95 @@
++/*
++ * Copyright (C) 1995, 1996, 1997, 1998, and 1999 WIDE Project.
++ * All rights reserved.
++ * 
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ * 3. Neither the name of the project nor the names of its contributors
++ *    may be used to endorse or promote products derived from this software
++ *    without specific prior written permission.
++ * 
++ * THIS SOFTWARE IS PROVIDED BY THE PROJECT AND CONTRIBUTORS ``AS IS'' AND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++ * ARE DISCLAIMED.  IN NO EVENT SHALL THE PROJECT OR CONTRIBUTORS BE LIABLE
++ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++ * SUCH DAMAGE.
++ */
++/*
++ * fake library for ssh v6 enabler patch
++ *
++ * This file includes getnameinfo().
++ * These funtions are defined in rfc2133.
++ *
++ * But these functions are not implemented correctly. The minimum subset
++ * is implemented for ssh use only. For exapmle, this routine assumes
++ * that ai_family is AF_INET. Don't use it for another purpose.
++ * 
++ * In the case not using 'configure --enable-ipv6', this getnameinfo.c
++ * will be used if you have broken getnameinfo or no getnameinfo.
++ */
++
++#if 0
++#include <stdlib.h>
++#include <sys/types.h>
++#include <sys/socket.h>
++#include <netinet/in.h>
++#include <arpa/inet.h>
++#include <netdb.h>
++#include <string.h>
++#include "gai.h"
++#endif
++
++int
++getnameinfo(sa, salen, host, hostlen, serv, servlen, flags)
++const struct sockaddr *sa;
++size_t salen;
++char *host;
++size_t hostlen;
++char *serv;
++size_t servlen;
++int flags;
++{
++  struct sockaddr_in *sin = (struct sockaddr_in *)sa;
++  struct hostent *hp;
++  char tmpserv[16];
++  
++  if (serv) {
++    sprintf(tmpserv, "%d", ntohs(sin->sin_port));
++    if (strlen(tmpserv) > servlen)
++      return EAI_MEMORY;
++    else
++      strcpy(serv, tmpserv);
++  }
++  if (host)
++    if (flags & NI_NUMERICHOST)
++      if (strlen(inet_ntoa(sin->sin_addr)) > hostlen)
++	return EAI_MEMORY;
++      else {
++	strcpy(host, inet_ntoa(sin->sin_addr));
++	return 0;
++      }
++    else
++      if (hp = gethostbyaddr((char *)&sin->sin_addr, sizeof(struct in_addr),
++			     AF_INET))
++	if (strlen(hp->h_name) > hostlen)
++	  return EAI_MEMORY;
++	else {
++	  strcpy(host, hp->h_name);
++	  return 0;
++	}
++      else
++	return EAI_NODATA;
++  return 0;
++}
+diff -Nru apache_1.3.20/src/main/http_config.c apache_1.3.20.new/src/main/http_config.c
+--- apache_1.3.20/src/main/http_config.c	Mon May 21 11:02:04 2001
++++ apache_1.3.20.new/src/main/http_config.c	Mon May 21 10:54:52 2001
+@@ -1564,7 +1564,6 @@
+     ap_scoreboard_fname = DEFAULT_SCOREBOARD;
+     ap_lock_fname = DEFAULT_LOCKFILE;
+     ap_max_requests_per_child = DEFAULT_MAX_REQUESTS_PER_CHILD;
+-    ap_bind_address.s_addr = htonl(INADDR_ANY);
+     ap_listeners = NULL;
+     ap_listenbacklog = DEFAULT_LISTENBACKLOG;
+     ap_extended_status = 0;
+@@ -1597,7 +1596,13 @@
+     s->next = NULL;
+     s->addrs = ap_pcalloc(p, sizeof(server_addr_rec));
+     /* NOT virtual host; don't match any real network interface */
+-    s->addrs->host_addr.s_addr = htonl(INADDR_ANY);
++    memset(&s->addrs->host_addr, 0, sizeof(s->addrs->host_addr));
++#if 0
++    s->addrs->host_addr.ss_family = ap_default_family; /* XXX: needed?, XXX: PF_xxx can be different from AF_xxx */
++#endif
++#ifdef HAVE_SOCKADDR_LEN
++    s->addrs->host_addr.ss_len = sizeof(s->addrs->host_addr); /* XXX: needed ? */
++#endif
+     s->addrs->host_port = 0;	/* matches any port */
+     s->addrs->virthost = "";	/* must be non-NULL */
+     s->names = s->wild_names = NULL;
+@@ -1616,19 +1621,33 @@
+ static void default_listeners(pool *p, server_rec *s)
+ {
+     listen_rec *new;
++    struct addrinfo hints, *res0, *res;
++    int gai;
++    char servbuf[NI_MAXSERV];
+ 
+     if (ap_listeners != NULL) {
+ 	return;
+     }
++    ap_snprintf(servbuf, sizeof(servbuf), "%d", s->port ? s->port : DEFAULT_HTTP_PORT);
++    memset (&hints, 0, sizeof(hints));
++    hints.ai_family = ap_default_family;
++    hints.ai_socktype = SOCK_STREAM;
++    hints.ai_flags = AI_PASSIVE;
++    gai = getaddrinfo(NULL, servbuf, &hints, &res0);
++    if (gai){
++	fprintf(stderr, "default_listeners(): getaddrinfo(PASSIVE) for family %u: %s\n",
++		gai_strerror(gai), ap_default_family);
++	exit (1);
++    }
+     /* allocate a default listener */
+     new = ap_pcalloc(p, sizeof(listen_rec));
+-    new->local_addr.sin_family = AF_INET;
+-    new->local_addr.sin_addr = ap_bind_address;
+-    new->local_addr.sin_port = htons(s->port ? s->port : DEFAULT_HTTP_PORT);
++    memcpy(&new->local_addr, res0->ai_addr, res0->ai_addrlen);
+     new->fd = -1;
+     new->used = 0;
+     new->next = NULL;
+     ap_listeners = new;
++
++    freeaddrinfo(res0);
+ }
+ 
+ 
+diff -Nru apache_1.3.20/src/main/http_core.c apache_1.3.20.new/src/main/http_core.c
+--- apache_1.3.20/src/main/http_core.c	Fri Mar  9 11:10:25 2001
++++ apache_1.3.20.new/src/main/http_core.c	Mon May 21 10:54:52 2001
+@@ -71,6 +71,7 @@
+ #include "util_md5.h"
+ #include "scoreboard.h"
+ #include "fnmatch.h"
++#include "sa_len.h"
+ 
+ #ifdef USE_MMAP_FILES
+ #include <sys/mman.h>
+@@ -594,7 +595,9 @@
+ /* Code from Harald Hanche-Olsen <hanche@imf.unit.no> */
+ static ap_inline void do_double_reverse (conn_rec *conn)
+ {
+-    struct hostent *hptr;
++    struct addrinfo hints, *res, *res0;
++    char hostbuf1[128], hostbuf2[128]; /* INET6_ADDRSTRLEN(=46) is enough */
++    int ok = 0;
+ 
+     if (conn->double_reverse) {
+ 	/* already done */
+@@ -605,28 +608,51 @@
+ 	conn->double_reverse = -1;
+ 	return;
+     }
+-    hptr = gethostbyname(conn->remote_host);
+-    if (hptr) {
+-	char **haddr;
+-
+-	for (haddr = hptr->h_addr_list; *haddr; haddr++) {
+-	    if (((struct in_addr *)(*haddr))->s_addr
+-		== conn->remote_addr.sin_addr.s_addr) {
+-		conn->double_reverse = 1;
+-		return;
+-	    }
++    memset(&hints, 0, sizeof(hints));
++    hints.ai_family = PF_UNSPEC;
++    hints.ai_socktype = SOCK_STREAM;
++    if (getaddrinfo(conn->remote_host, NULL, &hints, &res0)) {
++	conn->double_reverse = -1;
++	return;
++    }
++    for (res = res0; res; res = res->ai_next) {
++	if (res->ai_addr->sa_family != conn->remote_addr.ss_family ||
++	    !(res->ai_family == AF_INET 
++#ifdef INET6
++	      || res->ai_family == AF_INET6
++#endif
++	      )
++	    )
++	    continue;
++#ifndef HAVE_SOCKADDR_LEN
++	if (res->ai_addrlen != SA_LEN((struct sockaddr *)&conn->remote_addr))
++#else
++	if (res->ai_addr->sa_len != conn->remote_addr.ss_len)
++#endif
++	    continue;
++	if (getnameinfo(res->ai_addr, res->ai_addrlen,
++            hostbuf1, sizeof(hostbuf1), NULL, 0,
++            NI_NUMERICHOST))
++	    continue;
++	if (getnameinfo(((struct sockaddr *)&conn->remote_addr), res->ai_addrlen,
++            hostbuf2, sizeof(hostbuf2), NULL, 0,
++            NI_NUMERICHOST))
++	    continue;
++	if (strcmp(hostbuf1, hostbuf2) == 0){
++	    ok = 1;
++	    break;
+ 	}
+     }
+-    conn->double_reverse = -1;
++    conn->double_reverse = ok ? 1 : -1;
++    freeaddrinfo(res0);
+ }
+ 
+ API_EXPORT(const char *) ap_get_remote_host(conn_rec *conn, void *dir_config,
+ 					    int type)
+ {
+-    struct in_addr *iaddr;
+-    struct hostent *hptr;
+     int hostname_lookups;
+     int old_stat = SERVER_DEAD;	/* we shouldn't ever be in this state */
++    char hostnamebuf[MAXHOSTNAMELEN];
+ 
+     /* If we haven't checked the host name, and we want to */
+     if (dir_config) {
+@@ -648,10 +674,14 @@
+ 	    || hostname_lookups != HOSTNAME_LOOKUP_OFF)) {
+ 	old_stat = ap_update_child_status(conn->child_num, SERVER_BUSY_DNS,
+ 					  (request_rec*)NULL);
+-	iaddr = &(conn->remote_addr.sin_addr);
+-	hptr = gethostbyaddr((char *)iaddr, sizeof(struct in_addr), AF_INET);
+-	if (hptr != NULL) {
+-	    conn->remote_host = ap_pstrdup(conn->pool, (void *)hptr->h_name);
++	if (!getnameinfo((struct sockaddr *)&conn->remote_addr,
++#ifndef SIN6_LEN
++		SA_LEN((struct sockaddr *)&conn->remote_addr),
++#else
++		conn->remote_addr.ss_len,
++#endif
++		hostnamebuf, sizeof(hostnamebuf), NULL, 0, 0)) {
++	    conn->remote_host = ap_pstrdup(conn->pool, (void *)hostnamebuf);
+ 	    ap_str_tolower(conn->remote_host);
+ 	   
+ 	    if (hostname_lookups == HOSTNAME_LOOKUP_DOUBLE) {
+@@ -732,6 +762,7 @@
+ {
+     conn_rec *conn = r->connection;
+     core_dir_config *d;
++    char hbuf[MAXHOSTNAMELEN];
+ 
+     d = (core_dir_config *)ap_get_module_config(r->per_dir_config,
+ 						&core_module);
+@@ -741,23 +772,22 @@
+     }
+     if (d->use_canonical_name == USE_CANONICAL_NAME_DNS) {
+         if (conn->local_host == NULL) {
+-	    struct in_addr *iaddr;
+-	    struct hostent *hptr;
+             int old_stat;
+ 	    old_stat = ap_update_child_status(conn->child_num,
+ 					      SERVER_BUSY_DNS, r);
+-	    iaddr = &(conn->local_addr.sin_addr);
+-	    hptr = gethostbyaddr((char *)iaddr, sizeof(struct in_addr),
+-				 AF_INET);
+-	    if (hptr != NULL) {
+-	        conn->local_host = ap_pstrdup(conn->pool,
+-					      (void *)hptr->h_name);
+-		ap_str_tolower(conn->local_host);
+-	    }
+-	    else {
+-	        conn->local_host = ap_pstrdup(conn->pool,
+-					      r->server->server_hostname);
++	    if (getnameinfo((struct sockaddr *)&conn->local_addr,
++#ifndef SIN6_LEN
++		    SA_LEN((struct sockaddr *)&conn->local_addr),
++#else
++		    conn->local_addr.ss_len,
++#endif
++		    hbuf, sizeof(hbuf), NULL, 0, 0) == 0) {
++		conn->local_host = ap_pstrdup(conn->pool, hbuf);
++	    } else {
++		conn->local_host = ap_pstrdup(conn->pool,
++		    r->server->server_hostname);
+ 	    }
++	    ap_str_tolower(conn->local_host);
+ 	    (void) ap_update_child_status(conn->child_num, old_stat, r);
+ 	}
+ 	return conn->local_host;
+@@ -776,11 +806,13 @@
+ 
+     if (d->use_canonical_name == USE_CANONICAL_NAME_OFF
+ 	|| d->use_canonical_name == USE_CANONICAL_NAME_DNS) {
+-        return r->hostname ? ntohs(r->connection->local_addr.sin_port)
+-			   : port;
+-    }
+-    /* default */
+-    return port;
++        return r->hostname
++	    ?  ntohs(((struct sockaddr_in *)&r->connection->local_addr)->sin_port)
++	    : port;
++    }
++    return r->hostname
++	? ntohs(((struct sockaddr_in *)&r->connection->local_addr)->sin_port)
++	: port;
+ }
+ 
+ API_EXPORT(char *) ap_construct_url(pool *p, const char *uri,
+@@ -2499,12 +2531,25 @@
+ 
+ static const char *set_bind_address(cmd_parms *cmd, void *dummy, char *arg) 
+ {
++    struct addrinfo hints, *res;
++    struct sockaddr *sa;
++    size_t sa_len;
++    int error;
+     const char *err = ap_check_cmd_context(cmd, GLOBAL_ONLY);
+     if (err != NULL) {
+         return err;
+     }
+ 
+-    ap_bind_address.s_addr = ap_get_virthost_addr(arg, NULL);
++    if (strcmp(arg, "*") == 0)
++      arg = NULL;
++
++    sa = ap_get_virthost_addr(arg, NULL);
++#ifdef HAVE_SOCKADDR_LEN
++    sa_len = sa->sa_len;
++#else
++    sa_len = SA_LEN(sa);
++#endif
++    memcpy(&ap_bind_address, &sa, sa_len);
+     return NULL;
+ }
+ 
+@@ -2521,44 +2566,70 @@
+ }
+ #endif
+ 
+-static const char *set_listener(cmd_parms *cmd, void *dummy, char *ips)
++static const char *set_listener(cmd_parms *cmd, void *dummy, char *h, char *p)
+ {
+     listen_rec *new;
+-    char *ports;
+-    unsigned short port;
++    char *host, *port;
++    struct addrinfo hints, *res;
++    int error;
+     
+     const char *err = ap_check_cmd_context(cmd, GLOBAL_ONLY);
+     if (err != NULL) {
+         return err;
+     }
+ 
+-    ports = strchr(ips, ':');
+-    if (ports != NULL) {
+-	if (ports == ips) {
+-	    return "Missing IP address";
+-	}
+-	else if (ports[1] == '\0') {
+-	    return "Address must end in :<port-number>";
++    host = port = NULL;
++    if (!p) {
++	port = strrchr(h, ':');
++	if (port != NULL) {
++	    if (port == h) {
++		return "Missing IP address";
++	    }
++	    else if (port[1] == '\0') {
++		return "Address must end in :<port-number>";
++	    }
++	    *(port++) = '\0';
++	    if (*h)
++		host = h;
++	} else {
++	    host = NULL;
++	    port = h;
+ 	}
+-	*(ports++) = '\0';
+-    }
+-    else {
+-	ports = ips;
++    } else {
++	host = h;
++	port = p;
+     }
+ 
+-    new=ap_pcalloc(cmd->pool, sizeof(listen_rec));
+-    new->local_addr.sin_family = AF_INET;
+-    if (ports == ips) { /* no address */
+-	new->local_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+-    }
+-    else {
+-	new->local_addr.sin_addr.s_addr = ap_get_virthost_addr(ips, NULL);
+-    }
+-    port = atoi(ports);
+-    if (!port) {
+-	return "Port must be numeric";
++    if (host && strcmp(host, "*") == 0)
++	host = NULL;
++    
++    new = ap_pcalloc(cmd->pool, sizeof(listen_rec));
++
++    memset(&hints, 0, sizeof(hints));
++    hints.ai_family = host ? PF_UNSPEC : ap_default_family;
++    hints.ai_flags = AI_PASSIVE;
++    hints.ai_socktype = SOCK_STREAM;
++    error = getaddrinfo(host, port, &hints, &res);
++    if (error || !res) {
++	fprintf(stderr, "could not resolve ");
++	if (host)
++	    fprintf(stderr, "host \"%s\" ", host);
++	if (port)
++	    fprintf(stderr, "port \"%s\" ", port);
++	fprintf(stderr, "--- %s\n", gai_strerror(error));
++	exit(1);
++    }
++    if (res->ai_next) {
++        if (host)
++	    fprintf(stderr, "host \"%s\" ", host);
++	if (port)
++	    fprintf(stderr, "port \"%s\" ", port);
++	fprintf(stderr, "resolved to multiple addresses, ambiguous.\n");
++	exit(1);
+     }
+-    new->local_addr.sin_port = htons(port);
++
++    memcpy(&new->local_addr, res->ai_addr, res->ai_addrlen);
++
+     new->fd = -1;
+     new->used = 0;
+     new->next = ap_listeners;
+@@ -3144,7 +3215,7 @@
+ { "ThreadStackSize", set_threadstacksize, NULL, RSRC_CONF, TAKE1,
+   "Stack size each created thread will use."},
+ #endif
+-{ "Listen", set_listener, NULL, RSRC_CONF, TAKE1,
++{ "Listen", set_listener, NULL, RSRC_CONF, TAKE12,
+   "A port number or a numeric IP address and a port number"},
+ { "SendBufferSize", set_send_buffer_size, NULL, RSRC_CONF, TAKE1,
+   "Send buffer size in bytes"},
+@@ -3165,7 +3236,7 @@
+   "Name of the config file to be included" },
+ { "LogLevel", set_loglevel, NULL, RSRC_CONF, TAKE1,
+   "Level of verbosity in error logging" },
+-{ "NameVirtualHost", ap_set_name_virtual_host, NULL, RSRC_CONF, TAKE1,
++{ "NameVirtualHost", ap_set_name_virtual_host, NULL, RSRC_CONF, TAKE12,
+   "A numeric IP address:port, or the name of a host" },
+ #ifdef _OSD_POSIX
+ { "BS2000Account", set_bs2000_account, NULL, RSRC_CONF, TAKE1,
+diff -Nru apache_1.3.20/src/main/http_main.c apache_1.3.20.new/src/main/http_main.c
+--- apache_1.3.20/src/main/http_main.c	Mon May 21 11:02:04 2001
++++ apache_1.3.20.new/src/main/http_main.c	Mon May 21 11:06:01 2001
+@@ -124,6 +124,8 @@
+ #include <bstring.h>		/* for IRIX, FD_SET calls bzero() */
+ #endif
+ 
++#include "sa_len.h"
++
+ #ifdef MULTITHREAD
+ /* special debug stuff -- PCS */
+ 
+@@ -250,7 +252,12 @@
+ API_VAR_EXPORT char *ap_scoreboard_fname=NULL;
+ char *ap_lock_fname;
+ API_VAR_EXPORT char *ap_server_argv0=NULL;
+-struct in_addr ap_bind_address;
++#ifdef INET6
++API_VAR_EXPORT int ap_default_family = PF_INET6;
++#else
++API_VAR_EXPORT int ap_default_family = PF_INET;
++#endif
++struct sockaddr_storage ap_bind_address;
+ API_VAR_EXPORT int ap_daemons_to_start=0;
+ API_VAR_EXPORT int ap_daemons_min_free=0;
+ API_VAR_EXPORT int ap_daemons_max_free=0;
+@@ -1086,7 +1093,11 @@
+     fprintf(stderr, "Usage: %s [-D name] [-d directory] [-f file]\n", bin);
+ #endif
+     fprintf(stderr, "       %s [-C \"directive\"] [-c \"directive\"]\n", pad);
+-    fprintf(stderr, "       %s [-v] [-V] [-h] [-l] [-L] [-S] [-t] [-T]\n", pad);
++    fprintf(stderr, "       %s [-v] [-V] [-h] [-l] [-L] [-S] [-t] [-T]"
++#ifdef INET6
++	    " [-46]"
++#endif
++	    "\n", pad);
+     fprintf(stderr, "Options:\n");
+ #ifdef SHARED_CORE
+     fprintf(stderr, "  -R directory     : specify an alternate location for shared object files\n");
+@@ -1108,6 +1119,10 @@
+ #endif
+     fprintf(stderr, "  -t               : run syntax check for config files (with docroot check)\n");
+     fprintf(stderr, "  -T               : run syntax check for config files (without docroot check)\n");
++#ifdef INET6
++    fprintf(stderr, "  -4               : assume IPv4 on parsing configuration file\n");
++    fprintf(stderr, "  -6               : assume IPv6 on parsing configuration file\n");
++#endif
+ #ifdef WIN32
+     fprintf(stderr, "  -n name          : name the Apache service for -k options below;\n");
+     fprintf(stderr, "  -k stop|shutdown : tell running Apache to shutdown\n");
+@@ -3252,11 +3267,13 @@
+ 
+ 
+ static conn_rec *new_connection(pool *p, server_rec *server, BUFF *inout,
+-			     const struct sockaddr_in *remaddr,
+-			     const struct sockaddr_in *saddr,
++			     const struct sockaddr *remaddr,
++			     const struct sockaddr *saddr,
+ 			     int child_num)
+ {
+     conn_rec *conn = (conn_rec *) ap_pcalloc(p, sizeof(conn_rec));
++    char hostnamebuf[MAXHOSTNAMELEN];
++    size_t addr_len;
+ 
+     /* Got a connection structure, so initialize what fields we can
+      * (the rest are zeroed out by pcalloc).
+@@ -3265,17 +3282,29 @@
+     conn->child_num = child_num;
+ 
+     conn->pool = p;
+-    conn->local_addr = *saddr;
+-    conn->local_ip = ap_pstrdup(conn->pool,
+-				inet_ntoa(conn->local_addr.sin_addr));
++#ifndef SIN6_LEN
++    addr_len = SA_LEN(saddr);
++#else 
++    addr_len = saddr->sa_len;
++#endif
++    memcpy(&conn->local_addr, saddr, addr_len); 
++    getnameinfo((struct sockaddr *)&conn->local_addr, addr_len,
++	     hostnamebuf, sizeof(hostnamebuf), NULL, 0, NI_NUMERICHOST);  
++    conn->local_ip = ap_pstrdup(conn->pool, hostnamebuf);
+     conn->server = server; /* just a guess for now */
+     ap_update_vhost_given_ip(conn);
+     conn->base_server = conn->server;
+     conn->client = inout;
+ 
+-    conn->remote_addr = *remaddr;
+-    conn->remote_ip = ap_pstrdup(conn->pool,
+-			      inet_ntoa(conn->remote_addr.sin_addr));
++#ifndef SIN6_LEN 
++    addr_len = SA_LEN(remaddr);
++#else 
++    addr_len = remaddr->sa_len;
++#endif
++    memcpy(&conn->remote_addr, remaddr, addr_len);
++    getnameinfo((struct sockaddr *)&conn->remote_addr, addr_len,
++	    hostnamebuf, sizeof(hostnamebuf), NULL, 0, NI_NUMERICHOST);
++    conn->remote_ip = ap_pstrdup(conn->pool, hostnamebuf);           
+ #ifdef EAPI
+     conn->ctx = ap_ctx_new(conn->pool);
+ #endif /* EAPI */
+@@ -3326,21 +3355,47 @@
+ #define sock_disable_nagle(s)	/* NOOP */
+ #endif
+ 
+-static int make_sock(pool *p, const struct sockaddr_in *server)
++static int make_sock(pool *p, const struct sockaddr *server)
+ {
+     int s;
+     int one = 1;
+-    char addr[512];
++    char addr[INET6_ADDRSTRLEN + 128];
++    char a0[INET6_ADDRSTRLEN];
++    char p0[NI_MAXSERV];
++#ifdef MPE
++    int privport = 0;
++#endif
+ 
+-    if (server->sin_addr.s_addr != htonl(INADDR_ANY))
+-	ap_snprintf(addr, sizeof(addr), "address %s port %d",
+-		inet_ntoa(server->sin_addr), ntohs(server->sin_port));
+-    else
+-	ap_snprintf(addr, sizeof(addr), "port %d", ntohs(server->sin_port));
++    switch(server->sa_family){
++    case AF_INET:
++#ifdef INET6
++    case AF_INET6:
++#endif
++      break;
++    default:
++      ap_log_error(APLOG_MARK, APLOG_CRIT, server_conf,
++                   "make_sock: unsupported address family %u", 
++		   server->sa_family);
++      ap_unblock_alarms();
++      exit(1);
++    }
++    
++    getnameinfo(server,
++#ifndef SIN6_LEN
++		SA_LEN(server),
++#else
++		server->sa_len,
++#endif
++		a0, sizeof(a0), p0, sizeof(p0), NI_NUMERICHOST | NI_NUMERICSERV);
++    ap_snprintf(addr, sizeof(addr), "address %s port %s", a0, p0);
++#ifdef MPE
++    if (atoi(p0) < 1024)
++      privport++;
++#endif
+ 
+     /* note that because we're about to slack we don't use psocket */
+     ap_block_alarms();
+-    if ((s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1) {
++    if ((s = socket(server->sa_family, SOCK_STREAM, IPPROTO_TCP)) == -1) {
+ 	    ap_log_error(APLOG_MARK, APLOG_CRIT, server_conf,
+ 		    "make_sock: failed to get a socket for %s", addr);
+ 
+@@ -3443,15 +3498,19 @@
+ 
+ #ifdef MPE
+ /* MPE requires CAP=PM and GETPRIVMODE to bind to ports less than 1024 */
+-    if (ntohs(server->sin_port) < 1024)
++    if (privport)
+ 	GETPRIVMODE();
+ #endif
+-
+-    if (bind(s, (struct sockaddr *) server, sizeof(struct sockaddr_in)) == -1) {
++#ifndef SIN6_LEN
++    if (bind(s, server, SA_LEN(server)) == -1)
++#else
++    if (bind(s, server, server->sa_len) == -1)
++#endif
++    {
+ 	ap_log_error(APLOG_MARK, APLOG_CRIT, server_conf,
+ 	    "make_sock: could not bind to %s", addr);
+ #ifdef MPE
+-	if (ntohs(server->sin_port) < 1024)
++	if (privport)
+ 	    GETUSERMODE();
+ #endif
+ 
+@@ -3464,7 +3523,7 @@
+ 	exit(1);
+     }
+ #ifdef MPE
+-    if (ntohs(server->sin_port) < 1024)
++    if (privport)
+ 	GETUSERMODE();
+ #endif
+ 
+@@ -3611,15 +3670,17 @@
+     for (;;) {
+ 	fd = find_listener(lr);
+ 	if (fd < 0) {
+-	    fd = make_sock(p, &lr->local_addr);
++	    fd = make_sock(p, (struct sockaddr *)&lr->local_addr);
+ 	}
+ 	else {
+ 	    ap_note_cleanups_for_socket(p, fd);
+ 	}
+ 	/* if we get here, (fd >= 0) && (fd < FD_SETSIZE) */
+-	FD_SET(fd, &listenfds);
+-	if (fd > listenmaxfd)
+-	    listenmaxfd = fd;
++	if (fd > 0) {
++	    FD_SET(fd, &listenfds);
++	    if (fd > listenmaxfd)
++		listenmaxfd = fd;
++	}
+ 	lr->fd = fd;
+ 	if (lr->next == NULL)
+ 	    break;
+@@ -3918,8 +3979,8 @@
+ static void child_main(int child_num_arg)
+ {
+     NET_SIZE_T clen;
+-    struct sockaddr sa_server;
+-    struct sockaddr sa_client;
++    struct sockaddr_storage sa_server;
++    struct sockaddr_storage sa_client;
+     listen_rec *lr;
+ 
+     /* All of initialization is a critical section, we don't care if we're
+@@ -4084,7 +4145,7 @@
+ 	    usr1_just_die = 0;
+ 	    for (;;) {
+ 		clen = sizeof(sa_client);
+-		csd = ap_accept(sd, &sa_client, &clen);
++		csd = ap_accept(sd, (struct sockaddr *)&sa_client, &clen);
+ 		if (csd >= 0 || errno != EINTR)
+ 		    break;
+ 		if (deferred_die) {
+@@ -4234,7 +4295,7 @@
+ 	 */
+ 
+ 	clen = sizeof(sa_server);
+-	if (getsockname(csd, &sa_server, &clen) < 0) {
++	if (getsockname(csd, (struct sockaddr *)&sa_server, &clen) < 0) {
+ 	    ap_log_error(APLOG_MARK, APLOG_ERR, server_conf, "getsockname");
+ 	    continue;
+ 	}
+@@ -4279,8 +4340,8 @@
+ 	ap_bpushfd(conn_io, csd, dupped_csd);
+ 
+ 	current_conn = new_connection(ptrans, server_conf, conn_io,
+-				          (struct sockaddr_in *) &sa_client,
+-				          (struct sockaddr_in *) &sa_server,
++				          (struct sockaddr *)&sa_client,
++				          (struct sockaddr *)&sa_server,
+ 				          my_child_num);
+ 
+ 	/*
+@@ -4424,12 +4485,13 @@
+ 
+ #ifdef _OSD_POSIX
+     /* BS2000 requires a "special" version of fork() before a setuid() call */
+-    if ((pid = os_fork(ap_user_name)) == -1) {
++    if ((pid = os_fork(ap_user_name)) == -1)
+ #elif defined(TPF)
+-    if ((pid = os_fork(s, slot)) == -1) {
++    if ((pid = os_fork(s, slot)) == -1)
+ #else
+-    if ((pid = fork()) == -1) {
++    if ((pid = fork()) == -1)
+ #endif
++    {
+ 	ap_log_error(APLOG_MARK, APLOG_ERR, s, "fork: Unable to fork new process");
+ 
+ 	/* fork didn't succeed. Fix the scoreboard or else
+@@ -5003,7 +5065,10 @@
+     ap_setup_prelinked_modules();
+ 
+     while ((c = getopt(argc, argv,
+-				    "D:C:c:xXd:f:vVlLR:StTh"
++				    "D:C:c:xXd:f:vVlLR:StTh4"
++#ifdef INET6
++				    "6"
++#endif
+ #ifdef DEBUG_SIGSTOP
+ 				    "Z:"
+ #endif
+@@ -5078,8 +5143,14 @@
+ 	    ap_configtestonly = 1;
+ 	    ap_docrootcheck = 0;
+ 	    break;
+-	case 'h':
+-	    usage(argv[0]);
++	case '4':
++	    ap_default_family = PF_INET;
++	    break;
++#ifdef INET6
++	case '6':
++	    ap_default_family = PF_INET6;
++	    break;
++#endif
+ 	case '?':
+ 	    usage(argv[0]);
+ 	}
+@@ -5158,9 +5229,10 @@
+     else {
+ 	conn_rec *conn;
+ 	request_rec *r;
+-	struct sockaddr sa_server, sa_client;
+ 	BUFF *cio;
++	struct sockaddr_storage sa_server, sa_client;
+ 	NET_SIZE_T l;
++	char servbuf[NI_MAXSERV];
+ 
+ 	ap_set_version();
+ 	/* Yes this is called twice. */
+@@ -5207,25 +5279,32 @@
+ #endif
+ 
+ 	l = sizeof(sa_client);
+-	if ((getpeername(sock_in, &sa_client, &l)) < 0) {
++	if ((getpeername(sock_in, (struct sockaddr *)&sa_client, &l)) < 0) {
+ /* get peername will fail if the input isn't a socket */
+ 	    perror("getpeername");
+ 	    memset(&sa_client, '\0', sizeof(sa_client));
+ 	}
+ 
+ 	l = sizeof(sa_server);
+-	if (getsockname(sock_in, &sa_server, &l) < 0) {
++	if (getsockname(sock_in, (struct sockaddr *)&sa_server, &l) < 0) {
+ 	    perror("getsockname");
+ 	    fprintf(stderr, "Error getting local address\n");
+ 	    exit(1);
+ 	}
+-	server_conf->port = ntohs(((struct sockaddr_in *) &sa_server)->sin_port);
++	if (getnameinfo(((struct sockaddr *)&sa_server), l,
++			NULL, 0, servbuf, sizeof(servbuf), 
++			NI_NUMERICSERV)){
++	    fprintf(stderr, "getnameinfo(): family=%d\n", sa_server.ss_family);
++	    exit(1);
++	}
++	servbuf[sizeof(servbuf)-1] = '\0';
++	server_conf->port = atoi(servbuf);
+ 	cio = ap_bcreate(ptrans, B_RDWR | B_SOCKET);
+         cio->fd = sock_out;
+         cio->fd_in = sock_in;
+ 	conn = new_connection(ptrans, server_conf, cio,
+-			          (struct sockaddr_in *) &sa_client,
+-			          (struct sockaddr_in *) &sa_server, -1);
++			          (struct sockaddr *)&sa_client,
++			          (struct sockaddr *)&sa_server, -1);
+ 
+ 	while ((r = ap_read_request(conn)) != NULL) {
+ 
+@@ -7383,7 +7462,11 @@
+      * but only handle the -L option 
+      */
+     llp_dir = SHARED_CORE_DIR;
+-    while ((c = getopt(argc, argv, "D:C:c:Xd:f:vVlLR:SZ:tTh")) != -1) {
++    while ((c = getopt(argc, argv, "D:C:c:Xd:f:vVlLR:SZ:tTh4"
++#ifdef INET6
++		"6"
++#endif
++		)) != -1) {
+ 	switch (c) {
+ 	case 'D':
+ 	case 'C':
+@@ -7400,6 +7483,10 @@
+ 	case 't':
+ 	case 'T':
+ 	case 'h':
++	case '4':
++#ifdef INET6
++	case '6':
++#endif
+ 	case '?':
+ 	    break;
+ 	case 'R':
+diff -Nru apache_1.3.20/src/main/http_vhost.c apache_1.3.20.new/src/main/http_vhost.c
+--- apache_1.3.20/src/main/http_vhost.c	Sat Feb 24 11:09:46 2001
++++ apache_1.3.20.new/src/main/http_vhost.c	Mon May 21 10:54:52 2001
+@@ -68,6 +68,7 @@
+ #include "http_log.h"
+ #include "http_vhost.h"
+ #include "http_protocol.h"
++#include "sa_len.h"
+ 
+ /*
+  * After all the definitions there's an explanation of how it's all put
+@@ -165,78 +166,114 @@
+  * *paddr is the variable used to keep track of **paddr between calls
+  * port is the default port to assume
+  */
+-static const char *get_addresses(pool *p, char *w, server_addr_rec ***paddr,
+-			    unsigned port)
++static const char *get_addresses(pool *p, char *w, char *pstr,
++	server_addr_rec ***paddr, unsigned port)
+ {
+-    struct hostent *hep;
+-    unsigned long my_addr;
++    struct addrinfo hints, *res, *res0;
+     server_addr_rec *sar;
+-    char *t;
+-    int i, is_an_ip_addr;
++    char *t = NULL, *u = NULL, *v = NULL;
++    char *hoststr = NULL, *portstr = NULL;
++    char portpool[10];
++    int error;
++    char servbuf[NI_MAXSERV];
+ 
+-    if (*w == 0)
++    if (w == 0 || *w == 0)
+ 	return NULL;
+ 
+-    t = strchr(w, ':');
+-    if (t) {
+-	if (strcmp(t + 1, "*") == 0) {
+-	    port = 0;
++    portstr = portpool;
++    ap_snprintf(portpool, sizeof(portpool), "%u", port);
++    if (!pstr) {
++	v = w;
++	u = NULL;
++	if (*w == '['){
++	    u = strrchr(w, ']');
++	    if (u) {	/* [host]:port or [host] */
++		w++;
++		*u = '\0';
++		v = u + 1;
++	    }
+ 	}
+-	else if ((i = atoi(t + 1))) {
+-	    port = i;
++	/*        w   uv     ,       w=v        , w=v  */  
++	/* u!=0: [host]:port , u==0: [host:port , host */
++	t = strchr(v, ':');
++	if (t != NULL && strchr(t+1, ':') == NULL) {
++	    /* [host]:port-w/o-colons, host-without-colons:port-w/o-colons */
++	    *t = '\0';
++	    portstr = t + 1;
+ 	}
+ 	else {
+-	    return ":port must be numeric";
++	    portstr = "0";
+ 	}
+-	*t = 0;
++    } else {
++	portstr = pstr;
+     }
+ 
+-    is_an_ip_addr = 0;
+-    if (strcmp(w, "*") == 0) {
+-	my_addr = htonl(INADDR_ANY);
+-	is_an_ip_addr = 1;
+-    }
+-    else if (strcasecmp(w, "_default_") == 0
+-	     || strcmp(w, "255.255.255.255") == 0) {
+-	my_addr = DEFAULT_VHOST_ADDR;
+-	is_an_ip_addr = 1;
+-    }
+-    else if ((my_addr = ap_inet_addr(w)) != INADDR_NONE) {
+-	is_an_ip_addr = 1;
++    memset(&hints, 0, sizeof(hints));
++    hints.ai_socktype = SOCK_STREAM;
++    if (strcmp(w, "*") == 0 || strlen(w) == 0) {
++	hoststr = NULL;
++	hints.ai_family = PF_UNSPEC;
++	hints.ai_flags = AI_PASSIVE;
++    }
++    else if (strcasecmp(w, "_default4_") == 0 ||
++	     ((ap_default_family == PF_INET
++#ifndef INET6
++	       || ap_default_family == PF_UNSPEC
++#endif
++	       ) && strcasecmp(w, "_default_") == 0)){
++	hoststr = "255.255.255.255";
++	hints.ai_family = PF_INET;
++    }
++#ifdef INET6
++    else if (strcasecmp(w, "_default6_") == 0 ||
++	     ((ap_default_family == PF_INET6
++	       || ap_default_family == PF_UNSPEC
++	       ) && strcasecmp(w, "_default_") == 0)){
++	hoststr = "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff";
++	hints.ai_family = PF_INET6;
+     }
+-    if (is_an_ip_addr) {
+-	sar = ap_pcalloc(p, sizeof(server_addr_rec));
+-	**paddr = sar;
+-	*paddr = &sar->next;
+-	sar->host_addr.s_addr = my_addr;
+-	sar->host_port = port;
+-	sar->virthost = ap_pstrdup(p, w);
+-	if (t != NULL)
+-	    *t = ':';
+-	return NULL;
++#endif
++    else{
++	hoststr = w;
++	hints.ai_family = PF_UNSPEC;
+     }
+ 
+-    hep = gethostbyname(w);
+-
+-    if ((!hep) || (hep->h_addrtype != AF_INET || !hep->h_addr_list[0])) {
++    error = getaddrinfo(hoststr, portstr, &hints, &res0);
++    if (error || !res0) {
+ 	ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_ERR, NULL,
+-	    "Cannot resolve host name %s --- ignoring!", w);
+-	if (t != NULL)
+-	    *t = ':';
++	    "Cannot resolve host %s port %s --- ignoring!", hoststr, portstr);
++	if (t != NULL) *t = ':';
++	if (u != NULL) *u = ']';
+ 	return NULL;
+     }
+-
+-    for (i = 0; hep->h_addr_list[i]; ++i) {
++    for (res=res0; res; res=res->ai_next) {
++	switch (res->ai_addr->sa_family) {
++	case AF_INET:
++#ifdef INET6
++	case AF_INET6:
++#endif
++	    break;
++	default:
++	    ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_ERR, NULL,
++			 "Unsupported address family %u, for host %s port %s --- ignoring!",
++			 res->ai_addr->sa_family, hoststr, portstr);
++	    continue;
++	}
+ 	sar = ap_pcalloc(p, sizeof(server_addr_rec));
+ 	**paddr = sar;
+ 	*paddr = &sar->next;
+-	sar->host_addr = *(struct in_addr *) hep->h_addr_list[i];
+-	sar->host_port = port;
++	memcpy(&sar->host_addr, res->ai_addr, res->ai_addrlen);
++	if (getnameinfo(res->ai_addr, res->ai_addrlen, NULL, 0, servbuf,
++			sizeof(servbuf), NI_NUMERICSERV) == 0)
++		sar->host_port = atoi(servbuf);
++	else
++		sar->host_port = 0;
+ 	sar->virthost = ap_pstrdup(p, w);
+     }
+ 
+-    if (t != NULL)
+-	*t = ':';
++    freeaddrinfo(res0);
++    if (t != NULL) *t = ':';
++    if (u != NULL) *u = ']';
+     return NULL;
+ }
+ 
+@@ -250,7 +287,8 @@
+     /* start the list of addreses */
+     addrs = &s->addrs;
+     while (hostname[0]) {
+-	err = get_addresses(p, ap_getword_conf(p, &hostname), &addrs, s->port);
++	err = get_addresses(p, ap_getword_conf(p, &hostname), NULL,
++		&addrs, s->port);
+ 	if (err) {
+ 	    *addrs = NULL;
+ 	    return err;
+@@ -268,10 +306,11 @@
+ }
+ 
+ 
+-const char *ap_set_name_virtual_host (cmd_parms *cmd, void *dummy, char *arg)
++const char *ap_set_name_virtual_host (cmd_parms *cmd, void *dummy, char *h,
++	char *p)
+ {
+     /* use whatever port the main server has at this point */
+-    return get_addresses(cmd->pool, arg, &name_vhost_list_tail,
++    return get_addresses(cmd->pool, h, p, &name_vhost_list_tail,
+ 			    cmd->server->port);
+ }
+ 
+@@ -345,6 +384,19 @@
+     return ((key >> 8) ^ key) % IPHASH_TABLE_SIZE;
+ }
+ 
++static unsigned hash_addr(struct sockaddr *sa)
++{
++    switch (sa->sa_family) {
++    case AF_INET:
++	return hash_inaddr(((struct sockaddr_in *)sa)->sin_addr.s_addr);
++#ifdef INET6
++    case AF_INET6:
++	return hash_inaddr(((struct sockaddr_in6 *)sa)->sin6_addr.s6_addr[12]);
++#endif
++    default:
++	return hash_inaddr(sa->sa_family);
++    }
++}
+ 
+ 
+ static ipaddr_chain *new_ipaddr_chain(pool *p,
+@@ -372,25 +424,77 @@
+     return new;
+ }
+ 
+-
+-static ap_inline ipaddr_chain *find_ipaddr(struct in_addr *server_ip,
+-    unsigned port)
++static ap_inline ipaddr_chain *find_ipaddr(struct sockaddr *sa)
+ {
+     unsigned bucket;
+     ipaddr_chain *trav;
+-    unsigned addr;
++    char a[NI_MAXHOST], b[NI_MAXHOST];
+ 
+     /* scan the hash table for an exact match first */
+-    addr = server_ip->s_addr;
+-    bucket = hash_inaddr(addr);
++    bucket = hash_addr(sa);
+     for (trav = iphash_table[bucket]; trav; trav = trav->next) {
+ 	server_addr_rec *sar = trav->sar;
+-	if ((sar->host_addr.s_addr == addr)
+-	    && (sar->host_port == 0 || sar->host_port == port
+-		|| port == 0)) {
+-	    return trav;
++	if (sar->host_addr.ss_family != sa->sa_family)
++	    continue;
++	switch (sa->sa_family) {
++	case AF_INET:
++	  {
++	    struct sockaddr_in *sin1, *sin2;
++	    sin1 = (struct sockaddr_in *)&sar->host_addr;
++	    sin2 = (struct sockaddr_in *)sa;
++	    if (sin1->sin_port == 0 || sin2->sin_port == 0
++	     || sin1->sin_port == sin2->sin_port) {
++		if (memcmp(&sin1->sin_addr, &sin2->sin_addr,
++			sizeof(sin1->sin_addr)) == 0) {
++		    return trav;
++		}
++	    }
++	    break;
++	  }
++#ifdef INET6
++	case AF_INET6:
++	  {
++	    struct sockaddr_in6 *sin1, *sin2;
++	    sin1 = (struct sockaddr_in6 *)&sar->host_addr;
++	    sin2 = (struct sockaddr_in6 *)sa;
++	    if (sin1->sin6_port == 0 || sin2->sin6_port == 0
++	     || sin1->sin6_port == sin2->sin6_port) {
++		if (memcmp(&sin1->sin6_addr, &sin2->sin6_addr,
++			sizeof(sin1->sin6_addr)) == 0) {
++		    return trav;
++		}
++	    }
++	    break;
++	  }
++#endif
++	default: /*unsupported*/
++	    break;
+ 	}
+     }
++
++#ifdef INET6
++    if (sa->sa_family == AF_INET6 &&
++	IN6_IS_ADDR_V4MAPPED(&((struct sockaddr_in6 *)sa)->sin6_addr)) {
++	/*
++	 * This is just horrible.  I just hate IPv4 mapped address.  It
++	 * complicates access control too much.
++	 * Due to hashed lookup, we need to visit it again.
++	 */
++	struct sockaddr_in sin;
++
++	memset(&sin, 0, sizeof(sin));
++	sin.sin_family = AF_INET;
++#ifdef SIN6_LEN
++	sin.sin_len = sizeof(sin);
++#endif
++	sin.sin_port = ((struct sockaddr_in6 *)sa)->sin6_port;
++	memcpy(&sin.sin_addr,
++	    &((struct sockaddr_in6 *)sa)->sin6_addr.s6_addr[12],
++	    sizeof(sin.sin_addr));
++	return find_ipaddr((struct sockaddr *)&sin);
++    }
++#endif
++
+     return NULL;
+ }
+ 
+@@ -416,21 +520,7 @@
+     int len;
+     char buf[MAX_STRING_LEN];
+ 
+-    if (ic->sar->host_addr.s_addr == DEFAULT_VHOST_ADDR) {
+-	len = ap_snprintf(buf, sizeof(buf), "_default_:%u",
+-		ic->sar->host_port);
+-    }
+-    else if (ic->sar->host_addr.s_addr == INADDR_ANY) {
+-	len = ap_snprintf(buf, sizeof(buf), "*:%u",
+-		ic->sar->host_port);
+-    }
+-    else {
+-	len = ap_snprintf(buf, sizeof(buf), "%pA:%u",
+-		&ic->sar->host_addr, ic->sar->host_port);
+-    }
+-    if (ic->sar->host_port == 0) {
+-	buf[len-1] = '*';
+-    }
++    len = ap_snprintf(buf, sizeof(buf), "%pI", &ic->sar->host_addr);
+     if (ic->names == NULL) {
+ 	if (ic->server == NULL)
+ 	    fprintf(f, "%-22s WARNING: No <VirtualHost> defined for this NameVirtualHost!\n", buf);
+@@ -558,10 +648,37 @@
+      * occured in the config file, we'll copy it in that order.
+      */
+     for (sar = name_vhost_list; sar; sar = sar->next) {
+-	unsigned bucket = hash_inaddr(sar->host_addr.s_addr);
++	unsigned bucket = hash_addr((struct sockaddr *)&sar->host_addr);
+ 	ipaddr_chain *ic = new_ipaddr_chain(p, NULL, sar);
++	int wildcard;
++
++	wildcard = 0;
++	switch (sar->host_addr.ss_family) {
++	case AF_INET:
++	  {
++	    struct sockaddr_in *sin;
++	    sin = (struct sockaddr_in *)&sar->host_addr;
++	    if (sin->sin_addr.s_addr == INADDR_ANY)
++		wildcard++;
++	    break;
++	  }
++#ifdef INET6
++	case AF_INET6:
++	  {
++	    struct sockaddr_in6 *sin6;
++	    sin6 = (struct sockaddr_in6 *)&sar->host_addr;
++	    if (*(ap_uint32_t *)&sin6->sin6_addr.s6_addr[0] == 0
++	     && *(ap_uint32_t *)&sin6->sin6_addr.s6_addr[4] == 0
++	     && *(ap_uint32_t *)&sin6->sin6_addr.s6_addr[8] == 0
++	     && *(ap_uint32_t *)&sin6->sin6_addr.s6_addr[12] == 0) {
++		wildcard++;
++	    }
++	    break;
++	  }
++#endif
++	}
+ 
+-	if (sar->host_addr.s_addr != INADDR_ANY) {
++	if (!wildcard) {
+ 	    *iphash_table_tail[bucket] = ic;
+ 	    iphash_table_tail[bucket] = &ic->next;
+ 	}
+@@ -588,12 +705,45 @@
+ 	has_default_vhost_addr = 0;
+ 	for (sar = s->addrs; sar; sar = sar->next) {
+ 	    ipaddr_chain *ic;
++	    int wildcard;
++
++	    wildcard = 0;
++	    switch (sar->host_addr.ss_family) {
++	    case AF_INET:
++	      {
++		struct sockaddr_in *sin;
++		sin = (struct sockaddr_in *)&sar->host_addr;
++		if (sin->sin_addr.s_addr == DEFAULT_VHOST_ADDR)
++		    wildcard++;
++		else if (sin->sin_addr.s_addr == INADDR_ANY)
++		    wildcard++;
++		break;
++	      }
++#ifdef INET6
++	    case AF_INET6:
++	      {
++		struct sockaddr_in6 *sin6;
++		sin6 = (struct sockaddr_in6 *)&sar->host_addr;
++		if (*(ap_uint32_t *)&sin6->sin6_addr.s6_addr[0] == ~0
++		 && *(ap_uint32_t *)&sin6->sin6_addr.s6_addr[4] == ~0
++		 && *(ap_uint32_t *)&sin6->sin6_addr.s6_addr[8] == ~0
++		 && *(ap_uint32_t *)&sin6->sin6_addr.s6_addr[12] == ~0) {
++		    wildcard++;
++		}
++		break;
++	      }
++#endif
++	    }
+ 
+-	    if (sar->host_addr.s_addr == DEFAULT_VHOST_ADDR
+-		|| sar->host_addr.s_addr == INADDR_ANY) {
+-		ic = find_default_server(sar->host_port);
+-		if (!ic || !add_name_vhost_config(p, main_s, s, sar, ic)) {
+-		    if (ic && ic->sar->host_port != 0) {
++	    if (wildcard) {
++		/* add it to default bucket for each appropriate sar
++		 * since we need to do a port test
++		 */
++		ipaddr_chain *other;
++
++		other = find_default_server(sar->host_port);
++		if (!other || !add_name_vhost_config(p, main_s, s, sar, other)) {
++		    if (other && other->sar->host_port != 0) {
+ 			ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_WARNING,
+ 			    main_s, "_default_ VirtualHost overlap on port %u,"
+ 			    " the first has precedence", sar->host_port);
+@@ -606,10 +756,11 @@
+ 	    }
+ 	    else {
+ 		/* see if it matches something we've already got */
+-		ic = find_ipaddr(&sar->host_addr, sar->host_port);
++		ic = find_ipaddr((struct sockaddr *)&sar->host_addr);
+ 
+ 		if (!ic) {
+-		    unsigned bucket = hash_inaddr(sar->host_addr.s_addr);
++		    unsigned bucket =
++		        hash_addr((struct sockaddr *)&sar->host_addr);
+ 
+ 		    ic = new_ipaddr_chain(p, s, sar);
+ 		    ic->next = *iphash_table_tail[bucket];
+@@ -646,19 +797,33 @@
+ 	    }
+ 	    else {
+ 		struct hostent *h;
++		char hostnamebuf[MAXHOSTNAMELEN];
+ 
+-		if ((h = gethostbyaddr((char *) &(s->addrs->host_addr),
+-					sizeof(struct in_addr), AF_INET))) {
+-		    s->server_hostname = ap_pstrdup(p, (char *) h->h_name);
++		if (!getnameinfo((struct sockaddr *)&s->addrs->host_addr,
++#ifndef SIN6_LEN
++			SA_LEN((struct sockaddr *)&s->addrs->host_addr),
++#else	
++			s->addrs->host_addr.ss_len,
++#endif
++			hostnamebuf, sizeof(hostnamebuf),
++			NULL, 0, 0)) {
++		    s->server_hostname = ap_pstrdup(p, hostnamebuf);
+ 		}
+ 		else {
+ 		    /* again, what can we do?  They didn't specify a
+ 		       ServerName, and their DNS isn't working. -djg */
++		    getnameinfo((struct sockaddr *)&s->addrs->host_addr,
++#ifndef SIN6_LEN
++			SA_LEN((struct sockaddr *)&s->addrs->host_addr),
++#else	
++			s->addrs->host_addr.ss_len,
++#endif
++			hostnamebuf, sizeof(hostnamebuf),
++			NULL, 0, NI_NUMERICHOST);
+ 		    ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_ERR, main_s,
+ 			    "Failed to resolve server name "
+ 			    "for %s (check DNS) -- or specify an explicit "
+-			    "ServerName",
+-			    inet_ntoa(s->addrs->host_addr));
++			    "ServerName", hostnamebuf);
+ 		    s->server_hostname =
+ 			ap_pstrdup(p, "bogus_host_without_reverse_dns");
+ 		}
+@@ -705,35 +870,58 @@
+     char *host = ap_palloc(r->pool, strlen(r->hostname) + 1);
+     const char *src;
+     char *dst;
++    const char *u = NULL, *v = NULL;
+ 
+     /* check and copy the host part */
+-    src = r->hostname;
++    u = src = r->hostname;
+ 
+     dst = host;
+-    while (*src) {
+-	if (*src == '.') {
+-	    *dst++ = *src++;
+-	    if (*src == '.')
+-		goto bad;
+-	    else
+-		continue;
+-	}
+-	if (*src == '/' || *src == '\\') {
+-	    goto bad;
+-	}
+-        if (*src == ':') {
+-            /* check the port part */
+-            while (*++src) {
+-                if (!ap_isdigit(*src)) {
+-                    goto bad;
+-                }
+-            }
+-            if (src[-1] == ':')
+-                goto bad;
+-            else
+-                break;
++     if (*u == '[') { /* IPv6 numeral address in brackets */
++         v = strchr(u, ']');
++       if (v == NULL) {
++           /* missing closing bracket */
++             goto bad;
++       }
++         if (v == (u + 1)) {
++             /* bad empty address */
++             goto bad;
++       }
++       for (src = u+1; src < v; src++)  /* copy IPv6 adress */
++           *dst = *src;
++       v++;
++       if (*v == ':') {
++          v++;
++          while (*v) {  /* check if portnum is correct */
++              if (!ap_isdigit(*v++))
++                  goto bad;
++          }
+         }
+-	*dst++ = *src++;
++     } else {
++         while (*src) {
++           if (*src == '.') {
++               *dst++ = *src++;
++               if (*src == '.')
++                   goto bad;
++               else
++                   continue;
++           }
++           if (*src == '/' || *src == '\\') {
++               goto bad;
++           }
++           if (*src == ':') {
++               /* sheck the port part */
++               while (*++src) {
++                   if (!ap_isdigit(*src)) {
++                       goto bad;
++                   }
++               }
++               if (src[-1] == ':')
++                   goto bad;
++               else
++                   break;
++           }
++           *dst++ = *src++;
++         }
+     }
+     /* strip trailing gubbins */
+     if (dst > host && dst[-1] == '.') {
+@@ -748,7 +936,7 @@
+ bad:
+     r->status = HTTP_BAD_REQUEST;
+     ap_log_rerror(APLOG_MARK, APLOG_NOERRNO|APLOG_ERR, r,
+-		  "Client sent malformed Host header");
++		  "Client sent malformed Host header <<%s>>",u);
+     return;
+ }
+ 
+@@ -851,11 +1039,25 @@
+      *   names we'll match have ports associated with them
+      */
+     const char *host = r->hostname;
+-    unsigned port = ntohs(r->connection->local_addr.sin_port);
++    unsigned port;
+     server_rec *s;
+     server_rec *last_s;
+     name_chain *src;
+ 
++    switch (r->connection->local_addr.ss_family) {
++    case AF_INET:
++    	port = ntohs(((struct sockaddr_in *)
++		    &r->connection->local_addr)->sin_port);
++	break;
++#ifdef INET6
++    case AF_INET6:
++    	port = ntohs(((struct sockaddr_in6 *)
++		    &r->connection->local_addr)->sin6_port);
++	break;
++#endif
++    default:
++	port = 0;	/*XXX*/
++    }
+     last_s = NULL;
+ 
+     /* Recall that the name_chain is a list of server_addr_recs, some of
+@@ -910,7 +1112,22 @@
+     server_rec *s;
+     server_rec *last_s;
+     name_chain *src;
+-    unsigned port = ntohs(r->connection->local_addr.sin_port);
++    unsigned port;
++
++    switch (r->connection->local_addr.ss_family) {
++    case AF_INET:
++    	port = ntohs(((struct sockaddr_in *)
++		    &r->connection->local_addr)->sin_port);
++	break;
++#ifdef INET6
++    case AF_INET6:
++    	port = ntohs(((struct sockaddr_in6 *)
++		    &r->connection->local_addr)->sin6_port);
++	break;
++#endif
++    default:
++	port = 0;	/*XXX*/
++    }
+ 
+     /*
+      * This is in conjunction with the ServerPath code in http_core, so we
+@@ -970,10 +1187,22 @@
+ void ap_update_vhost_given_ip(conn_rec *conn)
+ {
+     ipaddr_chain *trav;
+-    unsigned port = ntohs(conn->local_addr.sin_port);
++    char portbuf[NI_MAXSERV];
++    unsigned port;
++
++    if (getnameinfo((struct sockaddr *)&conn->local_addr,
++#ifndef SIN6_LEN
++	SA_LEN((struct sockaddr *)&conn->local_addr),
++#else	
++	conn->local_addr.ss_len,
++#endif
++	NULL, 0, portbuf, sizeof(portbuf), NI_NUMERICSERV) != 0) {
++	goto fail;
++    }
++    port = atoi(portbuf);
+ 
+     /* scan the hash table for an exact match first */
+-    trav = find_ipaddr(&conn->local_addr.sin_addr, port);
++    trav = find_ipaddr((struct sockaddr *)&conn->local_addr);
+     if (trav) {
+ 	/* save the name_chain for later in case this is a name-vhost */
+ 	conn->vhost_lookup_data = trav->names;
+@@ -991,6 +1220,7 @@
+ 	return;
+     }
+ 
++fail:
+     /* otherwise we're stuck with just the main server
+      * and no name-based vhosts
+      */
+diff -Nru apache_1.3.20/src/main/rfc1413.c apache_1.3.20.new/src/main/rfc1413.c
+--- apache_1.3.20/src/main/rfc1413.c	Mon Jan 15 18:05:04 2001
++++ apache_1.3.20.new/src/main/rfc1413.c	Mon May 21 10:54:52 2001
+@@ -82,6 +82,7 @@
+ #include "http_log.h"		/* for aplog_error */
+ #include "rfc1413.h"
+ #include "http_main.h"		/* set_callback_and_alarm */
++#include "sa_len.h"
+ 
+ /* Local stuff. */
+ /* Semi-well-known port */
+@@ -109,12 +110,13 @@
+ 
+ /* bind_connect - bind both ends of a socket */
+ /* Ambarish fix this. Very broken */
+-static int get_rfc1413(int sock, const struct sockaddr_in *our_sin,
+-		       const struct sockaddr_in *rmt_sin, 
++static int get_rfc1413(int sock, const struct sockaddr *our_sin,
++		       const struct sockaddr *rmt_sin, 
+ 		       char user[RFC1413_USERLEN+1], server_rec *srv)
+ {
+-    struct sockaddr_in rmt_query_sin, our_query_sin;
+-    unsigned int rmt_port, our_port;
++    struct sockaddr_storage rmt_query_sin, our_query_sin;
++    unsigned int o_rmt_port, o_our_port;	/* original port pair */
++    unsigned int rmt_port, our_port;		/* replied port pair */
+     int i;
+     char *cp;
+     char buffer[RFC1413_MAXDATA + 1];
+@@ -129,16 +131,47 @@
+      * addresses from the query socket.
+      */
+ 
+-    our_query_sin = *our_sin;
+-    our_query_sin.sin_port = htons(ANY_PORT);
+-#ifdef MPE 
+-    our_query_sin.sin_addr.s_addr = INADDR_ANY;
++#ifndef SIN6_LEN
++    memcpy(&our_query_sin, our_sin, SA_LEN(our_sin));
++    memcpy(&rmt_query_sin, rmt_sin, SA_LEN(rmt_sin));
++#else
++    memcpy(&our_query_sin, our_sin, our_sin->sa_len);
++    memcpy(&rmt_query_sin, rmt_sin, rmt_sin->sa_len);
+ #endif
+-    rmt_query_sin = *rmt_sin;
+-    rmt_query_sin.sin_port = htons(RFC1413_PORT);
++    switch (our_sin->sa_family) {
++    case AF_INET:
++#ifdef MPE
++      ((struct sockaddr_in *)&our_query_sin)->sin_addr.s_addr = INADDR_ANY; /* XXX: htonl(??) */
++#endif
++      ((struct sockaddr_in *)&our_query_sin)->sin_port = htons(ANY_PORT);
++      o_our_port = ntohs(((struct sockaddr_in *)our_sin)->sin_port);
++      ((struct sockaddr_in *)&rmt_query_sin)->sin_port = htons(RFC1413_PORT);
++      o_rmt_port = ntohs(((struct sockaddr_in *)rmt_sin)->sin_port);
++      break;
++#ifdef INET6
++    case AF_INET6:
++#ifdef MPE
++      memcpy(&((struct sockaddr_in6 *)&our_query_sin)->sin6_addr, 
++	     &in6addr_any, sizeof(struct in6_addr));
++#endif
++      ((struct sockaddr_in6 *)&our_query_sin)->sin6_port = htons(ANY_PORT);
++      o_our_port = ntohs(((struct sockaddr_in6 *)our_sin)->sin6_port);
++      ((struct sockaddr_in6 *)&rmt_query_sin)->sin6_port = htons(RFC1413_PORT);
++      o_rmt_port = ntohs(((struct sockaddr_in6 *)rmt_sin)->sin6_port);
++      break;
++#endif
++    default:
++      /* unsupported AF */
++      return -1;
++    }
+ 
+     if (bind(sock, (struct sockaddr *) &our_query_sin,
+-	     sizeof(struct sockaddr_in)) < 0) {
++#ifndef SIN6_LEN
++	     SA_LEN((struct sockaddr *) &our_query_sin)
++#else
++	     our_query_sin.ss_len
++#endif
++	     ) < 0) {
+ 	ap_log_error(APLOG_MARK, APLOG_CRIT, srv,
+ 		    "bind: rfc1413: Error binding to local port");
+ 	return -1;
+@@ -149,12 +182,18 @@
+  * the service
+  */
+     if (connect(sock, (struct sockaddr *) &rmt_query_sin,
+-		sizeof(struct sockaddr_in)) < 0)
+-	            return -1;
++#ifndef SIN6_LEN
++		SA_LEN((struct sockaddr *) &rmt_query_sin)
++#else
++		rmt_query_sin.ss_len
++#endif
++		) < 0) {
++	return -1;
++    }
+ 
+ /* send the data */
+-    buflen = ap_snprintf(buffer, sizeof(buffer), "%u,%u\r\n", ntohs(rmt_sin->sin_port),
+-		ntohs(our_sin->sin_port));
++    buflen = ap_snprintf(buffer, sizeof(buffer), "%u,%u\r\n", o_rmt_port,
++		o_our_port);
+ 
+     /* send query to server. Handle short write. */
+ #ifdef CHARSET_EBCDIC
+@@ -219,9 +258,9 @@
+     ascii2ebcdic(buffer, buffer, (size_t)i);
+ #endif
+     if (sscanf(buffer, "%u , %u : USERID :%*[^:]:%512s", &rmt_port, &our_port,
+-	       user) != 3 || ntohs(rmt_sin->sin_port) != rmt_port
+-	|| ntohs(our_sin->sin_port) != our_port)
++	       user) != 3 || o_rmt_port != rmt_port || o_our_port != our_port) {
+ 	return -1;
++    }
+ 
+     /*
+      * Strip trailing carriage return. It is part of the
+@@ -243,7 +282,7 @@
+ 
+     result = FROM_UNKNOWN;
+ 
+-    sock = ap_psocket(conn->pool, AF_INET, SOCK_STREAM, IPPROTO_TCP);
++    sock = ap_psocket(conn->pool, conn->remote_addr.ss_family, SOCK_STREAM, IPPROTO_TCP);
+     if (sock < 0) {
+ 	ap_log_error(APLOG_MARK, APLOG_CRIT, srv,
+ 		    "socket: rfc1413: error creating socket");
+@@ -256,8 +295,10 @@
+     if (ap_setjmp(timebuf) == 0) {
+ 	ap_set_callback_and_alarm(ident_timeout, ap_rfc1413_timeout);
+ 
+-	if (get_rfc1413(sock, &conn->local_addr, &conn->remote_addr, user, srv) >= 0)
++	if (get_rfc1413(sock, (struct sockaddr *)&conn->local_addr,
++		(struct sockaddr *)&conn->remote_addr, user, srv) >= 0) {
+ 	    result = user;
++	}
+     }
+     ap_set_callback_and_alarm(NULL, 0);
+     ap_pclosesocket(conn->pool, sock);
+diff -Nru apache_1.3.20/src/main/util.c apache_1.3.20.new/src/main/util.c
+--- apache_1.3.20/src/main/util.c	Fri Mar 30 19:37:54 2001
++++ apache_1.3.20.new/src/main/util.c	Mon May 21 11:04:30 2001
+@@ -1959,52 +1959,87 @@
+  * Parses a host of the form <address>[:port]
+  * :port is permitted if 'port' is not NULL
+  */
+-unsigned long ap_get_virthost_addr(char *w, unsigned short *ports)
++struct sockaddr *ap_get_virthost_addr(char *w, unsigned short *ports)
+ {
+-    struct hostent *hep;
+-    unsigned long my_addr;
+-    char *p;
+-
+-    p = strchr(w, ':');
++    static struct sockaddr_storage ss;
++    struct addrinfo hints, *res;
++    char *p, *r;
++    char *host;
++    char *port = "0";
++    int error;
++    char servbuf[NI_MAXSERV];
++
++    if (w == NULL)
++	w = "*";
++    p = r = NULL;
++    if (*w == '['){
++	if (r = strrchr(w+1, ']')){
++	    *r = '\0';
++	    p = r + 1;
++	    switch(*p){
++	    case ':':
++	      p++;
++	      /* nobreak; */
++	    case '\0':
++	      w++;
++	      break;
++	    default:
++	      p = NULL;
++	    }
++	}
++    }
++    else{
++	p = strchr(w, ':');
++	if (p != NULL && strchr(p+1, ':') != NULL)
++	    p = NULL;
++    }
+     if (ports != NULL) {
+-	*ports = 0;
+-	if (p != NULL && strcmp(p + 1, "*") != 0)
+-	    *ports = atoi(p + 1);
++	if (p != NULL && *p && strcmp(p + 1, "*") != 0)
++	    port = p + 1;
+     }
+ 
++    memset(&hints, 0, sizeof(hints));
++    hints.ai_socktype = SOCK_STREAM;
+     if (p != NULL)
+ 	*p = '\0';
+     if (strcmp(w, "*") == 0) {
+-	if (p != NULL)
+-	    *p = ':';
+-	return htonl(INADDR_ANY);
+-    }
+-
+-    my_addr = ap_inet_addr((char *)w);
+-    if (my_addr != INADDR_NONE) {
+-	if (p != NULL)
+-	    *p = ':';
+-	return my_addr;
++	host = NULL;
++	hints.ai_flags = AI_PASSIVE;
++	hints.ai_family = ap_default_family;
++    } else {
++	host = w;
++	hints.ai_family = PF_UNSPEC;
+     }
+ 
+-    hep = gethostbyname(w);
++    error = getaddrinfo(host, port, &hints, &res);
+ 
+-    if ((!hep) || (hep->h_addrtype != AF_INET || !hep->h_addr_list[0])) {
+-	fprintf(stderr, "Cannot resolve host name %s --- exiting!\n", w);
++    if (error || !res) {
++	fprintf(stderr, "ap_get_vitrhost_addr(): getaddrinfo(%s):%s --- exiting!\n", w, gai_strerror(error));
+ 	exit(1);
+     }
+ 
+-    if (hep->h_addr_list[1]) {
+-	fprintf(stderr, "Host %s has multiple addresses ---\n", w);
++    if (res->ai_next) {
++	fprintf(stderr, "ap_get_vitrhost_addr(): Host %s has multiple addresses ---\n", w);
+ 	fprintf(stderr, "you must choose one explicitly for use as\n");
+ 	fprintf(stderr, "a virtual host.  Exiting!!!\n");
+ 	exit(1);
+     }
+ 
++    if (r != NULL)
++	*r = ']';
+     if (p != NULL)
+ 	*p = ':';
+ 
+-    return ((struct in_addr *) (hep->h_addr))->s_addr;
++    memcpy(&ss, res->ai_addr, res->ai_addrlen);
++    if (getnameinfo(res->ai_addr, res->ai_addrlen,
++		    NULL, 0, servbuf, sizeof(servbuf),
++		    NI_NUMERICSERV)){
++	fprintf(stderr, "ap_get_virthost_addr(): getnameinfo() failed --- Exiting!!!\n");
++	exit(1);
++    }
++    if (ports) *ports = atoi(servbuf);
++    freeaddrinfo(res);
++    return (struct sockaddr *)&ss;
+ }
+ 
+ 
+@@ -2032,7 +2067,8 @@
+ #endif
+     char str[MAXHOSTNAMELEN];
+     char *server_hostname = NULL;
+-    struct hostent *p;
++    struct addrinfo hints, *res;
++    int error;
+ 
+ #ifdef BEOS /* BeOS returns zero as an error for gethostname */
+     if (gethostname(str, sizeof(str) - 1) == 0) {
+@@ -2045,29 +2081,38 @@
+     }
+     else 
+     {
+-        str[sizeof(str) - 1] = '\0';
+-        if ((!(p = gethostbyname(str))) 
+-            || (!(server_hostname = find_fqdn(a, p)))) {
+-            /* Recovery - return the default servername by IP: */
+-            if (p && p->h_addr_list && p->h_addr_list[0]) {
+-                ap_snprintf(str, sizeof(str), "%pA", p->h_addr_list[0]);
+-	        server_hostname = ap_pstrdup(a, str);
+-                /* We will drop through to report the IP-named server */
+-            }
+-        }
+-	else
+-            /* Since we found a fqdn, return it with no logged message. */
+-            return server_hostname;
+-    }
+-
+-    /* If we don't have an fdqn or IP, fall back to the loopback addr */
+-    if (!server_hostname) 
+-        server_hostname = ap_pstrdup(a, "127.0.0.1");
+-    
+-    ap_log_error(APLOG_MARK, APLOG_ALERT|APLOG_NOERRNO, NULL,
+-	         "%s: Could not determine the server's fully qualified "
+-                 "domain name, using %s for ServerName",
+-                 ap_server_argv0, server_hostname);
++       str[sizeof(str) - 1] = '\0';
++       memset(&hints, 0, sizeof(hints));
++       hints.ai_family = PF_UNSPEC;
++       hints.ai_flags = AI_CANONNAME;
++       error = getaddrinfo(str, NULL, &hints, &res);
++       if (error)
++       {
++              /* Recovery - return the default servername by IP: */
++
++           fprintf(stderr, "%s: cannot determine local host name.\n",
++                 ap_server_argv0);
++           fprintf(stderr, "Use the ServerName directive to set it manually.\n");
++           exit(1);
++
++           server_hostname = ap_pstrdup(a, res->ai_canonname);
++       }
++       else if (1)     /*fqdn found*/
++       {
++           /* XXX should check more conditions */
++           server_hostname = ap_pstrdup(a, res->ai_canonname);
++       }
++        else
++       {
++           ap_log_error(APLOG_MARK, APLOG_ALERT|APLOG_NOERRNO, NULL,
++                        "%s: Could not determine the server's fully qualified "
++                        "domain name, using %s for ServerName",
++                        ap_server_argv0, server_hostname);
++       }
++
++       /* Since we found a fdqn, return it with no logged message. */
++       freeaddrinfo(res);
++      }
+     
+     return server_hostname;
+ }
+@@ -2146,7 +2191,7 @@
+     char *quote_doubled_str, *dest;
+     
+     while (str[len]) {
+-        num_quotes += str[len++] == '\"';
++	num_quotes += str[len++] == '\"';
+     }
+     
+     quote_doubled_str = ap_palloc(p, len + num_quotes + 1);
+@@ -2271,3 +2316,11 @@
+     }
+     *dest = 0;
+ }
++
++#ifdef NEED_GETADDRINFO
++#include "getaddrinfo.c"
++#endif
++
++#ifdef NEED_GETNAMEINFO
++#include "getnameinfo.c"
++#endif
+diff -Nru apache_1.3.20/src/main/util_script.c apache_1.3.20.new/src/main/util_script.c
+--- apache_1.3.20/src/main/util_script.c	Wed May  9 07:17:11 2001
++++ apache_1.3.20.new/src/main/util_script.c	Mon May 21 10:54:52 2001
+@@ -67,6 +67,7 @@
+ #include "http_request.h"	/* for sub_req_lookup_uri() */
+ #include "util_script.h"
+ #include "util_date.h"		/* For parseHTTPdate() */
++#include "sa_len.h"
+ 
+ #ifdef OS2
+ #define INCL_DOS
+@@ -208,6 +209,7 @@
+     array_header *hdrs_arr = ap_table_elts(r->headers_in);
+     table_entry *hdrs = (table_entry *) hdrs_arr->elts;
+     int i;
++    char servbuf[NI_MAXSERV];
+ 
+     /* use a temporary table which we'll overlap onto
+      * r->subprocess_env later
+@@ -298,8 +300,16 @@
+     ap_table_addn(e, "SERVER_ADMIN", s->server_admin);	/* Apache */
+     ap_table_addn(e, "SCRIPT_FILENAME", r->filename);	/* Apache */
+ 
+-    ap_table_addn(e, "REMOTE_PORT",
+-		  ap_psprintf(r->pool, "%d", ntohs(c->remote_addr.sin_port)));
++    servbuf[0] = '\0';
++    if (!getnameinfo((struct sockaddr *)&c->remote_addr,
++#ifndef HAVE_SOCKADDR_LEN
++		     SA_LEN((struct sockaddr *)&c->remote_addr),
++#else
++		     c->remote_addr.ss_len,
++#endif
++		     NULL, 0, servbuf, sizeof(servbuf), NI_NUMERICSERV)){
++	ap_table_addn(e, "REMOTE_PORT", ap_pstrdup(r->pool, servbuf));
++    }
+ 
+     if (c->user) {
+ 	ap_table_addn(e, "REMOTE_USER", c->user);
+diff -Nru apache_1.3.20/src/main/util_uri.c apache_1.3.20.new/src/main/util_uri.c
+--- apache_1.3.20/src/main/util_uri.c	Sun Apr  8 09:50:02 2001
++++ apache_1.3.20.new/src/main/util_uri.c	Mon May 21 10:54:52 2001
+@@ -418,6 +418,12 @@
+          * the hostname.  If there's a port it is the first colon.
+          */
+         s = memchr(hostinfo, ':', uri - hostinfo);
++	if (*hostinfo == '[') {
++	    s = memchr(hostinfo+1, ']', uri - hostinfo - 1);
++	    if (s)
++		s = strchr(s, ':');
++	} else
++	    s = memchr(hostinfo, ':', uri - hostinfo);              
+         if (s == NULL) {
+             /* we expect the common case to have no port */
+             uptr->hostname = ap_pstrndup(p, hostinfo, uri - hostinfo);
+@@ -474,7 +480,12 @@
+     /* We expect hostinfo to point to the first character of
+      * the hostname.  There must be a port, separated by a colon
+      */
+-    s = strchr(hostinfo, ':');
++    if (*hostinfo == '[') {
++        s = strchr(hostinfo+1, ']');
++        if (s)
++            s = strchr(s, ':');
++    } else
++        s = strchr(hostinfo, ':');
+     if (s == NULL) {
+         return HTTP_BAD_REQUEST;
+     }
+diff -Nru apache_1.3.20/src/modules/proxy/mod_proxy.c apache_1.3.20.new/src/modules/proxy/mod_proxy.c
+--- apache_1.3.20/src/modules/proxy/mod_proxy.c	Mon May 21 11:02:04 2001
++++ apache_1.3.20.new/src/modules/proxy/mod_proxy.c	Mon May 21 10:54:52 2001
+@@ -555,11 +555,31 @@
+     struct proxy_remote *new;
+     char *p, *q;
+     int port;
++    char *bl = NULL, *br = NULL;
+ 
+     p = strchr(r, ':');
+     if (p == NULL || p[1] != '/' || p[2] != '/' || p[3] == '\0')
+ 	return "ProxyRemote: Bad syntax for a remote proxy server";
+-    q = strchr(p + 3, ':');
++    bl = p + 3;
++    if (*bl == '['){
++	br = strrchr(bl+1, ']');
++	if (br){
++	    bl++;
++	    *br = '\0';
++	    if (*(br+1) == ':'){	/* [host]:xx */
++		q = br+1;
++	    }
++	    else if (*(br+1) == '\0'){	/* [host] */
++		q = NULL;
++	    }
++	    else
++		q = strrchr(br, ':');	/* XXX */
++	}
++	else
++	    q = strrchr(bl, ':');	/* XXX */
++    }
++    else
++	q = strrchr(bl, ':');
+     if (q != NULL) {
+ 	if (sscanf(q + 1, "%u", &port) != 1 || port > 65535)
+ 	    return "ProxyRemote: Bad syntax for a remote proxy server (bad port number)";
+@@ -570,7 +590,7 @@
+     *p = '\0';
+     if (strchr(f, ':') == NULL)
+ 	ap_str_tolower(f);		/* lowercase scheme */
+-    ap_str_tolower(p + 3);		/* lowercase hostname */
++    ap_str_tolower(bl);			/* lowercase hostname */
+ 
+     if (port == -1) {
+ 	int i;
+@@ -583,7 +603,7 @@
+     new = ap_push_array(conf->proxies);
+     new->scheme = f;
+     new->protocol = r;
+-    new->hostname = p + 3;
++    new->hostname = bl;
+     new->port = port;
+     return NULL;
+ }
+diff -Nru apache_1.3.20/src/modules/proxy/mod_proxy.h apache_1.3.20.new/src/modules/proxy/mod_proxy.h
+--- apache_1.3.20/src/modules/proxy/mod_proxy.h	Mon Jan 15 18:05:28 2001
++++ apache_1.3.20.new/src/modules/proxy/mod_proxy.h	Mon May 21 10:54:52 2001
+@@ -318,7 +318,7 @@
+ int ap_proxy_is_domainname(struct dirconn_entry *This, pool *p);
+ int ap_proxy_is_hostname(struct dirconn_entry *This, pool *p);
+ int ap_proxy_is_word(struct dirconn_entry *This, pool *p);
+-int ap_proxy_doconnect(int sock, struct sockaddr_in *addr, request_rec *r);
++int ap_proxy_doconnect(int sock, struct sockaddr *addr, request_rec *r);
+ int ap_proxy_garbage_init(server_rec *, pool *);
+ /* This function is called by ap_table_do() for all header lines */
+ int ap_proxy_send_hdr_line(void *p, const char *key, const char *value);
+diff -Nru apache_1.3.20/src/modules/proxy/proxy_connect.c apache_1.3.20.new/src/modules/proxy/proxy_connect.c
+--- apache_1.3.20/src/modules/proxy/proxy_connect.c	Mon Jan 15 18:05:29 2001
++++ apache_1.3.20.new/src/modules/proxy/proxy_connect.c	Mon May 21 10:54:52 2001
+@@ -116,14 +116,15 @@
+ 			  const char *proxyhost, int proxyport)
+ {
+     struct sockaddr_in server;
+-    struct in_addr destaddr;
+-    struct hostent server_hp;
+-    const char *host, *err;
++    struct addrinfo hints, *res, *res0;
++    const char *hoststr;
++    const char *portstr = NULL;
+     char *p;
+     int port, sock;
+     char buffer[HUGE_STRING_LEN];
+-    int nbytes, i, j;
++    int nbytes, i;
+     fd_set fds;
++    int error;
+ 
+     void *sconf = r->server->module_config;
+     proxy_server_conf *conf =
+@@ -131,26 +132,59 @@
+     struct noproxy_entry *npent = (struct noproxy_entry *) conf->noproxies->elts;
+ 
+     memset(&server, '\0', sizeof(server));
++#ifdef HAVE_SOCKADDR_LEN
++    server.sin_len = sizeof(server);
++#endif
+     server.sin_family = AF_INET;
+ 
+     /* Break the URL into host:port pairs */
+ 
+-    host = url;
++    hoststr = url;
+     p = strchr(url, ':');
+-    if (p == NULL)
+-	port = DEFAULT_HTTPS_PORT;
+-    else {
+-	port = atoi(p + 1);
++    if (p == NULL) {
++	char pbuf[32];
++	ap_snprintf(pbuf, sizeof(pbuf), "%d", DEFAULT_HTTPS_PORT);
++	portstr = pbuf;
++    } else {
++	portstr = p + 1;
+ 	*p = '\0';
+     }
++    port = atoi(portstr);
++
++    memset(&hints, 0, sizeof(hints));
++    hints.ai_family = PF_UNSPEC;
++    hints.ai_socktype = SOCK_STREAM;
++    hints.ai_protocol = IPPROTO_TCP;
++    error = getaddrinfo(hoststr, portstr, &hints, &res0);
++    if (error) {
++	return ap_proxyerror(r, HTTP_INTERNAL_SERVER_ERROR,
++		    gai_strerror(error));       /* give up */
++    }
+ 
+ /* check if ProxyBlock directive on this host */
+-    destaddr.s_addr = ap_inet_addr(host);
+-    for (i = 0; i < conf->noproxies->nelts; i++) {
+-	if ((npent[i].name != NULL && strstr(host, npent[i].name) != NULL)
+-	    || destaddr.s_addr == npent[i].addr.s_addr || npent[i].name[0] == '*')
++    for (res = res0; res; res = res = res->ai_next) {
++	struct sockaddr_in *sin;
++	int fail;
++
++	fail = 0;
++	for (i = 0; i < conf->noproxies->nelts; i++) {
++	    if (npent[i].name != NULL && strstr(hoststr, npent[i].name))
++		fail++;
++	    if (npent[i].name != NULL && strcmp(npent[i].name, "*") == 0)
++		fail++;
++	    switch (res->ai_family) {
++	    case AF_INET:
++		sin = (struct sockaddr_in *)res->ai_addr;
++		if (sin->sin_addr.s_addr == npent[i].addr.s_addr)
++		    fail++;
++		break;
++	    }
++	}
++	if (fail) {
++	    freeaddrinfo(res0);
+ 	    return ap_proxyerror(r, HTTP_FORBIDDEN,
+ 				 "Connect to remote machine blocked");
++	}
+     }
+ 
+     /* Check if it is an allowed port */
+@@ -161,59 +195,64 @@
+ 	    case DEFAULT_SNEWS_PORT:
+ 		break;
+ 	    default:
++		freeaddrinfo(res0);
+ 		return HTTP_FORBIDDEN;
+ 	}
+-    } else if(!allowed_port(conf, port))
++    } else if(!allowed_port(conf, port)) {
++	freeaddrinfo(res0);
+ 	return HTTP_FORBIDDEN;
++    }
+ 
+     if (proxyhost) {
++	char pbuf[10];
++
++	freeaddrinfo(res0);
++
++	ap_snprintf(pbuf, sizeof(pbuf), "%d", proxyport);
++	memset(&hints, 0, sizeof(hints));
++	hints.ai_family = PF_UNSPEC;
++	hints.ai_socktype = SOCK_STREAM;
++	hints.ai_protocol = IPPROTO_TCP;
++	error = getaddrinfo(proxyhost, pbuf, &hints, &res0);
++	if (error)
++	    return HTTP_INTERNAL_SERVER_ERROR;	/* XXX */
++
+ 	Explain2("CONNECT to remote proxy %s on port %d", proxyhost, proxyport);
+     }
+     else {
+-	Explain2("CONNECT to %s on port %d", host, port);
++	Explain2("CONNECT to %s on port %d", hoststr, port);
+     }
+ 
+-    server.sin_port = (proxyport ? htons(proxyport) : htons(port));
+-    err = ap_proxy_host2addr(proxyhost ? proxyhost : host, &server_hp);
+-
+-    if (err != NULL)
+-	return ap_proxyerror(r,
+-			     proxyhost ? HTTP_BAD_GATEWAY : HTTP_INTERNAL_SERVER_ERROR,
+-			     err);
+-
+-    sock = ap_psocket(r->pool, PF_INET, SOCK_STREAM, IPPROTO_TCP);
+-    if (sock == -1) {
+-	ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
+-		    "proxy: error creating socket");
+-	return HTTP_INTERNAL_SERVER_ERROR;
+-    }
++    sock = i = -1;
++    for (res = res0; res; res = res->ai_next) {
++	sock = ap_psocket(r->pool, res->ai_family, res->ai_socktype, res->ai_protocol);
++	if (sock == -1)
++	    continue;
+ 
+ #ifdef CHECK_FD_SETSIZE
+-    if (sock >= FD_SETSIZE) {
+-	ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_WARNING, NULL,
+-	    "proxy_connect_handler: filedescriptor (%u) "
+-	    "larger than FD_SETSIZE (%u) "
+-	    "found, you probably need to rebuild Apache with a "
+-	    "larger FD_SETSIZE", sock, FD_SETSIZE);
+-	ap_pclosesocket(r->pool, sock);
+-	return HTTP_INTERNAL_SERVER_ERROR;
+-    }
++	if (sock >= FD_SETSIZE) {
++	    ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_WARNING, NULL,
++			"proxy_connect_handler: filedescriptor (%u) "
++			"larger than FD_SETSIZE (%u) "
++			"found, you probably need to rebuild Apache with a "
++			"larger FD_SETSIZE.  Anyway try to open next socket.",
++			sock, FD_SETSIZE);
++	    ap_pclosesocket(r->pool, sock);
++	    continue;
++	}
+ #endif
+ 
+-    j = 0;
+-    while (server_hp.h_addr_list[j] != NULL) {
+-	memcpy(&server.sin_addr, server_hp.h_addr_list[j],
+-	       sizeof(struct in_addr));
+-	i = ap_proxy_doconnect(sock, &server, r);
++	i = ap_proxy_doconnect(sock, res->ai_addr, r);
+ 	if (i == 0)
+ 	    break;
+-	j++;
+     }
++    freeaddrinfo(res0);
+     if (i == -1) {
+ 	ap_pclosesocket(r->pool, sock);
+-	return ap_proxyerror(r, HTTP_INTERNAL_SERVER_ERROR, ap_pstrcat(r->pool,
+-					"Could not connect to remote machine:<br>",
+-					strerror(errno), NULL));
++	return ap_proxyerror(r, HTTP_INTERNAL_SERVER_ERROR,
++			ap_pstrcat(r->pool,
++				"Could not connect to remote machine:<br>",
++				strerror(errno), NULL));
+     }
+ 
+     /* If we are connecting through a remote proxy, we need to pass
+diff -Nru apache_1.3.20/src/modules/proxy/proxy_ftp.c apache_1.3.20.new/src/modules/proxy/proxy_ftp.c
+--- apache_1.3.20/src/modules/proxy/proxy_ftp.c	Fri Mar  9 11:10:31 2001
++++ apache_1.3.20.new/src/modules/proxy/proxy_ftp.c	Mon May 21 10:54:52 2001
+@@ -62,6 +62,7 @@
+ #include "http_main.h"
+ #include "http_log.h"
+ #include "http_core.h"
++#include "sa_len.h"
+ 
+ #define AUTODETECT_PWD
+ 
+@@ -453,8 +454,10 @@
+     const char *err;
+     int port, i, j, len, sock, dsock, rc, nocache = 0;
+     int csd = 0;
+-    struct sockaddr_in server;
+-    struct hostent server_hp;
++    struct sockaddr_storage server;
++    struct addrinfo hints, *res, *res0;
++    char portbuf[10];
++    int error;
+     struct in_addr destaddr;
+     table *resp_hdrs;
+     BUFF *f;
+@@ -475,11 +478,18 @@
+     unsigned int presult, h0, h1, h2, h3, p0, p1;
+     unsigned int paddr;
+     unsigned short pport;
+-    struct sockaddr_in data_addr;
++    struct sockaddr_storage data_addr;
++    struct sockaddr_in *sin;
+     int pasvmode = 0;
+     char pasv[64];
+     char *pstr;
+ 
++/* stuff for LPSV/EPSV */
++    unsigned int paf, holen, ho[16], polen, po[2];
++    struct sockaddr_in6 *sin6;
++    int lpsvmode = 0;
++    char *cmd;
++
+ /* stuff for responses */
+     char resp[MAX_STRING_LEN];
+     char *size = NULL;
+@@ -549,62 +559,52 @@
+     if (parms != NULL)
+ 	*(parms++) = '\0';
+ 
+-    memset(&server, 0, sizeof(struct sockaddr_in));
+-    server.sin_family = AF_INET;
+-    server.sin_port = htons(port);
+-    err = ap_proxy_host2addr(host, &server_hp);
+-    if (err != NULL)
+-	return ap_proxyerror(r, HTTP_INTERNAL_SERVER_ERROR, err);
+-
+-    sock = ap_psocket(p, PF_INET, SOCK_STREAM, IPPROTO_TCP);
+-    if (sock == -1) {
+-	ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
+-		     "proxy: error creating socket");
+-	return HTTP_INTERNAL_SERVER_ERROR;
+-    }
++    ap_snprintf(portbuf, sizeof(portbuf), "%d", port);
++    memset(&hints, 0, sizeof(hints));
++    hints.ai_family = PF_UNSPEC;
++    hints.ai_socktype = SOCK_STREAM;
++    error = getaddrinfo(host, portbuf, &hints, &res0);
++    if (error) {
++	return ap_proxyerror(r, HTTP_INTERNAL_SERVER_ERROR,
++	    gai_strerror(error));
++    }
++
++    i = -1;
++    for (res = res0; res; res = res->ai_next) {
++	sock = ap_psocket(p, res->ai_family, res->ai_socktype,
++	    res->ai_protocol);
++	if (sock == -1)
++	    continue;
+ 
+ #if !defined(TPF) && !defined(BEOS)
+-    if (conf->recv_buffer_size > 0
+-	&& setsockopt(sock, SOL_SOCKET, SO_RCVBUF,
+-		       (const char *) &conf->recv_buffer_size, sizeof(int))
+-	    == -1) {
+-	    ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
+-			 "setsockopt(SO_RCVBUF): Failed to set ProxyReceiveBufferSize, using default");
+-    }
++	if (conf->recv_buffer_size > 0
++	    && setsockopt(sock, SOL_SOCKET, SO_RCVBUF,
++			   (const char *) &conf->recv_buffer_size, sizeof(int))
++		== -1) {
++		ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
++			     "setsockopt(SO_RCVBUF): Failed to set ProxyReceiveBufferSize, using default");
++	}
+ #endif
+ 
+-    if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (void *) &one,
+-		   sizeof(one)) == -1) {
++	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (void *) &one,
++		       sizeof(one)) == -1) {
+ #ifndef _OSD_POSIX /* BS2000 has this option "always on" */
+-	ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
+-		     "proxy: error setting reuseaddr option: setsockopt(SO_REUSEADDR)");
+-	ap_pclosesocket(p, sock);
+-	return HTTP_INTERNAL_SERVER_ERROR;
++	    ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
++			 "proxy: error setting reuseaddr option: setsockopt(SO_REUSEADDR)");
++	    ap_pclosesocket(p, sock);
++	    freeaddrinfo(res0);
++	    return HTTP_INTERNAL_SERVER_ERROR;
+ #endif /*_OSD_POSIX*/
+-    }
+-
+-#ifdef SINIX_D_RESOLVER_BUG
+-    {
+-	struct in_addr *ip_addr = (struct in_addr *) *server_hp.h_addr_list;
+-
+-	for (; ip_addr->s_addr != 0; ++ip_addr) {
+-	    memcpy(&server.sin_addr, ip_addr, sizeof(struct in_addr));
+-	    i = ap_proxy_doconnect(sock, &server, r);
+-	    if (i == 0)
+-		break;
+ 	}
+-    }
+-#else
+-    j = 0;
+-    while (server_hp.h_addr_list[j] != NULL) {
+-	memcpy(&server.sin_addr, server_hp.h_addr_list[j],
+-	       sizeof(struct in_addr));
+-	i = ap_proxy_doconnect(sock, &server, r);
+-	if (i == 0)
++
++	i = ap_proxy_doconnect(sock, res->ai_addr, r);
++	if (i == 0){
++	    memcpy(&server, res->ai_addr, res->ai_addrlen);
+ 	    break;
+-	j++;
++	}
++	ap_pclosesocket(p, sock);
+     }
+-#endif
++    freeaddrinfo(res0);
+     if (i == -1) {
+ 	ap_pclosesocket(p, sock);
+ 	return ap_proxyerror(r, HTTP_BAD_GATEWAY, ap_pstrcat(r->pool,
+@@ -808,7 +808,7 @@
+     }
+ 
+ /* try to set up PASV data connection first */
+-    dsock = ap_psocket(p, PF_INET, SOCK_STREAM, IPPROTO_TCP);
++    dsock = ap_psocket(p, server.ss_family, SOCK_STREAM, IPPROTO_TCP);
+     if (dsock == -1) {
+ 	ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
+ 		     "proxy: error creating PASV socket");
+@@ -827,11 +827,21 @@
+     }
+ #endif
+ 
+-    ap_bputs("PASV" CRLF, f);
++lpsvagain:
++    if (server.ss_family == AF_INET)
++	cmd = "PASV";
++    else if (lpsvmode)
++	cmd = "LPSV";
++    else
++	cmd = "EPSV";
++    ap_bputs(cmd, f);
++    ap_bputs(CRLF, f);
+     ap_bflush(f);
+-    Explain0("FTP: PASV command issued");
++    Explain0("FTP: passive command issued");
+ /* possible results: 227, 421, 500, 501, 502, 530 */
+     /* 227 Entering Passive Mode (h1,h2,h3,h4,p1,p2). */
++    /* 228 Entering Long Passive Mode (...). */
++    /* 229 Entering Extended Passive Mode (...). */
+     /* 421 Service not available, closing control connection. */
+     /* 500 Syntax error, command unrecognized. */
+     /* 501 Syntax error in parameters or arguments. */
+@@ -840,7 +850,7 @@
+     i = ap_bgets(pasv, sizeof(pasv), f);
+     if (i == -1) {
+ 	ap_log_rerror(APLOG_MARK, APLOG_ERR|APLOG_NOERRNO, r,
+-		     "PASV: control connection is toast");
++		     "%s: control connection is toast", cmd);
+ 	ap_pclosesocket(p, dsock);
+ 	ap_bclose(f);
+ 	ap_kill_timeout(r);
+@@ -872,10 +882,14 @@
+ 	    pport = (p1 << 8) + p0;
+ 	    Explain5("FTP: contacting host %d.%d.%d.%d:%d",
+ 		     h3, h2, h1, h0, pport);
+-	    data_addr.sin_family = AF_INET;
+-	    data_addr.sin_addr.s_addr = htonl(paddr);
+-	    data_addr.sin_port = htons(pport);
+-	    i = ap_proxy_doconnect(dsock, &data_addr, r);
++	    sin = (struct sockaddr_in *)&data_addr;
++	    sin->sin_family = AF_INET;
++#ifdef SIN6_LEN
++	    sin->sin_len = sizeof(*sin);
++#endif
++	    sin->sin_addr.s_addr = htonl(paddr);
++	    sin->sin_port = htons(pport);
++	    i = ap_proxy_doconnect(dsock, (struct sockaddr *)&data_addr, r);
+ 
+ 	    if (i == -1) {
+ 		ap_kill_timeout(r);
+@@ -883,17 +897,76 @@
+ 				     ap_pstrcat(r->pool,
+ 						"Could not connect to remote machine: ",
+ 						strerror(errno), NULL));
++	    } else {
++		pasvmode = 1;
+ 	    }
+-	    else {
++	} else if (presult == 228 && pstr != NULL
++		&& sscanf(pstr,
++"%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u",
++		    &paf, &holen, &ho[0], &ho[1], &ho[2], &ho[3],
++		    &ho[4], &ho[5], &ho[6], &ho[7], &ho[8], &ho[9], &ho[10], &ho[11],
++		    &ho[12], &ho[13], &ho[14], &ho[15], &polen, &po[0], &po[1]) == 21
++		&& paf == 6 && holen == 16 && polen == 2) {
++	    int i;
++	    sin6 = (struct sockaddr_in6 *)&data_addr;
++	    sin6->sin6_family = AF_INET6;
++#ifdef SIN6_LEN
++	    sin6->sin6_len = sizeof(*sin6);
++#endif
++	    for (i = 0; i < 16; i++)
++		sin6->sin6_addr.s6_addr[i] = ho[i] & 0xff;
++	    sin6->sin6_port = htons(((po[0] & 0xff) << 8) | (po[1] & 0xff));
++	    i = ap_proxy_doconnect(dsock, (struct sockaddr *)&data_addr, r);
++
++	    if (i == -1) {
++		ap_kill_timeout(r);
++		return ap_proxyerror(r, HTTP_BAD_GATEWAY,
++				     ap_pstrcat(r->pool,
++						"Could not connect to remote machine: ",
++						strerror(errno), NULL));
++	    } else {
++		pasvmode = 1;
++	    }
++	} else if (presult == 229 && pstr != NULL
++		&& pstr[0] == pstr[1] && pstr[0] == pstr[2]
++		&& pstr[0] == pstr[strlen(pstr) - 1]) {
++	    /* expect "|||port|" */
++#ifndef SIN6_LEN
++	    memcpy(&data_addr, &server, SA_LEN((struct sockaddr *)&server));
++#else
++	    memcpy(&data_addr, &server, server.ss_len);
++#endif
++	    switch (data_addr.ss_family) {
++	    case AF_INET:
++		sin = (struct sockaddr_in *)&data_addr;
++		sin->sin_port = htons(atoi(pstr + 3));
++		break;
++	    case AF_INET6:
++		sin6 = (struct sockaddr_in6 *)&data_addr;
++		sin6->sin6_port = htons(atoi(pstr + 3));
++		break;
++	    }
++	    i = ap_proxy_doconnect(dsock, (struct sockaddr *)&data_addr, r);
++
++	    if (i == -1) {
++		ap_kill_timeout(r);
++		return ap_proxyerror(r, HTTP_BAD_GATEWAY,
++				     ap_pstrcat(r->pool,
++						"Could not connect to remote machine: ",
++						strerror(errno), NULL));
++	    } else {
+ 		pasvmode = 1;
+ 	    }
++	} else if (!lpsvmode && strcmp(cmd, "EPSV") == 0) {
++	    lpsvmode = 1;
++	    goto lpsvagain;
+ 	}
+ 	else
+ 	    ap_pclosesocket(p, dsock);	/* and try the regular way */
+     }
+ 
+     if (!pasvmode) {		/* set up data connection */
+-	clen = sizeof(struct sockaddr_in);
++	clen = sizeof(server);
+ 	if (getsockname(sock, (struct sockaddr *) &server, &clen) < 0) {
+ 	    ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
+ 			 "proxy: error getting socket address");
+@@ -902,7 +975,7 @@
+ 	    return HTTP_INTERNAL_SERVER_ERROR;
+ 	}
+ 
+-	dsock = ap_psocket(p, PF_INET, SOCK_STREAM, IPPROTO_TCP);
++	dsock = ap_psocket(p, server.ss_family, SOCK_STREAM, IPPROTO_TCP);
+ 	if (dsock == -1) {
+ 	    ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
+ 			 "proxy: error creating socket");
+@@ -923,13 +996,26 @@
+ #endif /*_OSD_POSIX*/
+ 	}
+ 
+-	if (bind(dsock, (struct sockaddr *) &server,
+-		 sizeof(struct sockaddr_in)) == -1) {
+-	    char buff[22];
++#ifndef SIN6_LEN
++	if (bind(dsock, (struct sockaddr *) &server, SA_LEN((struct sockaddr *)&server)) == -1)
++#else
++	if (bind(dsock, (struct sockaddr *) &server, server.ss_len) == -1)
++#endif
++	{
++	    char hostnamebuf[MAXHOSTNAMELEN], portnamebuf[MAXHOSTNAMELEN];
+ 
+-	    ap_snprintf(buff, sizeof(buff), "%s:%d", inet_ntoa(server.sin_addr), server.sin_port);
++	    getnameinfo((struct sockaddr *)&server,
++#ifndef SIN6_LEN
++		    SA_LEN((struct sockaddr *)&server),
++#else
++		    server.ss_len,
++#endif
++		hostnamebuf, sizeof(hostnamebuf),
++		portnamebuf, sizeof(portnamebuf),
++		NI_NUMERICHOST | NI_NUMERICSERV);
+ 	    ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
+-			 "proxy: error binding to ftp data socket %s", buff);
++			 "proxy: error binding to ftp data socket %s:%s",
++			 hostnamebuf, portnamebuf);
+ 	    ap_bclose(f);
+ 	    ap_pclosesocket(p, dsock);
+ 	    return HTTP_INTERNAL_SERVER_ERROR;
+@@ -1188,7 +1274,7 @@
+ 
+     if (!pasvmode) {		/* wait for connection */
+ 	ap_hard_timeout("proxy ftp data connect", r);
+-	clen = sizeof(struct sockaddr_in);
++	clen = sizeof(server);
+ 	do
+ 	    csd = accept(dsock, (struct sockaddr *) &server, &clen);
+ 	while (csd == -1 && errno == EINTR);
+diff -Nru apache_1.3.20/src/modules/proxy/proxy_http.c apache_1.3.20.new/src/modules/proxy/proxy_http.c
+--- apache_1.3.20/src/modules/proxy/proxy_http.c	Mon May 21 11:02:04 2001
++++ apache_1.3.20.new/src/modules/proxy/proxy_http.c	Mon May 21 10:54:52 2001
+@@ -177,9 +177,8 @@
+     array_header *reqhdrs_arr;
+     table *resp_hdrs;
+     table_entry *reqhdrs;
+-    struct sockaddr_in server;
+-    struct in_addr destaddr;
+-    struct hostent server_hp;
++    struct addrinfo hints, *res, *res0;
++    int error;
+     BUFF *f;
+     char buffer[HUGE_STRING_LEN];
+     char portstr[32];
+@@ -201,9 +200,6 @@
+     struct nocache_entry *ncent = (struct nocache_entry *) conf->nocaches->elts;
+     int nocache = 0;
+ 
+-    memset(&server, '\0', sizeof(server));
+-    server.sin_family = AF_INET;
+-
+ /* We break the URL into host, port, path-search */
+ 
+     urlptr = strstr(url, "://");
+@@ -211,6 +207,8 @@
+ 	return HTTP_BAD_REQUEST;
+     urlptr += 3;
+     destport = DEFAULT_HTTP_PORT;
++    ap_snprintf(portstr, sizeof(portstr), "%d", DEFAULT_HTTP_PORT);
++    destportstr = portstr;           
+ #ifdef EAPI
+     ap_hook_use("ap::mod_proxy::http::handler::set_destport", 
+                 AP_HOOK_SIG2(int,ptr), 
+@@ -229,7 +227,20 @@
+ 	urlptr = strp;
+ 	desthost = q;
+     }
+-
++   if (*desthost == '['){
++       char *u = strrchr(desthost+1, ']');
++       if (u){
++	   desthost++;
++	   *u = '\0';
++	   if (*(u+1) == ':'){ /* [host]:xx */
++	       strp2 = u+1;
++	   } else if (*(u+1) == '\0'){   /* [host] */
++	       strp2 = NULL;
++	   } else
++	       return HTTP_BAD_REQUEST;
++	} else
++	    return HTTP_BAD_REQUEST;
++   } else
+     strp2 = strchr(desthost, ':');
+     if (strp2 != NULL) {
+ 	*(strp2++) = '\0';
+@@ -240,41 +251,69 @@
+     }
+ 
+ /* check if ProxyBlock directive on this host */
+-    destaddr.s_addr = ap_inet_addr(desthost);
+-    for (i = 0; i < conf->noproxies->nelts; i++) {
+-        if (destaddr.s_addr == npent[i].addr.s_addr ||
+-            (npent[i].name != NULL &&
+-              (npent[i].name[0] == '*' || strstr(desthost, npent[i].name) != NULL)))
++     memset(&hints, 0, sizeof(hints));
++     hints.ai_family = PF_UNSPEC;
++     hints.ai_socktype = SOCK_STREAM;
++     hints.ai_protocol = IPPROTO_TCP;
++     error = getaddrinfo(desthost, destportstr, &hints, &res0);
++     if (error) {
++       return ap_proxyerror(r, HTTP_INTERNAL_SERVER_ERROR,
++               gai_strerror(error));       /* give up */
++     }
++    
++ /* check if ProxyBlock directive on this host */
++     for (res = res0; res; res = res->ai_next) {
++       struct sockaddr_in *sin;
++ #ifdef INET6
++       struct sockaddr_in6 *sin6;
++ #endif
++       int fail;
++       
++       fail = 0;
++       for (i = 0; i < conf->noproxies->nelts; i++) {
++           if (npent[i].name != NULL && strstr(desthost, npent[i].name))
++               fail++;
++           if (npent[i].name != NULL && strcmp(npent[i].name, "*") == 0)
++               fail++;
++           switch (res->ai_family) {
++               case AF_INET:
++                   sin = (struct sockaddr_in *)res->ai_addr;
++                   if (sin->sin_addr.s_addr == npent[i].addr.s_addr)
++                       fail++;
++                   break;
++                   }
++           }
++       if (fail) {
++           freeaddrinfo(res0);                  
+             return ap_proxyerror(r, HTTP_FORBIDDEN,
+                                  "Connect to remote machine blocked");
+-    }
+-
+-    if (proxyhost != NULL) {
+-	server.sin_port = htons(proxyport);
+-	err = ap_proxy_host2addr(proxyhost, &server_hp);
+-	if (err != NULL)
+-	    return DECLINED;	/* try another */
+-#ifdef EAPI
+-	peer = ap_psprintf(p, "%s:%u", proxyhost, proxyport);  
+-#endif
+-    }
+-    else {
+-	server.sin_port = htons(destport);
+-	err = ap_proxy_host2addr(desthost, &server_hp);
+-	if (err != NULL)
+-	    return ap_proxyerror(r, HTTP_INTERNAL_SERVER_ERROR, err);
+-#ifdef EAPI
+-	peer =  ap_psprintf(p, "%s:%u", desthost, destport);  
+-#endif
+-    }
+-
+-    sock = ap_psocket(p, PF_INET, SOCK_STREAM, IPPROTO_TCP);
+-    if (sock == -1) {
+-	ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
+-		    "proxy: error creating socket");
+-	return HTTP_INTERNAL_SERVER_ERROR;
+-    }
+-
++       }
++      }
++  
++      if (proxyhost != NULL) {
++       char pbuf[10];
++       
++       freeaddrinfo(res0);
++       ap_snprintf(pbuf, sizeof(pbuf), "%d", proxyport);
++       memset(&hints, 0, sizeof(hints));
++       hints.ai_family = PF_UNSPEC;
++       hints.ai_socktype = SOCK_STREAM;
++       hints.ai_protocol = IPPROTO_TCP;
++       error = getaddrinfo(proxyhost, pbuf, &hints, &res0);
++       if (error)
++            return DECLINED;    /* try another */
++  #ifdef EAPI
++        peer = ap_psprintf(p, "%s:%u", proxyhost, proxyport);  
++  #endif
++      }
++  
++     sock = i = -1;
++     for (res = res0; res; res = res->ai_next) {
++       sock = ap_psocket(p, res->ai_family, res->ai_socktype,
++               res->ai_protocol);
++       if (sock < 0)
++           continue;
++    
+ #if !defined(TPF) && !defined(BEOS)
+     if (conf->recv_buffer_size) {
+ 	if (setsockopt(sock, SOL_SOCKET, SO_RCVBUF,
+@@ -286,28 +325,12 @@
+     }
+ #endif
+ 
+-#ifdef SINIX_D_RESOLVER_BUG
+-    {
+-	struct in_addr *ip_addr = (struct in_addr *) *server_hp.h_addr_list;
+-
+-	for (; ip_addr->s_addr != 0; ++ip_addr) {
+-	    memcpy(&server.sin_addr, ip_addr, sizeof(struct in_addr));
+-	    i = ap_proxy_doconnect(sock, &server, r);
+-	    if (i == 0)
+-		break;
+-	}
+-    }
+-#else
+-    j = 0;
+-    while (server_hp.h_addr_list[j] != NULL) {
+-	memcpy(&server.sin_addr, server_hp.h_addr_list[j],
+-	       sizeof(struct in_addr));
+-	i = ap_proxy_doconnect(sock, &server, r);
++	i = ap_proxy_doconnect(sock, res->ai_addr, r);
+ 	if (i == 0)
+ 	    break;
+-	j++;
++	ap_pclosesocket(p, sock); 
+     }
+-#endif
++    freeaddrinfo(res0);
+     if (i == -1) {
+ 	if (proxyhost != NULL)
+ 	    return DECLINED;	/* try again another way */
+@@ -515,17 +538,31 @@
+ 	ap_table_set(resp_hdrs, "URI", proxy_location_reverse_map(r, datestr));
+ 
+ /* check if NoCache directive on this host */
++  {
++    struct sockaddr_in *sin;
++#ifdef INET6
++    struct sockaddr_in6 *sin6;
++#endif
++
+     if (nocache == 0) {
+ 	for (i = 0; i < conf->nocaches->nelts; i++) {
+-	    if (destaddr.s_addr == ncent[i].addr.s_addr ||
+-	        (ncent[i].name != NULL &&
+-		  (ncent[i].name[0] == '*' ||
+-		   strstr(desthost, ncent[i].name) != NULL))) {
+-	       nocache = 1;
+-	       break;
++	    if (ncent[i].name != NULL && 
++		(ncent[i].name[0] == '*' ||
++		 strstr(desthost, ncent[i].name) != NULL)) {
++		nocache = 1;
++		break;
++	    }
++	    switch (res->ai_addr->sa_family) {
++	    case AF_INET:
++		sin = (struct sockaddr_in *)res->ai_addr;
++		if (sin->sin_addr.s_addr == ncent[i].addr.s_addr) {
++		    nocache = 1;
++		    break;
++		}
+ 	    }
+ 	}
+     }
++  }
+ 
+     i = ap_proxy_cache_update(c, resp_hdrs, !backasswards, nocache);
+     if (i != DECLINED) {
+diff -Nru apache_1.3.20/src/modules/proxy/proxy_util.c apache_1.3.20.new/src/modules/proxy/proxy_util.c
+--- apache_1.3.20/src/modules/proxy/proxy_util.c	Fri Mar 16 08:01:23 2001
++++ apache_1.3.20.new/src/modules/proxy/proxy_util.c	Mon May 21 10:54:52 2001
+@@ -64,6 +64,7 @@
+ #include "http_log.h"
+ #include "util_uri.h"
+ #include "util_date.h"	/* get ap_checkmask() decl. */
++#include "sa_len.h"
+ 
+ static int proxy_match_ipaddr(struct dirconn_entry *This, request_rec *r);
+ static int proxy_match_domainname(struct dirconn_entry *This, request_rec *r);
+@@ -218,6 +219,7 @@
+     int i;
+     char *strp, *host, *url = *urlp;
+     char *user = NULL, *password = NULL;
++    char *t = NULL, *u = NULL, *v = NULL;
+ 
+     if (url[0] != '/' || url[1] != '/')
+ 	return "Malformed URL";
+@@ -256,11 +258,22 @@
+ 	*passwordp = password;
+     }
+ 
+-    strp = strrchr(host, ':');
+-    if (strp != NULL) {
+-	*(strp++) = '\0';
+-
+-	for (i = 0; strp[i] != '\0'; i++)
++    v = host;
++    if (*host == '['){
++	u = strrchr(host, ']');
++	if (u){
++	    host++;
++	    *u = '\0';
++	    v = u + 1;
++	}
++    }
++    t = strrchr(v, ':');
++    if (t){
++	*t = '\0';
++	strp = t + 1;
++    }
++    if (strp){
++	for (i=0; strp[i] != '\0'; i++)
+ 	    if (!ap_isdigit(strp[i]))
+ 		break;
+ 
+@@ -278,17 +291,29 @@
+ 	return "Missing host in URL";
+ /* check hostname syntax */
+     for (i = 0; host[i] != '\0'; i++)
+-	if (!ap_isdigit(host[i]) && host[i] != '.')
++	if (!ap_isxdigit(host[i]) && host[i] != '.' && host[i] != ':')
+ 	    break;
+     /* must be an IP address */
+ #if defined(WIN32) || defined(NETWARE) || defined(TPF) || defined(BEOS)
+     if (host[i] == '\0' && (inet_addr(host) == -1))
++	return "Bad IP address in URL";
++#else
++    if (host[i] == '\0') {
++	struct addrinfo hints, *res0;
++	int gai;
++	memset(&hints, 0, sizeof(hints));
++	hints.ai_family = PF_UNSPEC;
++	hints.ai_flags = AI_NUMERICHOST;
++	if (gai = getaddrinfo(host, NULL, &hints, &res0)) {
++#if 0
++	    return gai_strerror(gai);
+ #else
+-    if (host[i] == '\0' && (ap_inet_addr(host) == -1 || inet_network(host) == -1))
++	    return "Bad IP address in URL";
+ #endif
+-    {
+-	return "Bad IP address in URL";
++	}
++	freeaddrinfo(res0);
+     }
++#endif
+ 
+ /*    if (strchr(host,'.') == NULL && domain != NULL)
+    host = pstrcat(p, host, domain, NULL);
+@@ -1238,22 +1263,45 @@
+     return host != NULL && strstr(host, This->name) != NULL;
+ }
+ 
+-int ap_proxy_doconnect(int sock, struct sockaddr_in *addr, request_rec *r)
++int ap_proxy_doconnect(int sock, struct sockaddr *addr, request_rec *r)
+ {
+     int i;
++    int salen;
++    char hbuf[NI_MAXHOST], pbuf[NI_MAXSERV];
++#ifdef NI_WITHSCOPEID
++    const int niflags = NI_NUMERICHOST | NI_NUMERICSERV | NI_WITHSCOPEID;
++#else
++    const int niflags = NI_NUMERICHOST | NI_NUMERICSERV;
++#endif
+ 
+     ap_hard_timeout("proxy connect", r);
++#ifdef HAVE_SOCKADDR_LEN
++    salen = addr->sa_len;
++#else
++    switch (addr->sa_family) {
++    case AF_INET6:
++	salen = sizeof(struct sockaddr_in6);
++	break;
++    default:
++	salen = sizeof(struct sockaddr_in);
++	break;
++    }
++#endif
+     do {
+-	i = connect(sock, (struct sockaddr *) addr, sizeof(struct sockaddr_in));
++	i = connect(sock,  addr, salen);
+ #if defined(WIN32) || defined(NETWARE)
+ 	if (i == SOCKET_ERROR)
+ 	    errno = WSAGetLastError();
+ #endif /* WIN32 */
+     } while (i == -1 && errno == EINTR);
+     if (i == -1) {
++	if (getnameinfo(addr, salen, hbuf, sizeof(hbuf), pbuf, sizeof(pbuf),
++		niflags) != 0) {
++	    strcpy(hbuf, "?");
++	    strcpy(pbuf, "?");
++	}
+ 	ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
+-		     "proxy connect to %s port %d failed",
+-		     inet_ntoa(addr->sin_addr), ntohs(addr->sin_port));
++		     "proxy connect to %s port %s failed", hbuf, pbuf);
+     }
+     ap_kill_timeout(r);
+ 
+diff -Nru apache_1.3.20/src/modules/standard/mod_access.c apache_1.3.20.new/src/modules/standard/mod_access.c
+--- apache_1.3.20/src/modules/standard/mod_access.c	Mon Jan 15 18:05:34 2001
++++ apache_1.3.20.new/src/modules/standard/mod_access.c	Mon May 21 10:54:52 2001
+@@ -74,7 +74,10 @@
+     T_ALL,
+     T_IP,
+     T_HOST,
+-    T_FAIL
++    T_FAIL,
++#ifdef INET6
++    T_IP6,
++#endif
+ };
+ 
+ typedef struct {
+@@ -82,9 +85,15 @@
+     union {
+ 	char *from;
+ 	struct {
+-	    unsigned long net;
+-	    unsigned long mask;
++	    struct in_addr net;
++	    struct in_addr mask;
+ 	} ip;
++#ifdef INET6
++	struct {
++	    struct in6_addr net6;
++	    struct in6_addr mask6;
++	} ip6;
++#endif
+     } x;
+     enum allowdeny_type type;
+ } allowdeny;
+@@ -167,90 +176,230 @@
+ 
+     }
+     else if ((s = strchr(where, '/'))) {
+-	unsigned long mask;
++	struct addrinfo hints, *resnet, *resmask;
++	struct sockaddr_storage net, mask;
++	int error;
++	char *p;
++	int justdigits;
+ 
+-	a->type = T_IP;
++	a->type = T_FAIL;	/*just in case*/
+ 	/* trample on where, we won't be using it any more */
+ 	*s++ = '\0';
+ 
+-	if (!is_ip(where)
+-	    || (a->x.ip.net = ap_inet_addr(where)) == INADDR_NONE) {
++	justdigits = 0;
++	for (p = s; *p; p++) {
++	    if (!isdigit(*p))
++		break;
++	}
++	if (!*p)
++	    justdigits++;
++
++	memset(&hints, 0, sizeof(hints));
++	hints.ai_family = PF_UNSPEC;
++	hints.ai_socktype = SOCK_STREAM;	/*dummy*/
++#ifdef AI_NUMERICHOST
++	hints.ai_flags = AI_NUMERICHOST;	/*don't resolve*/
++#endif
++	resnet = NULL;
++	error = getaddrinfo(where, NULL, &hints, &resnet);
++	if (error || !resnet) {
++	    if (resnet)
++		freeaddrinfo(resnet);
+ 	    a->type = T_FAIL;
+ 	    return "syntax error in network portion of network/netmask";
+ 	}
++	if (resnet->ai_next) {
++	    freeaddrinfo(resnet);
++	    a->type = T_FAIL;
++	    return "network/netmask resolved to multiple addresses";
++	}
++	memcpy(&net, resnet->ai_addr, resnet->ai_addrlen);
++	freeaddrinfo(resnet);
+ 
+-	/* is_ip just tests if it matches [\d.]+ */
+-	if (!is_ip(s)) {
++	switch (net.ss_family) {
++	case AF_INET:
++	    a->type = T_IP;
++	    a->x.ip.net.s_addr = ((struct sockaddr_in *)&net)->sin_addr.s_addr;
++	    break;
++#ifdef INET6
++	case AF_INET6:
++	    a->type = T_IP6;
++	    memcpy(&a->x.ip6.net6, &((struct sockaddr_in6 *)&net)->sin6_addr,
++		sizeof(a->x.ip6.net6));
++	    break;
++#endif
++	default:
+ 	    a->type = T_FAIL;
+-	    return "syntax error in mask portion of network/netmask";
++	    return "unknown address family for network";
+ 	}
+-	/* is it in /a.b.c.d form? */
+-	if (strchr(s, '.')) {
+-	    mask = ap_inet_addr(s);
+-	    if (mask == INADDR_NONE) {
++
++	if (!justdigits) {
++	    memset(&hints, 0, sizeof(hints));
++	    hints.ai_family = PF_UNSPEC;
++	    hints.ai_socktype = SOCK_STREAM;	/*dummy*/ 
++#ifdef AI_NUMERICHOST
++	    hints.ai_flags = AI_NUMERICHOST;	/*don't resolve*/
++#endif
++	    resmask = NULL;
++	    error = getaddrinfo(s, NULL, &hints, &resmask);
++	    if (error || !resmask) {
++		if (resmask)
++		    freeaddrinfo(resmask);
+ 		a->type = T_FAIL;
+ 		return "syntax error in mask portion of network/netmask";
+ 	    }
+-	}
+-	else {
+-	    /* assume it's in /nnn form */
+-	    mask = atoi(s);
+-	    if (mask > 32 || mask <= 0) {
+-		a->type = T_FAIL;
+-		return "invalid mask in network/netmask";
+-	    }
+-	    mask = 0xFFFFFFFFUL << (32 - mask);
+-	    mask = htonl(mask);
+-	}
+-	a->x.ip.mask = mask;
+-        a->x.ip.net  = (a->x.ip.net & mask);   /* pjr - This fixes PR 4770 */
+-    }
+-    else if (ap_isdigit(*where) && is_ip(where)) {
+-	/* legacy syntax for ip addrs: a.b.c. ==> a.b.c.0/24 for example */
+-	int shift;
+-	char *t;
+-	int octet;
+-
+-	a->type = T_IP;
+-	/* parse components */
+-	s = where;
+-	a->x.ip.net = 0;
+-	a->x.ip.mask = 0;
+-	shift = 24;
+-	while (*s) {
+-	    t = s;
+-	    if (!ap_isdigit(*t)) {
++	    if (resmask->ai_next) {
++		freeaddrinfo(resmask);
+ 		a->type = T_FAIL;
+-		return "invalid ip address";
++		return "network/netmask resolved to multiple addresses";
+ 	    }
+-	    while (ap_isdigit(*t)) {
+-		++t;
+-	    }
+-	    if (*t == '.') {
+-		*t++ = 0;
+-	    }
+-	    else if (*t) {
++	    memcpy(&mask, resmask->ai_addr, resmask->ai_addrlen);
++	    freeaddrinfo(resmask);
++
++	    if (net.ss_family != mask.ss_family) {
+ 		a->type = T_FAIL;
+-		return "invalid ip address";
++		return "network/netmask resolved to different address family";
+ 	    }
+-	    if (shift < 0) {
+-		return "invalid ip address, only 4 octets allowed";
++
++	    switch (a->type) {
++	    case T_IP:
++		a->x.ip.mask.s_addr =
++		    ((struct sockaddr_in *)&mask)->sin_addr.s_addr;
++		break;
++#ifdef INET6
++	    case T_IP6:
++		memcpy(&a->x.ip6.mask6,
++		    &((struct sockaddr_in6 *)&mask)->sin6_addr,
++		    sizeof(a->x.ip6.mask6));
++		break;
++#endif
+ 	    }
+-	    octet = atoi(s);
+-	    if (octet < 0 || octet > 255) {
+-		a->type = T_FAIL;
+-		return "each octet must be between 0 and 255 inclusive";
++	} else {
++	    int mask;
++	    mask = atoi(s);
++	    switch (a->type) {
++	    case T_IP:
++		if (mask < 0 || 32 < mask) {
++		    a->type = T_FAIL;
++		    return "netmask out of range";
++		}
++		a->x.ip.mask.s_addr = htonl(0xFFFFFFFFUL << (32 - mask));
++		break;
++#ifdef INET6
++	    case T_IP6:
++	      {
++		int i;
++		if (mask < 0 || 128 < mask) {
++		    a->type = T_FAIL;
++		    return "netmask out of range";
++		}
++		for (i = 0; i < mask / 8; i++) {
++		    a->x.ip6.mask6.s6_addr[i] = 0xff;
++		}
++		if (mask % 8)
++		    a->x.ip6.mask6.s6_addr[i] = 0xff << (8 - (mask % 8));
++		break;
++	      }
++#endif
+ 	    }
+-	    a->x.ip.net |= octet << shift;
+-	    a->x.ip.mask |= 0xFFUL << shift;
+-	    s = t;
+-	    shift -= 8;
+ 	}
+-	a->x.ip.net = ntohl(a->x.ip.net);
+-	a->x.ip.mask = ntohl(a->x.ip.mask);
+     }
+     else {
+-	a->type = T_HOST;
++	struct addrinfo hints, *res;
++	struct sockaddr_storage ss;
++	int error;
++
++	a->type = T_FAIL;	/*just in case*/
++
++	/* First, try using the old apache code to match */
++	/* legacy syntax for ip addrs: a.b.c. ==> a.b.c.0/24 for example */
++	if (ap_isdigit(*where) && is_ip(where)) {
++	    int shift;
++	    char *t;
++	    int octet;
++
++	    a->type = T_IP;
++	    /* parse components */
++	    s = where;
++	    a->x.ip.net.s_addr = 0;
++	    a->x.ip.mask.s_addr = 0;
++	    shift = 24;
++	    while (*s) {
++		t = s;
++		if (!ap_isdigit(*t)) {
++		    a->type = T_FAIL;
++		    return "invalid ip address";
++		}
++		while (ap_isdigit(*t)) {
++		    ++t;
++		}
++		if (*t == '.') {
++		    *t++ = 0;
++		}
++		else if (*t) {
++		    a->type = T_FAIL;
++		    return "invalid ip address";
++		}
++		if (shift < 0) {
++		    return "invalid ip address, only 4 octets allowed";
++		}
++		octet = atoi(s);
++		if (octet < 0 || octet > 255) {
++		    a->type = T_FAIL;
++		    return "each octet must be between 0 and 255 inclusive";
++		}
++		a->x.ip.net.s_addr |= octet << shift;
++		a->x.ip.mask.s_addr |= 0xFFUL << shift;
++		s = t;
++		shift -= 8;
++	    }
++	    a->x.ip.net.s_addr = ntohl(a->x.ip.net.s_addr);
++	    a->x.ip.mask.s_addr = ntohl(a->x.ip.mask.s_addr);
++
++	    return NULL;
++	}
++
++	/* IPv4/v6 numeric address */
++	memset(&hints, 0, sizeof(hints));
++	hints.ai_family = PF_UNSPEC;
++	hints.ai_socktype = SOCK_STREAM;	/*dummy*/
++#ifdef AI_NUMERICHOST
++	hints.ai_flags = AI_NUMERICHOST;	/*don't resolve*/
++#endif
++	res = NULL;
++	error = getaddrinfo(where, NULL, &hints, &res);
++	if (error || !res) {
++	    if (res)
++		freeaddrinfo(res);
++	    a->type = T_HOST;
++	    return NULL;
++	}
++	if (res->ai_next) {
++	    freeaddrinfo(res);
++	    a->type = T_FAIL;
++	    return "network/netmask resolved to multiple addresses";
++	}
++	memcpy(&ss, res->ai_addr, res->ai_addrlen);
++	freeaddrinfo(res);
++
++	switch (ss.ss_family) {
++	case AF_INET:
++	    a->type = T_IP;
++	    a->x.ip.net.s_addr = ((struct sockaddr_in *)&ss)->sin_addr.s_addr;
++	    memset(&a->x.ip.mask, 0xff, sizeof(a->x.ip.mask));
++	    break;
++#ifdef INET6
++	case AF_INET6:
++	    a->type = T_IP6;
++	    memcpy(&a->x.ip6.net6, &((struct sockaddr_in6 *)&ss)->sin6_addr,
++		sizeof(a->x.ip6.net6));
++	    memset(&a->x.ip6.mask6, 0xff, sizeof(a->x.ip6.mask6));
++	    break;
++#endif
++	default:
++	    a->type = T_FAIL;
++	    return "unknown address family for network";
++	}
+     }
+ 
+     return NULL;
+@@ -315,12 +464,63 @@
+ 	    return 1;
+ 
+ 	case T_IP:
+-	    if (ap[i].x.ip.net != INADDR_NONE
+-		&& (r->connection->remote_addr.sin_addr.s_addr
+-		    & ap[i].x.ip.mask) == ap[i].x.ip.net) {
+-		return 1;
++	    if (ap[i].x.ip.net.s_addr == INADDR_NONE)
++		break;
++	    switch (r->connection->remote_addr.ss_family) {
++	    case AF_INET:
++		if ((((struct sockaddr_in *)&r->connection->remote_addr)->sin_addr.s_addr
++			& ap[i].x.ip.mask.s_addr) == ap[i].x.ip.net.s_addr) {
++		    return 1;
++		}
++		break;
++#ifdef INET6
++	    case AF_INET6:
++		if (!IN6_IS_ADDR_V4MAPPED(&((struct sockaddr_in6 *)&r->connection->remote_addr)->sin6_addr))	/*XXX*/
++		    break;
++		if ((*(ap_uint32_t *)&((struct sockaddr_in6 *)&r->connection->remote_addr)->sin6_addr.s6_addr[12]
++			& ap[i].x.ip.mask.s_addr) == ap[i].x.ip.net.s_addr) {
++		    return 1;
++		}
++		break;
++#endif
++	    }
++	    break;
++
++#ifdef INET6
++	case T_IP6:
++	  {
++	    struct in6_addr masked;
++	    int j;
++	    if (IN6_IS_ADDR_UNSPECIFIED(&ap[i].x.ip6.net6))
++		break;
++	    switch (r->connection->remote_addr.ss_family) {
++	    case AF_INET:
++		if (!IN6_IS_ADDR_V4MAPPED(&ap[i].x.ip6.net6))	/*XXX*/
++		    break;
++		memset(&masked, 0, sizeof(masked));
++		masked.s6_addr[10] = masked.s6_addr[11] = 0xff;
++		memcpy(&masked.s6_addr[12],
++		    &((struct sockaddr_in *)&r->connection->remote_addr)->sin_addr.s_addr,
++		    sizeof(struct sockaddr_in));
++		for (j = 0; j < sizeof(struct in6_addr); j++)
++			masked.s6_addr[j] &= ap[i].x.ip6.mask6.s6_addr[j];
++		if (memcmp(&masked, &ap[i].x.ip6.net6, sizeof(masked)) == 0)
++		    return 1;
++		break;
++	    case AF_INET6:
++		memset(&masked, 0, sizeof(masked));
++		memcpy(&masked,
++		    &((struct sockaddr_in6 *)&r->connection->remote_addr)->sin6_addr,
++		    sizeof(masked));
++		for (j = 0; j < sizeof(struct in6_addr); j++)
++		    masked.s6_addr[j] &= ap[i].x.ip6.mask6.s6_addr[j];
++		if (memcmp(&masked, &ap[i].x.ip6.net6, sizeof(masked)) == 0)
++		    return 1;
++		break;
+ 	    }
+ 	    break;
++	  }
++#endif
+ 
+ 	case T_HOST:
+ 	    if (!gothost) {
+diff -Nru apache_1.3.20/src/modules/standard/mod_unique_id.c apache_1.3.20.new/src/modules/standard/mod_unique_id.c
+--- apache_1.3.20/src/modules/standard/mod_unique_id.c	Mon Jan 15 18:05:51 2001
++++ apache_1.3.20.new/src/modules/standard/mod_unique_id.c	Mon May 21 10:54:52 2001
+@@ -67,14 +67,26 @@
+ #include "http_config.h"
+ #include "http_log.h"
+ #include "multithread.h"
++#include "sa_len.h"
+ 
+ #ifdef MULTITHREAD
+ #error sorry this module does not support multithreaded servers yet
+ #endif
+ 
++/*#define SHORT_UNIQUE_ID*/
++
+ typedef struct {
+     unsigned int stamp;
+-    unsigned int in_addr;
++    union {
++	struct in_addr in;
++#ifdef INET6
++# ifdef SHORT_UNIQUE_ID
++	ap_uint32_t in6;
++# else
++	struct in6_addr in6;
++# endif
++#endif
++    } addr;
+     unsigned int pid;
+     unsigned short counter;
+ } unique_id_rec;
+@@ -144,7 +156,7 @@
+  * this shouldn't be a problem till year 2106.
+  */
+ 
+-static unsigned global_in_addr;
++static struct sockaddr_storage global_addr;
+ 
+ static APACHE_TLS unique_id_rec cur_unique_id;
+ 
+@@ -164,7 +176,8 @@
+ #define MAXHOSTNAMELEN 256
+ #endif
+     char str[MAXHOSTNAMELEN + 1];
+-    struct hostent *hent;
++    struct addrinfo hints, *res, *res0;
++    int error;
+ #ifndef NO_GETTIMEOFDAY
+     struct timeval tv;
+ #endif
+@@ -174,8 +187,8 @@
+      */
+     unique_id_rec_offset[0] = XtOffsetOf(unique_id_rec, stamp);
+     unique_id_rec_size[0] = sizeof(cur_unique_id.stamp);
+-    unique_id_rec_offset[1] = XtOffsetOf(unique_id_rec, in_addr);
+-    unique_id_rec_size[1] = sizeof(cur_unique_id.in_addr);
++    unique_id_rec_offset[1] = XtOffsetOf(unique_id_rec, addr);
++    unique_id_rec_size[1] = sizeof(cur_unique_id.addr);
+     unique_id_rec_offset[2] = XtOffsetOf(unique_id_rec, pid);
+     unique_id_rec_size[2] = sizeof(cur_unique_id.pid);
+     unique_id_rec_offset[3] = XtOffsetOf(unique_id_rec, counter);
+@@ -201,17 +214,44 @@
+     }
+     str[sizeof(str) - 1] = '\0';
+ 
+-    if ((hent = gethostbyname(str)) == NULL) {
++    memset(&hints, 0, sizeof(hints));
++    hints.ai_family = PF_UNSPEC;
++    error = getaddrinfo(str, NULL, &hints, &res0);
++    if (error) {
+         ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_ALERT, s,
+-		     "mod_unique_id: unable to gethostbyname(\"%s\")", str);
++                     "mod_unique_id: getaddrinfo failed for \"%s\" (%s)", str,
++		     gai_strerror(error));
+         exit(1);
+     }
+ 
+-    global_in_addr = ((struct in_addr *) hent->h_addr_list[0])->s_addr;
++    error = 1;
++    for (res = res0; res; res = res->ai_next) {
++	switch (res->ai_family) {
++	case AF_INET:
++#ifdef INET6
++	case AF_INET6:
++#endif
++	    memcpy(&global_addr, res->ai_addr, res->ai_addrlen);
++	    error = 0;
++	    break;
++	}
++    }
++    freeaddrinfo(res0);
++    if (error) {
++        ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_ALERT, s,
++                    "mod_unique_id: no known AF found for \"%s\"", str);
++        exit(1);
++    }
+ 
++    getnameinfo((struct sockaddr *)&global_addr,
++#ifndef SIN6_LEN
++	SA_LEN((struct sockaddr *)&global_addr),
++#else
++	global_addr.ss_len,
++#endif
++	str, sizeof(str), NULL, 0, NI_NUMERICHOST);
+     ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_INFO, s,
+-		 "mod_unique_id: using ip addr %s",
+-		 inet_ntoa(*(struct in_addr *) hent->h_addr_list[0]));
++                 "mod_unique_id: using ip addr %s", str);
+ 
+     /*
+      * If the server is pummelled with restart requests we could possibly end
+@@ -270,7 +310,23 @@
+ 		     "oh no! pids are greater than 32-bits!  I'm broken!");
+     }
+ 
+-    cur_unique_id.in_addr = global_in_addr;
++    memset(&cur_unique_id.addr, 0, sizeof(cur_unique_id.addr));
++    switch (global_addr.ss_family) {
++    case AF_INET:
++	cur_unique_id.addr.in = ((struct sockaddr_in *)&global_addr)->sin_addr;
++	break;
++#ifdef INET6
++    case AF_INET6:
++#ifdef SHORT_UNIQUE_ID
++	cur_unique_id.addr.in6 =
++	    ((struct sockaddr_in6 *)&global_addr)->sin6_addr.s6_addr32[3];
++#else
++	cur_unique_id.addr.in6 =
++	    ((struct sockaddr_in6 *)&global_addr)->sin6_addr;
++#endif
++	break;
++#endif
++    }
+ 
+     /*
+      * If we use 0 as the initial counter we have a little less protection
+diff -Nru apache_1.3.20/src/support/ab.c apache_1.3.20.new/src/support/ab.c
+--- apache_1.3.20/src/support/ab.c	Fri Mar  9 11:10:55 2001
++++ apache_1.3.20.new/src/support/ab.c	Mon May 21 10:54:52 2001
+@@ -140,6 +140,8 @@
+ #include <sys/uio.h>
+ #endif
+ 
++#include "sa_len.h"
++
+ #endif				/* NO_APACHE_INCLUDES */
+ /* ------------------- DEFINITIONS -------------------------- */
+ 
+@@ -195,7 +197,7 @@
+      auth[1024],		/* optional (basic/uuencoded)
+ 				 * authentification */
+      hdrs[4096];		/* optional arbitrary headers */
+-int port = 80;			/* port number */
++char *port = "80";		/* port number */
+ 
+ int use_html = 0;		/* use html in the report */
+ char *tablestring;
+@@ -227,7 +229,7 @@
+ struct data *stats;		/* date for each request */
+ 
+ fd_set readbits, writebits;	/* bits for select */
+-struct sockaddr_in server;	/* server addr structure */
++struct sockaddr_storage server;      /* server addr structure */
+ 
+ #ifndef BEOS
+ #define ab_close(s) close(s)
+@@ -332,7 +334,7 @@
+     printf("\r                                                                           \r");
+     printf("Server Software:        %s\n", servername);
+     printf("Server Hostname:        %s\n", hostname);
+-    printf("Server Port:            %d\n", port);
++    printf("Server Port:            %s\n", port);
+     printf("\n");
+     printf("Document Path:          %s\n", path);
+     printf("Document Length:        %d bytes\n", doclen);
+@@ -531,14 +533,19 @@
+     c->cbx = 0;
+     c->gotheader = 0;
+ 
+-    c->fd = socket(AF_INET, SOCK_STREAM, 0);
++    c->fd = socket(server.ss_family, SOCK_STREAM, 0);
+     if (c->fd < 0)
+ 	err("socket");
+ 
+     nonblock(c->fd);
+     gettimeofday(&c->start, 0);
+ 
+-    if (connect(c->fd, (struct sockaddr *) & server, sizeof(server)) < 0) {
++#ifndef SIN6_LEN
++    if (connect(c->fd, (struct sockaddr *) & server, SA_LEN((struct sockaddr*)&server)) < 0)
++#else
++    if (connect(c->fd, (struct sockaddr *) &server, server.ss_len) < 0)
++#endif
++    {
+ 	if (errno == EINPROGRESS) {
+ 	    c->state = STATE_CONNECTING;
+ 	    FD_SET(c->fd, &writebits);
+@@ -772,14 +779,17 @@
+     }
+ 
+     {
+-	/* get server information */
+-	struct hostent *he;
+-	he = gethostbyname(hostname);
+-	if (!he)
+-	    err("bad hostname");
+-	server.sin_family = he->h_addrtype;
+-	server.sin_port = htons(port);
+-	server.sin_addr.s_addr = ((unsigned long *) (he->h_addr_list[0]))[0];
++        /* get server information */
++	struct addrinfo hints, *res;
++	int error;
++
++	memset(&hints, 0, sizeof(hints));
++	hints.ai_family = PF_UNSPEC;
++	error = getaddrinfo(hostname, port, &hints, &res);
++	if (error)
++		err("bad hostname");
++	memcpy(&server, res->ai_addr, res->ai_addrlen);
++	freeaddrinfo(res);
+     }
+ 
+     con = malloc(concurrency * sizeof(struct connection));
+@@ -954,7 +964,7 @@
+     *cp = '\0';
+     strcpy(hostname, h);
+     if (p != NULL)
+-	port = atoi(p);
++        port = strdup(p);
+     return 0;
+ }
+ 
+@@ -1131,3 +1141,7 @@
+ 
+     exit(0);
+ }
++
++#ifdef NEED_GETADDRINFO
++#include "../main/getaddrinfo.c"
++#endif
+diff -Nru apache_1.3.20/src/support/logresolve.c apache_1.3.20.new/src/support/logresolve.c
+--- apache_1.3.20/src/support/logresolve.c	Mon Apr  2 11:22:11 2001
++++ apache_1.3.20.new/src/support/logresolve.c	Mon May 21 10:54:52 2001
+@@ -54,7 +54,9 @@
+ #endif /* BEOS */
+ #endif /* !MPE && !WIN32*/
+ 
+-static void cgethost(struct in_addr ipnum, char *string, int check);
++#include "sa_len.h"
++
++static void cgethost(struct sockaddr *sa, char *string, int check);
+ static int getline(char *s, int n);
+ static void stats(FILE *output);
+ 
+@@ -91,7 +93,7 @@
+  */
+ 
+ struct nsrec {
+-    struct in_addr ipnum;
++    struct sockaddr_storage addr;
+     char *hostname;
+     int noname;
+     struct nsrec *next;
+@@ -122,17 +124,48 @@
+  * IP numbers with their IP number as hostname, setting noname flag
+  */
+ 
+-static void cgethost (struct in_addr ipnum, char *string, int check)
++static void cgethost (struct sockaddr *sa, char *string, int check)
+ {
++    ap_uint32_t hashval;
++    struct sockaddr_in *sin;
++#ifdef INET6
++    struct sockaddr_in6 *sin6;
++#endif
+     struct nsrec **current, *new;
+-    struct hostent *hostdata;
+     char *name;
++    char hostnamebuf[MAXHOSTNAMELEN];
++
++    switch (sa->sa_family) {
++    case AF_INET:
++	hashval = ((struct sockaddr_in *)sa)->sin_addr.s_addr;
++	break;
++#ifdef INET6
++    case AF_INET6:
++	hashval = *(ap_uint32_t *)&((struct sockaddr_in6 *)sa)->sin6_addr.s6_addr[12];
++	break;
++#endif
++    default:
++	hashval = 0;
++	break;
++    }
++
++    current = &nscache[((hashval + (hashval >> 8) +
++			 (hashval >> 16) + (hashval >> 24)) % BUCKETS)];
+ 
+-    current = &nscache[((ipnum.s_addr + (ipnum.s_addr >> 8) +
+-			 (ipnum.s_addr >> 16) + (ipnum.s_addr >> 24)) % BUCKETS)];
++    while (*current) {
++#ifndef SIN6_LEN
++	if (SA_LEN(sa) == SA_LEN((struct sockaddr *)&(*current)->addr)
++	 && memcmp(sa, &(*current)->addr, SA_LEN(sa)) == 0)
++#else
++	if (sa->sa_len == (*current)->addr.ss_len
++	 && memcmp(sa, &(*current)->addr, sa->sa_len) == 0)
++#endif
++	{
++	    break;
++	}
+ 
+-    while (*current != NULL && ipnum.s_addr != (*current)->ipnum.s_addr)
+ 	current = &(*current)->next;
++    }
+ 
+     if (*current == NULL) {
+ 	cachesize++;
+@@ -145,45 +178,55 @@
+ 	*current = new;
+ 	new->next = NULL;
+ 
+-	new->ipnum = ipnum;
++#ifndef SIN6_LEN
++	memcpy(&new->addr, sa, SA_LEN(sa));
++#else
++	memcpy(&new->addr, sa, sa->sa_len);
++#endif
+ 
+-	hostdata = gethostbyaddr((const char *) &ipnum, sizeof(struct in_addr),
+-				 AF_INET);
+-	if (hostdata == NULL) {
+-	    if (h_errno > MAX_ERR)
+-		errors[UNKNOWN_ERR]++;
+-	    else
+-		errors[h_errno]++;
+-	    new->noname = h_errno;
+-	    name = strdup(inet_ntoa(ipnum));
+-	}
+-	else {
+-	    new->noname = 0;
+-	    name = strdup(hostdata->h_name);
+-	    if (check) {
+-		if (name == NULL) {
+-		    perror("strdup");
+-		    fprintf(stderr, "Insufficient memory\n");
+-		    exit(1);
+-		}
+-		hostdata = gethostbyname(name);
+-		if (hostdata != NULL) {
+-		    char **hptr;
+-
+-		    for (hptr = hostdata->h_addr_list; *hptr != NULL; hptr++)
+-			if (((struct in_addr *) (*hptr))->s_addr == ipnum.s_addr)
+-			    break;
+-		    if (*hptr == NULL)
+-			hostdata = NULL;
+-		}
+-		if (hostdata == NULL) {
+-		    fprintf(stderr, "Bad host: %s != %s\n", name,
+-			    inet_ntoa(ipnum));
+-		    new->noname = NO_REVERSE;
+-		    free(name);
+-		    name = strdup(inet_ntoa(ipnum));
+-		    errors[NO_REVERSE]++;
++	new->noname = getnameinfo(sa,
++#ifndef SIN6_LEN
++		SA_LEN(sa),
++#else
++		sa->sa_len,
++#endif
++		    hostnamebuf, sizeof(hostnamebuf), NULL, 0, 0);
++	name = strdup(hostnamebuf);
++	if (check) {
++	    struct addrinfo hints, *res;
++	    int error;
++	    memset(&hints, 0, sizeof(hints));
++	    hints.ai_family = PF_UNSPEC;
++	    error = getaddrinfo(hostnamebuf, NULL, &hints, &res);
++	    if (!error) {
++		while (res) {
++#ifndef SIN6_LEN
++		    if (SA_LEN(sa) == res->ai_addrlen
++		     && memcmp(sa, res->ai_addr, SA_LEN(sa)) == 0)
++#else
++		    if (sa->sa_len == res->ai_addrlen
++		     && memcmp(sa, res->ai_addr, sa->sa_len) == 0)
++#endif
++		    {
++			break;
++		    }
++		    res = res->ai_next;
+ 		}
++		if (!res)
++		    error++;
++	    }
++	    if (error) {
++		getnameinfo(sa,
++#ifndef SIN6_LEN
++		    SA_LEN(sa),
++#else
++		    sa->sa_len,
++#endif
++		    hostnamebuf, sizeof(hostnamebuf), NULL, 0, NI_NUMERICHOST);
++		fprintf(stderr, "Bad host: %s != %s\n", name, hostnamebuf);
++		new->noname = NO_REVERSE;
++		free(name);
++		name = strdup(hostnamebuf);
+ 	    }
+ 	}
+ 	new->hostname = name;
+@@ -211,6 +254,7 @@
+     char *ipstring;
+     struct nsrec *current;
+     char *errstring[MAX_ERR + 3];
++    char hostnamebuf[MAXHOSTNAMELEN];
+ 
+     for (i = 0; i < MAX_ERR + 3; i++)
+ 	errstring[i] = "Unknown error";
+@@ -242,7 +286,14 @@
+ 
+     for (i = 0; i < BUCKETS; i++)
+ 	for (current = nscache[i]; current != NULL; current = current->next) {
+-	    ipstring = inet_ntoa(current->ipnum);
++	    getnameinfo((struct sockaddr *)&current->addr,
++#ifndef SIN6_LEN
++		    SA_LEN((struct sockaddr *)&current->addr),
++#else
++		    current->addr.ss_len,
++#endif
++		    hostnamebuf, sizeof(hostnamebuf), NULL, 0, NI_NUMERICHOST);
++	    ipstring = hostnamebuf;
+ 	    if (current->noname == 0)
+ 		fprintf(output, "  %3d  %15s - %s\n", i, ipstring,
+ 			current->hostname);
+@@ -276,9 +327,10 @@
+ 
+ int main (int argc, char *argv[])
+ {
+-    struct in_addr ipnum;
+     char *bar, hoststring[MAXDNAME + 1], line[MAXLINE], *statfile;
+     int i, check;
++    struct addrinfo hints, *res;
++    int error;
+ 
+ #ifdef WIN32
+     WSADATA wsaData;
+@@ -322,8 +374,10 @@
+ 	bar = strchr(line, ' ');
+ 	if (bar != NULL)
+ 	    *bar = '\0';
+-	ipnum.s_addr = inet_addr(line);
+-	if (ipnum.s_addr == 0xffffffffu) {
++	memset(&hints, 0, sizeof(hints));
++	hints.ai_family = PF_UNSPEC;
++	error = getaddrinfo(line, NULL, &hints, &res);
++	if (error) {
+ 	    if (bar != NULL)
+ 		*bar = ' ';
+ 	    puts(line);
+@@ -333,11 +387,12 @@
+ 
+ 	resolves++;
+ 
+-	cgethost(ipnum, hoststring, check);
++	cgethost(res->ai_addr, hoststring, check);
+ 	if (bar != NULL)
+ 	    printf("%s %s\n", hoststring, bar + 1);
+ 	else
+ 	    puts(hoststring);
++	freeaddrinfo(res);
+     }
+ 
+ #ifdef WIN32
+@@ -358,3 +413,11 @@
+ 
+     return (0);
+ }
++
++#ifdef NEED_GETADDRINFO
++#include "../main/getaddrinfo.c"
++#endif
++
++#ifdef NEED_GETNAMEINFO
++#include "../main/getnameinfo.c"
++#endif
