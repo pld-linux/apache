@@ -123,6 +123,7 @@ Summary(pl):	Dokumentacja do Apache
 Group:		Documentation
 Group(pl):	Dokumentacja
 Requires:	%{name} = %{version}
+Obsoletes:	apache-manual
 
 %description doc
 Documentation for apache in HTML format.
