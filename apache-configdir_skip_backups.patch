@@ -1,33 +1,33 @@
---- apache_1.3.17/src/main/http_config.c.wiget	Thu May 10 14:41:08 2001
-+++ apache_1.3.17/src/main/http_config.c	Thu May 10 15:42:12 2001
-@@ -1287,6 +1287,7 @@
- 	DIR *dirp;
- 	struct DIR_TYPE *dir_entry;
- 	int current;
+diff -urN httpd-2.0.35.org/server/config.c httpd-2.0.35/server/config.c
+--- httpd-2.0.35.org/server/config.c	Thu Apr 11 13:35:30 2002
++++ httpd-2.0.35/server/config.c	Thu Apr 11 13:42:14 2002
+@@ -1427,6 +1427,7 @@
+         apr_dir_t *dirp;
+         apr_finfo_t dirent;
+         int current;
 +	size_t slen;
- 	array_header *candidates = NULL;
- 	fnames *fnew;
+         apr_array_header_t *candidates = NULL;
+         fnames *fnew;
+         apr_status_t rv;
+@@ -1448,11 +1449,18 @@
  
-@@ -1309,11 +1310,19 @@
- 	}
- 	candidates = ap_make_array(p, 1, sizeof(fnames));
- 	while ((dir_entry = readdir(dirp)) != NULL) {
-+	    slen = strlen(dir_entry->d_name);
- 	    /* strip out '.' and '..' */
- 	    if (strcmp(dir_entry->d_name, ".") &&
--		strcmp(dir_entry->d_name, "..")) {
--		fnew = (fnames *) ap_push_array(candidates);
--		fnew->fname = ap_make_full_path(p, fname, dir_entry->d_name);
-+		strcmp(dir_entry->d_name, "..") &&
-+		(dir_entry->d_name)[slen-1] != '~') {
-+		    if (slen < 8 || strcmp((dir_entry->d_name + slen - 7), ".rpmnew")) {
-+			    if (slen < 9 || 
-+				strcmp((dir_entry->d_name + slen - 8), ".rpmorig") && 
-+				strcmp((dir_entry->d_name + slen - 8), ".rpmsave")) {
-+				    fnew = (fnames *) ap_push_array(candidates);
-+				    fnew->fname = ap_make_full_path(p, fname, dir_entry->d_name);
-+			    }
+         candidates = apr_array_make(p, 1, sizeof(fnames));
+         while (apr_dir_read(&dirent, APR_FINFO_DIRENT, dirp) == APR_SUCCESS) {
++	    slen = strlen(dirent.name);
+             /* strip out '.' and '..' */
+             if (strcmp(dirent.name, ".")
+-                && strcmp(dirent.name, "..")) {
+-                fnew = (fnames *) apr_array_push(candidates);
+-                fnew->fname = ap_make_full_path(p, fname, dirent.name);
++                && strcmp(dirent.name, "..")
++		&& (dirent.d_name)[slen-1] != '~') {
++		if (slen < 8 || strcmp((dirent.d_name + slen - 7), ".rpmnew")) {
++		    if (slen < 9 || 
++			    strcmp((dirent.d_name + slen - 8), ".rpmorig") && 
++			    strcmp((dirent.d_name + slen - 8), ".rpmsave")) {
++	                fnew = (fnames *) apr_array_push(candidates);
++        	        fnew->fname = ap_make_full_path(p, fname, dirent.name);
 +		    }
- 	    }
- 	}
- 	ap_pclosedir(p, dirp);
+             }
+         }
+ 
