@@ -1064,7 +1064,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_config.c apache_1.3.28/src/main/http_
  
  
 --- apache_1.3.31/src/main/http_core.c.orig	Mon May  3 22:15:26 2004
-+++ apache_1.3.31/src/main/http_core.c	Wed May 12 13:06:21 2004
++++ apache_1.3.31/src/main/http_core.c	Sat May 15 00:06:26 2004
 @@ -28,6 +28,7 @@
  #include "util_md5.h"
  #include "scoreboard.h"
@@ -1073,7 +1073,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_config.c apache_1.3.28/src/main/http_
  
  #ifdef USE_MMAP_FILES
  #include <sys/mman.h>
-@@ -565,7 +565,7 @@
+@@ -564,7 +565,7 @@
       * file if you care. So the adhoc value should do.
       */
      return ap_psprintf(r->pool,"%pp%pp%pp%pp%pp",
@@ -1093,7 +1093,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_config.c apache_1.3.28/src/main/http_
  
      if (conn->double_reverse) {
  	/* already done */
-@@ -672,19 +675,43 @@
+@@ -672,30 +675,54 @@
          conn->remote_host = ""; /* prevent another lookup */
  	return;
      }
@@ -1146,9 +1146,11 @@ diff -Nur apache_1.3.28.orig/src/main/http_config.c apache_1.3.28/src/main/http_
 +    conn->double_reverse = ok ? 1 : -1;
 +    freeaddrinfo(res0);
      /* invalidate possible reverse-resolved hostname if forward lookup fails */
-     conn->remote_host = "";
+-    conn->remote_host = "";
++    if(!ok)
++	conn->remote_host = "";
  }
-@@ -692,10 +719,9 @@
+ 
  API_EXPORT(const char *) ap_get_remote_host(conn_rec *conn, void *dir_config,
  					    int type)
  {
@@ -1160,7 +1162,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_config.c apache_1.3.28/src/main/http_
  
      /* If we haven't checked the host name, and we want to */
      if (dir_config) {
-@@ -717,10 +743,14 @@
+@@ -717,10 +744,14 @@
  	    || hostname_lookups != HOSTNAME_LOOKUP_OFF)) {
  	old_stat = ap_update_child_status(conn->child_num, SERVER_BUSY_DNS,
  					  (request_rec*)NULL);
@@ -1179,7 +1181,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_config.c apache_1.3.28/src/main/http_
  	    ap_str_tolower(conn->remote_host);
  	   
  	    if (hostname_lookups == HOSTNAME_LOOKUP_DOUBLE) {
-@@ -798,6 +828,7 @@
+@@ -798,6 +829,7 @@
  {
      conn_rec *conn = r->connection;
      core_dir_config *d;
@@ -1187,7 +1189,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_config.c apache_1.3.28/src/main/http_
  
      d = (core_dir_config *)ap_get_module_config(r->per_dir_config,
  						&core_module);
-@@ -807,23 +838,22 @@
+@@ -807,23 +839,22 @@
      }
      if (d->use_canonical_name == USE_CANONICAL_NAME_DNS) {
          if (conn->local_host == NULL) {
@@ -1223,7 +1225,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_config.c apache_1.3.28/src/main/http_
  	    (void) ap_update_child_status(conn->child_num, old_stat, r);
  	}
  	return conn->local_host;
-@@ -835,7 +865,7 @@
+@@ -835,7 +866,7 @@
  API_EXPORT(unsigned) ap_get_server_port(const request_rec *r)
  {
      unsigned port;
@@ -1232,7 +1234,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_config.c apache_1.3.28/src/main/http_
      core_dir_config *d =
        (core_dir_config *)ap_get_module_config(r->per_dir_config, &core_module);
      
-@@ -2621,12 +2651,25 @@
+@@ -2621,12 +2652,25 @@
  
  static const char *set_bind_address(cmd_parms *cmd, void *dummy, char *arg) 
  {
@@ -1259,7 +1261,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_config.c apache_1.3.28/src/main/http_
      return NULL;
  }
  
-@@ -2658,48 +2701,71 @@
+@@ -2658,48 +2702,71 @@
      return NULL;
  }
  
@@ -1361,7 +1363,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_config.c apache_1.3.28/src/main/http_
      new->fd = -1;
      new->used = 0;
      new->next = ap_listeners;
-@@ -3602,7 +3668,7 @@
+@@ -3602,7 +3669,7 @@
  { "ThreadStackSize", set_threadstacksize, NULL, RSRC_CONF, TAKE1,
    "Stack size each created thread will use."},
  #endif
@@ -1370,7 +1372,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_config.c apache_1.3.28/src/main/http_
    "A port number or a numeric IP address and a port number"},
  { "SendBufferSize", set_send_buffer_size, NULL, RSRC_CONF, TAKE1,
    "Send buffer size in bytes"},
-@@ -3636,7 +3702,7 @@
+@@ -3636,7 +3703,7 @@
    "Name of the config file to be included" },
  { "LogLevel", set_loglevel, NULL, RSRC_CONF, TAKE1,
    "Level of verbosity in error logging" },
@@ -3765,7 +3767,7 @@ diff -Nur apache_1.3.28.orig/src/modules/proxy/proxy_util.c apache_1.3.28/src/mo
      ap_kill_timeout(r);
  
 --- apache_1.3.31/src/modules/standard/mod_access.c.orig	Sun Mar  7 22:47:14 2004
-+++ apache_1.3.31/src/modules/standard/mod_access.c	Fri May 14 21:42:47 2004
++++ apache_1.3.31/src/modules/standard/mod_access.c	Sat May 15 00:05:40 2004
 @@ -31,7 +31,10 @@
      T_ALL,
      T_IP,
@@ -3791,7 +3793,7 @@ diff -Nur apache_1.3.28.orig/src/modules/proxy/proxy_util.c apache_1.3.28/src/mo
      } x;
      enum allowdeny_type type;
  } allowdeny;
-@@ -124,94 +133,231 @@
+@@ -124,94 +133,242 @@
  
      }
      else if ((s = strchr(where, '/'))) {
@@ -3913,14 +3915,14 @@ diff -Nur apache_1.3.28.orig/src/modules/proxy/proxy_util.c apache_1.3.28/src/mo
 +		freeaddrinfo(resmask);
  		a->type = T_FAIL;
 -		return "invalid ip address";
-+		return "network/netmask resolved to multiple addresses";
- 	    }
+-	    }
 -	    while (ap_isdigit(*t)) {
 -		++t;
 -	    }
 -	    if (*t == '.') {
 -		*t++ = 0;
--	    }
++		return "network/netmask resolved to multiple addresses";
+ 	    }
 -	    else if (*t) {
 +	    memcpy(&mask, resmask->ai_addr, resmask->ai_addrlen);
 +	    freeaddrinfo(resmask);
@@ -3986,6 +3988,17 @@ diff -Nur apache_1.3.28.orig/src/modules/proxy/proxy_util.c apache_1.3.28/src/mo
  	}
 -	a->x.ip.net.s_addr = ntohl(a->x.ip.net.s_addr);
 -	a->x.ip.mask.s_addr = ntohl(a->x.ip.mask.s_addr);
++	/* mask network address */
++	switch (a->type) {
++	case T_IP:
++	    a->x.ip.net.s_addr &= a->x.ip.mask.s_addr;
++	    break;
++	case T_IP6:
++	    a->x.ip6.net6.s6_addr32[0] &= a->x.ip6.mask6.s6_addr32[0];
++	    a->x.ip6.net6.s6_addr32[1] &= a->x.ip6.mask6.s6_addr32[1];
++	    a->x.ip6.net6.s6_addr32[2] &= a->x.ip6.mask6.s6_addr32[2];
++	    a->x.ip6.net6.s6_addr32[3] &= a->x.ip6.mask6.s6_addr32[3];
++	}
      }
      else {
 -	a->type = T_HOST;
@@ -4089,7 +4102,7 @@ diff -Nur apache_1.3.28.orig/src/modules/proxy/proxy_util.c apache_1.3.28/src/mo
  
      return NULL;
  }
-@@ -275,13 +421,63 @@
+@@ -275,13 +432,63 @@
  	    return 1;
  
  	case T_IP:
