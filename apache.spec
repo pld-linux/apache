@@ -26,7 +26,7 @@ Summary(ru):	óÁÍÙÊ ÐÏÐÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.0.47
-Release:	0.2
+Release:	0.3
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -146,6 +146,18 @@ the same user who is running the web server.
 SuEXEC umo¿liwia serwerowi Apache uruchamianie programów CGI i SSI z
 innym UID ni¿ wywo³uj±cy je serwer. Normalnie programy CGI i SSI s±
 wykonywane jako taki sam u¿ytkownik jak serwer WWW.
+
+%package index
+Summary:        Apache index.html* files
+Summary(pl):    Pliki Apache index.html*
+Group:          Documentation
+Requires:       %{name} = %{version}
+
+%description index
+Apache index.html* files.
+
+%description index -l pl
+Pliki Apache index.html*.
 
 %package devel
 Summary:	Module development tools for the Apache web server
@@ -1230,12 +1242,7 @@ fi
 %doc%attr(755,root,root) %{_datadir}/manual/search/manual-index.cgi
 %{_datadir}/manual/style
 
-# Having all index.html.LANG files here is very bad idea.
 %attr(755,root,root) %dir %{_datadir}/html
-%config(noreplace,missingok) %{_datadir}/html/index.html
-%config(noreplace,missingok) %{_datadir}/html/index.html.en
-%{_datadir}/html/*.gif
-%{_datadir}/html/*.png
 %{_datadir}/icons
 %attr(755,root,root) %{_datadir}/cgi-bin
 
@@ -1246,6 +1253,12 @@ fi
 %attr(4755,root,root) %{_sbindir}/suexec
 %attr(755,root,root) %{_libexecdir}/mod_suexec.so
 %{_datadir}/manual/mod/mod_suexec.html.en
+
+%files index
+%defattr(644,root,root,755)
+%config(noreplace,missingok) %{_datadir}/html/index.html*
+%{_datadir}/html/*.gif
+%{_datadir}/html/*.png
 
 %files devel
 %defattr(644,root,root,755)
