@@ -1287,6 +1287,9 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/*-config
 %{_includedir}
+%{_libdir}/APRVARS
+%{_libdir}/*.exp
+%{_libexecdir}/*.exp
 %attr(755,root,root) %{_libdir}/lib*.so
 %attr(755,root,root) %{_libdir}/lib*.la
 
