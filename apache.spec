@@ -447,7 +447,7 @@ Requires:	%{name}(EAPI) = %{version}
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
-%patch6 -p1
+%{!?bcond_apache_disable_ipv6:%patch6 -p1}
 %patch7 -p1
 %patch8 -p1
 %patch9 -p1
@@ -457,6 +457,7 @@ Requires:	%{name}(EAPI) = %{version}
 
 %build
 OPTIM="%{!?debug:$RPM_OPT_FLAGS}%{?debug:-O -g}" \
+IPV6_RULE=%{!?bcond_apache_disable_ipv6:--enable-rule=INET6}
 ./configure \
 	--prefix=%{_prefix} \
 	--sysconfdir=%{_sysconfdir} \
@@ -479,8 +480,8 @@ OPTIM="%{!?debug:$RPM_OPT_FLAGS}%{?debug:-O -g}" \
 	--suexec-gidmin=500 \
 	--suexec-docroot=%{_datadir} \
 	--disable-rule=WANTHSREGEX \
-	--enable-rule=EAPI \
-	--enable-rule=INET6
+	--enable-rule=EAPI ${IPV6_RULE}
+
 %{__make} LIBS1="-lm -lcrypt -lmm -ldl"
 
 rm -f src/modules/standard/mod_auth_db.so
