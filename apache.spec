@@ -27,7 +27,7 @@ Summary(uk):	îÁÊÐÏÐÕÌÑÒÎ¦ÛÉÊ Web-Server
 Summary(zh_CN):	Internet ÉÏÓ¦ÓÃ×î¹ã·ºµÄ Web ·þÎñ³ÌÐò¡£
 Name:		apache
 Version:	1.3.24
-Release:	0.1
+Release:	0.2
 License:	Apache Group License
 Group:		Networking/Daemons
 URL:		http://www.apache.org/
@@ -63,6 +63,7 @@ Patch18:	%{name}-EAPI-missing_files.patch
 Patch19:	%{name}-PLD-nov6.patch
 Patch20:	%{name}-configdir_skip_backups.patch
 Patch21:	%{name}-apxs-quiet.patch
+Patch22:	http://www.apache.org/dist/httpd/patches/apply_to_1.3.24/proxy_http1.1_chunking.patch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 BuildRequires:	db3-devel
 BuildRequires:	mm-devel >= 1.1.3
@@ -646,6 +647,9 @@ wa¿no¶ci mo¿e byæ ustalana w zale¿no¶ci od czasu modyfikacji plików
 
 %prep
 %setup -q -n apache_%{version} -a3
+cd src
+%patch22 -p0
+cd ..
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
@@ -732,8 +736,6 @@ install %{SOURCE9}  $RPM_BUILD_ROOT%{_sysconfdir}/mod_status.conf
 install %{SOURCE10} $RPM_BUILD_ROOT%{_sysconfdir}/mod_proxy.conf
 
 ln -sf index.html.en $RPM_BUILD_ROOT%{_datadir}/html/index.html
-
-gzip -9nf ABOUT_APACHE src/CHANGES README
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -1141,7 +1143,7 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc ABOUT_APACHE.gz src/CHANGES.gz README.gz
+%doc ABOUT_APACHE src/CHANGES README
 %doc conf/mime.types
 
 %attr(754,root,root) /etc/rc.d/init.d/httpd
