@@ -68,10 +68,8 @@ case "$1" in
 	;;
   reload)
 	msg_reloading httpd
-	busy
 	killproc httpd -HUP
 	RETVAL=$?
-	[ $RETVAL -eq 0 ] && ok || died
 	;;
   *)
 	msg_usage "$0 {start|stop|restart|reload|status}"
