@@ -67,20 +67,24 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 BuildRequires:	db3-devel
 BuildRequires:	mm-devel >= 1.1.3
 %{?mod_rewrite_ldap:BuildRequires: openldap-devel}
-Provides:	httpd
-Provides:	webserver
-Provides:	%{name}(EAPI) = %{version}
-Prereq:		/sbin/chkconfig
-Prereq:		/usr/sbin/useradd
-Prereq:		/usr/bin/getgid
-Prereq:		/bin/id
-Prereq:		sh-utils
-Prereq:		rc-scripts
-Prereq:		mm
-Prereq:		perl
+PreReq:		rc-scripts
+PreReq:		mm
+PreReq:		perl
+Requires(pre):	sh-utils
+Requires(pre):	/usr/bin/getgid
+Requires(pre):	/bin/id
+Requires(pre):	/usr/sbin/useradd
+Requires(post,preun):	/sbin/chkconfig
+Requires(postun):	/usr/sbin/userdel
+Requires(postun):	/usr/sbin/groupdel
 Requires:	mailcap
 Requires:	/etc/mime.types
 Requires:	psmisc >= 20.1
+Provides:	httpd
+Provides:	webserver
+Provides:	%{name}(EAPI) = %{version}
+Obsoletes:	httpd
+Obsoletes:	webserver
 Obsoletes:	apache-extra
 Obsoletes:	apache6
 Obsoletes:	apache-doc
@@ -739,20 +743,20 @@ rm -rf $RPM_BUILD_ROOT
 %pre
 if [ -n "`getgid http`" ]; then
 	if [ "`getgid http`" != "51" ]; then
-		echo "Warning: group http haven't gid=51. Correct this before installing apache" 1>&2
+		echo "Error: group http doesn't have gid=51. Correct this before installing apache." 1>&2
 		exit 1
 	fi
 else
-	echo "Adding group http GID=51"
+	echo "Adding group http GID=51."
 	/usr/sbin/groupadd -g 51 -r -f http
 fi
 if [ -n "`id -u http 2>/dev/null`" ]; then
 	if [ "`id -u http`" != "51" ]; then
-		echo "Warning: user http haven't uid=51. Correct this before installing apache" 1>&2
+		echo "Error: user http doesn't have uid=51. Correct this before installing apache." 1>&2
 		exit 1
 	fi
 else
-	echo "Adding user http UID=51"
+	echo "Adding user http UID=51."
 	/usr/sbin/useradd -u 51 -r -d /home/httpd -s /bin/false -c "HTTP User" -g http http 1>&2
 fi
 
@@ -810,9 +814,9 @@ fi
 
 %postun
 if [ "$1" = "0" ]; then
-	echo "Removing user http UID=51"
+	echo "Removing user http."
 	/usr/sbin/userdel http
-	echo "Removing group http GID=51"
+	echo "Removing group http."
 	/usr/sbin/groupdel http
 fi
 
