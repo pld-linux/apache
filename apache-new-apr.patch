@@ -31,7 +31,7 @@ diff -urN httpd-2.0.47.org/modules/arch/win32/mod_isapi.c httpd-2.0.47/modules/a
      apr_status_t rv;
  
 -    apr_pool_sub_make(&loaded.pool, pconf, NULL);
-+    apr_pool_create_ex(&loaded.pool, pconf, NULL);
++    apr_pool_create_ex(&loaded.pool, pconf, NULL, NULL);
      if (!loaded.pool) {
  	ap_log_error(APLOG_MARK, APLOG_ERR, APR_EGENERAL, NULL,
  	             "ISAPI: could not create the isapi cache pool");
@@ -454,7 +454,7 @@ diff -urN httpd-2.0.47.org/modules/ssl/ssl_scache_dbm.c httpd-2.0.47/modules/ssl
      apr_pool_t *p;
  
 -    apr_pool_sub_make(&p, mc->pPool, NULL);
-+    apr_pool_create_ex(&p, mc->pPool, NULL);
++    apr_pool_create_ex(&p, mc->pPool, NULL, NULL);
      if (p != NULL) {
          /* the correct way */
          unlink(apr_pstrcat(p, mc->szSessionCacheDataFile, SSL_DBM_FILE_SUFFIX_DIR, NULL));
@@ -463,7 +463,7 @@ diff -urN httpd-2.0.47.org/modules/ssl/ssl_scache_dbm.c httpd-2.0.47/modules/ssl
      for (;;) {
          /* allocate the key array in a memory sub pool */
 -        apr_pool_sub_make(&p, mc->pPool, NULL);
-+        apr_pool_create_ex(&p, mc->pPool, NULL);
++        apr_pool_create_ex(&p, mc->pPool, NULL, NULL);
          if (p == NULL)
              break;
          if ((keylist = apr_palloc(p, sizeof(dbmkey)*KEYMAX)) == NULL) {
@@ -811,7 +811,7 @@ diff -urN httpd-2.0.47.org/server/mpm/winnt/mpm_winnt.c httpd-2.0.47/server/mpm/
      char *cwd;
  
 -    apr_pool_sub_make(&ptemp, p, NULL);
-+    apr_pool_create_ex(&ptemp, p, NULL);
++    apr_pool_create_ex(&ptemp, p, NULL, NULL);
  
      /* Build the command line. Should look something like this:
       * C:/apache/bin/apache.exe -f ap_server_confname 
@@ -836,7 +836,7 @@ diff -urN httpd-2.0.47.org/server/mpm/winnt/nt_eventlog.c httpd-2.0.47/server/mp
      apr_pool_t *p;
      
 -    apr_pool_sub_make(&p, NULL, NULL);
-+    apr_pool_create_ex(&p, NULL, NULL);
++    apr_pool_create_ex(&p, NULL, NULL, NULL);
  
      errarg[0] = "The Apache service named";
      errarg[1] = display_name;
