@@ -15,7 +15,7 @@ Summary(pt_BR):	Servidor HTTPD para prover serviços WWW
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.0.36
-Release:	0.1
+Release:	0.2
 License:	Apache Group License
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/
@@ -31,6 +31,7 @@ Source10:	%{name}-mod_proxy.conf
 Source11:	%{name}-mod_info.conf
 Source12:	%{name}-mod_ssl.conf
 Source13:	%{name}-mod_dav.conf
+Source14:	%{name}-mod_dir.conf
 Source20:	%{name}-server.crt
 Source21:	%{name}-server.key
 Patch0:		%{name}-apxs.patch
@@ -672,6 +673,7 @@ install %{SOURCE10} $CFG/30_mod_proxy.conf
 install %{SOURCE11} $CFG/35_mod_info.conf
 install %{SOURCE12} $CFG/40_mod_ssl.conf
 install %{SOURCE13} $CFG/45_mod_dav.conf
+install %{SOURCE14} $CFG/59_mod_dir.conf
 
 echo "LoadModule actions_module       %{_libexecdir}/mod_actions.so" > $CFG/50_mod_actions.conf
 echo "LoadModule auth_module          %{_libexecdir}/mod_auth.so" > $CFG/51_mod_auth.conf
@@ -684,7 +686,6 @@ LoadModule disk_cache_module    %{_libexecdir}/mod_disk_cache.so" > $CFG/55_mod_
 echo "LoadModule cgid_module          %{_libexecdir}/mod_cgid.so" > $CFG/56_mod_cgid.conf
 echo "LoadModule charset_lite_module  %{_libexecdir}/mod_charset_lite.so" > $CFG/57_mod_charset_lite.conf
 echo "LoadModule deflate_module       %{_libexecdir}/mod_deflate.so" > $CFG/58_mod_deflate.conf
-echo "LoadModule dir_module           %{_libexecdir}/mod_dir.so" > $CFG/59_mod_dir.conf
 echo "LoadModule expires_module       %{_libexecdir}/mod_expires.so" > $CFG/60_mod_expires.conf
 echo "LoadModule file_cache_module    %{_libexecdir}/mod_file_cache.so" > $CFG/61_mod_file_cache.conf
 echo "LoadModule headers_module       %{_libexecdir}/mod_headers.so" > $CFG/62_mod_headers.conf
