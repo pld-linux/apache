@@ -63,7 +63,7 @@ BuildRequires:	zlib-devel
 BuildRequires:	libtool >= 1.5
 BuildRequires:	apr-devel >= 1:0.9.4-1
 BuildRequires:	apr-util-devel >= 1:0.9.4-1
-PreReq:		perl
+PreReq:		perl-base
 PreReq:		rc-scripts
 Requires(pre):	/bin/id
 Requires(pre):	/usr/bin/getgid
