@@ -7,6 +7,7 @@ Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	1.3.12
 Release:	3
+Copyright:	BSD-like
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Source0:	ftp://ftp.apache.org/dist/%{name}_%{version}.tar.gz
@@ -29,7 +30,6 @@ Patch5:		apache-EAPI.patch
 Patch6:		apache-v6-PLD-1.patch.gz
 Patch7:		apache-mm_conf.patch
 Patch8:		apache-modules_symbols.patch
-Copyright:	BSD-like
 Provides:	httpd
 Provides:	webserver
 Prereq:		/sbin/chkconfig
@@ -476,130 +476,258 @@ fi
 
 %post mod_actions
 %{_sbindir}/apxs -e -a -n action %{_libexecdir}/mod_actions.so 1>&2
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+fi
 
 %preun mod_actions
 if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n action %{_libexecdir}/mod_actions.so 1>&2
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2
+	fi
 fi
 
 %post mod_auth_anon
 %{_sbindir}/apxs -e -a -n auth_anon %{_libexecdir}/mod_auth_anon.so 1>&2
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+fi
 
 %preun mod_auth_anon
 if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n auth_anon %{_libexecdir}/mod_auth_anon.so 1>&2
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2
+	fi
 fi
 
 %post mod_define
 %{_sbindir}/apxs -e -a -n define %{_libexecdir}/mod_define.so 1>&2
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+fi
 
 %preun mod_define
 if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n define %{_libexecdir}/mod_define.so 1>&2
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2
+	fi
 fi
 
 %post mod_digest
 %{_sbindir}/apxs -e -a -n digest %{_libexecdir}/mod_digest.so 1>&2
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+fi
 
 %preun mod_digest
 if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n digest %{_libexecdir}/mod_digest.so 1>&2
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2
+	fi
 fi
 
 %post mod_dir
 %{_sbindir}/apxs -e -a -n dir %{_libexecdir}/mod_dir.so 1>&2
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+fi
 
 %preun mod_dir
 if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n dir %{_libexecdir}/mod_dir.so 1>&2
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2
+	fi
 fi
 
 %post mod_expires
 %{_sbindir}/apxs -e -a -n expires %{_libexecdir}/mod_expires.so 1>&2
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+fi
 
 %preun mod_expires
 if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n expires %{_libexecdir}/mod_expires.so 1>&2
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2
+	fi
 fi
 
 %post mod_headers
 %{_sbindir}/apxs -e -a -n headers %{_libexecdir}/mod_headers.so 1>&2
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+fi
 
 %preun mod_headers
 if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n headers %{_libexecdir}/mod_headers.so 1>&2
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2
+	fi
 fi
 
 %post mod_mmap_static
 %{_sbindir}/apxs -e -a -n mmap_static %{_libexecdir}/mod_mmap_static.so 1>&2
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+fi
 
 %preun mod_mmap_static
 if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n mmap_static %{_libexecdir}/mod_mmap_static.so 1>&2
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2
+	fi
 fi
 
 %post mod_imap
 %{_sbindir}/apxs -e -a -n imap %{_libexecdir}/mod_imap.so 1>&2
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+fi
 
 %preun mod_imap
 if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n imap %{_libexecdir}/mod_imap.so 1>&2
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2
+	fi
 fi
 
 %post mod_info
 %{_sbindir}/apxs -e -a -n info %{_libexecdir}/mod_info.so 1>&2
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+fi
 
 %preun mod_info
 if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n info %{_libexecdir}/mod_info.so 1>&2
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2
+	fi
 fi
 
 %post mod_proxy
 %{_sbindir}/apxs -e -a -n proxy %{_libexecdir}/libproxy.so 1>&2
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+fi
 
 %preun mod_proxy
 if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n proxy %{_libexecdir}/libproxy.so 1>&2
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2
+	fi
 fi
 
 %post mod_rewrite
 %{_sbindir}/apxs -e -a -n rewrite %{_libexecdir}/mod_rewrite.so 1>&2
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+fi
 
 %preun mod_rewrite
 if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n rewrite %{_libexecdir}/mod_rewrite.so 1>&2
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2
+	fi
 fi
 
 %post mod_status
 %{_sbindir}/apxs -e -a -n status %{_libexecdir}/mod_status.so 1>&2
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+fi
 
 %preun mod_status
 if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n status %{_libexecdir}/mod_status.so 1>&2
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2
+	fi
 fi
 
 %post mod_usertrack
 %{_sbindir}/apxs -e -a -n usertrack %{_libexecdir}/mod_usertrack.so 1>&2
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+fi
 
 %preun mod_usertrack
 if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n usertrack %{_libexecdir}/mod_usertrack.so 1>&2
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2
+	fi
 fi
 
 %post mod_unique_id
 %{_sbindir}/apxs -e -a -n unique_id %{_libexecdir}/mod_unique_id.so 1>&2
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+fi
 
 %preun mod_unique_id
 if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n unique_id %{_libexecdir}/mod_unique_id.so 1>&2
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2
+	fi
 fi
 
 %post mod_vhost_alias
 %{_sbindir}/apxs -e -a -n vhost_alias %{_libexecdir}/mod_vhost_alias.so 1>&2
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+fi
 
 %preun mod_vhost_alias
 if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n vhost_alias %{_libexecdir}/mod_vhost_alias.so 1>&2
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2
+	fi
 fi
 
 %clean
