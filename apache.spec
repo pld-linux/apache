@@ -22,7 +22,10 @@ Copyright:	BSD-like
 Provides:	httpd
 Provides:	webserver
 Prereq:		/sbin/chkconfig
-Prereq:		%{_sbindir}/useradd
+Prereq:		/usr/sbin/useradd
+Prereq:		/usr/bin/getgid
+Prereq:		/usr/bin/id
+Prereq:		sh-utils >= 2.0
 Requires:	rc-scripts
 URL:		http://www.apache.org/
 BuildRoot:	/tmp/%{name}-%{version}-root
@@ -161,8 +164,8 @@ gzip -9nf $RPM_BUILD_ROOT%{_mandir}/man*/* \
 	ABOUT_APACHE src/CHANGES KEYS README README.v6
 
 %pre
-if [ -n `id -g http` ]; then
-	if [ "`id -g http`" != "51" ]; then
+if [ -n `getgid http` ]; then
+	if [ "`getgid http`" != "51" ]; then
 		echo "Warning: group http haven't gid=51. Corect this before install apache"
 		exit 1
 	fi
