@@ -58,7 +58,7 @@ case "$1" in
 	;;
   status)
 	status httpd
-	RETVAL $?
+	RETVAL=$?
 	/usr/sbin/httpd -S
 	;;
   restart)
