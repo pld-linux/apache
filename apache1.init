@@ -63,6 +63,14 @@ case "$1" in
 	RETVAL=$?
 	/usr/sbin/httpd -S
 	;;
+  reload)
+  	if [ -f /var/lock/subsys/httpd ]; then
+		msg_reloading httpd
+		kill -HUP `pidof httpd`
+	else
+		msg_not_running httpd
+	fi
+	;;
   restart|force-reload)
 	$0 stop
 	$0 start
