@@ -51,6 +51,7 @@ Source11:	%{name}-mod_info.conf
 Source12:	%{name}-mod_ssl.conf
 Source13:	%{name}-mod_dav.conf
 Source14:	%{name}-mod_dir.conf
+Source15:	%{name}-suexec.conf
 Source20:	%{name}-server.crt
 Source21:	%{name}-server.key
 Patch0:		%{name}-configdir_skip_backups.patch
@@ -784,6 +785,7 @@ install %{SOURCE11} $CFG/35_mod_info.conf
 install %{SOURCE12} $CFG/40_mod_ssl.conf
 install %{SOURCE13} $CFG/45_mod_dav.conf
 install %{SOURCE14} $CFG/59_mod_dir.conf
+install %{SOURCE15} $CFG/13_mod_suexec.conf
 
 echo "LoadModule ldap_module	%{_libexecdir}/mod_ldap.so" > $CFG/49_mod_ldap.conf
 echo "LoadModule actions_module	%{_libexecdir}/mod_actions.so" > $CFG/50_mod_actions.conf
@@ -1294,6 +1296,7 @@ fi
 %defattr(644,root,root,755)
 %attr(4755,root,root) %{_sbindir}/suexec
 %attr(755,root,root) %{_libexecdir}/mod_suexec.so
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_suexec.conf
 %{_datadir}/manual/mod/mod_suexec.html.en
 
 %files index
