@@ -14,6 +14,8 @@
 # - --with-suexec-gidmin=500 or =100 ?
 # - --with-suexec-uidmin=500 or =1000 ?
 %include	/usr/lib/rpm/macros.perl
+# this is internal macro, don't change to %%apache_modules_api
+%define		_apache_modules_api 20020903
 Summary:	The most widely used Web server on the Internet
 Summary(de):	Leading World Wide Web-Server
 Summary(es):	Servidor HTTPD para proveer servicios WWW
@@ -24,7 +26,7 @@ Summary(ru):	óÁÍÙÊ ÐÏÐÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.0.47
-Release:	0.1
+Release:	0.2
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -57,7 +59,7 @@ BuildRequires:	gdbm-devel >= 1.8.3
 BuildRequires:	perl-devel >= 5.004
 BuildRequires:	rpm-perlprov >= 4.0.4
 BuildRequires:	zlib-devel
-BuildRequires:	libtool
+BuildRequires:	libtool >= 1.5
 PreReq:		perl
 PreReq:		rc-scripts
 Requires(pre): /bin/id
@@ -74,6 +76,7 @@ Requires:	mailcap
 Requires:	psmisc >= 20.1
 Provides:	httpd = %{version}
 Provides:	webserver = %{version}
+Provides:	apache(modules-api) = %{_apache_modules_api}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 Obsoletes:	apache-extra
 Obsoletes:	apache-doc
@@ -609,9 +612,13 @@ Pliki nag³ówkowe, biblioteki dla konsolidatora APR.
 %patch3 -p1
 
 %build
-cd srclib/apr
-%{__autoconf}
-cd ../..
+# sanity check
+MODULES_API=`awk '/#define MODULE_MAGIC_NUMBER_MAJOR/ {print $3}' include/ap_mmn.h`
+if [ "$MODULES_API" != "%_apache_modules_api" ]; then
+	echo "Set %%_apache_modules_api to $MODILES_API and rerun."
+	exit 1
+fi
+./buildconf
 %configure \
 	--enable-layout=PLD \
 	--enable-modules=all \
