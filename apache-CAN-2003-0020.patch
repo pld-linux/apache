@@ -1,0 +1,31 @@
+From RedHat's errata for 1.3.27
+--- src/main/http_log.c.escape	2003-02-14 10:57:45.000000000 +0000
++++ src/main/http_log.c	2003-02-14 11:17:30.000000000 +0000
+@@ -251,6 +251,17 @@
+     }
+ }
+ 
++/* Clean 'str' of non-printable characters. */
++static void sanitize(char *str, size_t len)
++{
++    while (len--) {
++        /* iscntrl implies !isprint; redundant but paranoid. */
++        if (!isprint(*str) || iscntrl(*str))
++            *str = '!';
++        str++;
++    }
++}    
++
+ API_EXPORT(void) ap_open_logs(server_rec *s_main, pool *p)
+ {
+     server_rec *virt, *q;
+@@ -459,6 +470,9 @@
+ 
+     len += ap_vsnprintf(errstr + len, sizeof(errstr) - len, fmt, args);
+ 
++    /* clean of non-printable characters. */
++    sanitize(errstr, len);
++
+     /* NULL if we are logging to syslog */
+     if (logf) {
+ 	fputs(errstr, logf);
