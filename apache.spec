@@ -112,7 +112,6 @@ Provides:	apache(modules-api) = %{_apache_modules_api}
 Obsoletes:	apache-extra
 Obsoletes:	apache-doc
 Obsoletes:	apache6
-Obsoletes:	apache1
 Obsoletes:	indexhtml
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
