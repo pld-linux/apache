@@ -15,7 +15,7 @@ Summary(pt_BR):	Servidor HTTPD para prover serviços WWW
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.0.39
-Release:	0.1
+Release:	0.2
 License:	Apache Group License
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/
