@@ -247,7 +247,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc ABOUT_APACHE.gz src/CHANGES.gz KEYS.gz README.gz
 %doc conf/mime.types
 
-%attr(754,root,root) /etc/rc.d/init.d/*
+%attr(754,root,root) /etc/rc.d/init.d/httpd
 
 %attr(750,root,root) %dir %{_sysconfdir}
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/*
@@ -256,6 +256,20 @@ rm -rf $RPM_BUILD_ROOT
 
 %attr(755,root,root) %dir %{_datadir}/html
 %config(noreplace) %{_datadir}/html/index.html
+%lang(ca) %{_datadir}/html/index.html.ca
+%lang(cz) %{_datadir}/html/index.html.cz
+%lang(de) %{_datadir}/html/index.html.de
+%lang(dk) %{_datadir}/html/index.html.dk
+%lang(ee) %{_datadir}/html/index.html.ee
+%lang(en) %{_datadir}/html/index.html.en
+%lang(es) %{_datadir}/html/index.html.es
+%lang(fr) %{_datadir}/html/index.html.fr
+%lang(it) %{_datadir}/html/index.html.it
+%lang(lu) %{_datadir}/html/index.html.lu
+%lang(nl) %{_datadir}/html/index.html.nl
+%lang(pt) %{_datadir}/html/index.html.pt
+%lang(se) %{_datadir}/html/index.html.se
+
 %{_datadir}/html/*.gif
 %{_datadir}/errordocs
 %dir %{_datadir}/icons
