@@ -46,33 +46,36 @@ Patch0:		%{name}-apxs.patch
 Patch1:		%{name}-configdir_skip_backups.patch
 Patch2:		%{name}-layout.patch
 Patch3:		%{name}-suexec.patch
-BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
+BuildRequires:	db-devel
+BuildRequires:	expat-devel
+BuildRequires:	gdbm-devel
 %{!?_without_ssl:BuildRequires:	openssl-devel >= 0.9.7}
 %{!?_without_ssl:BuildRequires:	openssl-tools >= 0.9.7}
-BuildRequires:	db-devel
-BuildRequires:	zlib-devel
-BuildRequires:	expat-devel
 BuildRequires:	perl-devel >= 5.004
-BuildRequires:	gdbm-devel
-BuildRequires:	byacc
 BuildRequires:	rpm-perlprov >= 4.0.4
-Provides:	httpd = %{version}
-Provides:	webserver = %{version}
-Prereq:		/sbin/chkconfig
-Prereq:		/usr/sbin/useradd
-Prereq:		/usr/bin/getgid
-Prereq:		/bin/id
-Prereq:		sh-utils
-Prereq:		rc-scripts
-Prereq:		perl
+BuildRequires:	zlib-devel
+PreReq:		perl
+PreReq:		rc-scripts
+Requires(pre):	/usr/bin/getgid
+Requires(pre):	/bin/id
+Requires(pre):	/usr/sbin/groupadd
+Requires(pre):	/usr/sbin/useradd
+Requires(post,preun):	/sbin/chkconfig
+Requires(post,postun):	/sbin/ldconfig
+Requires(post):	fileutils
+Requires(postun):	/usr/sbin/userdel
+Requires(postun):	/usr/sbin/groupdel
 Requires:	mailcap
 Requires:	/etc/mime.types
 Requires:	psmisc >= 20.1
 Requires:	libtool
+Provides:	httpd = %{version}
+Provides:	webserver = %{version}
 Obsoletes:	apache-extra
 Obsoletes:	apache6
 Obsoletes:	apache-doc
 Obsoletes:	indexhtml
+BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_sysconfdir	/etc/httpd
 %define		_includedir	%{_prefix}/include/apache
@@ -712,7 +715,7 @@ rm -rf $RPM_BUILD_ROOT
 %pre
 if [ -n "`getgid http`" ]; then
 	if [ "`getgid http`" != "51" ]; then
-		echo "Warning: group http haven't gid=51. Correct this before installing apache" 1>&2
+		echo "Error: group http doesn't have gid=51. Correct this before installing apache." 1>&2
 		exit 1
 	fi
 else
@@ -720,7 +723,7 @@ else
 fi
 if [ -n "`id -u http 2>/dev/null`" ]; then
 	if [ "`id -u http`" != "51" ]; then
-		echo "Warning: user http haven't uid=51. Correct this before installing apache" 1>&2
+		echo "Error: user http doesn't have uid=51. Correct this before installing apache." 1>&2
 		exit 1
 	fi
 else
