@@ -5,15 +5,13 @@ Summary(pl):	Serwer WWW (World Wide Web) ze wsparciem dla IPv6
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	1.3.6
-Release:	2
+Release:	2.0
 Group:		Networking/Daemons
-Group(pl):	Sieci/Demony
+Group(pl):	Sieciowe/Serwery
 Source0:	ftp://ftp.apache.org/apache/dist/%{name}_%{version}.tar.gz
 Source1:	apache.init
 Source2:	%{name}.logrotate
 Source3:	%{name}-extra1.tar.bz2
-########	http://stonecold.unity.ncsu.edu/software/mod_auth_kerb
-#Source5:	mod_auth_kerb-4.3.tar.gz
 Source6:	apache_1.3.6.tar.gz.asc
 Source7:	apache_1.3.6.tar.gz.md5
 Source8:	apache.sysconfig
@@ -29,7 +27,13 @@ Provides:	httpd
 Provides:	webserver
 Prereq:		/sbin/chkconfig
 URL:		http://www.apache.org/
+
 BuildRoot:	/tmp/%{name}-%{version}-root
+
+%define		_sysconfdir	/etc/httpd
+%define		_includedir	%{_prefix}/include/apache
+%define		_datadir	/home/httpd
+%define		_libexecdir	%{_prefix}/lib/apache
 
 %description
 Apache is a full featured web server that is freely available, and also
@@ -51,11 +55,11 @@ konfigurowanie serwerów wirtualnych. Ta wersja wspiera IPv6.
 %description -l tr
 Apache serbest daðýtýlan ve çok kullanýlan yetenekli bir web sunucusudur.
 
-%package	suexec
+%package suexec
 Summary:	Apache suexec wrapper
 Summary(pl):	Suexec wrapper do serwera www Apache
 Group:		Networking/Development
-Group(pl):	Sieci/Programowanie
+Group(pl):	Sieciowe/Programowanie
 Requires:	%{name} = %{version}
 
 %description suexec
@@ -69,11 +73,11 @@ SuEXEC umo¿liwia serwerowi Apache uruchamianie programów CGI i SSI z innym
 UID ni¿ wywo³uj±cy je serwer. Normalnie programy CGI i SSI s± wykonywane
 jako taki sam u¿ytkownik jak serwer WWW.
 
-%package	devel
+%package devel
 Summary:	Apache include files
 Summary(pl):	Pliki nag³ówkowe do serwera www Apache
 Group:		Networking/Development
-Group(pl):	Sieci/Programowanie
+Group(pl):	Sieciowe/Programowanie
 Requires:	%{name} = %{version}
 
 %description devel
@@ -82,19 +86,18 @@ Apache include files.
 %description -l pl devel
 Pliki nag³ówkowe dla serwera WWW Apache.
 
-%package	doc
+%package doc
 Summary:	Apache dokumentation
 Summary(pl):	Dokumentacja do Apache
 Group:		Documentation
 Group(pl):	Dokumentacja
 Requires:	%{name} = %{version}
-URL:		http://www.apache.org/
 
 %description doc
 Documentation for apache in HTML format.
 
 %description -l pl doc
-Dokumentacja do Apache w formacie HTML
+Dokumentacja do Apache w formacie HTML.
 
 %prep 
 %setup -q -n apache_%{version} -a3
@@ -105,12 +108,14 @@ Dokumentacja do Apache w formacie HTML
 %patch4 -p1
 
 %build
-OPTIM="$RPM_OPT_FLAGS" LDFLAGS="-s"\
-    ./configure \
+OPTIM="$RPM_OPT_FLAGS" LDFLAGS="-s" \
+./configure \
 	--prefix=%{_prefix} \
-	--sysconfdir=/etc/httpd \
-	--datadir=/home/httpd \
-	--libexecdir=/usr/lib/apache \
+	--sysconfdir=%{_sysconfdir} \
+	--includedir=%{_includedir} \
+	--sbindir=%{_sbindir} \
+	--libexecdir=%{_libexecdir} \
+	--datadir=%{_datadir} \
 	--localstatedir=/var \
 	--runtimedir=/var/run \
 	--logfiledir=/var/log/httpd \
@@ -123,8 +128,6 @@ OPTIM="$RPM_OPT_FLAGS" LDFLAGS="-s"\
 	--suexec-caller=http \
 	--suexec-uidmin=500 \
 	--suexec-gidmin=500 \
-	--sbindir=%{_sbindir} \
-	--includedir=%{_includedir}/apache \
 	--enable-rule=INET6 
 make
 
@@ -133,79 +136,76 @@ rm -rf $RPM_BUILD_ROOT
 
 make install-quiet root="$RPM_BUILD_ROOT"
 
-mv $RPM_BUILD_ROOT/home/httpd/htdocs $RPM_BUILD_ROOT/home/httpd/html
+mv $RPM_BUILD_ROOT%{_datadir}/htdocs $RPM_BUILD_ROOT%{_datadir}/html
 
 install -d $RPM_BUILD_ROOT/etc/{httpd,logrotate.d,rc.d/init.d,sysconfig}
-install -d $RPM_BUILD_ROOT/home/httpd/{html/manual,icons,cgi-bin}
+install -d $RPM_BUILD_ROOT%{_datadir}/{html/manual,icons,cgi-bin}
 install -d $RPM_BUILD_ROOT/{usr/{lib/apache,sbin,share,man/man{1,8}},var/log/httpd}
 
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/apache
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
 install %{SOURCE8} $RPM_BUILD_ROOT/etc/sysconfig/apache
 
-install -d $RPM_BUILD_ROOT%{_includedir}/apache
+install -d $RPM_BUILD_ROOT%{_includedir}
 
-rm -f $RPM_BUILD_ROOT/etc/httpd/*
-rm -f $RPM_BUILD_ROOT/home/httpd/html/manual/expand.pl
+rm -f $RPM_BUILD_ROOT%{_sysconfdir}/*
+rm -f $RPM_BUILD_ROOT%{_datadir}/html/manual/expand.pl
 
 touch $RPM_BUILD_ROOT/var/log/httpd/{access,error,agent,referer}_log
 
-cp -a apache-extra/errordocs	$RPM_BUILD_ROOT/home/httpd/
-cp -a apache-extra/icons/*	$RPM_BUILD_ROOT/home/httpd/icons
-cp -a apache-extra/*.conf	$RPM_BUILD_ROOT/etc/httpd
-cp -a apache-extra/m*		$RPM_BUILD_ROOT/etc/httpd
+cp -a apache-extra/errordocs	$RPM_BUILD_ROOT%{_datadir}/
+cp -a apache-extra/icons/*	$RPM_BUILD_ROOT%{_datadir}/icons
+cp -a apache-extra/*.conf	$RPM_BUILD_ROOT%{_sysconfdir}
+cp -a apache-extra/m*		$RPM_BUILD_ROOT%{_sysconfdir}
 
 mv $RPM_BUILD_ROOT/usr/man $RPM_BUILD_ROOT%{_mandir}
 
-strip $RPM_BUILD_ROOT/usr/lib/apache/*
+strip $RPM_BUILD_ROOT%{_libexecdir}/*
 
 gzip -9nf $RPM_BUILD_ROOT%{_mandir}/man*/* \
 	ABOUT_APACHE src/CHANGES KEYS README README.v6
-
-%clean
-rm -rf $RPM_BUILD_ROOT
 
 %post
 /sbin/chkconfig --add httpd
 umask 137
 touch /var/log/httpd/{access,error,agent,referer}_log
 if [ -f /var/lock/subsys/httpd ]; then
-   /etc/rc.d/init.d/httpd restart >&2
+	/etc/rc.d/init.d/httpd restart 1>&2
 fi
 
 %preun
-if [ $1 = 0 ]; then
-   if [ -f /var/lock/subsys/httpd ]; then
-       /etc/rc.d/init.d/httpd stop >&2
-   fi
-   /sbin/chkconfig --del httpd
+if [ "$1" = "0" ]; then
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd stop 1>&2
+	fi
+	/sbin/chkconfig --del httpd
 fi
+
+%clean
+rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
 %doc ABOUT_APACHE.gz src/CHANGES.gz KEYS.gz README.gz
 %doc conf/mime.types README.v6.gz
 
-%attr(751,root,root) %dir /etc/httpd
-%attr(640,root,root) %config %verify(not size mtime md5) /etc/httpd/*
+%attr(754,root,root) /etc/rc.d/init.d/*
+
+%attr(751,root,root) %dir %{_sysconfdir}
+%attr(640,root,root) %config %verify(not size mtime md5) %{_sysconfdir}/*
 %attr(640,root,root) %config %verify(not size mtime md5) /etc/sysconfig/*
 %attr(640,root,root) %config /etc/logrotate.d/*
 
-%attr(755,root,root) %dir /home/httpd/html
+%attr(755,root,root) %dir %{_datadir}/html
+%config(noreplace) %{_datadir}/html/index.html
+%{_datadir}/html/*.gif
+%{_datadir}/errordocs
+%dir %{_datadir}/icons
+%{_datadir}/icons/*.gif
+%attr(755,root,root) %{_datadir}/cgi-bin
 
-%config(noreplace) /home/httpd/html/index.html
-
-%attr(644,root,root) /home/httpd/html/*.gif
-%attr(755,root,root) /etc/rc.d/init.d/*
-
-%attr(755,root,root) /home/httpd/cgi-bin
-%attr(755,root,root) /usr/lib/apache
-
-%attr(755,root,root) %dir /home/httpd/icons
-/home/httpd/icons/*.gif
-
-%attr(755,root,root) %dir /home/httpd/errordocs
-/home/httpd/errordocs/*
+%dir %{_libexecdir}
+%attr(755,root,root) %{_libexecdir}/*
 
 %attr(755,root,root) %{_bindir}/dbmmanage 
 %attr(755,root,root) %{_bindir}/htdigest
@@ -226,14 +226,13 @@ fi
 %attr(640,root,root) %ghost /var/log/httpd/*
 
 %files suexec
-%attr(4711,root,root) %{_sbindir}/suexec
+%attr(4755,root,root) %{_sbindir}/suexec
 
 %files devel
 %defattr(644,root,root,755) 
 
-%dir %{_includedir}/apache
-%{_includedir}/apache/*
+%{_includedir}
 
 %files doc
 %defattr(644,root,root,755)
-%attr(-,root,root) /home/httpd/html/manual
+%attr(-,root,root) %{_datadir}/html/manual
