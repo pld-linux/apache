@@ -53,6 +53,7 @@ Patch2:		%{name}-suexec.patch
 Patch3:		%{name}-nolibs.patch
 Patch4:		%{name}-apr.patch
 URL:		http://httpd.apache.org/
+BuildRequires:	automake
 BuildRequires:	apr-devel >= 1:0.9.4-1
 BuildRequires:	apr-util-devel >= 1:0.9.5-0.3
 BuildRequires:	db-devel
@@ -609,6 +610,7 @@ if [ "$MODULES_API" != "%_apache_modules_api" ]; then
 	exit 1
 fi
 ./buildconf
+install /usr/share/automake/config.* build/
 %configure \
 	--prefix=%{_libexecdir} \
 	--enable-layout=PLD \
