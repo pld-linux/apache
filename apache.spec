@@ -22,7 +22,7 @@ Summary(pl):	Serwer WWW (World Wide Web)
 Summary(pt_BR):	Servidor HTTPD para prover serviços WWW
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
-Version:	2.0.43
+Version:	2.0.44
 Release:	0.2
 License:	Apache Group License
 Group:		Networking/Daemons
@@ -46,7 +46,6 @@ Patch0:		%{name}-apxs.patch
 Patch1:		%{name}-configdir_skip_backups.patch
 Patch2:		%{name}-layout.patch
 Patch3:		%{name}-suexec.patch
-Patch4:		%{name}-db.patch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %{!?_without_ssl:BuildRequires:	openssl-devel >= 0.9.6f}
 %{!?_without_ssl:BuildRequires:	openssl-tools}
@@ -579,7 +578,6 @@ Statyczne biblioteki APR.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
-%patch4 -p1
 
 %build
 %configure \
@@ -1082,7 +1080,7 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc ABOUT_APACHE CHANGES README ROADMAP
+%doc ABOUT_APACHE CHANGES README 
 %doc docs/conf/mime.types
 
 %attr(754,root,root) /etc/rc.d/init.d/httpd
