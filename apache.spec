@@ -671,7 +671,7 @@ CPPFLAGS="-DMAX_SERVER_LIMIT=200000 -DBIG_SECURITY_HOLE=1"
 for mpm in %{?with_metuxmpm:metuxmpm} perchild prefork worker; do
 install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
 ../%configure \
-	--prefix=%{_sysconfdir} \
+	--prefix=%{_sysconfdir}/ \
 	--exec-prefix=%{_libexecdir} \
 	--with-installbuilddir=%{_libdir}/apache/build \
 	--enable-layout=PLD \
