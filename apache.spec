@@ -42,6 +42,7 @@ Source2:	%{name}.logrotate
 Source3:	%{name}-icons.tar.gz
 # Source3-md5:	2b085cbc19fd28536dc883f0b864cd83
 Source4:	%{name}.sysconfig
+Source5:	%{name}.monitrc
 Source6:	%{name}-httpd.conf
 Source8:	%{name}-mod_vhost_alias.conf
 Source9:	%{name}-mod_status.conf
@@ -766,7 +767,7 @@ done
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig} \
+install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig,monit} \
 	$RPM_BUILD_ROOT%{_var}/{log/{httpd,archiv/httpd},{run,cache}/apache}
 
 # prefork is default one
@@ -811,6 +812,7 @@ ln -sf %{_libexecdir}/build $RPM_BUILD_ROOT%{_sysconfdir}/build
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/apache
 install %{SOURCE4} $RPM_BUILD_ROOT/etc/sysconfig/apache
+install %{SOURCE5} $RPM_BUILD_ROOT/etc/monit
 
 touch $RPM_BUILD_ROOT/var/log/httpd/{access,error,agent,referer,suexec}_log
 
@@ -1238,6 +1240,7 @@ fi
 %attr(640,root,root) %{_sysconfdir}/magic
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/sysconfig/*
 %attr(640,root,root) %config(noreplace) /etc/logrotate.d/*
+%attr(750,root,root) %config(noreplace) %verify(not md5 size mtime) /etc/monit/*.monitrc
 
 %attr(755,root,root) %{_libexecdir}/mod_access.so
 %attr(755,root,root) %{_libexecdir}/mod_alias.so
