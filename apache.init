@@ -27,7 +27,10 @@ if is_no "${NETWORKING}"; then
         msg_Network_Down httpd
         exit 1
 fi
-			
+
+if is_no ${IPV6_NETWORKING}; then
+        HTTPD_OPTS="$HTTPD_OPTS -4"
+fi
 
 # See how we were called.
 case "$1" in
@@ -35,7 +38,7 @@ case "$1" in
 	# Check if the service is already running?
         if [ ! -f /var/lock/subsys/httpd ]; then
 		msg_starting httpd
-		daemon httpd
+		daemon httpd $HTTPD_OPTS
 	        RETVAL=$?
     		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/httpd
 	else
