@@ -5,7 +5,7 @@ Summary(pl):	Serwer WWW (World Wide Web) ze wsparciem dla IPv6
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	1.3.9
-Release:	1
+Release:	2
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Source0:	ftp://ftp.apache.org/apache/dist/%{name}_%{version}.tar.gz
@@ -127,7 +127,8 @@ OPTIM="$RPM_OPT_FLAGS" LDFLAGS="-s" \
 	--suexec-caller=http \
 	--suexec-uidmin=500 \
 	--suexec-gidmin=500 \
-	--enable-rule=INET6 
+	--enable-rule=INET6 \
+	--disable-rule=WANTHSREGEX
 make
 
 %install
