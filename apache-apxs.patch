@@ -22,7 +22,7 @@ diff -urN httpd-2.0.39.org/support/apxs.in httpd-2.0.39/support/apxs.in
 -my $envvars = get_vars("sbindir") . "/envvars";
 -$envvars = eval qq("$envvars");
 -$envvars = eval qq("$envvars");
-+my $envvars = ""
++my $envvars = "";
  
  #allow apxs to be run from the source tree, before installation
  if ($0 =~ m:support/apxs$:) {
