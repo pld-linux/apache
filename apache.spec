@@ -6,29 +6,29 @@ Summary(pl):	Serwer WWW (World Wide Web)
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	1.3.12
-Release:	6
+Release:	7
 License:	BSD-like
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Source0:	ftp://ftp.apache.org/dist/%{name}_%{version}.tar.gz
-Source1:	apache.init
-Source2:	apache.logrotate
-Source3:	apache-icons.tar.gz
-Source4:	apache.sysconfig
-Source6:	apache-httpd.conf
-Source8:	apache-mod_vhost_alias.conf
-Source9:	apache-mod_status.conf
-Source10:	apache-mod_proxy.conf
-Patch0:		apache-PLD.patch
-Patch1:		apache-suexec.patch
-Patch2:		apache-htdocs.patch
-Patch3:		apache-errordocs.patch
-Patch4:		apache-apxs.patch
-Patch5:		apache-EAPI.patch
-Patch6:		apache-v6-PLD-2.patch.gz
-Patch7:		apache-mm_conf.patch
-Patch8:		apache-modules_symbols.patch
-Patch9:		apache-apxs_force_rm_cp.patch
+Source1:	%{name}.init
+Source2:	%{name}.logrotate
+Source3:	%{name}-icons.tar.gz
+Source4:	%{name}.sysconfig
+Source6:	%{name}-httpd.conf
+Source8:	%{name}-mod_vhost_alias.conf
+Source9:	%{name}-mod_status.conf
+Source10:	%{name}-mod_proxy.conf
+Patch0:		%{name}-PLD.patch
+Patch1:		%{name}-suexec.patch
+Patch2:		%{name}-htdocs.patch
+Patch3:		%{name}-errordocs.patch
+Patch4:		%{name}-apxs.patch
+Patch5:		%{name}-EAPI.patch
+Patch6:		%{name}-v6-PLD-2.patch.gz
+Patch7:		%{name}-mm_conf.patch
+Patch8:		%{name}-modules_symbols.patch
+Patch9:		%{name}-apxs_force_rm_cp.patch
 Provides:	httpd
 Provides:	webserver
 Prereq:		/sbin/chkconfig
@@ -36,7 +36,7 @@ Prereq:		/usr/sbin/useradd
 Prereq:		/usr/bin/getgid
 Prereq:		/bin/id
 Prereq:		sh-utils
-BuildRequires:	mm-devel
+BuildRequires:	mm-devel >= 1.1.3
 Requires:	rc-scripts
 Requires:	mailcap
 Requires:	/etc/mime.types
@@ -416,7 +416,7 @@ OPTIM="$RPM_OPT_FLAGS" \
 	--suexec-caller=http \
 	--suexec-uidmin=500 \
 	--suexec-gidmin=500 \
-  --suexec-docroot=/home/httpd \
+	--suexec-docroot=%{_datadir} \
 	--disable-rule=WANTHSREGEX \
 	--enable-rule=EAPI \
 	--enable-rule=INET6
@@ -430,7 +430,7 @@ install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig} \
 
 %{__make} install-quiet root="$RPM_BUILD_ROOT"
 
-mv $RPM_BUILD_ROOT%{_datadir}/html/manual $RPM_BUILD_ROOT%{_datadir}
+mv -f $RPM_BUILD_ROOT%{_datadir}/html/manual $RPM_BUILD_ROOT%{_datadir}
 
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/apache
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
@@ -467,7 +467,7 @@ else
 fi
 if [ -n "`id -u http 2>/dev/null`" ]; then
 	if [ "`id -u http`" != "51" ]; then
-		echo "Warning: user http haven't uid=51. Corect this before install apache" 1>&2
+		echo "Warning:user http haven't uid=51. Corect this before install apache" 1>&2
 		exit 1
 	fi
 else
@@ -723,7 +723,7 @@ if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n proxy %{_libexecdir}/libproxy.so 1>&2
 	grep -v -q "^Include.*mod_proxy.conf" /etc/httpd/httpd.conf > \
 		/etc/httpd/httpd.conf.tmp
-	mv /etc/httpd/httpd.conf.tmp /etc/httpd/httpd.conf
+	mv -f /etc/httpd/httpd.conf.tmp /etc/httpd/httpd.conf
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
@@ -761,7 +761,7 @@ if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n status %{_libexecdir}/mod_status.so 1>&2
 	grep -v -q "^Include.*mod_status.conf" /etc/httpd/httpd.conf > \
 		/etc/httpd/httpd.conf.tmp
-	mv /etc/httpd/httpd.conf.tmp /etc/httpd/httpd.conf
+	mv -f /etc/httpd/httpd.conf.tmp /etc/httpd/httpd.conf
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
@@ -815,7 +815,7 @@ if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n vhost_alias %{_libexecdir}/mod_vhost_alias.so 1>&2
 	grep -v -q "^Include.*mod_vhost_alias.conf" /etc/httpd/httpd.conf > \
 		/etc/httpd/httpd.conf.tmp
-	mv /etc/httpd/httpd.conf.tmp /etc/httpd/httpd.conf
+	mv -f /etc/httpd/httpd.conf.tmp /etc/httpd/httpd.conf
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
