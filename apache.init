@@ -33,6 +33,10 @@ else
 fi
 
 [ -z "$HTTPD_MPM" ] && HTTPD_MPM="prefork"
+[ -z "$HTTPD_CONF" ] && HTTPD_CONF="/etc/httpd/httpd.conf"
+if   [ -d "$HTTPD_CONF" ]; then CFG="-d $HTTPD_CONF"
+elif [ -f "$HTTPD_CONF" ]; then CFG="-f $HTTPD_CONF"
+else CFG=""; fi
 
 RETVAL=0
 # See how we were called.
@@ -41,7 +45,7 @@ case "$1" in
 	# Check if the service is already running?
 	if [ ! -f /var/lock/subsys/httpd ]; then
 		msg_starting httpd.${HTTPD_MPM}
-		daemon httpd.${HTTPD_MPM} -f /etc/httpd/httpd.conf $HTTPD_OPTS
+		daemon httpd.${HTTPD_MPM} $CFG $HTTPD_OPTS
 		RETVAL=$?
 		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/httpd
 	else

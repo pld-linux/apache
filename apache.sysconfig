@@ -1,9 +1,13 @@
+# $Id$
 # Customized setings for apache
 
 # Nice level for apache
 SERVICE_RUN_NICE_LEVEL="+5"
 
-# Cmdline options 
+# config dir/file path
+HTTPD_CONF="/etc/httpd/httpd.conf"
+
+# other command-line options 
 HTTPD_OPTS=""
 
 # choose MPM
