@@ -28,7 +28,7 @@ Summary(zh_CN):	Internet 上应用最广泛的 Web 服务程序。
 Name:		apache
 Version:	1.3.26
 Release:	2
-License:	Apache Group License
+License:	Apache Group 
 Group:		Networking/Daemons
 URL:		http://www.apache.org/
 Source0:	ftp://ftp.apache.org/dist/%{name}_%{version}.tar.gz
