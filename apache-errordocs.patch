@@ -445,7 +445,7 @@ diff -Nru apache_1.3.9/errordocs/HEADER.shtml apache_1.3.9.new/errordocs/HEADER.
 +<!--#echo var="title"-->
 +</TITLE>
 +</HEAD>
-+<BODY BGCOLOR="#808080">
++<BODY BGCOLOR="#FFFFFF">
 +<!--#set var="english" value="/icons/gb.gif"-->
 +<!--#set var="polish" value="/icons/poland.gif"-->
 +<H2 ALIGN="center">
