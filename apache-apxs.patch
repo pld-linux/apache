@@ -1,25 +1,31 @@
---- apache_1.3.9/src/support/apxs.pl.apxs	Sat Jul 24 14:05:02 1999
-+++ apache_1.3.9/src/support/apxs.pl	Fri Aug 27 11:28:09 1999
-@@ -92,15 +92,15 @@
- ##  Initial shared object support check
+--- apache_1.3.11/src/support/apxs.pl.apxs	Thu Dec 16 17:10:30 1999
++++ apache_1.3.11/src/support/apxs.pl	Tue Jan 25 01:19:16 2000
+@@ -1,4 +1,4 @@
+-#!/usr/local/bin/perl
++#!/usr/bin/perl
+ ## ====================================================================
+ ## Copyright (c) 1998-1999 The Apache Group.  All rights reserved.
+ ##
+@@ -220,15 +220,15 @@
+ ##  Initial DSO support check
  ##
  if (not -x "$CFG_SBINDIR/$CFG_TARGET") {
--	print STDERR "apxs:Error: $CFG_SBINDIR/$CFG_TARGET not found or not executable\n";
--	exit(1);
-+	print STDERR "apxs:Warning: $CFG_SBINDIR/$CFG_TARGET not found or not executable\n";
-+	print STDERR "apxs:Warning: Continuing anyway...\n";
+-    print STDERR "apxs:Error: $CFG_SBINDIR/$CFG_TARGET not found or not executable\n";
+-    exit(1);
++    print STDERR "apxs:Warning: $CFG_SBINDIR/$CFG_TARGET not found or not executable\n";
++    print STDERR "apxs:Warning: Continuing anyway...\n";
  }
  if (not grep(/mod_so/, `$CFG_SBINDIR/$CFG_TARGET -l`)) {
--    print STDERR "apxs:Error: Sorry, no shared object support for Apache\n";
--    print STDERR "apxs:Error: available under your platform. Make sure\n";
--    print STDERR "apxs:Error: the Apache module mod_so is compiled into\n";
--    print STDERR "apxs:Error: your server binary `$CFG_SBINDIR/$CFG_TARGET'.\n";
+-    print STDERR "apxs:Error: Sorry, no DSO support for Apache available\n";
+-    print STDERR "apxs:Error: under your platform. Make sure the Apache\n";
+-    print STDERR "apxs:Error: module mod_so is compiled into your server\n";
+-    print STDERR "apxs:Error: binary `$CFG_SBINDIR/$CFG_TARGET'.\n";
 -    exit(1);
-+    print STDERR "apxs:Warning: No shared object support for Apache\n";
-+    print STDERR "apxs:Warning: available under your platform. Make sure\n";
-+    print STDERR "apxs:Warning: the Apache module mod_so is compiled into\n";
-+    print STDERR "apxs:Warning: your server binary `$CFG_SBINDIR/$CFG_TARGET'.\n";
-+    print STDERR "apsx:Warning: Continuing anyway...\n";
++    print STDERR "apxs:Warning: Sorry, no DSO support for Apache available\n";
++    print STDERR "apxs:Warning: under your platform. Make sure the Apache\n";
++    print STDERR "apxs:Warning: module mod_so is compiled into your server\n";
++    print STDERR "apxs:Warning: binary `$CFG_SBINDIR/$CFG_TARGET'.\n";
++    print STDERR "apxs:Warning: Continuing anyway...\n";
  }
  
  ##
