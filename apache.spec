@@ -115,8 +115,8 @@ OPTIM=$RPM_OPT_FLAGS LDFLAGS=-s\
 	--suexec-caller=http \
 	--suexec-uidmin=500 \
 	--suexec-gidmin=500 \
-	--sbindir=/usr/sbin \
-	--includedir=/usr/include/apache
+	--sbindir=%{_sbindir} \
+	--includedir=%{_includedir}/apache
 
 make
 
@@ -134,7 +134,7 @@ install -d $RPM_BUILD_ROOT/{usr/{lib/apache,sbin,man/man{1,8}},var/log/httpd}
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/apache
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
 
-install -d $RPM_BUILD_ROOT/usr/include/apache
+install -d $RPM_BUILD_ROOT%{_includedir}/apache
 
 rm -f $RPM_BUILD_ROOT/etc/httpd/conf/*
 rm -f $RPM_BUILD_ROOT/home/httpd/html/manual/expand.pl
@@ -193,12 +193,12 @@ fi
 %attr(755,root,root) %{_bindir}/htdigest
 %attr(755,root,root) %{_bindir}/htpasswd
 
-%attr(755,root,root) /usr/sbin/ab
-%attr(755,root,root) /usr/sbin/apachectl
-%attr(755,root,root) /usr/sbin/apxs
-%attr(755,root,root) /usr/sbin/httpd
-%attr(755,root,root) /usr/sbin/logresolve
-%attr(755,root,root) /usr/sbin/rotatelogs
+%attr(755,root,root) %{_sbindir}/ab
+%attr(755,root,root) %{_sbindir}/apachectl
+%attr(755,root,root) %{_sbindir}/apxs
+%attr(755,root,root) %{_sbindir}/httpd
+%attr(755,root,root) %{_sbindir}/logresolve
+%attr(755,root,root) %{_sbindir}/rotatelogs
 
 %{_mandir}/man[18]/*
 
@@ -206,13 +206,13 @@ fi
 %attr(640,root,root) %config %verify(not size mtime md5) /var/log/httpd/*
 
 %files suexec
-%attr(4711,root,root) /usr/sbin/suexec
+%attr(4711,root,root) %{_sbindir}/suexec
 
 %files devel
 %defattr(644,root,root,755) 
 
-%dir /usr/include/apache
-/usr/include/apache/*
+%dir %{_includedir}/apache
+%{_includedir}/apache/*
 
 %files doc
 %defattr(644,root,root,755)
