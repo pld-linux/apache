@@ -32,7 +32,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.0.51
-Release:	1
+Release:	2
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -1758,7 +1758,7 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_sbindir}/apxs
 %attr(755,root,root) %{_sbindir}/envvars*
-%attr(750,root,root) %dir %{_sysconfdir}
+%attr(751,root,root) %dir %{_sysconfdir}
 %dir %{_libexecdir}
 %dir %{_libexecdir}/build
 %{_libexecdir}/build/config_vars.mk
