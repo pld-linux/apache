@@ -219,7 +219,7 @@ fi
 - changed permidssion on logrotate config file to 600,
 - changed permidssion on /var/log/httpd to 700,
 - added %ghost /var/log/httpd/*
-- added striping modules.
+- added stripping modules.
 - added patch to defeat header dos attack
 
 * Sat Jul 18 1998 Manoj Kasichainula <manojk@io.com>
