@@ -274,6 +274,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/errordocs
 %dir %{_datadir}/icons
 %{_datadir}/icons/*.gif
+%dir %{_datadir}/icons/small
+%{_datadir}/icons/small/*.gif
 %attr(755,root,root) %{_datadir}/cgi-bin
 
 %dir %{_libexecdir}
