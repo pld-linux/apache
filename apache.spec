@@ -1386,7 +1386,7 @@ fi
 %attr(755,root,root) %{_bindir}/apu-config
 %dir %{_includedir}
 %{_includedir}/apr*.h
-#%{_libdir}/APRVARS
+#%%{_libdir}/APRVARS
 %{_libdir}/apr*.exp
 %attr(755,root,root) %{_libdir}/libapr*.so
 %{_libdir}/libapr*.la
