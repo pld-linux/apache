@@ -624,6 +624,7 @@ Statyczne biblioteki APR.
 	--with-suexec-bin=%{_sbindir}/suexec \
 	--with-suexec-caller=http \
 	--with-suexec-docroot=%{_datadir} \
+	--with-suexec-logfile=/var/log/httpd/suexec_log \
 	--with-suexec-uidmin=500 \
 	--with-suexec-gidmin=500 \
 	--with-suexec-umask=077
@@ -669,7 +670,7 @@ install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/apache
 install %{SOURCE4} $RPM_BUILD_ROOT/etc/sysconfig/apache
 
-touch $RPM_BUILD_ROOT/var/log/httpd/{access,error,agent,referer}_log
+touch $RPM_BUILD_ROOT/var/log/httpd/{access,error,agent,referer,suexec}_log
 
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/ssl
 install %{SOURCE20} $RPM_BUILD_ROOT%{_sysconfdir}/ssl/server.crt
