@@ -14,7 +14,7 @@ Summary(pt_BR):	Servidor HTTPD para prover serviços WWW
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.0.35
-Release:	0.2
+Release:	0.3
 License:	Apache Group License
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/
@@ -652,11 +652,10 @@ install -d $RPM_BUILD_ROOT%{_var}/{run,cache}/apache
 
 mv -f $RPM_BUILD_ROOT%{_sysconfdir}/build \
 	$RPM_BUILD_ROOT%{_libexecdir}/build
-cp $RPM_BUILD_ROOT%{_libexecdir}/build/config_vars.mk \
-	$RPM_BUILD_ROOT%{_libexecdir}/build/config_vars.mk.old
-sed -e "s#$RPM_BUILD_ROOT##g" $RPM_BUILD_ROOT%{_libexecdir}/build/config_vars.mk.old \
-	> $RPM_BUILD_ROOT%{_libexecdir}/build/config_vars.mk
 ln -s %{_libexecdir}/build $RPM_BUILD_ROOT%{_sysconfdir}/build
+
+perl -pi -e "s#$RPM_BUILD_ROOT##g" $RPM_BUILD_ROOT%{_libexecdir}/build/config_vars.mk
+perl -pi -e "s#dlname=''#dlname='libapr.so.0'#g" $RPM_BUILD_ROOT%{_libdir}/libapr.la
 
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/apache
