@@ -1,6 +1,276 @@
-diff -Nru apache_1.3.12/src/modules/standard/mod_auth_db.c apache_1.3.12.new/src/modules/standard/mod_auth_db.c
---- apache_1.3.12/src/modules/standard/mod_auth_db.c	Sun Nov 28 13:59:51 1999
-+++ apache_1.3.12.new/src/modules/standard/mod_auth_db.c	Sun Apr  2 23:51:16 2000
+diff -urN apache_1.3.14.orig/src/modules/standard/mod_actions.c apache_1.3.14/src/modules/standard/mod_actions.c
+--- apache_1.3.14.orig/src/modules/standard/mod_actions.c	Wed Feb  2 21:44:00 2000
++++ apache_1.3.14/src/modules/standard/mod_actions.c	Sat Nov 11 22:52:25 2000
+@@ -96,34 +96,34 @@
+  * track extension method mappings -- table keys are case-INsensitive.
+  */
+ typedef struct {
+-    table *action_types;       /* Added with Action... */
++    table *actions_types;       /* Added with Action... */
+     char *scripted[METHODS];   /* Added with Script... */
+     array_header *xmethods;    /* Added with Script -- extension methods */
+-} action_dir_config;
++} actions_dir_config;
+ 
+-module action_module;
++module actions_module;
+ 
+-static void *create_action_dir_config(pool *p, char *dummy)
++static void *create_actions_dir_config(pool *p, char *dummy)
+ {
+-    action_dir_config *new =
+-	(action_dir_config *) ap_palloc(p, sizeof(action_dir_config));
++    actions_dir_config *new =
++	(actions_dir_config *) ap_palloc(p, sizeof(actions_dir_config));
+ 
+-    new->action_types = ap_make_table(p, 4);
++    new->actions_types = ap_make_table(p, 4);
+     memset(new->scripted, 0, sizeof(new->scripted));
+     new->xmethods = ap_make_array(p, 4, sizeof(xmethod_t));
+     return new;
+ }
+ 
+-static void *merge_action_dir_configs(pool *p, void *basev, void *addv)
++static void *merge_actions_dir_configs(pool *p, void *basev, void *addv)
+ {
+-    action_dir_config *base = (action_dir_config *) basev;
+-    action_dir_config *add = (action_dir_config *) addv;
+-    action_dir_config *new = (action_dir_config *) ap_palloc(p,
+-                                  sizeof(action_dir_config));
++    actions_dir_config *base = (actions_dir_config *) basev;
++    actions_dir_config *add = (actions_dir_config *) addv;
++    actions_dir_config *new = (actions_dir_config *) ap_palloc(p,
++                                  sizeof(actions_dir_config));
+     int i;
+ 
+-    new->action_types = ap_overlay_tables(p, add->action_types,
+-				       base->action_types);
++    new->actions_types = ap_overlay_tables(p, add->actions_types,
++				       base->actions_types);
+ 
+     for (i = 0; i < METHODS; ++i) {
+         new->scripted[i] = add->scripted[i] ? add->scripted[i]
+@@ -133,14 +133,14 @@
+     return new;
+ }
+ 
+-static const char *add_action(cmd_parms *cmd, action_dir_config *m, char *type,
++static const char *add_actions(cmd_parms *cmd, actions_dir_config *m, char *type,
+ 			      char *script)
+ {
+-    ap_table_setn(m->action_types, type, script);
++    ap_table_setn(m->actions_types, type, script);
+     return NULL;
+ }
+ 
+-static const char *set_script(cmd_parms *cmd, action_dir_config *m,
++static const char *set_script(cmd_parms *cmd, actions_dir_config *m,
+                               char *method, char *script)
+ {
+     int methnum;
+@@ -182,20 +182,20 @@
+     return NULL;
+ }
+ 
+-static const command_rec action_cmds[] =
++static const command_rec actions_cmds[] =
+ {
+-    {"Action", add_action, NULL, OR_FILEINFO, TAKE2,
++    {"Action", add_actions, NULL, OR_FILEINFO, TAKE2,
+      "a media type followed by a script name"},
+     {"Script", set_script, NULL, ACCESS_CONF | RSRC_CONF, TAKE2,
+      "a method followed by a script name"},
+     {NULL}
+ };
+ 
+-static int action_handler(request_rec *r)
++static int actions_handler(request_rec *r)
+ {
+-    action_dir_config *conf = (action_dir_config *)
+-        ap_get_module_config(r->per_dir_config, &action_module);
+-    const char *t, *action = r->handler ? r->handler : 
++    actions_dir_config *conf = (actions_dir_config *)
++        ap_get_module_config(r->per_dir_config, &actions_module);
++    const char *t, *actions = r->handler ? r->handler : 
+ 	ap_field_noparam(r->pool, r->content_type);
+     const char *script;
+     int i;
+@@ -242,9 +242,9 @@
+ 	return DECLINED;
+     }
+ 
+-    /* Second, check for actions (which override the method scripts) */
+-    if ((t = ap_table_get(conf->action_types,
+-			  action ? action : ap_default_type(r)))) {
++    /* Second, check for actionss (which override the method scripts) */
++    if ((t = ap_table_get(conf->actions_types,
++			  actions ? actions : ap_default_type(r)))) {
+ 	script = t;
+     }
+ 
+@@ -260,22 +260,22 @@
+     return OK;
+ }
+ 
+-static const handler_rec action_handlers[] =
++static const handler_rec actions_handlers[] =
+ {
+-    {"*/*", action_handler},
++    {"*/*", actions_handler},
+     {NULL}
+ };
+ 
+-module action_module =
++module actions_module =
+ {
+     STANDARD_MODULE_STUFF,
+     NULL,			/* initializer */
+-    create_action_dir_config,	/* dir config creater */
+-    merge_action_dir_configs,	/* dir merger --- default is to override */
++    create_actions_dir_config,	/* dir config creater */
++    merge_actions_dir_configs,	/* dir merger --- default is to override */
+     NULL,			/* server config */
+     NULL,			/* merge server config */
+-    action_cmds,		/* command table */
+-    action_handlers,		/* handlers */
++    actions_cmds,		/* command table */
++    actions_handlers,		/* handlers */
+     NULL,			/* filename translation */
+     NULL,			/* check_user_id */
+     NULL,			/* check auth */
+diff -urN apache_1.3.14.orig/src/modules/standard/mod_auth_anon.c apache_1.3.14/src/modules/standard/mod_auth_anon.c
+--- apache_1.3.14.orig/src/modules/standard/mod_auth_anon.c	Fri Jun  2 01:42:27 2000
++++ apache_1.3.14/src/modules/standard/mod_auth_anon.c	Sat Nov 11 22:52:25 2000
+@@ -114,12 +114,12 @@
+     int auth_anon_mustemail;
+     int auth_anon_authoritative;
+ 
+-} anon_auth_config_rec;
++} auth_anon_config_rec;
+ 
+-static void *create_anon_auth_dir_config(pool *p, char *d)
++static void *create_auth_anon_dir_config(pool *p, char *d)
+ {
+-    anon_auth_config_rec *sec = (anon_auth_config_rec *)
+-    ap_pcalloc(p, sizeof(anon_auth_config_rec));
++    auth_anon_config_rec *sec = (auth_anon_config_rec *)
++    ap_pcalloc(p, sizeof(auth_anon_config_rec));
+ 
+     if (!sec)
+ 	return NULL;		/* no memory... */
+@@ -136,39 +136,39 @@
+ }
+ 
+ static const char *anon_set_passwd_flag(cmd_parms *cmd,
+-				 anon_auth_config_rec * sec, int arg)
++				 auth_anon_config_rec * sec, int arg)
+ {
+     sec->auth_anon_mustemail = arg;
+     return NULL;
+ }
+ 
+ static const char *anon_set_userid_flag(cmd_parms *cmd,
+-				 anon_auth_config_rec * sec, int arg)
++				 auth_anon_config_rec * sec, int arg)
+ {
+     sec->auth_anon_nouserid = arg;
+     return NULL;
+ }
+ static const char *anon_set_logemail_flag(cmd_parms *cmd,
+-				   anon_auth_config_rec * sec, int arg)
++				   auth_anon_config_rec * sec, int arg)
+ {
+     sec->auth_anon_logemail = arg;
+     return NULL;
+ }
+ static const char *anon_set_verifyemail_flag(cmd_parms *cmd,
+-				      anon_auth_config_rec * sec, int arg)
++				      auth_anon_config_rec * sec, int arg)
+ {
+     sec->auth_anon_verifyemail = arg;
+     return NULL;
+ }
+ static const char *anon_set_authoritative_flag(cmd_parms *cmd,
+-					anon_auth_config_rec * sec, int arg)
++					auth_anon_config_rec * sec, int arg)
+ {
+     sec->auth_anon_authoritative = arg;
+     return NULL;
+ }
+ 
+ static const char *anon_set_string_slots(cmd_parms *cmd,
+-				  anon_auth_config_rec * sec, char *arg)
++				  auth_anon_config_rec * sec, char *arg)
+ {
+ 
+     auth_anon *first;
+@@ -191,7 +191,7 @@
+     return NULL;
+ }
+ 
+-static const command_rec anon_auth_cmds[] =
++static const command_rec auth_anon_cmds[] =
+ {
+     {"Anonymous", anon_set_string_slots, NULL, OR_AUTHCFG, ITERATE,
+      "a space-separated list of user IDs"},
+@@ -209,13 +209,13 @@
+     {NULL}
+ };
+ 
+-module MODULE_VAR_EXPORT anon_auth_module;
++module MODULE_VAR_EXPORT auth_anon_module;
+ 
+-static int anon_authenticate_basic_user(request_rec *r)
++static int authenticate_anon_basic_user(request_rec *r)
+ {
+-    anon_auth_config_rec *sec =
+-    (anon_auth_config_rec *) ap_get_module_config(r->per_dir_config,
+-					       &anon_auth_module);
++    auth_anon_config_rec *sec =
++    (auth_anon_config_rec *) ap_get_module_config(r->per_dir_config,
++					       &auth_anon_module);
+     conn_rec *c = r->connection;
+     const char *sent_pw;
+     int res = DECLINED;
+@@ -275,9 +275,9 @@
+ {
+ #ifdef NOTYET
+     conn_rec *c = r->connection;
+-    anon_auth_config_rec *sec =
+-    (anon_auth_config_rec *) ap_get_module_config(r->per_dir_config,
+-					       &anon_auth_module);
++    auth_anon_config_rec *sec =
++    (auth_anon_config_rec *) ap_get_module_config(r->per_dir_config,
++					       &auth_anon_module);
+ 
+     if (!sec->auth_anon)
+ 	return DECLINED;
+@@ -291,18 +291,18 @@
+ }
+ 
+ 
+-module MODULE_VAR_EXPORT anon_auth_module =
++module MODULE_VAR_EXPORT auth_anon_module =
+ {
+     STANDARD_MODULE_STUFF,
+     NULL,			/* initializer */
+-    create_anon_auth_dir_config,	/* dir config creater */
++    create_auth_anon_dir_config,	/* dir config creater */
+     NULL,			/* dir merger ensure strictness */
+     NULL,			/* server config */
+     NULL,			/* merge server config */
+-    anon_auth_cmds,		/* command table */
++    auth_anon_cmds,		/* command table */
+     NULL,			/* handlers */
+     NULL,			/* filename translation */
+-    anon_authenticate_basic_user,	/* check_user_id */
++    authenticate_anon_basic_user,	/* check_user_id */
+     check_anon_access,		/* check auth */
+     NULL,			/* check access */
+     NULL,			/* type_checker */
+diff -urN apache_1.3.14.orig/src/modules/standard/mod_auth_db.c apache_1.3.14/src/modules/standard/mod_auth_db.c
+--- apache_1.3.14.orig/src/modules/standard/mod_auth_db.c	Sun Nov 28 13:59:51 1999
++++ apache_1.3.14/src/modules/standard/mod_auth_db.c	Sat Nov 11 22:52:25 2000
 @@ -72,7 +72,7 @@
   *           instead of   AuthDBMUserFile    AuthDBMGroupFile
   *
@@ -115,122 +385,10 @@ diff -Nru apache_1.3.12/src/modules/standard/mod_auth_db.c apache_1.3.12.new/src
      db_check_auth,		/* check auth */
      NULL,			/* check access */
      NULL,			/* type_checker */
-diff -Nru apache_1.3.12/src/modules/standard/mod_include.c apache_1.3.12.new/src/modules/standard/mod_include.c
---- apache_1.3.12/src/modules/standard/mod_include.c	Wed Feb  2 21:44:03 2000
-+++ apache_1.3.12.new/src/modules/standard/mod_include.c	Sun Apr  2 23:31:33 2000
-@@ -106,7 +106,7 @@
- #define RAW_ASCII_CHAR(ch)  (ch)
- #endif /*CHARSET_EBCDIC*/
- 
--module MODULE_VAR_EXPORT includes_module;
-+module MODULE_VAR_EXPORT include_module;
- 
- /* ------------------------ Environment function -------------------------- */
- 
-@@ -728,7 +728,7 @@
- 
- 	    /* see the Kludge in send_parsed_file for why */
- 	    if (rr) 
--		ap_set_module_config(rr->request_config, &includes_module, r);
-+		ap_set_module_config(rr->request_config, &include_module, r);
- 
-             if (!error_fmt && ap_run_sub_req(rr)) {
-                 error_fmt = "unable to include \"%s\" in parsed file %s";
-@@ -2306,7 +2306,7 @@
-  * option only changes the default.
-  */
- 
--module includes_module;
-+module include_module;
- enum xbithack {
-     xbithack_off, xbithack_on, xbithack_full
- };
-@@ -2317,7 +2317,7 @@
- #define DEFAULT_XBITHACK xbithack_off
- #endif
- 
--static void *create_includes_dir_config(pool *p, char *dummy)
-+static void *create_include_dir_config(pool *p, char *dummy)
- {
-     enum xbithack *result = (enum xbithack *) ap_palloc(p, sizeof(enum xbithack));
-     *result = DEFAULT_XBITHACK;
-@@ -2348,7 +2348,7 @@
- {
-     FILE *f;
-     enum xbithack *state =
--    (enum xbithack *) ap_get_module_config(r->per_dir_config, &includes_module);
-+    (enum xbithack *) ap_get_module_config(r->per_dir_config, &include_module);
-     int errstatus;
-     request_rec *parent;
- 
-@@ -2419,7 +2419,7 @@
- 	while (q) {
- 	    if (ap_table_get(q->notes, PARENT_STRING)) {
- 		/* Kludge --- See below */
--		ap_set_module_config(r->request_config, &includes_module, q);
-+		ap_set_module_config(r->request_config, &include_module, q);
- 
- 		/* Create the initial environment in the parent */
- 		ap_add_common_vars(q);
-@@ -2441,7 +2441,7 @@
- 	}
-     }
- 
--    if ((parent = ap_get_module_config(r->request_config, &includes_module))) {
-+    if ((parent = ap_get_module_config(r->request_config, &include_module))) {
- 	/* Kludge --- for nested includes, we want to keep the subprocess
- 	 * environment of the base document (for compatibility); that means
- 	 * torquing our own last_modified date as well so that the
-@@ -2511,7 +2511,7 @@
-     }
- 
-     state = (enum xbithack *) ap_get_module_config(r->per_dir_config,
--                                                &includes_module);
-+                                                &include_module);
- 
-     if (*state == xbithack_off) {
-         return DECLINED;
-@@ -2520,13 +2520,13 @@
- #endif
- }
- 
--static const command_rec includes_cmds[] =
-+static const command_rec include_cmds[] =
- {
-     {"XBitHack", set_xbithack, NULL, OR_OPTIONS, TAKE1, "Off, On, or Full"},
-     {NULL}
- };
- 
--static const handler_rec includes_handlers[] =
-+static const handler_rec include_handlers[] =
- {
-     {INCLUDES_MAGIC_TYPE, send_shtml_file},
-     {INCLUDES_MAGIC_TYPE3, send_shtml_file},
-@@ -2535,16 +2535,16 @@
-     {NULL}
- };
- 
--module MODULE_VAR_EXPORT includes_module =
-+module MODULE_VAR_EXPORT include_module =
- {
-     STANDARD_MODULE_STUFF,
-     NULL,                       /* initializer */
--    create_includes_dir_config, /* dir config creater */
-+    create_include_dir_config,  /* dir config creater */
-     NULL,                       /* dir merger --- default is to override */
-     NULL,                       /* server config */
-     NULL,                       /* merge server config */
--    includes_cmds,              /* command table */
--    includes_handlers,          /* handlers */
-+    include_cmds,               /* command table */
-+    include_handlers,           /* handlers */
-     NULL,                       /* filename translation */
-     NULL,                       /* check_user_id */
-     NULL,                       /* check auth */
-diff -Nru apache_1.3.12/src/modules/standard/mod_auth_dbm.c apache_1.3.12.new/src/modules/standard/mod_auth_dbm.c
---- apache_1.3.12/src/modules/standard/mod_auth_dbm.c	Mon Aug  2 22:50:22 1999
-+++ apache_1.3.12.new/src/modules/standard/mod_auth_dbm.c	Mon Apr  3 00:15:09 2000
-@@ -87,7 +87,7 @@
+diff -urN apache_1.3.14.orig/src/modules/standard/mod_auth_dbm.c apache_1.3.14/src/modules/standard/mod_auth_dbm.c
+--- apache_1.3.14.orig/src/modules/standard/mod_auth_dbm.c	Thu Sep 21 15:19:33 2000
++++ apache_1.3.14/src/modules/standard/mod_auth_dbm.c	Sat Nov 11 22:56:37 2000
+@@ -92,7 +92,7 @@
   * instead.
   *
   * MODULE-DEFINITION-START
@@ -239,7 +397,7 @@ diff -Nru apache_1.3.12/src/modules/standard/mod_auth_dbm.c apache_1.3.12.new/sr
   * ConfigStart
      . ./helpers/find-dbm-lib
   * ConfigEnd
-@@ -100,12 +100,12 @@
+@@ -105,12 +105,12 @@
      char *auth_dbmgrpfile;
      int auth_dbmauthoritative;
  
@@ -256,7 +414,7 @@ diff -Nru apache_1.3.12/src/modules/standard/mod_auth_dbm.c apache_1.3.12.new/sr
  
      sec->auth_dbmpwfile = NULL;
      sec->auth_dbmgrpfile = NULL;
-@@ -122,27 +122,27 @@
+@@ -127,27 +127,27 @@
      return ap_set_file_slot(cmd, offset, f);
  }
  
@@ -286,12 +444,12 @@ diff -Nru apache_1.3.12/src/modules/standard/mod_auth_dbm.c apache_1.3.12.new/sr
      {NULL}
  };
  
--module dbm_auth_module;
-+module auth_dbm_module;
+-module MODULE_VAR_EXPORT dbm_auth_module;
++module MODULE_VAR_EXPORT auth_dbm_module;
  
  static char *get_dbm_pw(request_rec *r, char *user, char *auth_dbmpwfile)
  {
-@@ -205,11 +205,11 @@
+@@ -210,11 +210,11 @@
      return grp_data;
  }
  
@@ -307,7 +465,7 @@ diff -Nru apache_1.3.12/src/modules/standard/mod_auth_dbm.c apache_1.3.12.new/sr
      conn_rec *c = r->connection;
      const char *sent_pw;
      char *real_pw, *colon_pw;
-@@ -250,9 +250,9 @@
+@@ -255,9 +255,9 @@
  
  static int dbm_check_auth(request_rec *r)
  {
@@ -320,12 +478,12 @@ diff -Nru apache_1.3.12/src/modules/standard/mod_auth_dbm.c apache_1.3.12.new/sr
      char *user = r->connection->user;
      int m = r->method_number;
  
-@@ -311,18 +311,18 @@
+@@ -316,18 +316,18 @@
  }
  
  
--module dbm_auth_module =
-+module auth_dbm_module =
+-module MODULE_VAR_EXPORT dbm_auth_module =
++module MODULE_VAR_EXPORT auth_dbm_module =
  {
      STANDARD_MODULE_STUFF,
      NULL,			/* initializer */
@@ -343,9 +501,121 @@ diff -Nru apache_1.3.12/src/modules/standard/mod_auth_dbm.c apache_1.3.12.new/sr
      dbm_check_auth,		/* check auth */
      NULL,			/* check access */
      NULL,			/* type_checker */
-diff -Nru apache_1.3.12/src/modules/standard/mod_log_agent.c apache_1.3.12.new/src/modules/standard/mod_log_agent.c
---- apache_1.3.12/src/modules/standard/mod_log_agent.c	Fri Jan  1 20:05:10 1999
-+++ apache_1.3.12.new/src/modules/standard/mod_log_agent.c	Mon Apr  3 00:21:51 2000
+diff -urN apache_1.3.14.orig/src/modules/standard/mod_include.c apache_1.3.14/src/modules/standard/mod_include.c
+--- apache_1.3.14.orig/src/modules/standard/mod_include.c	Fri Sep 22 20:26:32 2000
++++ apache_1.3.14/src/modules/standard/mod_include.c	Sat Nov 11 22:52:25 2000
+@@ -106,7 +106,7 @@
+ #define RAW_ASCII_CHAR(ch)  (ch)
+ #endif /*CHARSET_EBCDIC*/
+ 
+-module MODULE_VAR_EXPORT includes_module;
++module MODULE_VAR_EXPORT include_module;
+ 
+ /* ------------------------ Environment function -------------------------- */
+ 
+@@ -733,7 +733,7 @@
+ 
+ 	    /* see the Kludge in send_parsed_file for why */
+ 	    if (rr) 
+-		ap_set_module_config(rr->request_config, &includes_module, r);
++		ap_set_module_config(rr->request_config, &include_module, r);
+ 
+             if (!error_fmt && ap_run_sub_req(rr)) {
+                 error_fmt = "unable to include \"%s\" in parsed file %s";
+@@ -2311,7 +2311,7 @@
+  * option only changes the default.
+  */
+ 
+-module includes_module;
++module include_module;
+ enum xbithack {
+     xbithack_off, xbithack_on, xbithack_full
+ };
+@@ -2322,7 +2322,7 @@
+ #define DEFAULT_XBITHACK xbithack_off
+ #endif
+ 
+-static void *create_includes_dir_config(pool *p, char *dummy)
++static void *create_include_dir_config(pool *p, char *dummy)
+ {
+     enum xbithack *result = (enum xbithack *) ap_palloc(p, sizeof(enum xbithack));
+     *result = DEFAULT_XBITHACK;
+@@ -2353,7 +2353,7 @@
+ {
+     FILE *f;
+     enum xbithack *state =
+-    (enum xbithack *) ap_get_module_config(r->per_dir_config, &includes_module);
++    (enum xbithack *) ap_get_module_config(r->per_dir_config, &include_module);
+     int errstatus;
+     request_rec *parent;
+ 
+@@ -2424,7 +2424,7 @@
+ 	while (q) {
+ 	    if (ap_table_get(q->notes, PARENT_STRING)) {
+ 		/* Kludge --- See below */
+-		ap_set_module_config(r->request_config, &includes_module, q);
++		ap_set_module_config(r->request_config, &include_module, q);
+ 
+ 		/* Create the initial environment in the parent */
+ 		ap_add_common_vars(q);
+@@ -2446,7 +2446,7 @@
+ 	}
+     }
+ 
+-    if ((parent = ap_get_module_config(r->request_config, &includes_module))) {
++    if ((parent = ap_get_module_config(r->request_config, &include_module))) {
+ 	/* Kludge --- for nested includes, we want to keep the subprocess
+ 	 * environment of the base document (for compatibility); that means
+ 	 * torquing our own last_modified date as well so that the
+@@ -2516,7 +2516,7 @@
+     }
+ 
+     state = (enum xbithack *) ap_get_module_config(r->per_dir_config,
+-                                                &includes_module);
++                                                &include_module);
+ 
+     if (*state == xbithack_off) {
+         return DECLINED;
+@@ -2525,13 +2525,13 @@
+ #endif
+ }
+ 
+-static const command_rec includes_cmds[] =
++static const command_rec include_cmds[] =
+ {
+     {"XBitHack", set_xbithack, NULL, OR_OPTIONS, TAKE1, "Off, On, or Full"},
+     {NULL}
+ };
+ 
+-static const handler_rec includes_handlers[] =
++static const handler_rec include_handlers[] =
+ {
+     {INCLUDES_MAGIC_TYPE, send_shtml_file},
+     {INCLUDES_MAGIC_TYPE3, send_shtml_file},
+@@ -2540,16 +2540,16 @@
+     {NULL}
+ };
+ 
+-module MODULE_VAR_EXPORT includes_module =
++module MODULE_VAR_EXPORT include_module =
+ {
+     STANDARD_MODULE_STUFF,
+     NULL,                       /* initializer */
+-    create_includes_dir_config, /* dir config creater */
++    create_include_dir_config,  /* dir config creater */
+     NULL,                       /* dir merger --- default is to override */
+     NULL,                       /* server config */
+     NULL,                       /* merge server config */
+-    includes_cmds,              /* command table */
+-    includes_handlers,          /* handlers */
++    include_cmds,               /* command table */
++    include_handlers,           /* handlers */
+     NULL,                       /* filename translation */
+     NULL,                       /* check_user_id */
+     NULL,                       /* check auth */
+diff -urN apache_1.3.14.orig/src/modules/standard/mod_log_agent.c apache_1.3.14/src/modules/standard/mod_log_agent.c
+--- apache_1.3.14.orig/src/modules/standard/mod_log_agent.c	Fri Jan  1 20:05:10 1999
++++ apache_1.3.14/src/modules/standard/mod_log_agent.c	Sat Nov 11 22:52:25 2000
 @@ -60,7 +60,7 @@
  #include "http_config.h"
  #include "http_log.h"
@@ -458,9 +728,9 @@ diff -Nru apache_1.3.12/src/modules/standard/mod_log_agent.c apache_1.3.12.new/s
      NULL,                       /* header parser */
      NULL,                       /* child_init */
      NULL,                       /* child_exit */
-diff -Nru apache_1.3.12/src/modules/standard/mod_log_config.c apache_1.3.12.new/src/modules/standard/mod_log_config.c
---- apache_1.3.12/src/modules/standard/mod_log_config.c	Mon Apr  3 00:26:44 2000
-+++ apache_1.3.12.new/src/modules/standard/mod_log_config.c	Mon Apr  3 00:24:40 2000
+diff -urN apache_1.3.14.orig/src/modules/standard/mod_log_config.c apache_1.3.14/src/modules/standard/mod_log_config.c
+--- apache_1.3.14.orig/src/modules/standard/mod_log_config.c	Sat Nov 11 22:51:24 2000
++++ apache_1.3.14/src/modules/standard/mod_log_config.c	Sat Nov 11 22:52:25 2000
 @@ -180,7 +180,7 @@
  #include "http_log.h"
  #include <limits.h>
@@ -469,7 +739,7 @@ diff -Nru apache_1.3.12/src/modules/standard/mod_log_config.c apache_1.3.12.new/
 +module MODULE_VAR_EXPORT log_config_module;
  
  static int xfer_flags = (O_WRONLY | O_APPEND | O_CREAT);
- #if defined(OS2) || defined(WIN32)
+ #if defined(OS2) || defined(WIN32) || defined(NETWARE)
 @@ -207,29 +207,29 @@
  
  /*
@@ -768,9 +1038,9 @@ diff -Nru apache_1.3.12/src/modules/standard/mod_log_config.c apache_1.3.12.new/
      NULL,                       /* handlers */
      NULL,                       /* filename translation */
      NULL,                       /* check_user_id */
-diff -Nru apache_1.3.12/src/modules/standard/mod_log_referer.c apache_1.3.12.new/src/modules/standard/mod_log_referer.c
---- apache_1.3.12/src/modules/standard/mod_log_referer.c	Fri Jan  1 20:05:11 1999
-+++ apache_1.3.12.new/src/modules/standard/mod_log_referer.c	Mon Apr  3 00:44:02 2000
+diff -urN apache_1.3.14.orig/src/modules/standard/mod_log_referer.c apache_1.3.14/src/modules/standard/mod_log_referer.c
+--- apache_1.3.14.orig/src/modules/standard/mod_log_referer.c	Fri Jan  1 20:05:11 1999
++++ apache_1.3.14/src/modules/standard/mod_log_referer.c	Sat Nov 11 22:52:25 2000
 @@ -60,7 +60,7 @@
  #include "http_config.h"
  #include "http_log.h"
@@ -899,273 +1169,3 @@ diff -Nru apache_1.3.12/src/modules/standard/mod_log_referer.c apache_1.3.12.new
      NULL,                       /* header parser */
      NULL,                       /* child_init */
      NULL,                       /* child_exit */
-diff -Nru apache_1.3.12/src/modules/standard/mod_actions.c apache_1.3.12.new/src/modules/standard/mod_actions.c
---- apache_1.3.12/src/modules/standard/mod_actions.c	Wed Feb  2 21:44:00 2000
-+++ apache_1.3.12.new/src/modules/standard/mod_actions.c	Mon Apr  3 00:47:35 2000
-@@ -96,34 +96,34 @@
-  * track extension method mappings -- table keys are case-INsensitive.
-  */
- typedef struct {
--    table *action_types;       /* Added with Action... */
-+    table *actions_types;       /* Added with Action... */
-     char *scripted[METHODS];   /* Added with Script... */
-     array_header *xmethods;    /* Added with Script -- extension methods */
--} action_dir_config;
-+} actions_dir_config;
- 
--module action_module;
-+module actions_module;
- 
--static void *create_action_dir_config(pool *p, char *dummy)
-+static void *create_actions_dir_config(pool *p, char *dummy)
- {
--    action_dir_config *new =
--	(action_dir_config *) ap_palloc(p, sizeof(action_dir_config));
-+    actions_dir_config *new =
-+	(actions_dir_config *) ap_palloc(p, sizeof(actions_dir_config));
- 
--    new->action_types = ap_make_table(p, 4);
-+    new->actions_types = ap_make_table(p, 4);
-     memset(new->scripted, 0, sizeof(new->scripted));
-     new->xmethods = ap_make_array(p, 4, sizeof(xmethod_t));
-     return new;
- }
- 
--static void *merge_action_dir_configs(pool *p, void *basev, void *addv)
-+static void *merge_actions_dir_configs(pool *p, void *basev, void *addv)
- {
--    action_dir_config *base = (action_dir_config *) basev;
--    action_dir_config *add = (action_dir_config *) addv;
--    action_dir_config *new = (action_dir_config *) ap_palloc(p,
--                                  sizeof(action_dir_config));
-+    actions_dir_config *base = (actions_dir_config *) basev;
-+    actions_dir_config *add = (actions_dir_config *) addv;
-+    actions_dir_config *new = (actions_dir_config *) ap_palloc(p,
-+                                  sizeof(actions_dir_config));
-     int i;
- 
--    new->action_types = ap_overlay_tables(p, add->action_types,
--				       base->action_types);
-+    new->actions_types = ap_overlay_tables(p, add->actions_types,
-+				       base->actions_types);
- 
-     for (i = 0; i < METHODS; ++i) {
-         new->scripted[i] = add->scripted[i] ? add->scripted[i]
-@@ -133,14 +133,14 @@
-     return new;
- }
- 
--static const char *add_action(cmd_parms *cmd, action_dir_config *m, char *type,
-+static const char *add_actions(cmd_parms *cmd, actions_dir_config *m, char *type,
- 			      char *script)
- {
--    ap_table_setn(m->action_types, type, script);
-+    ap_table_setn(m->actions_types, type, script);
-     return NULL;
- }
- 
--static const char *set_script(cmd_parms *cmd, action_dir_config *m,
-+static const char *set_script(cmd_parms *cmd, actions_dir_config *m,
-                               char *method, char *script)
- {
-     int methnum;
-@@ -182,20 +182,20 @@
-     return NULL;
- }
- 
--static const command_rec action_cmds[] =
-+static const command_rec actions_cmds[] =
- {
--    {"Action", add_action, NULL, OR_FILEINFO, TAKE2,
-+    {"Action", add_actions, NULL, OR_FILEINFO, TAKE2,
-      "a media type followed by a script name"},
-     {"Script", set_script, NULL, ACCESS_CONF | RSRC_CONF, TAKE2,
-      "a method followed by a script name"},
-     {NULL}
- };
- 
--static int action_handler(request_rec *r)
-+static int actions_handler(request_rec *r)
- {
--    action_dir_config *conf = (action_dir_config *)
--        ap_get_module_config(r->per_dir_config, &action_module);
--    const char *t, *action = r->handler ? r->handler : 
-+    actions_dir_config *conf = (actions_dir_config *)
-+        ap_get_module_config(r->per_dir_config, &actions_module);
-+    const char *t, *actions = r->handler ? r->handler : 
- 	ap_field_noparam(r->pool, r->content_type);
-     const char *script;
-     int i;
-@@ -242,9 +242,9 @@
- 	return DECLINED;
-     }
- 
--    /* Second, check for actions (which override the method scripts) */
--    if ((t = ap_table_get(conf->action_types,
--			  action ? action : ap_default_type(r)))) {
-+    /* Second, check for actionss (which override the method scripts) */
-+    if ((t = ap_table_get(conf->actions_types,
-+			  actions ? actions : ap_default_type(r)))) {
- 	script = t;
-     }
- 
-@@ -260,22 +260,22 @@
-     return OK;
- }
- 
--static const handler_rec action_handlers[] =
-+static const handler_rec actions_handlers[] =
- {
--    {"*/*", action_handler},
-+    {"*/*", actions_handler},
-     {NULL}
- };
- 
--module action_module =
-+module actions_module =
- {
-     STANDARD_MODULE_STUFF,
-     NULL,			/* initializer */
--    create_action_dir_config,	/* dir config creater */
--    merge_action_dir_configs,	/* dir merger --- default is to override */
-+    create_actions_dir_config,	/* dir config creater */
-+    merge_actions_dir_configs,	/* dir merger --- default is to override */
-     NULL,			/* server config */
-     NULL,			/* merge server config */
--    action_cmds,		/* command table */
--    action_handlers,		/* handlers */
-+    actions_cmds,		/* command table */
-+    actions_handlers,		/* handlers */
-     NULL,			/* filename translation */
-     NULL,			/* check_user_id */
-     NULL,			/* check auth */
-diff -Nru apache_1.3.12/src/modules/standard/mod_auth_anon.c apache_1.3.12.new/src/modules/standard/mod_auth_anon.c
---- apache_1.3.12/src/modules/standard/mod_auth_anon.c	Thu Oct 21 22:45:15 1999
-+++ apache_1.3.12.new/src/modules/standard/mod_auth_anon.c	Mon Apr  3 00:50:56 2000
-@@ -114,12 +114,12 @@
-     int auth_anon_mustemail;
-     int auth_anon_authoritative;
- 
--} anon_auth_config_rec;
-+} auth_anon_config_rec;
- 
--static void *create_anon_auth_dir_config(pool *p, char *d)
-+static void *create_auth_anon_dir_config(pool *p, char *d)
- {
--    anon_auth_config_rec *sec = (anon_auth_config_rec *)
--    ap_pcalloc(p, sizeof(anon_auth_config_rec));
-+    auth_anon_config_rec *sec = (auth_anon_config_rec *)
-+    ap_pcalloc(p, sizeof(auth_anon_config_rec));
- 
-     if (!sec)
- 	return NULL;		/* no memory... */
-@@ -136,39 +136,39 @@
- }
- 
- static const char *anon_set_passwd_flag(cmd_parms *cmd,
--				 anon_auth_config_rec * sec, int arg)
-+				 auth_anon_config_rec * sec, int arg)
- {
-     sec->auth_anon_mustemail = arg;
-     return NULL;
- }
- 
- static const char *anon_set_userid_flag(cmd_parms *cmd,
--				 anon_auth_config_rec * sec, int arg)
-+				 auth_anon_config_rec * sec, int arg)
- {
-     sec->auth_anon_nouserid = arg;
-     return NULL;
- }
- static const char *anon_set_logemail_flag(cmd_parms *cmd,
--				   anon_auth_config_rec * sec, int arg)
-+				   auth_anon_config_rec * sec, int arg)
- {
-     sec->auth_anon_logemail = arg;
-     return NULL;
- }
- static const char *anon_set_verifyemail_flag(cmd_parms *cmd,
--				      anon_auth_config_rec * sec, int arg)
-+				      auth_anon_config_rec * sec, int arg)
- {
-     sec->auth_anon_verifyemail = arg;
-     return NULL;
- }
- static const char *anon_set_authoritative_flag(cmd_parms *cmd,
--					anon_auth_config_rec * sec, int arg)
-+					auth_anon_config_rec * sec, int arg)
- {
-     sec->auth_anon_authoritative = arg;
-     return NULL;
- }
- 
- static const char *anon_set_string_slots(cmd_parms *cmd,
--				  anon_auth_config_rec * sec, char *arg)
-+				  auth_anon_config_rec * sec, char *arg)
- {
- 
-     auth_anon *first;
-@@ -191,7 +191,7 @@
-     return NULL;
- }
- 
--static const command_rec anon_auth_cmds[] =
-+static const command_rec auth_anon_cmds[] =
- {
-     {"Anonymous", anon_set_string_slots, NULL, OR_AUTHCFG, ITERATE,
-      "a space-separated list of user IDs"},
-@@ -209,13 +209,13 @@
-     {NULL}
- };
- 
--module MODULE_VAR_EXPORT anon_auth_module;
-+module MODULE_VAR_EXPORT auth_anon_module;
- 
--static int anon_authenticate_basic_user(request_rec *r)
-+static int authenticate_anon_basic_user(request_rec *r)
- {
--    anon_auth_config_rec *sec =
--    (anon_auth_config_rec *) ap_get_module_config(r->per_dir_config,
--					       &anon_auth_module);
-+    auth_anon_config_rec *sec =
-+    (auth_anon_config_rec *) ap_get_module_config(r->per_dir_config,
-+					       &auth_anon_module);
-     conn_rec *c = r->connection;
-     const char *sent_pw;
-     int res = DECLINED;
-@@ -275,9 +275,9 @@
- {
- #ifdef NOTYET
-     conn_rec *c = r->connection;
--    anon_auth_config_rec *sec =
--    (anon_auth_config_rec *) ap_get_module_config(r->per_dir_config,
--					       &anon_auth_module);
-+    auth_anon_config_rec *sec =
-+    (auth_anon_config_rec *) ap_get_module_config(r->per_dir_config,
-+					       &auth_anon_module);
- 
-     if (!sec->auth_anon)
- 	return DECLINED;
-@@ -291,18 +291,18 @@
- }
- 
- 
--module MODULE_VAR_EXPORT anon_auth_module =
-+module MODULE_VAR_EXPORT auth_anon_module =
- {
-     STANDARD_MODULE_STUFF,
-     NULL,			/* initializer */
--    create_anon_auth_dir_config,	/* dir config creater */
-+    create_auth_anon_dir_config,	/* dir config creater */
-     NULL,			/* dir merger ensure strictness */
-     NULL,			/* server config */
-     NULL,			/* merge server config */
--    anon_auth_cmds,		/* command table */
-+    auth_anon_cmds,		/* command table */
-     NULL,			/* handlers */
-     NULL,			/* filename translation */
--    anon_authenticate_basic_user,	/* check_user_id */
-+    authenticate_anon_basic_user,	/* check_user_id */
-     check_anon_access,		/* check auth */
-     NULL,			/* check access */
-     NULL,			/* type_checker */

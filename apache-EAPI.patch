@@ -1,29 +1,29 @@
-diff -Nru apache_1.3.12/htdocs/manual/mod/directives.html apache_1.3.12.new/htdocs/manual/mod/directives.html
---- apache_1.3.12/htdocs/manual/mod/directives.html	Mon Mar 13 19:38:44 2000
-+++ apache_1.3.12.new/htdocs/manual/mod/directives.html	Mon Mar 13 19:29:56 2000
+diff -urN apache_1.3.14.orig/htdocs/manual/mod/directives.html apache_1.3.14/htdocs/manual/mod/directives.html
+--- apache_1.3.14.orig/htdocs/manual/mod/directives.html	Tue Oct 10 22:23:46 2000
++++ apache_1.3.14/htdocs/manual/mod/directives.html	Sat Nov 11 20:59:29 2000
 @@ -99,6 +99,7 @@
  <LI><A HREF="mod_autoindex.html#defaulticon">DefaultIcon</A>
  <LI><A HREF="mod_mime.html#defaultlanguage">DefaultLanguage</A>
  <LI><A HREF="core.html#defaulttype">DefaultType</A>
 +<LI><A HREF="mod_define.html#define">Define</A>
- <LI><A HREF="mod_access.html#deny">deny</A>
+ <LI><A HREF="mod_access.html#deny">Deny</A>
  <LI><A HREF="core.html#directory">&lt;Directory&gt;</A>
  <LI><A HREF="core.html#directorymatch">&lt;DirectoryMatch&gt;</A>
-diff -Nru apache_1.3.12/htdocs/manual/mod/index.html apache_1.3.12.new/htdocs/manual/mod/index.html
---- apache_1.3.12/htdocs/manual/mod/index.html	Mon Mar 13 19:38:44 2000
-+++ apache_1.3.12.new/htdocs/manual/mod/index.html	Mon Mar 13 19:29:55 2000
-@@ -62,6 +62,8 @@
+diff -urN apache_1.3.14.orig/htdocs/manual/mod/index.html apache_1.3.14/htdocs/manual/mod/index.html
+--- apache_1.3.14.orig/htdocs/manual/mod/index.html	Tue Oct 10 22:23:46 2000
++++ apache_1.3.14/htdocs/manual/mod/index.html	Sat Nov 11 20:58:35 2000
+@@ -65,6 +65,8 @@
  <DT><A HREF="mod_cookies.html">mod_cookies</A> up to Apache 1.1.1
  <DD>Support for Netscape-like cookies.  Replaced in Apache 1.2 by
  mod_usertrack
 +<DT><A HREF="mod_define.html">mod_define</A>
 +<DD>Variable Definition for Arbitrary Directives
- <DT><A HREF="mod_digest.html">mod_digest</A>
+ <DT><A HREF="mod_digest.html">mod_digest</A> Apache 1.1 and up
  <DD>MD5 authentication
  <DT><A HREF="mod_dir.html">mod_dir</A>
-diff -Nru apache_1.3.12/htdocs/manual/mod/mod_define.html apache_1.3.12.new/htdocs/manual/mod/mod_define.html
---- apache_1.3.12/htdocs/manual/mod/mod_define.html	Thu Jan  1 01:00:00 1970
-+++ apache_1.3.12.new/htdocs/manual/mod/mod_define.html	Fri Aug 27 11:23:39 1999
+diff -urN apache_1.3.14.orig/htdocs/manual/mod/mod_define.html apache_1.3.14/htdocs/manual/mod/mod_define.html
+--- apache_1.3.14.orig/htdocs/manual/mod/mod_define.html	Thu Jan  1 01:00:00 1970
++++ apache_1.3.14/htdocs/manual/mod/mod_define.html	Sat Nov 11 20:49:14 2000
 @@ -0,0 +1,135 @@
 +<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 +<!--%hypertext -->
@@ -160,30 +160,31 @@ diff -Nru apache_1.3.12/htdocs/manual/mod/mod_define.html apache_1.3.12.new/htdo
 +</BODY>
 +</HTML>
 +<!--/%hypertext -->
-diff -Nru apache_1.3.12/src/ApacheCore.def apache_1.3.12.new/src/ApacheCore.def
---- apache_1.3.12/src/ApacheCore.def	Mon Mar 13 19:38:44 2000
-+++ apache_1.3.12.new/src/ApacheCore.def	Mon Mar 13 19:30:30 2000
-@@ -360,3 +360,17 @@
- 	ap_SHA1Final   @355
- 	ap_sha1_base64   @356
-         ap_send_error_response @357
-+	ap_add_config_define   @358
-+	ap_global_ctx   @359
-+	ap_ctx_new   @360
-+	ap_ctx_get   @361
-+	ap_ctx_set   @362
-+	ap_hook_init   @363
-+	ap_hook_kill   @364
-+	ap_hook_configure   @365
-+	ap_hook_register_I   @366
-+	ap_hook_unregister_I   @367
-+	ap_hook_status   @368
-+	ap_hook_use   @369
-+	ap_hook_call   @370
+diff -urN apache_1.3.14.orig/src/ApacheCore.def apache_1.3.14/src/ApacheCore.def
+--- apache_1.3.14.orig/src/ApacheCore.def	Sun Oct  8 07:23:15 2000
++++ apache_1.3.14/src/ApacheCore.def	Sat Nov 11 20:56:47 2000
+@@ -389,3 +389,18 @@
+ 	ap_stripprefix @380
+         ap_os_dso_load @381
+         ap_os_dso_error @382
 +
-diff -Nru apache_1.3.12/src/Configuration.tmpl apache_1.3.12.new/src/Configuration.tmpl
---- apache_1.3.12/src/Configuration.tmpl	Mon Mar 13 19:38:44 2000
-+++ apache_1.3.12.new/src/Configuration.tmpl	Mon Mar 13 19:39:11 2000
++	; EAPI patch
++	ap_add_config_define   @383
++	ap_global_ctx   @384
++	ap_ctx_new   @385
++	ap_ctx_get   @386
++	ap_ctx_set   @387
++	ap_hook_init   @388
++	ap_hook_kill   @389
++	ap_hook_configure   @390
++	ap_hook_register_I   @391
++	ap_hook_unregister_I   @392
++	ap_hook_status   @393
++	ap_hook_use   @394
++	ap_hook_call   @395
+diff -urN apache_1.3.14.orig/src/Configuration.tmpl apache_1.3.14/src/Configuration.tmpl
+--- apache_1.3.14.orig/src/Configuration.tmpl	Sat Aug 14 10:35:43 1999
++++ apache_1.3.14/src/Configuration.tmpl	Sat Nov 11 20:49:14 2000
 @@ -68,6 +68,24 @@
  #TARGET=
  
@@ -221,10 +222,10 @@ diff -Nru apache_1.3.12/src/Configuration.tmpl apache_1.3.12.new/src/Configurati
  
  ##
  ## Request logging modules
-diff -Nru apache_1.3.12/src/Configure apache_1.3.12.new/src/Configure
---- apache_1.3.12/src/Configure	Mon Mar 13 19:38:44 2000
-+++ apache_1.3.12.new/src/Configure	Mon Mar 13 19:30:30 2000
-@@ -1727,6 +1727,72 @@
+diff -urN apache_1.3.14.orig/src/Configure apache_1.3.14/src/Configure
+--- apache_1.3.14.orig/src/Configure	Tue Oct 10 17:30:03 2000
++++ apache_1.3.14/src/Configure	Sat Nov 11 20:49:14 2000
+@@ -1778,6 +1778,72 @@
  fi
  
  ####################################################################
@@ -297,9 +298,9 @@ diff -Nru apache_1.3.12/src/Configure apache_1.3.12.new/src/Configure
  ## Add in the Expat library if needed/wanted.
  ##
  if [ -d ./lib/expat-lite/ ]; then
-diff -Nru apache_1.3.12/src/ap/Makefile.tmpl apache_1.3.12.new/src/ap/Makefile.tmpl
---- apache_1.3.12/src/ap/Makefile.tmpl	Mon Mar 13 19:38:44 2000
-+++ apache_1.3.12.new/src/ap/Makefile.tmpl	Mon Mar 13 19:30:30 2000
+diff -urN apache_1.3.14.orig/src/ap/Makefile.tmpl apache_1.3.14/src/ap/Makefile.tmpl
+--- apache_1.3.14.orig/src/ap/Makefile.tmpl	Fri Jun 23 01:22:21 2000
++++ apache_1.3.14/src/ap/Makefile.tmpl	Sat Nov 11 20:49:14 2000
 @@ -6,7 +6,8 @@
  LIB=libap.a
  
@@ -310,52 +311,52 @@ diff -Nru apache_1.3.12/src/ap/Makefile.tmpl apache_1.3.12.new/src/ap/Makefile.t
  
  .c.o:
  	$(CC) -c $(INCLUDES) $(CFLAGS) $<
-diff -Nru apache_1.3.12/src/ap/ap.mak apache_1.3.12.new/src/ap/ap.mak
---- apache_1.3.12/src/ap/ap.mak	Mon Mar 13 19:38:44 2000
-+++ apache_1.3.12.new/src/ap/ap.mak	Mon Mar 13 19:30:30 2000
-@@ -47,6 +47,9 @@
- 	-@erase "$(INTDIR)\ap_cpystrn.obj"
+diff -urN apache_1.3.14.orig/src/ap/ap.mak apache_1.3.14/src/ap/ap.mak
+--- apache_1.3.14.orig/src/ap/ap.mak	Thu Sep 21 15:57:14 2000
++++ apache_1.3.14/src/ap/ap.mak	Sat Nov 11 20:50:57 2000
+@@ -50,6 +50,9 @@
  	-@erase "$(INTDIR)\ap_fnmatch.obj"
  	-@erase "$(INTDIR)\ap_md5c.obj"
+ 	-@erase "$(INTDIR)\ap_sha1.obj"
 +	-@erase "$(INTDIR)\ap_hook.obj"
 +	-@erase "$(INTDIR)\ap_ctx.obj"
 +	-@erase "$(INTDIR)\ap_mm.obj"
  	-@erase "$(INTDIR)\ap_signal.obj"
  	-@erase "$(INTDIR)\ap_slack.obj"
  	-@erase "$(INTDIR)\ap_snprintf.obj"
-@@ -105,6 +108,9 @@
- 	"$(INTDIR)\ap_cpystrn.obj" \
+@@ -109,6 +112,9 @@
  	"$(INTDIR)\ap_fnmatch.obj" \
  	"$(INTDIR)\ap_md5c.obj" \
+ 	"$(INTDIR)\ap_sha1.obj" \
 +	"$(INTDIR)\ap_hook.obj" \
 +	"$(INTDIR)\ap_ctx.obj" \
 +	"$(INTDIR)\ap_mm.obj" \
  	"$(INTDIR)\ap_signal.obj" \
  	"$(INTDIR)\ap_slack.obj" \
- 	"$(INTDIR)\ap_snprintf.obj" \
-@@ -139,6 +145,9 @@
- 	-@erase "$(INTDIR)\ap_cpystrn.obj"
+ 	"$(INTDIR)\ap_snprintf.obj"
+@@ -143,6 +149,9 @@
  	-@erase "$(INTDIR)\ap_fnmatch.obj"
  	-@erase "$(INTDIR)\ap_md5c.obj"
+ 	-@erase "$(INTDIR)\ap_sha1.obj"
 +	-@erase "$(INTDIR)\ap_hook.obj"
 +	-@erase "$(INTDIR)\ap_ctx.obj"
 +	-@erase "$(INTDIR)\ap_mm.obj"
  	-@erase "$(INTDIR)\ap_signal.obj"
  	-@erase "$(INTDIR)\ap_slack.obj"
  	-@erase "$(INTDIR)\ap_snprintf.obj"
-@@ -197,6 +206,9 @@
- 	"$(INTDIR)\ap_cpystrn.obj" \
+@@ -202,6 +211,9 @@
  	"$(INTDIR)\ap_fnmatch.obj" \
  	"$(INTDIR)\ap_md5c.obj" \
+ 	"$(INTDIR)\ap_sha1.obj" \
 +	"$(INTDIR)\ap_hook.obj" \
 +	"$(INTDIR)\ap_ctx.obj" \
 +	"$(INTDIR)\ap_mm.obj" \
  	"$(INTDIR)\ap_signal.obj" \
  	"$(INTDIR)\ap_slack.obj" \
- 	"$(INTDIR)\ap_snprintf.obj" \
-diff -Nru apache_1.3.12/src/ap/ap_ctx.c apache_1.3.12.new/src/ap/ap_ctx.c
---- apache_1.3.12/src/ap/ap_ctx.c	Thu Jan  1 01:00:00 1970
-+++ apache_1.3.12.new/src/ap/ap_ctx.c	Thu Dec 30 22:02:56 1999
+ 	"$(INTDIR)\ap_snprintf.obj"
+diff -urN apache_1.3.14.orig/src/ap/ap_ctx.c apache_1.3.14/src/ap/ap_ctx.c
+--- apache_1.3.14.orig/src/ap/ap_ctx.c	Thu Jan  1 01:00:00 1970
++++ apache_1.3.14/src/ap/ap_ctx.c	Sat Nov 11 20:49:14 2000
 @@ -0,0 +1,155 @@
 +/* ====================================================================
 + * Copyright (c) 1998-2000 The Apache Group.  All rights reserved.
@@ -512,9 +513,9 @@ diff -Nru apache_1.3.12/src/ap/ap_ctx.c apache_1.3.12.new/src/ap/ap_ctx.c
 +}
 +
 +#endif /* EAPI */
-diff -Nru apache_1.3.12/src/ap/ap_hook.c apache_1.3.12.new/src/ap/ap_hook.c
---- apache_1.3.12/src/ap/ap_hook.c	Thu Jan  1 01:00:00 1970
-+++ apache_1.3.12.new/src/ap/ap_hook.c	Thu Dec 30 22:02:56 1999
+diff -urN apache_1.3.14.orig/src/ap/ap_hook.c apache_1.3.14/src/ap/ap_hook.c
+--- apache_1.3.14.orig/src/ap/ap_hook.c	Thu Jan  1 01:00:00 1970
++++ apache_1.3.14/src/ap/ap_hook.c	Sat Nov 11 20:49:14 2000
 @@ -0,0 +1,930 @@
 +#if 0
 +=pod
@@ -1446,9 +1447,9 @@ diff -Nru apache_1.3.12/src/ap/ap_hook.c apache_1.3.12.new/src/ap/ap_hook.c
 +
 +=pod
 +*/
-diff -Nru apache_1.3.12/src/ap/ap_mm.c apache_1.3.12.new/src/ap/ap_mm.c
---- apache_1.3.12/src/ap/ap_mm.c	Thu Jan  1 01:00:00 1970
-+++ apache_1.3.12.new/src/ap/ap_mm.c	Thu Dec 30 22:02:56 1999
+diff -urN apache_1.3.14.orig/src/ap/ap_mm.c apache_1.3.14/src/ap/ap_mm.c
+--- apache_1.3.14.orig/src/ap/ap_mm.c	Thu Jan  1 01:00:00 1970
++++ apache_1.3.14/src/ap/ap_mm.c	Sat Nov 11 20:49:14 2000
 @@ -0,0 +1,178 @@
 +/* ====================================================================
 + * Copyright (c) 1999-2000 The Apache Group.  All rights reserved.
@@ -1628,12 +1629,12 @@ diff -Nru apache_1.3.12/src/ap/ap_mm.c apache_1.3.12.new/src/ap/ap_mm.c
 +    STUB(mm_lib_version(), 0)
 +
 +#endif /* EAPI */
-diff -Nru apache_1.3.12/src/include/alloc.h apache_1.3.12.new/src/include/alloc.h
---- apache_1.3.12/src/include/alloc.h	Mon Mar 13 19:38:44 2000
-+++ apache_1.3.12.new/src/include/alloc.h	Mon Mar 13 19:30:30 2000
-@@ -93,6 +93,15 @@
- 
+diff -urN apache_1.3.14.orig/src/include/ap_alloc.h apache_1.3.14/src/include/ap_alloc.h
+--- apache_1.3.14.orig/src/include/ap_alloc.h	Fri Jun  2 01:42:23 2000
++++ apache_1.3.14/src/include/ap_alloc.h	Sat Nov 11 20:49:14 2000
+@@ -94,6 +94,15 @@
  pool * ap_init_alloc(void);		/* Set up everything */
+ void ap_cleanup_alloc(void);
  API_EXPORT(pool *) ap_make_sub_pool(pool *);	/* All pools are subpools of permanent_pool */
 +#if defined(EAPI)
 +typedef enum { AP_POOL_RD, AP_POOL_RW } ap_pool_lock_mode;
@@ -1647,9 +1648,9 @@ diff -Nru apache_1.3.12/src/include/alloc.h apache_1.3.12.new/src/include/alloc.
  API_EXPORT(void) ap_destroy_pool(pool *);
  
  /* pools have nested lifetimes -- sub_pools are destroyed when the
-diff -Nru apache_1.3.12/src/include/ap_ctx.h apache_1.3.12.new/src/include/ap_ctx.h
---- apache_1.3.12/src/include/ap_ctx.h	Thu Jan  1 01:00:00 1970
-+++ apache_1.3.12.new/src/include/ap_ctx.h	Thu Dec 30 22:02:59 1999
+diff -urN apache_1.3.14.orig/src/include/ap_ctx.h apache_1.3.14/src/include/ap_ctx.h
+--- apache_1.3.14.orig/src/include/ap_ctx.h	Thu Jan  1 01:00:00 1970
++++ apache_1.3.14/src/include/ap_ctx.h	Sat Nov 11 20:49:14 2000
 @@ -0,0 +1,110 @@
 +/* ====================================================================
 + * Copyright (c) 1998-2000 The Apache Group.  All rights reserved.
@@ -1761,9 +1762,9 @@ diff -Nru apache_1.3.12/src/include/ap_ctx.h apache_1.3.12.new/src/include/ap_ct
 +#endif /* AP_CTX_H */
 +
 +#endif /* EAPI */
-diff -Nru apache_1.3.12/src/include/ap_hook.h apache_1.3.12.new/src/include/ap_hook.h
---- apache_1.3.12/src/include/ap_hook.h	Thu Jan  1 01:00:00 1970
-+++ apache_1.3.12.new/src/include/ap_hook.h	Thu Dec 30 22:02:59 1999
+diff -urN apache_1.3.14.orig/src/include/ap_hook.h apache_1.3.14/src/include/ap_hook.h
+--- apache_1.3.14.orig/src/include/ap_hook.h	Thu Jan  1 01:00:00 1970
++++ apache_1.3.14/src/include/ap_hook.h	Sat Nov 11 20:49:14 2000
 @@ -0,0 +1,710 @@
 +#if 0
 +=cut
@@ -2475,9 +2476,9 @@ diff -Nru apache_1.3.12/src/include/ap_hook.h apache_1.3.12.new/src/include/ap_h
 +
 +=cut
 +*/
-diff -Nru apache_1.3.12/src/include/ap_mm.h apache_1.3.12.new/src/include/ap_mm.h
---- apache_1.3.12/src/include/ap_mm.h	Thu Jan  1 01:00:00 1970
-+++ apache_1.3.12.new/src/include/ap_mm.h	Thu Dec 30 22:02:59 1999
+diff -urN apache_1.3.14.orig/src/include/ap_mm.h apache_1.3.14/src/include/ap_mm.h
+--- apache_1.3.14.orig/src/include/ap_mm.h	Thu Jan  1 01:00:00 1970
++++ apache_1.3.14/src/include/ap_mm.h	Sat Nov 11 20:49:14 2000
 @@ -0,0 +1,130 @@
 +/* ====================================================================
 + * Copyright (c) 1999-2000 The Apache Group.  All rights reserved.
@@ -2609,11 +2610,11 @@ diff -Nru apache_1.3.12/src/include/ap_mm.h apache_1.3.12.new/src/include/ap_mm.
 +
 +#endif /* EAPI */
 +
-diff -Nru apache_1.3.12/src/include/ap_mmn.h apache_1.3.12.new/src/include/ap_mmn.h
---- apache_1.3.12/src/include/ap_mmn.h	Mon Mar 13 19:38:44 2000
-+++ apache_1.3.12.new/src/include/ap_mmn.h	Mon Mar 13 19:30:30 2000
-@@ -229,7 +229,23 @@
-  * 19990320.7           - add ap_strcasestr()
+diff -urN apache_1.3.14.orig/src/include/ap_mmn.h apache_1.3.14/src/include/ap_mmn.h
+--- apache_1.3.14.orig/src/include/ap_mmn.h	Tue Oct  3 18:39:38 2000
++++ apache_1.3.14/src/include/ap_mmn.h	Sat Nov 11 20:49:14 2000
+@@ -232,7 +232,23 @@
+  * 19990320.10          - add ap_is_rdirectory() and ap_stripprefix()
   */
  
 +/* 
@@ -2636,9 +2637,9 @@ diff -Nru apache_1.3.12/src/include/ap_mmn.h apache_1.3.12.new/src/include/ap_mm
  
  #ifndef MODULE_MAGIC_NUMBER_MAJOR
  #define MODULE_MAGIC_NUMBER_MAJOR 19990320
-diff -Nru apache_1.3.12/src/include/buff.h apache_1.3.12.new/src/include/buff.h
---- apache_1.3.12/src/include/buff.h	Mon Mar 13 19:38:44 2000
-+++ apache_1.3.12.new/src/include/buff.h	Mon Mar 13 19:30:30 2000
+diff -urN apache_1.3.14.orig/src/include/buff.h apache_1.3.14/src/include/buff.h
+--- apache_1.3.14.orig/src/include/buff.h	Fri Jan  1 20:04:39 1999
++++ apache_1.3.14/src/include/buff.h	Sat Nov 11 20:49:14 2000
 @@ -124,6 +124,10 @@
      /* transport handle, for RPC binding handle or some such */
      void *t_handle;
@@ -2661,9 +2662,9 @@ diff -Nru apache_1.3.12/src/include/buff.h apache_1.3.12.new/src/include/buff.h
  
  #ifndef CHARSET_EBCDIC
  
-diff -Nru apache_1.3.12/src/include/http_conf_globals.h apache_1.3.12.new/src/include/http_conf_globals.h
---- apache_1.3.12/src/include/http_conf_globals.h	Mon Mar 13 19:38:44 2000
-+++ apache_1.3.12.new/src/include/http_conf_globals.h	Mon Mar 13 19:30:30 2000
+diff -urN apache_1.3.14.orig/src/include/http_conf_globals.h apache_1.3.14/src/include/http_conf_globals.h
+--- apache_1.3.14.orig/src/include/http_conf_globals.h	Tue Oct 10 15:21:20 2000
++++ apache_1.3.14/src/include/http_conf_globals.h	Sat Nov 11 20:49:14 2000
 @@ -91,6 +91,9 @@
  extern int ap_listenbacklog;
  extern int ap_dump_settings;
@@ -2672,11 +2673,11 @@ diff -Nru apache_1.3.12/src/include/http_conf_globals.h apache_1.3.12.new/src/in
 +extern API_VAR_EXPORT ap_ctx *ap_global_ctx;
 +#endif /* EAPI */
  
- extern char *ap_pid_fname;
- extern char *ap_scoreboard_fname;
-diff -Nru apache_1.3.12/src/include/http_config.h apache_1.3.12.new/src/include/http_config.h
---- apache_1.3.12/src/include/http_config.h	Mon Mar 13 19:38:44 2000
-+++ apache_1.3.12.new/src/include/http_config.h	Mon Mar 13 19:30:30 2000
+ extern API_VAR_EXPORT char *ap_pid_fname;
+ extern API_VAR_EXPORT char *ap_scoreboard_fname;
+diff -urN apache_1.3.14.orig/src/include/http_config.h apache_1.3.14/src/include/http_config.h
+--- apache_1.3.14.orig/src/include/http_config.h	Fri Jun  2 01:42:23 2000
++++ apache_1.3.14/src/include/http_config.h	Sat Nov 11 20:49:14 2000
 @@ -275,6 +275,65 @@
      void (*child_exit) (server_rec *, pool *);
  #endif
@@ -2743,9 +2744,9 @@ diff -Nru apache_1.3.12/src/include/http_config.h apache_1.3.12.new/src/include/
  } module;
  
  /* Initializer for the first few module slots, which are only
-diff -Nru apache_1.3.12/src/include/http_main.h apache_1.3.12.new/src/include/http_main.h
---- apache_1.3.12/src/include/http_main.h	Mon Mar 13 19:38:44 2000
-+++ apache_1.3.12.new/src/include/http_main.h	Mon Mar 13 19:30:30 2000
+diff -urN apache_1.3.14.orig/src/include/http_main.h apache_1.3.14/src/include/http_main.h
+--- apache_1.3.14.orig/src/include/http_main.h	Thu Jun 15 21:18:26 2000
++++ apache_1.3.14/src/include/http_main.h	Sat Nov 11 20:49:14 2000
 @@ -124,7 +124,11 @@
  API_EXPORT(void) ap_sync_scoreboard_image(void);
  int ap_update_child_status(int child_num, int status, request_rec *r);
@@ -2757,10 +2758,10 @@ diff -Nru apache_1.3.12/src/include/http_main.h apache_1.3.12.new/src/include/ht
 +#endif
  API_EXPORT(int) ap_check_alarm(void);
  
- #ifndef NO_OTHER_CHILD
-diff -Nru apache_1.3.12/src/include/httpd.h apache_1.3.12.new/src/include/httpd.h
---- apache_1.3.12/src/include/httpd.h	Mon Mar 13 19:38:44 2000
-+++ apache_1.3.12.new/src/include/httpd.h	Mon Mar 13 19:30:30 2000
+ void setup_signal_names(char *prefix);
+diff -urN apache_1.3.14.orig/src/include/httpd.h apache_1.3.14/src/include/httpd.h
+--- apache_1.3.14.orig/src/include/httpd.h	Tue Oct 10 22:13:03 2000
++++ apache_1.3.14/src/include/httpd.h	Sat Nov 11 20:57:42 2000
 @@ -69,7 +69,19 @@
  /* Headers in which EVERYONE has an interest... */
  
@@ -2768,7 +2769,7 @@ diff -Nru apache_1.3.12/src/include/httpd.h apache_1.3.12.new/src/include/httpd.
 +#ifdef EAPI
 +#include "ap_mm.h"
 +#endif
- #include "alloc.h"
+ #include "ap_alloc.h"
 +/*
 + * Include the Extended API headers.
 + * Don't move the position. It has to be after alloc.h because it uses the
@@ -2815,7 +2816,7 @@ diff -Nru apache_1.3.12/src/include/httpd.h apache_1.3.12.new/src/include/httpd.
  /* Number of requests to try to handle in a single process.  If <= 0,
   * the children don't die off.  That's the default here, since I'm still
   * interested in finding and stanching leaks.
-@@ -438,6 +468,9 @@
+@@ -445,6 +475,9 @@
  API_EXPORT(const char *) ap_get_server_version(void);
  API_EXPORT(void) ap_add_version_component(const char *component);
  API_EXPORT(const char *) ap_get_server_built(void);
@@ -2825,7 +2826,7 @@ diff -Nru apache_1.3.12/src/include/httpd.h apache_1.3.12.new/src/include/httpd.
  
  /* Numeric release version identifier: MMNNFFRBB: major minor fix final beta
   * Always increases along the same track as the source branch.
-@@ -819,6 +852,10 @@
+@@ -837,6 +870,10 @@
   * record to improve 64bit alignment the next time we need to break
   * binary compatibility for some other reason.
   */
@@ -2836,7 +2837,7 @@ diff -Nru apache_1.3.12/src/include/httpd.h apache_1.3.12.new/src/include/httpd.
  };
  
  
-@@ -867,6 +904,9 @@
+@@ -885,6 +922,9 @@
      char *local_host;		/* used for ap_get_server_name when
  				 * UseCanonicalName is set to DNS
  				 * (ignores setting of HostnameLookups) */
@@ -2846,7 +2847,7 @@ diff -Nru apache_1.3.12/src/include/httpd.h apache_1.3.12.new/src/include/httpd.
  };
  
  /* Per-vhost config... */
-@@ -939,6 +979,10 @@
+@@ -957,6 +997,10 @@
      int limit_req_line;      /* limit on size of the HTTP request line    */
      int limit_req_fieldsize; /* limit on size of any request header field */
      int limit_req_fields;    /* limit on number of request header fields  */
@@ -2857,9 +2858,9 @@ diff -Nru apache_1.3.12/src/include/httpd.h apache_1.3.12.new/src/include/httpd.
  };
  
  /* These are more like real hosts than virtual hosts */
-diff -Nru apache_1.3.12/src/main/alloc.c apache_1.3.12.new/src/main/alloc.c
---- apache_1.3.12/src/main/alloc.c	Mon Mar 13 19:38:44 2000
-+++ apache_1.3.12.new/src/main/alloc.c	Mon Mar 13 19:30:30 2000
+diff -urN apache_1.3.14.orig/src/main/alloc.c apache_1.3.14/src/main/alloc.c
+--- apache_1.3.14.orig/src/main/alloc.c	Fri Jul 14 16:17:35 2000
++++ apache_1.3.14/src/main/alloc.c	Sat Nov 11 20:49:14 2000
 @@ -63,6 +63,10 @@
   */
  
@@ -3076,8 +3077,8 @@ diff -Nru apache_1.3.12/src/main/alloc.c apache_1.3.12.new/src/main/alloc.c
  #ifdef ALLOC_STATS
  static void dump_stats(void)
  {
-@@ -519,14 +611,74 @@
-     return permanent_pool;
+@@ -525,14 +617,74 @@
+     ap_destroy_mutex(spawn_mutex);
  }
  
 +#if defined(EAPI)
@@ -3151,7 +3152,7 @@ diff -Nru apache_1.3.12/src/main/alloc.c apache_1.3.12.new/src/main/alloc.c
      /* Don't hold the mutex during cleanups. */
      run_cleanups(a->cleanups);
      a->cleanups = NULL;
-@@ -560,6 +712,10 @@
+@@ -566,6 +718,10 @@
      ap_block_alarms();
      ap_clear_pool(a);
  
@@ -3162,7 +3163,7 @@ diff -Nru apache_1.3.12/src/main/alloc.c apache_1.3.12.new/src/main/alloc.c
      (void) ap_acquire_mutex(alloc_mutex);
      if (a->parent) {
  	if (a->parent->sub_pools == a)
-@@ -570,6 +726,10 @@
+@@ -576,6 +732,10 @@
  	    a->sub_next->sub_prev = a->sub_prev;
      }
      (void) ap_release_mutex(alloc_mutex);
@@ -3173,7 +3174,7 @@ diff -Nru apache_1.3.12/src/main/alloc.c apache_1.3.12.new/src/main/alloc.c
  
      free_blocks(a->first);
      ap_unblock_alarms();
-@@ -584,6 +744,30 @@
+@@ -590,6 +750,30 @@
      return bytes_in_block_list(block_freelist);
  }
  
@@ -3204,7 +3205,7 @@ diff -Nru apache_1.3.12/src/main/alloc.c apache_1.3.12.new/src/main/alloc.c
  /*****************************************************************
   * POOL_DEBUG support
   */
-@@ -749,16 +933,31 @@
+@@ -755,16 +939,31 @@
  
      ap_block_alarms();
  
@@ -3236,7 +3237,7 @@ diff -Nru apache_1.3.12/src/main/alloc.c apache_1.3.12.new/src/main/alloc.c
  
      ap_unblock_alarms();
  
-@@ -870,6 +1069,11 @@
+@@ -876,6 +1075,11 @@
      char *ptr;
  
      size = (char *)ps->vbuff.curpos - ps->base;
@@ -3248,7 +3249,7 @@ diff -Nru apache_1.3.12/src/main/alloc.c apache_1.3.12.new/src/main/alloc.c
      ptr = realloc(ps->base, 2*size);
      if (ptr == NULL) {
  	fputs("Ouch!  Out of memory!\n", stderr);
-@@ -890,9 +1094,21 @@
+@@ -896,9 +1100,21 @@
      cur_len = strp - blok->h.first_avail;
  
      /* must try another blok */
@@ -3270,7 +3271,7 @@ diff -Nru apache_1.3.12/src/main/alloc.c apache_1.3.12.new/src/main/alloc.c
      memcpy(nblok->h.first_avail, blok->h.first_avail, cur_len);
      ps->vbuff.curpos = nblok->h.first_avail + cur_len;
      /* save a byte for the NUL terminator */
-@@ -901,10 +1117,18 @@
+@@ -907,10 +1123,18 @@
      /* did we allocate the current blok? if so free it up */
      if (ps->got_a_new_block) {
  	debug_fill(blok->h.first_avail, blok->h.endp - blok->h.first_avail);
@@ -3289,7 +3290,7 @@ diff -Nru apache_1.3.12/src/main/alloc.c apache_1.3.12.new/src/main/alloc.c
      }
      ps->blok = nblok;
      ps->got_a_new_block = 1;
-@@ -923,6 +1147,11 @@
+@@ -929,6 +1153,11 @@
      void *ptr;
  
      ap_block_alarms();
@@ -3301,7 +3302,7 @@ diff -Nru apache_1.3.12/src/main/alloc.c apache_1.3.12.new/src/main/alloc.c
      ps.base = malloc(512);
      if (ps.base == NULL) {
  	fputs("Ouch!  Out of memory!\n", stderr);
-@@ -935,6 +1164,11 @@
+@@ -941,6 +1170,11 @@
      *ps.vbuff.curpos++ = '\0';
      ptr = ps.base;
      /* shrink */
@@ -3313,10 +3314,10 @@ diff -Nru apache_1.3.12/src/main/alloc.c apache_1.3.12.new/src/main/alloc.c
      ptr = realloc(ptr, (char *)ps.vbuff.curpos - (char *)ptr);
      if (ptr == NULL) {
  	fputs("Ouch!  Out of memory!\n", stderr);
-diff -Nru apache_1.3.12/src/main/buff.c apache_1.3.12.new/src/main/buff.c
---- apache_1.3.12/src/main/buff.c	Mon Mar 13 19:38:44 2000
-+++ apache_1.3.12.new/src/main/buff.c	Mon Mar 13 19:30:30 2000
-@@ -125,7 +125,11 @@
+diff -urN apache_1.3.14.orig/src/main/buff.c apache_1.3.14/src/main/buff.c
+--- apache_1.3.14.orig/src/main/buff.c	Tue Sep 26 23:03:42 2000
++++ apache_1.3.14/src/main/buff.c	Sat Nov 11 20:49:14 2000
+@@ -126,7 +126,11 @@
    select() sometimes returns 1 even though the write will block. We must work around this.
  */
  
@@ -3328,7 +3329,7 @@ diff -Nru apache_1.3.12/src/main/buff.c apache_1.3.12.new/src/main/buff.c
  {
      int iostate = 1;
      fd_set fdset;
-@@ -193,8 +197,11 @@
+@@ -194,8 +198,11 @@
      return (rv);
  }
  
@@ -3341,7 +3342,7 @@ diff -Nru apache_1.3.12/src/main/buff.c apache_1.3.12.new/src/main/buff.c
  {
      int iostate = 1;
      fd_set fdset;
-@@ -257,6 +264,9 @@
+@@ -273,6 +280,9 @@
      }
      else
  #endif
@@ -3351,7 +3352,7 @@ diff -Nru apache_1.3.12/src/main/buff.c apache_1.3.12.new/src/main/buff.c
  	rv = read(fb->fd_in, buf, nbyte);
      
      return rv;
-@@ -268,6 +278,9 @@
+@@ -284,6 +294,9 @@
  
  #if defined (WIN32) || defined(NETWARE)
      if (fb->flags & B_SOCKET) {
@@ -3361,7 +3362,7 @@ diff -Nru apache_1.3.12/src/main/buff.c apache_1.3.12.new/src/main/buff.c
  	rv = recvwithtimeout(fb->fd_in, buf, nbyte, 0);
  	if (rv == SOCKET_ERROR)
  	    errno = WSAGetLastError();
-@@ -315,6 +328,9 @@
+@@ -331,6 +344,9 @@
      }
      else
  #endif
@@ -3371,7 +3372,7 @@ diff -Nru apache_1.3.12/src/main/buff.c apache_1.3.12.new/src/main/buff.c
  #if defined (B_SFIO)
  	rv = sfwrite(fb->sf_out, buf, nbyte);
  #else
-@@ -341,6 +357,9 @@
+@@ -357,6 +373,9 @@
  
  #if defined(WIN32) || defined(NETWARE)
      if (fb->flags & B_SOCKET) {
@@ -3381,7 +3382,7 @@ diff -Nru apache_1.3.12/src/main/buff.c apache_1.3.12.new/src/main/buff.c
  	rv = sendwithtimeout(fb->fd, buf, nbyte, 0);
  	if (rv == SOCKET_ERROR)
  	    errno = WSAGetLastError();
-@@ -421,6 +440,10 @@
+@@ -437,6 +456,10 @@
  		       (size_t) SF_UNBOUND, 1, SF_WRITE);
  #endif
  
@@ -3392,7 +3393,7 @@ diff -Nru apache_1.3.12/src/main/buff.c apache_1.3.12.new/src/main/buff.c
      return fb;
  }
  
-@@ -1067,6 +1090,9 @@
+@@ -1083,6 +1106,9 @@
      i = 0;
      while (i < nvec) {
  	do
@@ -3402,10 +3403,10 @@ diff -Nru apache_1.3.12/src/main/buff.c apache_1.3.12.new/src/main/buff.c
  	    rv = writev(fb->fd, &vec[i], nvec - i);
  	while (rv == -1 && (errno == EINTR || errno == EAGAIN)
  	       && !(fb->flags & B_EOUT));
-diff -Nru apache_1.3.12/src/main/http_config.c apache_1.3.12.new/src/main/http_config.c
---- apache_1.3.12/src/main/http_config.c	Mon Mar 13 19:38:44 2000
-+++ apache_1.3.12.new/src/main/http_config.c	Mon Mar 13 19:30:30 2000
-@@ -582,6 +582,20 @@
+diff -urN apache_1.3.14.orig/src/main/http_config.c apache_1.3.14/src/main/http_config.c
+--- apache_1.3.14.orig/src/main/http_config.c	Tue Oct  3 18:39:40 2000
++++ apache_1.3.14/src/main/http_config.c	Sat Nov 11 20:49:14 2000
+@@ -598,6 +598,20 @@
  	m->name = tmp;
      }
  #endif /*_OSD_POSIX*/
@@ -3426,7 +3427,7 @@ diff -Nru apache_1.3.12/src/main/http_config.c apache_1.3.12.new/src/main/http_c
  }
  
  /* 
-@@ -596,6 +610,21 @@
+@@ -612,6 +626,21 @@
  {
      module *modp;
  
@@ -3448,7 +3449,7 @@ diff -Nru apache_1.3.12/src/main/http_config.c apache_1.3.12.new/src/main/http_c
      modp = top_module;
      if (modp == m) {
  	/* We are the top module, special case */
-@@ -985,6 +1014,27 @@
+@@ -1005,6 +1034,27 @@
      const command_rec *cmd;
      module *mod = top_module;
  
@@ -3476,7 +3477,7 @@ diff -Nru apache_1.3.12/src/main/http_config.c apache_1.3.12.new/src/main/http_c
      if ((l[0] == '#') || (!l[0]))
  	return NULL;
  
-@@ -1334,6 +1384,10 @@
+@@ -1433,6 +1483,10 @@
      s->limit_req_fieldsize = main_server->limit_req_fieldsize;
      s->limit_req_fields = main_server->limit_req_fields;
  
@@ -3487,7 +3488,7 @@ diff -Nru apache_1.3.12/src/main/http_config.c apache_1.3.12.new/src/main/http_c
      *ps = s;
  
      return ap_parse_vhost_addrs(p, hostname, s);
-@@ -1444,6 +1498,10 @@
+@@ -1543,6 +1597,10 @@
  
      s->module_config = create_server_config(p, s);
      s->lookup_defaults = create_default_per_dir_config(p);
@@ -3498,9 +3499,9 @@ diff -Nru apache_1.3.12/src/main/http_config.c apache_1.3.12.new/src/main/http_c
  
      return s;
  }
-diff -Nru apache_1.3.12/src/main/http_main.c apache_1.3.12.new/src/main/http_main.c
---- apache_1.3.12/src/main/http_main.c	Mon Mar 13 19:38:44 2000
-+++ apache_1.3.12.new/src/main/http_main.c	Mon Mar 13 19:30:30 2000
+diff -urN apache_1.3.14.orig/src/main/http_main.c apache_1.3.14/src/main/http_main.c
+--- apache_1.3.14.orig/src/main/http_main.c	Sat Nov 11 20:44:14 2000
++++ apache_1.3.14/src/main/http_main.c	Sat Nov 11 20:53:13 2000
 @@ -259,6 +259,9 @@
  int ap_listenbacklog;
  int ap_dump_settings = 0;
@@ -3511,7 +3512,7 @@ diff -Nru apache_1.3.12/src/main/http_main.c apache_1.3.12.new/src/main/http_mai
  
  /*
   * The max child slot ever assigned, preserved across restarts.  Necessary
-@@ -441,6 +444,30 @@
+@@ -444,6 +447,30 @@
      }
  }
  
@@ -3542,7 +3543,7 @@ diff -Nru apache_1.3.12/src/main/http_main.c apache_1.3.12.new/src/main/http_mai
  #ifndef NETWARE
  static APACHE_TLS int volatile exit_after_unblock = 0;
  #endif
-@@ -1191,6 +1218,10 @@
+@@ -1208,6 +1235,10 @@
  	    ap_log_transaction(log_req);
  	}
  
@@ -3553,7 +3554,7 @@ diff -Nru apache_1.3.12/src/main/http_main.c apache_1.3.12.new/src/main/http_mai
  	ap_bsetflag(save_req->connection->client, B_EOUT, 1);
  	ap_bclose(save_req->connection->client);
  	
-@@ -1199,6 +1230,9 @@
+@@ -1216,6 +1247,9 @@
          ap_longjmp(jmpbuffer, 1);
      }
      else {			/* abort the connection */
@@ -3563,7 +3564,7 @@ diff -Nru apache_1.3.12/src/main/http_main.c apache_1.3.12.new/src/main/http_mai
  	ap_bsetflag(current_conn->client, B_EOUT, 1);
  	ap_bclose(current_conn->client);
  	current_conn->aborted = 1;
-@@ -1264,7 +1298,11 @@
+@@ -1281,7 +1315,11 @@
  }
  #endif
  
@@ -3575,7 +3576,7 @@ diff -Nru apache_1.3.12/src/main/http_main.c apache_1.3.12.new/src/main/http_mai
  {
      unsigned int old;
  
-@@ -1500,10 +1538,16 @@
+@@ -1517,10 +1555,16 @@
      /* Send any leftover data to the client, but never try to again */
  
      if (ap_bflush(r->connection->client) == -1) {
@@ -3592,17 +3593,17 @@ diff -Nru apache_1.3.12/src/main/http_main.c apache_1.3.12.new/src/main/http_mai
      ap_bsetflag(r->connection->client, B_EOUT, 1);
  
      /* Close our half of the connection --- send the client a FIN */
-@@ -2203,6 +2247,9 @@
- #endif
+@@ -2231,6 +2275,9 @@
      /* Clear the pool - including any registered cleanups */
      ap_destroy_pool(pglobal);
+ #endif
 +#ifdef EAPI
 +    ap_kill_alloc_shared();
 +#endif
      exit(code);
  }
  
-@@ -3211,6 +3258,24 @@
+@@ -3224,6 +3271,24 @@
      conn->remote_addr = *remaddr;
      conn->remote_ip = ap_pstrdup(conn->pool,
  			      inet_ntoa(conn->remote_addr.sin_addr));
@@ -3627,7 +3628,7 @@ diff -Nru apache_1.3.12/src/main/http_main.c apache_1.3.12.new/src/main/http_mai
  
      return conn;
  }
-@@ -3617,6 +3682,15 @@
+@@ -3645,6 +3710,15 @@
      printf("Server's Module Magic Number: %u:%u\n",
  	   MODULE_MAGIC_NUMBER_MAJOR, MODULE_MAGIC_NUMBER_MINOR);
      printf("Server compiled with....\n");
@@ -3643,7 +3644,7 @@ diff -Nru apache_1.3.12/src/main/http_main.c apache_1.3.12.new/src/main/http_mai
  #ifdef BIG_SECURITY_HOLE
      printf(" -D BIG_SECURITY_HOLE\n");
  #endif
-@@ -3770,6 +3844,22 @@
+@@ -3798,6 +3872,22 @@
      ap_server_pre_read_config  = ap_make_array(pcommands, 1, sizeof(char *));
      ap_server_post_read_config = ap_make_array(pcommands, 1, sizeof(char *));
      ap_server_config_defines   = ap_make_array(pcommands, 1, sizeof(char *));
@@ -3666,7 +3667,7 @@ diff -Nru apache_1.3.12/src/main/http_main.c apache_1.3.12.new/src/main/http_mai
  }
  
  #ifndef MULTITHREAD
-@@ -4191,6 +4281,9 @@
+@@ -4217,6 +4307,9 @@
  
  	    ap_sync_scoreboard_image();
  	    if (ap_scoreboard_image->global.running_generation != ap_my_generation) {
@@ -3676,7 +3677,7 @@ diff -Nru apache_1.3.12/src/main/http_main.c apache_1.3.12.new/src/main/http_mai
  		ap_bclose(conn_io);
  		clean_child_exit(0);
  	    }
-@@ -4219,6 +4312,9 @@
+@@ -4245,6 +4338,9 @@
  	 */
  
  #ifdef NO_LINGCLOSE
@@ -3686,7 +3687,7 @@ diff -Nru apache_1.3.12/src/main/http_main.c apache_1.3.12.new/src/main/http_mai
  	ap_bclose(conn_io);	/* just close it */
  #else
  	if (r && r->connection
-@@ -4229,6 +4325,9 @@
+@@ -4255,6 +4351,9 @@
  	    lingering_close(r);
  	}
  	else {
@@ -3696,7 +3697,7 @@ diff -Nru apache_1.3.12/src/main/http_main.c apache_1.3.12.new/src/main/http_mai
  	    ap_bsetflag(conn_io, B_EOUT, 1);
  	    ap_bclose(conn_io);
  	}
-@@ -4953,16 +5052,31 @@
+@@ -4979,16 +5078,31 @@
  	    usage(argv[0]);
  	}
      }
@@ -3728,7 +3729,7 @@ diff -Nru apache_1.3.12/src/main/http_main.c apache_1.3.12.new/src/main/http_mai
      }
  
      child_timeouts = !ap_standalone || one_process;
-@@ -5098,6 +5212,10 @@
+@@ -5122,6 +5236,10 @@
  	    ap_destroy_pool(r->pool);
  	}
  
@@ -3739,7 +3740,7 @@ diff -Nru apache_1.3.12/src/main/http_main.c apache_1.3.12.new/src/main/http_mai
  	ap_bclose(cio);
      }
      exit(0);
-@@ -5449,6 +5567,9 @@
+@@ -5468,6 +5586,9 @@
  	ap_kill_cleanups_for_socket(ptrans, csd);
  
  #ifdef NO_LINGCLOSE
@@ -3749,7 +3750,7 @@ diff -Nru apache_1.3.12/src/main/http_main.c apache_1.3.12.new/src/main/http_mai
  	ap_bclose(conn_io);	/* just close it */
  #else
  	if (r && r->connection
-@@ -5459,6 +5580,9 @@
+@@ -5478,6 +5599,9 @@
  	    lingering_close(r);
  	}
  	else {
@@ -3759,7 +3760,7 @@ diff -Nru apache_1.3.12/src/main/http_main.c apache_1.3.12.new/src/main/http_mai
  	    ap_bsetflag(conn_io, B_EOUT, 1);
  	    ap_bclose(conn_io);
  	}
-@@ -6785,6 +6909,9 @@
+@@ -6878,6 +7002,9 @@
          }
      }
  
@@ -3769,21 +3770,21 @@ diff -Nru apache_1.3.12/src/main/http_main.c apache_1.3.12.new/src/main/http_mai
  
      if (!ap_os_is_path_absolute(ap_server_confname)) {
          char *full_conf_path;
-@@ -6818,6 +6945,10 @@
+@@ -6929,6 +7056,10 @@
      }
- #endif
+ #else /* ndef WIN32 */
      server_conf = ap_read_config(pconf, ptrans, ap_server_confname);
++#endif
 +
 +#ifdef EAPI
 +    ap_init_alloc_shared(FALSE);
-+#endif
+ #endif
  
      if (ap_configtestonly) {
-         fprintf(stderr, "%s: Syntax OK\n", ap_server_root_relative(pcommands, ap_server_confname));
-diff -Nru apache_1.3.12/src/main/http_protocol.c apache_1.3.12.new/src/main/http_protocol.c
---- apache_1.3.12/src/main/http_protocol.c	Mon Mar 13 19:38:44 2000
-+++ apache_1.3.12.new/src/main/http_protocol.c	Mon Mar 13 19:30:30 2000
-@@ -1028,6 +1028,10 @@
+diff -urN apache_1.3.14.orig/src/main/http_protocol.c apache_1.3.14/src/main/http_protocol.c
+--- apache_1.3.14.orig/src/main/http_protocol.c	Tue Oct 10 05:29:08 2000
++++ apache_1.3.14/src/main/http_protocol.c	Sat Nov 11 20:49:14 2000
+@@ -1039,6 +1039,10 @@
      r->status          = HTTP_REQUEST_TIME_OUT;  /* Until we get a request */
      r->the_request     = NULL;
  
@@ -3794,7 +3795,7 @@ diff -Nru apache_1.3.12/src/main/http_protocol.c apache_1.3.12.new/src/main/http
  #ifdef CHARSET_EBCDIC
      ap_bsetflag(r->connection->client, B_ASCII2EBCDIC|B_EBCDIC2ASCII, 1);
  #endif
-@@ -1174,6 +1178,11 @@
+@@ -1185,6 +1189,11 @@
      rnew->read_body       = REQUEST_NO_BODY;
  
      rnew->main = (request_rec *) r;
@@ -3806,10 +3807,10 @@ diff -Nru apache_1.3.12/src/main/http_protocol.c apache_1.3.12.new/src/main/http
  }
  
  void ap_finalize_sub_req_protocol(request_rec *sub)
-diff -Nru apache_1.3.12/src/main/http_request.c apache_1.3.12.new/src/main/http_request.c
---- apache_1.3.12/src/main/http_request.c	Mon Mar 13 19:38:44 2000
-+++ apache_1.3.12.new/src/main/http_request.c	Mon Mar 13 19:30:30 2000
-@@ -1316,6 +1316,9 @@
+diff -urN apache_1.3.14.orig/src/main/http_request.c apache_1.3.14/src/main/http_request.c
+--- apache_1.3.14.orig/src/main/http_request.c	Fri Sep 22 20:42:42 2000
++++ apache_1.3.14/src/main/http_request.c	Sat Nov 11 20:49:14 2000
+@@ -1383,6 +1383,9 @@
      new->no_local_copy   = r->no_local_copy;
      new->read_length     = r->read_length;     /* We can only read it once */
      new->vlist_validator = r->vlist_validator;
@@ -3819,9 +3820,9 @@ diff -Nru apache_1.3.12/src/main/http_request.c apache_1.3.12.new/src/main/http_
  
      ap_table_setn(new->subprocess_env, "REDIRECT_STATUS",
  	ap_psprintf(r->pool, "%d", r->status));
-diff -Nru apache_1.3.12/src/modules/extra/mod_define.c apache_1.3.12.new/src/modules/extra/mod_define.c
---- apache_1.3.12/src/modules/extra/mod_define.c	Thu Jan  1 01:00:00 1970
-+++ apache_1.3.12.new/src/modules/extra/mod_define.c	Thu Dec 30 22:00:58 1999
+diff -urN apache_1.3.14.orig/src/modules/extra/mod_define.c apache_1.3.14/src/modules/extra/mod_define.c
+--- apache_1.3.14.orig/src/modules/extra/mod_define.c	Thu Jan  1 01:00:00 1970
++++ apache_1.3.14/src/modules/extra/mod_define.c	Sat Nov 11 20:49:14 2000
 @@ -0,0 +1,416 @@
 +/*
 +**  mod_define.c - Apache module for configuration defines ($xxx)
@@ -4239,9 +4240,9 @@ diff -Nru apache_1.3.12/src/modules/extra/mod_define.c apache_1.3.12.new/src/mod
 +    NULL                   /* EAPI: new_connection                */
 +};
 +
-diff -Nru apache_1.3.12/src/modules/proxy/mod_proxy.c apache_1.3.12.new/src/modules/proxy/mod_proxy.c
---- apache_1.3.12/src/modules/proxy/mod_proxy.c	Mon Mar 13 19:38:44 2000
-+++ apache_1.3.12.new/src/modules/proxy/mod_proxy.c	Mon Mar 13 19:30:30 2000
+diff -urN apache_1.3.14.orig/src/modules/proxy/mod_proxy.c apache_1.3.14/src/modules/proxy/mod_proxy.c
+--- apache_1.3.14.orig/src/modules/proxy/mod_proxy.c	Fri Jun  2 01:42:26 2000
++++ apache_1.3.14/src/modules/proxy/mod_proxy.c	Sat Nov 11 20:49:14 2000
 @@ -214,6 +214,9 @@
  static int proxy_fixup(request_rec *r)
  {
@@ -4366,9 +4367,9 @@ diff -Nru apache_1.3.12/src/modules/proxy/mod_proxy.c apache_1.3.12.new/src/modu
  };
  
  
-diff -Nru apache_1.3.12/src/modules/proxy/proxy_http.c apache_1.3.12.new/src/modules/proxy/proxy_http.c
---- apache_1.3.12/src/modules/proxy/proxy_http.c	Mon Mar 13 19:38:44 2000
-+++ apache_1.3.12.new/src/modules/proxy/proxy_http.c	Mon Mar 13 19:30:30 2000
+diff -urN apache_1.3.14.orig/src/modules/proxy/proxy_http.c apache_1.3.14/src/modules/proxy/proxy_http.c
+--- apache_1.3.14.orig/src/modules/proxy/proxy_http.c	Tue Feb 29 15:24:27 2000
++++ apache_1.3.14/src/modules/proxy/proxy_http.c	Sat Nov 11 20:49:14 2000
 @@ -189,6 +189,9 @@
      const char *urlptr = NULL;
      const char *datestr;
@@ -4453,9 +4454,9 @@ diff -Nru apache_1.3.12/src/modules/proxy/proxy_http.c apache_1.3.12.new/src/mod
  
      if (conf->viaopt == via_block) {
  	/* Block all outgoing Via: headers */
-diff -Nru apache_1.3.12/src/modules/standard/mod_log_config.c apache_1.3.12.new/src/modules/standard/mod_log_config.c
---- apache_1.3.12/src/modules/standard/mod_log_config.c	Mon Mar 13 19:38:44 2000
-+++ apache_1.3.12.new/src/modules/standard/mod_log_config.c	Mon Mar 13 19:30:30 2000
+diff -urN apache_1.3.14.orig/src/modules/standard/mod_log_config.c apache_1.3.14/src/modules/standard/mod_log_config.c
+--- apache_1.3.14.orig/src/modules/standard/mod_log_config.c	Fri Jun  2 01:42:28 2000
++++ apache_1.3.14/src/modules/standard/mod_log_config.c	Sat Nov 11 20:49:14 2000
 @@ -257,6 +257,9 @@
  typedef const char *(*item_key_func) (request_rec *, char *);
  
@@ -4541,10 +4542,10 @@ diff -Nru apache_1.3.12/src/modules/standard/mod_log_config.c apache_1.3.12.new/
      cp = (*item->func) (item->want_orig ? orig : r, item->arg);
      return cp ? cp : "-";
  }
-diff -Nru apache_1.3.12/src/modules/standard/mod_rewrite.c apache_1.3.12.new/src/modules/standard/mod_rewrite.c
---- apache_1.3.12/src/modules/standard/mod_rewrite.c	Mon Mar 13 19:38:44 2000
-+++ apache_1.3.12.new/src/modules/standard/mod_rewrite.c	Mon Mar 13 19:30:30 2000
-@@ -3770,6 +3770,15 @@
+diff -urN apache_1.3.14.orig/src/modules/standard/mod_rewrite.c apache_1.3.14/src/modules/standard/mod_rewrite.c
+--- apache_1.3.14.orig/src/modules/standard/mod_rewrite.c	Fri Sep 22 22:47:19 2000
++++ apache_1.3.14/src/modules/standard/mod_rewrite.c	Sat Nov 11 20:49:14 2000
+@@ -3613,6 +3613,15 @@
      }
  #endif /* ndef WIN32 && NETWARE*/
  
@@ -4560,9 +4561,9 @@ diff -Nru apache_1.3.12/src/modules/standard/mod_rewrite.c apache_1.3.12.new/src
      if (result == NULL) {
          return ap_pstrdup(r->pool, "");
      }
-diff -Nru apache_1.3.12/src/modules/standard/mod_so.c apache_1.3.12.new/src/modules/standard/mod_so.c
---- apache_1.3.12/src/modules/standard/mod_so.c	Mon Mar 13 19:38:44 2000
-+++ apache_1.3.12.new/src/modules/standard/mod_so.c	Mon Mar 13 19:30:30 2000
+diff -urN apache_1.3.14.orig/src/modules/standard/mod_so.c apache_1.3.14/src/modules/standard/mod_so.c
+--- apache_1.3.14.orig/src/modules/standard/mod_so.c	Tue May  4 13:21:14 1999
++++ apache_1.3.14/src/modules/standard/mod_so.c	Sat Nov 11 20:49:14 2000
 @@ -257,11 +257,24 @@
       * Make sure the found module structure is really a module structure
       * 
@@ -4588,9 +4589,9 @@ diff -Nru apache_1.3.12/src/modules/standard/mod_so.c apache_1.3.12.new/src/modu
  
      /* 
       * Add this module to the Apache core structures
-diff -Nru apache_1.3.12/src/modules/standard/mod_status.c apache_1.3.12.new/src/modules/standard/mod_status.c
---- apache_1.3.12/src/modules/standard/mod_status.c	Mon Mar 13 19:38:44 2000
-+++ apache_1.3.12.new/src/modules/standard/mod_status.c	Mon Mar 13 19:30:30 2000
+diff -urN apache_1.3.14.orig/src/modules/standard/mod_status.c apache_1.3.14/src/modules/standard/mod_status.c
+--- apache_1.3.14.orig/src/modules/standard/mod_status.c	Fri Jun  2 01:42:29 2000
++++ apache_1.3.14/src/modules/standard/mod_status.c	Sat Nov 11 20:49:14 2000
 @@ -475,12 +475,33 @@
  	    if (no_table_report)
  		ap_rputs("<p><hr><h2>Server Details</h2>\n\n", r);
@@ -4684,9 +4685,9 @@ diff -Nru apache_1.3.12/src/modules/standard/mod_status.c apache_1.3.12.new/src/
  
      } else {
  
-diff -Nru apache_1.3.12/src/support/apxs.pl apache_1.3.12.new/src/support/apxs.pl
---- apache_1.3.12/src/support/apxs.pl	Mon Mar 13 19:38:44 2000
-+++ apache_1.3.12.new/src/support/apxs.pl	Mon Mar 13 19:30:30 2000
+diff -urN apache_1.3.14.orig/src/support/apxs.pl apache_1.3.14/src/support/apxs.pl
+--- apache_1.3.14.orig/src/support/apxs.pl	Sat Nov 11 20:44:14 2000
++++ apache_1.3.14/src/support/apxs.pl	Sat Nov 11 20:49:14 2000
 @@ -651,5 +651,11 @@
      NULL,                  /* child_init                          */
      NULL,                  /* child_exit                          */
@@ -4699,10 +4700,10 @@ diff -Nru apache_1.3.12/src/support/apxs.pl apache_1.3.12.new/src/support/apxs.p
 +#endif
  };
  
-diff -Nru apache_1.3.12/src/support/httpd.exp apache_1.3.12.new/src/support/httpd.exp
---- apache_1.3.12/src/support/httpd.exp	Mon Mar 13 19:38:44 2000
-+++ apache_1.3.12.new/src/support/httpd.exp	Mon Mar 13 19:30:30 2000
-@@ -413,3 +413,59 @@
+diff -urN apache_1.3.14.orig/src/support/httpd.exp apache_1.3.14/src/support/httpd.exp
+--- apache_1.3.14.orig/src/support/httpd.exp	Tue Oct 10 20:05:25 2000
++++ apache_1.3.14/src/support/httpd.exp	Sat Nov 11 20:49:14 2000
+@@ -421,3 +421,59 @@
  XML_SetUnparsedEntityDeclHandler
  XML_SetUserData
  XML_UseParserAsHandlerArg

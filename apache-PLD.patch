@@ -1,21 +1,11 @@
---- apache_1.3.6/src/main/http_main.c.redhat	Wed Mar 17 18:05:43 1999
-+++ apache_1.3.6/src/main/http_main.c	Thu Mar 25 17:24:55 1999
-@@ -404,6 +404,9 @@
-     else {
- 	ap_add_version_component(SERVER_BASEVERSION " (" PLATFORM ")");
-     }
-+
-+    ap_add_version_component(" (PLD/Linux)");
-+    
-     /*
-      * Lock the server_version string if we're not displaying
-      * the full set of tokens
---- apache_1.3.9/config.layout.pld	Thu Jul 29 20:12:43 1999
-+++ apache_1.3.9/config.layout	Mon Aug 23 19:29:39 1999
-@@ -150,3 +150,22 @@
-     proxycachedir: $localstatedir/proxy
+diff -urN apache_1.3.14.orig/config.layout apache_1.3.14/config.layout
+--- apache_1.3.14.orig/config.layout	Tue Sep 26 01:44:55 2000
++++ apache_1.3.14/config.layout	Sat Nov 11 20:41:04 2000
+@@ -249,3 +249,23 @@
+     logfiledir:    $prefix/logs
+     proxycachedir: $prefix/proxy
  </Layout>
- 
++
 +# PLD layout...
 +<Layout PLD>
 +    prefix:        /usr
@@ -35,3 +25,16 @@
 +    logfiledir:    $localstatedir/log/httpd
 +    proxycachedir: $localstatedir/cache/www/apache
 +</Layout>     
+diff -urN apache_1.3.14.orig/src/main/http_main.c apache_1.3.14/src/main/http_main.c
+--- apache_1.3.14.orig/src/main/http_main.c	Thu Sep 28 15:32:36 2000
++++ apache_1.3.14/src/main/http_main.c	Sat Nov 11 20:39:48 2000
+@@ -432,6 +432,9 @@
+     else {
+ 	ap_add_version_component(SERVER_BASEVERSION " (" PLATFORM ")");
+     }
++
++    ap_add_version_component(" (PLD/Linux)");
++    
+     /*
+      * Lock the server_version string if we're not displaying
+      * the full set of tokens
