@@ -32,7 +32,7 @@ Summary(ru):	óÁÍÙÊ ÐÏÐÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.0.49
-Release:	4
+Release:	5
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -79,6 +79,7 @@ Patch19:	httpd-2.0.48-fdsetsize.patch
 Patch20:	httpd-2.0.48-sslpphrase.patch
 Patch21:	%{name}-v6only-ENOPROTOOPT.patch
 Patch22:	%{name}-conffile-path.patch
+Patch23:	http://www.apache.org/dist/httpd/patches/apply_to_2.0.49/CAN-2004-0493.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	automake
 BuildRequires:	apr-devel >= 1:0.9.5-6
@@ -656,6 +657,7 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 %patch20 -p1
 %patch21 -p1
 %patch22 -p1
+%patch23 -p0
 
 %build
 # sanity check
