@@ -5,7 +5,7 @@ Summary(pl):	Serwer WWW (World Wide Web) ze wsparciem dla IPv6
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	1.3.6
-Release:	2.1
+Release:	2.2
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
 Source0:	ftp://ftp.apache.org/apache/dist/%{name}_%{version}.tar.gz
@@ -166,7 +166,23 @@ gzip -9nf $RPM_BUILD_ROOT%{_mandir}/man*/* \
 	ABOUT_APACHE src/CHANGES KEYS README README.v6
 
 %pre
-/usr/sbin/useradd -u 51 -r -f httpd
+if [ -n `id -g http` ]; then
+	if [ "`id -g http`" != "51" ]; then
+		echo "Warning: group http haven't gid=51. Corect this before install apache"
+		exit 1
+	fi
+else
+	/usr/sbin/groupadd -u 51 -r -f httpd
+fi
+if [ -n `id -u http` ]; then
+	if [ "`id -g http`" != "51" ]; then
+		echo "Warning: user http haven't gid=51. Corect this before install apache"
+		exit 1
+	fi
+else
+	/usr/sbin/useradd -u 51 -r -f httpd
+fi
+
 
 %post
 /sbin/chkconfig --add httpd
@@ -182,7 +198,6 @@ if [ "$1" = "0" ]; then
 		/etc/rc.d/init.d/httpd stop 1>&2
 	fi
 	/sbin/chkconfig --del httpd
-	groupdel http
 fi
 
 %clean
