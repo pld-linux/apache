@@ -11,7 +11,7 @@ Summary(pl):	Serwer WWW (World Wide Web)
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	1.3.17
-Release:	2
+Release:	3
 License:	Apache Group License
 Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
@@ -125,9 +125,7 @@ Requires:	%{name}(EAPI) = %{version}
 Provides:	%{name}(EAPI)-devel
 
 %description devel
-The apache-devel package contains the source code for the Apache Web
-server and the APXS binary you'll need to build Dynamic Shared Objects
-(DSOs) for Apache.
+The apache-devel package contains header files for Apache.
 
 %description -l fr devel
 Le package apache-devel contient le code source pour le serveur Web
@@ -444,6 +442,7 @@ wirtualnych.
 
 %package mod_unique_id
 Summary:	Apache module which provides a magic token for each request
+Summary(pl):	Modu³ nadaj±cy ka¿demu ¿±daniu unikalny token
 Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
@@ -460,8 +459,15 @@ machines. The environment variable UNIQUE_ID is set to the identifier
 for each request. Unique identifiers are useful for various reasons
 which are beyond the scope of this document.
 
+%description -l pl mod_unique_id
+Modu³ nadaje przy ka¿dym ¿±daniu token unikalny w ramach wszystkich
+¿±dañ, nawet w ramach poprawnie skonfigurowanego klastra z wielu
+maszyn. Modu³ ustawia przy ka¿dym ¿±daniu zmienn± ¶rodowiskow±
+UNIQUE_ID.
+
 %package mod_expires
-Summary:	Apache module which provides .... 
+Summary:	Apache module which generates Expires HTTP headers
+Summary(pl):	Modu³ generuj±cy nag³ówki HTTP Expires
 Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
@@ -470,6 +476,14 @@ Prereq:		perl
 Requires:	%{name}(EAPI) = %{version}
 
 %description mod_expires
+This module controls the setting of the Expires HTTP header in server
+responses. The expiration date can set to be relative to either the time
+the source file was last modified, or to the time of the client access.
+
+%description -l pl mod_expires
+Modu³ kontroluje ustawianie nag³ówka HTTP Expires. Data wyga¶niêcia
+wa¿no¶ci mo¿e byæ ustalana w zale¿no¶ci od czasu modyfikacji plików
+¼ród³owych lub odwo³ania klienta.
 
 %prep 
 %setup -q -n apache_%{version} -a3
@@ -536,7 +550,7 @@ rm -f src/modules/standard/mod_rewrite.so
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig} \
 	$RPM_BUILD_ROOT%{_datadir}/errordocs \
-	$RPM_BUILD_ROOT/var/{log/{httpd,archiv/httpd},{lib,run}/apache}
+	$RPM_BUILD_ROOT/var/{log/{httpd,archiv/httpd},run/apache}
 
 %{__make} install-quiet root="$RPM_BUILD_ROOT"
 
@@ -563,7 +577,7 @@ gzip -9nf ABOUT_APACHE src/CHANGES KEYS README
 %pre
 if [ -n "`getgid http`" ]; then
 	if [ "`getgid http`" != "51" ]; then
-		echo "Warning:group http haven't gid=51. Corect this before install apache" 1>&2
+		echo "Warning: group http haven't gid=51. Correct this before install apache" 1>&2
 		exit 1
 	fi
 else
@@ -571,7 +585,7 @@ else
 fi
 if [ -n "`id -u http 2>/dev/null`" ]; then
 	if [ "`id -u http`" != "51" ]; then
-		echo "Warning:user http haven't uid=51. Corect this before install apache" 1>&2
+		echo "Warning: user http haven't uid=51. Correct this before install apache" 1>&2
 		exit 1
 	fi
 else
@@ -989,7 +1003,6 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_sbindir}/logresolve
 %attr(755,root,root) %{_sbindir}/rotatelogs
 
-%dir %attr(770,root,http) /var/lib/apache
 %dir %attr(770,root,http) /var/run/apache
 
 %{_mandir}/man1/htdigest.1*
