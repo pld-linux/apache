@@ -1,0 +1,15 @@
+diff -ur httpd-2.0.49-orig/configure.in httpd-2.0.49/configure.in
+--- httpd-2.0.49-orig/configure.in	2004-04-02 15:04:49.000000000 -0700
++++ httpd-2.0.49/configure.in	2004-04-02 15:07:26.319486516 -0700
+@@ -541,9 +541,9 @@
+ APR_EXPAND_VAR(ap_prefix, $prefix)
+ AC_DEFINE_UNQUOTED(HTTPD_ROOT, "${ap_prefix}",
+ 	[Root directory of the Apache install area])
+-AC_DEFINE_UNQUOTED(SERVER_CONFIG_FILE, "${rel_sysconfdir}/${progname}.conf",
++AC_DEFINE_UNQUOTED(SERVER_CONFIG_FILE, "${exp_sysconfdir}/httpd.conf",
+ 	[Location of the config file, relative to the Apache root directory])
+-AC_DEFINE_UNQUOTED(AP_TYPES_CONFIG_FILE, "${rel_sysconfdir}/mime.types",
++AC_DEFINE_UNQUOTED(AP_TYPES_CONFIG_FILE, "${exp_sysconfdir}/mime.types",
+ 	[Location of the MIME types config file, relative to the Apache root directory])
+ AC_DEFINE_UNQUOTED(APACHE_MPM_DIR, "$MPM_DIR",
+ 	[Location of the source for the current MPM])
