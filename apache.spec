@@ -1,8 +1,4 @@
-#
-# Conditional build:
-# mod_rewrite_ldap - enable ldap map supoort for mod_rewrite (alpha)
-# _without_apache_ipv6 - disable IPv6 support
-#
+%define ver	2_0_31
 %include	/usr/lib/rpm/macros.perl
 Summary:	The most widely used Web server on the Internet
 Summary(de):	Leading World Wide Web-Server
@@ -11,50 +7,30 @@ Summary(fr):	Le serveur web le plus utilise sur Internet
 Summary(pl):	Serwer WWW (World Wide Web)
 Summary(pt_BR):	Servidor HTTPD para prover serviços WWW
 Summary(tr):	Lider WWW tarayýcý
-Name:		apache
-Version:	1.3.22
-Release:	3
+Name:		apache2
+Version:	%(echo %{ver} | sed -e "s#_#\.#")
+Release:	1
 License:	Apache Group License
 Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
 Group(pl):	Sieciowe/Serwery
-URL:		http://www.apache.org/
-Source0:	ftp://ftp.apache.org/dist/%{name}_%{version}.tar.gz
-Source1:	%{name}.init
-Source2:	%{name}.logrotate
-Source3:	%{name}-icons.tar.gz
-Source4:	%{name}.sysconfig
-Source5:	http://www.mif.pg.gda.pl/homepages/ankry/man-PLD/%{name}-non-english-man-pages.tar.bz2
-Source6:	%{name}-httpd.conf
-Source8:	%{name}-mod_vhost_alias.conf
-Source9:	%{name}-mod_status.conf
-Source10:	%{name}-mod_proxy.conf
-Patch0:		%{name}-PLD.patch
-Patch1:		%{name}-suexec.patch
-Patch2:		%{name}-htdocs.patch
-Patch3:		%{name}-errordocs.patch
-Patch4:		%{name}-apxs.patch
-Patch5:		%{name}-mod_ssl-addon.patch
-Patch6:		%{name}-mod_ssl-eapi.patch
-Patch7:		%{name}-EAPI_MM_CORE_PATH-correction.patch
-Patch8:		%{name}-EAPI_MM=SYSTEM.patch
-Patch9:		%{name}-ipv6-PLD.patch
-Patch10:	%{name}-modules_symbols.patch
-Patch11:	%{name}-apxs_force_rm_cp.patch
-Patch12:	%{name}-db3.patch
-Patch13:	%{name}-lookup_map_ldap.patch
-Patch14:	%{name}-man.patch
-Patch15:	%{name}-fpic.patch
-Patch16:	%{name}-buff.patch
-Patch17:	%{name}-mkstemp.patch
-Patch18:	%{name}-EAPI-missing_files.patch
-Patch19:	%{name}-PLD-nov6.patch
-Patch20:	%{name}-configdir_skip_backups.patch
-Patch21:	%{name}-apxs-quiet.patch
+URL:		http://httpd.apache.org/
+Source0:	http://www.apache.org/dist/httpd/httpd-%{ver}-alpha.tar.gz
+#Source1:	%{name}.init
+#Source2:	%{name}.logrotate
+#Source3:	%{name}-icons.tar.gz
+#Source4:	%{name}.sysconfig
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
+BuildRequires:	openssl-devel
 BuildRequires:	db3-devel
-BuildRequires:	mm-devel >= 1.1.3
-%{?mod_rewrite_ldap:BuildRequires: openldap-devel}
+# FIXME
+BuildRequires:	db1-devel
+BuildRequires:	zlib-devel
+BuildRequires:	gdbm-devel
+BuildRequires:	expat-devel
+BuildRequires:	expat-static
+BuildRequires:	perl-devel >= 5.004
+
 Provides:	httpd
 Provides:	webserver
 Provides:	%{name}(EAPI) = %{version}
@@ -74,10 +50,11 @@ Obsoletes:	apache6
 Obsoletes:	apache-doc
 Obsoletes:	indexhtml
 
-%define		_sysconfdir	/etc/httpd
-%define		_includedir	%{_prefix}/include/apache
+%define		_bindir		%{_sbindir}
+%define		_sysconfdir	/etc/httpd2
+%define		_includedir	%{_prefix}/include/apache2
 %define		_datadir	/home/httpd
-%define		_libexecdir	%{_prefix}/lib/apache
+%define		_libexecdir	%{_libdir}/apache2
 
 %description
 Apache is a powerful, full-featured, efficient and freely-available
@@ -525,73 +502,83 @@ wa¿no¶ci mo¿e byæ ustalana w zale¿no¶ci od czasu modyfikacji plików
 ¼ród³owych lub odwo³ania klienta.
 
 %prep 
-%setup -q -n apache_%{version} -a3
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p0
-%patch6 -p0
-%patch7 -p1
-%patch8 -p1
-%{!?_without_apache_ipv6:%patch9 -p1}
-%patch10 -p1
-%patch11 -p1
-%patch12 -p1
-%{?mod_rewrite_ldap:%patch13 -p1}
-%patch14 -p1
-%patch15 -p1
-%patch16 -p1
-%patch17 -p1
-%patch18 -p1
-%{?_without_apache_ipv6:%patch19 -p1}
-%patch20 -p1
-%patch21 -p1
+%setup -q -n httpd-%{ver}
 
 %build
-OPTIM="%{rpmcflags}" \
-./configure \
-	--prefix=%{_prefix} \
-	--sysconfdir=%{_sysconfdir} \
-	--includedir=%{_includedir} \
-	--sbindir=%{_sbindir} \
-	--libexecdir=%{_libexecdir} \
-	--datadir=%{_datadir} \
-	--manualdir=%{_datadir}/html/manual \
-	--localstatedir=/var \
-	--runtimedir=/var/run \
-	--logfiledir=/var/log/httpd \
-	--with-layout=PLD \
-	--without-confadjust \
-	--enable-module=all \
-	--enable-shared=max \
-	--proxycachedir=/var/cache/apache \
-	--with-perl=%{_bindir}/perl \
+%configure2_13 \
+	--enable-layout=PLD \
+	--enable-modules=all \
+	--enable-mods-shared=max \
+	--enable-auth-anon	 \
+	--enable-auth-dbm \
+	--enable-auth-digest \
+	--enable-file-cache \
+	--enable-echo \
+	--enable-cache \
+	--enable-mem-cache \
+	--enable-ext-filter \
+	--enable-case-filter \
+	--enable-case-filter-in \
+	--enable-deflate \
+	--with-z=%{_prefix} \
+	--enable-mime-magic \
+	--enable-cern-meta \
+	--enable-expires \
+	--enable-headers \
+	--enable-usertrack \
+	--enable-unique-id \
+	--enable-proxy \
+	--enable-proxy-connect \
+	--enable-proxy-ftp \
+	--enable-proxy-http \
+	--enable-ssl \
+	--enable-optional-hook-export \
+	--enable-optional-hook-import \
+	--enable-optional-fn-import \
+	--enable-optional-fn-export \
+	--enable-http \
+	--enable-dav \
+	--enable-info \
 	--enable-suexec \
-	--suexec-caller=http \
-	--suexec-uidmin=500 \
-	--suexec-gidmin=500 \
-	--suexec-docroot=%{_datadir} \
-	--disable-rule=WANTHSREGEX \
-	--enable-rule=EAPI \
-	%{!?_without_apache_ipv6:--enable-rule=INET6}
+	--enable-cgi \
+	--enable-cgid \
+	--enable-dav-fs \
+	--enable-vhost-alias \
+	--enable-speling \
+	--enable-rewrite \
+	--enable-so \
+	--with-mpm=threaded \	
+	--with-suexec-bin=%{_sbindir} \
+	--with-suexec-caller=http \
+	--with-suexec-docroot=%{_datadir} \
+	--with-suexec-uidmin=500 \
+	--with-suexec-gidmin=500 \
+	--with-suexec-umask=077
 
-%{__make} LIBS1="-lm -lcrypt -lmm -ldl"
-
-rm -f src/modules/standard/mod_auth_db.so
-%{__make} -C src/modules/standard mod_auth_db.so LIBS_SHLIB="-ldb"
-
-rm -f src/modules/standard/mod_rewrite.so
-%{__make} -C src/modules/standard mod_rewrite.so LIBS_SHLIB="-ldb %{?mod_rewrite_ldap:-lldap -llber}"
+%{__make}
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig} \
-	$RPM_BUILD_ROOT%{_datadir}/errordocs \
-	$RPM_BUILD_ROOT/var/{log/{httpd,archiv/httpd},run/apache}
 
-%{__make} install-quiet root="$RPM_BUILD_ROOT"
+%{makeinstall} \
+	prefix=%{_sysconfdir}/httpd2 \
+	bindir=$RPM_BUILD_ROOT%{_sbindir} \
+	sbindir=$RPM_BUILD_ROOT%{_sbindir} \
+	installbuilddir=$RPM_BUILD_ROOT%{_sysconfdir}/build \
+	libexecdir=$RPM_BUILD_ROOT%{_libdir}/%{name} \
+	mandir=$RPM_BUILD_ROOT%{_mandir} \
+	sysconfdir=$RPM_BUILD_ROOT%{_sysconfdir}/conf \
+	datadir=$RPM_BUILD_ROOT%{_datadir} \
+	iconsdir=$RPM_BUILD_ROOT%{_datadir}/icons \
+	errordir=$RPM_BUILD_ROOT%{_datadir}/error \
+	htdocsdir=$RPM_BUILD_ROOT%{_datadir}/html \
+	manualdir=$RPM_BUILD_ROOT%{_datadir}/manual \
+	cgidir=$RPM_BUILD_ROOT%{_datadir}/cgi-bin \
+	includedir=$RPM_BUILD_ROOT%{_includedir} \
+	localstatedir=$RPM_BUILD_ROOT%{_localstatedir} \
+	runtimedir=$RPM_BUILD_ROOT{_var}/run \
+	logdir=$RPM_BUILD_ROOT%{_var}/log/httpd2 \
+	proxycachedir=$RPM_BUILD_ROOT%{_var}/cache/httpd2   
 
 mv -f $RPM_BUILD_ROOT%{_datadir}/html/manual $RPM_BUILD_ROOT%{_datadir}
 
