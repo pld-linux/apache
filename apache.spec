@@ -6,7 +6,7 @@ Summary(pl):	Serwer WWW (World Wide Web)
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	1.3.12
-Release:	4
+Release:	5
 License:	BSD-like
 Group:		Networking/Daemons
 Group(pl):	Sieciowe/Serwery
@@ -545,7 +545,7 @@ if [ "$1" = "0" ]; then
 fi
 
 %post mod_actions
-%{_sbindir}/apxs -e -a -n action %{_libexecdir}/mod_actions.so 1>&2
+%{_sbindir}/apxs -e -a -n actions %{_libexecdir}/mod_actions.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 else
@@ -554,7 +554,7 @@ fi
 
 %preun mod_actions
 if [ "$1" = "0" ]; then
-	%{_sbindir}/apxs -e -A -n action %{_libexecdir}/mod_actions.so 1>&2
+	%{_sbindir}/apxs -e -A -n actions %{_libexecdir}/mod_actions.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
@@ -707,7 +707,7 @@ fi
 %post mod_proxy
 %{_sbindir}/apxs -e -a -n proxy %{_libexecdir}/libproxy.so 1>&2
 if [ -f /etc/httpd/httpd.conf ] && ! grep -q "^Include.*mod_proxy.conf" /etc/httpd/httpd.conf; then
-	echo "Include mod_proxy.conf" >> /etc/httpd/httpd.conf
+	echo "Include /etc/httpd/mod_proxy.conf" >> /etc/httpd/httpd.conf
 fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
@@ -745,7 +745,7 @@ fi
 %post mod_status
 %{_sbindir}/apxs -e -a -n status %{_libexecdir}/mod_status.so 1>&2
 if [ -f /etc/httpd/httpd.conf ] && ! grep -q "^Include.*mod_status.conf" /etc/httpd/httpd.conf; then
-	echo "Include mod_status.conf" >> /etc/httpd/httpd.conf
+	echo "Include /etc/httpd/mod_status.conf" >> /etc/httpd/httpd.conf
 fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
@@ -799,7 +799,7 @@ fi
 %post mod_vhost_alias
 %{_sbindir}/apxs -e -a -n vhost_alias %{_libexecdir}/mod_vhost_alias.so 1>&2
 if [ -f /etc/httpd/httpd.conf ] && ! grep -q "^Include.*mod_vhost_alias.conf" /etc/httpd/httpd.conf; then
-	echo "Include mod_vhost_alias.conf" >> /etc/httpd/httpd.conf
+	echo "Include /etc/httpd/mod_vhost_alias.conf" >> /etc/httpd/httpd.conf
 fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
