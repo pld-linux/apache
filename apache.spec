@@ -1333,9 +1333,9 @@ fi
 %{_mandir}/man8/logresolve.8*
 %{_mandir}/man8/rotatelogs.8*
 
-%attr(750,root,root) %dir /var/log/httpd
-%attr(750,root,root) %dir /var/log/archiv/httpd
-%attr(640,root,root) %ghost /var/log/httpd/*
+%attr(750,root,logs) %dir /var/log/httpd
+%attr(750,root,logs) %dir /var/log/archiv/httpd
+%attr(640,root,logs) %ghost /var/log/httpd/*
 
 %dir %{_datadir}
 
