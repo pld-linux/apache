@@ -32,7 +32,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.0.50
-Release:	2
+Release:	2.1
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -61,7 +61,7 @@ Patch3:		%{name}-nolibs.patch
 Patch4:		%{name}-apr.patch
 # project homepage http://www.metux.de/mpm/en/?patpage=index
 # http://www.sannes.org/metuxmpm/
-Patch5:		httpd-2.0.47-metuxmpm-r7.diff
+Patch5:		httpd-2.0.48-metuxmpm-r8.patch
 Patch6:		httpd-2.0.40-xfsz.patch
 Patch7:		httpd-2.0.45-davetag.patch
 Patch8:		httpd-2.0.45-encode.patch
