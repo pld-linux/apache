@@ -1,6 +1,6 @@
-diff -Nur apache_1.3.22.orig/README.v6 apache_1.3.22/README.v6
---- apache_1.3.22.orig/README.v6	Thu Jan  1 01:00:00 1970
-+++ apache_1.3.22/README.v6	Tue Dec 18 23:14:29 2001
+diff -Nur apache_1.3.23.orig/README.v6 apache_1.3.23/README.v6
+--- apache_1.3.23.orig/README.v6	Thu Jan  1 01:00:00 1970
++++ apache_1.3.23/README.v6	Wed Feb  6 20:20:48 2002
 @@ -0,0 +1,166 @@
 +IPv6-ready apache 1.3.x
 +KAME Project
@@ -163,14 +163,14 @@ diff -Nur apache_1.3.22.orig/README.v6 apache_1.3.22/README.v6
 +Linux Port
 +	Arkadiusz Miskiewicz, Polish Linux Distribution project (IPv6)
 +	 http://www.pld.org.pl/
-+	 mailto:pld-list@pld.org.pl
++	 mailto:feedback@pld.org.pl
 +	Satoshi SHIDA, Linux IPv6 Users Group JP
 +	 http://www.v6.linux.or.jp/
 +	YOSHIFUJI Hideaki, USAGI Project
 +	 http://www.linux-ipv6.org/
-diff -Nur apache_1.3.22.orig/conf/httpd.conf-dist apache_1.3.22/conf/httpd.conf-dist
---- apache_1.3.22.orig/conf/httpd.conf-dist	Sat Oct  6 05:40:04 2001
-+++ apache_1.3.22/conf/httpd.conf-dist	Tue Dec 18 23:14:29 2001
+diff -Nur apache_1.3.23.orig/conf/httpd.conf-dist apache_1.3.23/conf/httpd.conf-dist
+--- apache_1.3.23.orig/conf/httpd.conf-dist	Wed Jan  9 17:05:31 2002
++++ apache_1.3.23/conf/httpd.conf-dist	Wed Feb  6 20:20:48 2002
 @@ -174,6 +174,11 @@
  #Listen 3000
  #Listen 12.34.56.78:80
@@ -183,16 +183,16 @@ diff -Nur apache_1.3.22.orig/conf/httpd.conf-dist apache_1.3.22/conf/httpd.conf-
  #
  # BindAddress: You can support virtual hosts with this option. This directive
  # is used to tell the server which IP address to listen to. It can either
-diff -Nur apache_1.3.22.orig/configure.v6 apache_1.3.22/configure.v6
---- apache_1.3.22.orig/configure.v6	Thu Jan  1 01:00:00 1970
-+++ apache_1.3.22/configure.v6	Tue Dec 18 23:14:29 2001
+diff -Nur apache_1.3.23.orig/configure.v6 apache_1.3.23/configure.v6
+--- apache_1.3.23.orig/configure.v6	Thu Jan  1 01:00:00 1970
++++ apache_1.3.23/configure.v6	Wed Feb  6 20:20:48 2002
 @@ -0,0 +1,3 @@
 +#! /bin/sh
 +
 +./configure --enable-rule=INET6 --enable-module=proxy $*
-diff -Nur apache_1.3.22.orig/src/Configuration.tmpl apache_1.3.22/src/Configuration.tmpl
---- apache_1.3.22.orig/src/Configuration.tmpl	Tue Dec 18 23:14:14 2001
-+++ apache_1.3.22/src/Configuration.tmpl	Tue Dec 18 23:14:29 2001
+diff -Nur apache_1.3.23.orig/src/Configuration.tmpl apache_1.3.23/src/Configuration.tmpl
+--- apache_1.3.23.orig/src/Configuration.tmpl	Wed Feb  6 20:17:43 2002
++++ apache_1.3.23/src/Configuration.tmpl	Wed Feb  6 20:21:56 2002
 @@ -191,6 +191,9 @@
  #  Rule EXPAT=default   : If Expat can be found at the system or
  #                         in lib/expat-lite, use it; otherwise
@@ -200,29 +200,29 @@ diff -Nur apache_1.3.22.orig/src/Configuration.tmpl apache_1.3.22/src/Configurat
 +# INET6:
 +#  IPv6 support.
 +#
- 
- Rule SOCKS4=no
- Rule SOCKS5=no
-@@ -198,6 +201,7 @@
+ # 
+ # CYGWIN_WINSOCK: 
+ #  Use Win32 API system calls for socket communication instead 
+@@ -205,6 +208,7 @@
  Rule IRIXN32=yes
  Rule PARANOID=no
  Rule EXPAT=default
 +Rule INET6=no
+ Rule CYGWIN_WINSOCK=no 
  
  # DEV_RANDOM:
- #  Note: this rule is only used when compiling mod_auth_digest.
-diff -Nur apache_1.3.22.orig/src/Configure apache_1.3.22/src/Configure
---- apache_1.3.22.orig/src/Configure	Tue Dec 18 23:14:13 2001
-+++ apache_1.3.22/src/Configure	Tue Dec 18 23:14:29 2001
-@@ -237,6 +237,7 @@
- RULE_EXPAT=`./helpers/CutRule EXPAT $file`
+diff -Nur apache_1.3.23.orig/src/Configure apache_1.3.23/src/Configure
+--- apache_1.3.23.orig/src/Configure	Wed Feb  6 20:17:43 2002
++++ apache_1.3.23/src/Configure	Wed Feb  6 20:20:48 2002
+@@ -238,6 +238,7 @@
+ RULE_CYGWIN_WINSOCK=`./helpers/CutRule CYGWIN_WINSOCK $file` 
  RULE_SHARED_CORE=`./helpers/CutRule SHARED_CORE $file`
  RULE_SHARED_CHAIN=`./helpers/CutRule SHARED_CHAIN $file`
 +RULE_INET6=`./helpers/CutRule INET6 $file`
  
  ####################################################################
  ## Rule SHARED_CORE implies required DSO support
-@@ -1692,6 +1693,124 @@
+@@ -1698,6 +1699,124 @@
      esac
  fi
  
@@ -347,7 +347,7 @@ diff -Nur apache_1.3.22.orig/src/Configure apache_1.3.22/src/Configure
  ####################################################################
  ## Find out what modules we want and try and configure things for them
  ## Module lines can look like this:
-@@ -2287,6 +2406,38 @@
+@@ -2293,6 +2412,38 @@
  echo "#define AP_LONGEST_LONG $AP_LONGEST_LONG" >>$AP_CONFIG_AUTO_H
  echo "#endif" >>$AP_CONFIG_AUTO_H
  
@@ -386,9 +386,9 @@ diff -Nur apache_1.3.22.orig/src/Configure apache_1.3.22/src/Configure
  ####################################################################
  ## More building ap_config_auto.h
  ##
-diff -Nur apache_1.3.22.orig/src/ap/ap_snprintf.c apache_1.3.22/src/ap/ap_snprintf.c
---- apache_1.3.22.orig/src/ap/ap_snprintf.c	Thu May 10 16:04:22 2001
-+++ apache_1.3.22/src/ap/ap_snprintf.c	Tue Dec 18 23:14:29 2001
+diff -Nur apache_1.3.23.orig/src/ap/ap_snprintf.c apache_1.3.23/src/ap/ap_snprintf.c
+--- apache_1.3.23.orig/src/ap/ap_snprintf.c	Mon Jan 21 22:56:43 2002
++++ apache_1.3.23/src/ap/ap_snprintf.c	Wed Feb  6 20:20:48 2002
 @@ -73,6 +73,7 @@
  #include <string.h>
  #include <stdlib.h>
@@ -465,1269 +465,9 @@ diff -Nur apache_1.3.22.orig/src/ap/ap_snprintf.c apache_1.3.22/src/ap/ap_snprin
  			else {
  			    s = S_NULL;
  			    s_len = S_NULL_LEN;
-diff -Nur apache_1.3.22.orig/src/ap/ap_snprintf.c~ apache_1.3.22/src/ap/ap_snprintf.c~
---- apache_1.3.22.orig/src/ap/ap_snprintf.c~	Thu Jan  1 01:00:00 1970
-+++ apache_1.3.22/src/ap/ap_snprintf.c~	Tue Dec 18 23:14:29 2001
-@@ -0,0 +1,1256 @@
-+/* ====================================================================
-+ * The Apache Software License, Version 1.1
-+ *
-+ * Copyright (c) 2000 The Apache Software Foundation.  All rights
-+ * reserved.
-+ *
-+ * Redistribution and use in source and binary forms, with or without
-+ * modification, are permitted provided that the following conditions
-+ * are met:
-+ *
-+ * 1. Redistributions of source code must retain the above copyright
-+ *    notice, this list of conditions and the following disclaimer.
-+ *
-+ * 2. Redistributions in binary form must reproduce the above copyright
-+ *    notice, this list of conditions and the following disclaimer in
-+ *    the documentation and/or other materials provided with the
-+ *    distribution.
-+ *
-+ * 3. The end-user documentation included with the redistribution,
-+ *    if any, must include the following acknowledgment:
-+ *       "This product includes software developed by the
-+ *        Apache Software Foundation (http://www.apache.org/)."
-+ *    Alternately, this acknowledgment may appear in the software itself,
-+ *    if and wherever such third-party acknowledgments normally appear.
-+ *
-+ * 4. The names "Apache" and "Apache Software Foundation" must
-+ *    not be used to endorse or promote products derived from this
-+ *    software without prior written permission. For written
-+ *    permission, please contact apache@apache.org.
-+ *
-+ * 5. Products derived from this software may not be called "Apache",
-+ *    nor may "Apache" appear in their name, without prior written
-+ *    permission of the Apache Software Foundation.
-+ *
-+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
-+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-+ * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
-+ * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
-+ * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
-+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-+ * SUCH DAMAGE.
-+ * ====================================================================
-+ *
-+ * This software consists of voluntary contributions made by many
-+ * individuals on behalf of the Apache Software Foundation.  For more
-+ * information on the Apache Software Foundation, please see
-+ * <http://www.apache.org/>.
-+ *
-+ * Portions of this software are based upon public domain software
-+ * originally written at the National Center for Supercomputing Applications,
-+ * University of Illinois, Urbana-Champaign.
-+ */
-+
-+/*
-+ * This code is based on, and used with the permission of, the
-+ * SIO stdio-replacement strx_* functions by Panos Tsirigotis
-+ * <panos@alumni.cs.colorado.edu> for xinetd.
-+ */
-+
-+#include "httpd.h"
-+
-+#include <stdio.h>
-+#include <ctype.h>
-+#ifndef NETWARE
-+#include <sys/types.h>
-+#endif
-+#include <stdarg.h>
-+#include <string.h>
-+#include <stdlib.h>
-+#include <math.h>
-+#ifdef WIN32
-+#include <float.h>
-+#endif
-+
-+typedef enum {
-+    NO = 0, YES = 1
-+} boolean_e;
-+
-+#ifndef FALSE
-+#define FALSE			0
-+#endif
-+#ifndef TRUE
-+#define TRUE			1
-+#endif
-+#ifndef AP_LONGEST_LONG
-+#define AP_LONGEST_LONG		long
-+#endif
-+#define NUL			'\0'
-+#define WIDE_INT		long
-+#define WIDEST_INT		AP_LONGEST_LONG
-+
-+typedef WIDE_INT wide_int;
-+typedef unsigned WIDE_INT u_wide_int;
-+typedef WIDEST_INT widest_int;
-+#ifdef __TANDEM
-+/* Although Tandem supports "long long" there is no unsigned variant. */
-+typedef unsigned long       u_widest_int;
-+#else
-+typedef unsigned WIDEST_INT u_widest_int;
-+#endif
-+typedef int bool_int;
-+
-+#define S_NULL			"(null)"
-+#define S_NULL_LEN		6
-+
-+#define FLOAT_DIGITS		6
-+#define EXPONENT_LENGTH		10
-+
-+/*
-+ * NUM_BUF_SIZE is the size of the buffer used for arithmetic conversions
-+ *
-+ * XXX: this is a magic number; do not decrease it
-+ */
-+#define NUM_BUF_SIZE		512
-+
-+/*
-+ * cvt.c - IEEE floating point formatting routines for FreeBSD
-+ * from GNU libc-4.6.27.  Modified to be thread safe.
-+ */
-+
-+/*
-+ *    ap_ecvt converts to decimal
-+ *      the number of digits is specified by ndigit
-+ *      decpt is set to the position of the decimal point
-+ *      sign is set to 0 for positive, 1 for negative
-+ */
-+
-+#define	NDIG	80
-+
-+/* buf must have at least NDIG bytes */
-+static char *ap_cvt(double arg, int ndigits, int *decpt, int *sign, int eflag, char *buf)
-+{
-+    register int r2;
-+    double fi, fj;
-+    register char *p, *p1;
-+    
-+    if (ndigits >= NDIG - 1)
-+	ndigits = NDIG - 2;
-+    r2 = 0;
-+    *sign = 0;
-+    p = &buf[0];
-+    if (arg < 0) {
-+	*sign = 1;
-+	arg = -arg;
-+    }
-+    arg = modf(arg, &fi);
-+    p1 = &buf[NDIG];
-+    /*
-+     * Do integer part
-+     */
-+    if (fi != 0) {
-+	p1 = &buf[NDIG];
-+	while (p1 > &buf[0] && fi != 0) {
-+	    fj = modf(fi / 10, &fi);
-+	    *--p1 = (int) ((fj + .03) * 10) + '0';
-+	    r2++;
-+	}
-+	while (p1 < &buf[NDIG])
-+	    *p++ = *p1++;
-+    }
-+    else if (arg > 0) {
-+	while ((fj = arg * 10) < 1) {
-+	    arg = fj;
-+	    r2--;
-+	}
-+    }
-+    p1 = &buf[ndigits];
-+    if (eflag == 0)
-+	p1 += r2;
-+    *decpt = r2;
-+    if (p1 < &buf[0]) {
-+	buf[0] = '\0';
-+	return (buf);
-+    }
-+    while (p <= p1 && p < &buf[NDIG]) {
-+	arg *= 10;
-+	arg = modf(arg, &fj);
-+	*p++ = (int) fj + '0';
-+    }
-+    if (p1 >= &buf[NDIG]) {
-+	buf[NDIG - 1] = '\0';
-+	return (buf);
-+    }
-+    p = p1;
-+    *p1 += 5;
-+    while (*p1 > '9') {
-+	*p1 = '0';
-+	if (p1 > buf)
-+	    ++ * --p1;
-+	else {
-+	    *p1 = '1';
-+	    (*decpt)++;
-+	    if (eflag == 0) {
-+		if (p > buf)
-+		    *p = '0';
-+		p++;
-+	    }
-+	}
-+    }
-+    *p = '\0';
-+    return (buf);
-+}
-+
-+static char *ap_ecvt(double arg, int ndigits, int *decpt, int *sign, char *buf)
-+{
-+    return (ap_cvt(arg, ndigits, decpt, sign, 1, buf));
-+}
-+
-+static char *ap_fcvt(double arg, int ndigits, int *decpt, int *sign, char *buf)
-+{
-+    return (ap_cvt(arg, ndigits, decpt, sign, 0, buf));
-+}
-+
-+/*
-+ * ap_gcvt  - Floating output conversion to
-+ * minimal length string
-+ */
-+
-+static char *ap_gcvt(double number, int ndigit, char *buf, boolean_e altform)
-+{
-+    int sign, decpt;
-+    register char *p1, *p2;
-+    register int i;
-+    char buf1[NDIG];
-+
-+    p1 = ap_ecvt(number, ndigit, &decpt, &sign, buf1);
-+    p2 = buf;
-+    if (sign)
-+	*p2++ = '-';
-+    for (i = ndigit - 1; i > 0 && p1[i] == '0'; i--)
-+	ndigit--;
-+    if ((decpt >= 0 && decpt - ndigit > 4)
-+	|| (decpt < 0 && decpt < -3)) {		/* use E-style */
-+	decpt--;
-+	*p2++ = *p1++;
-+	*p2++ = '.';
-+	for (i = 1; i < ndigit; i++)
-+	    *p2++ = *p1++;
-+	*p2++ = 'e';
-+	if (decpt < 0) {
-+	    decpt = -decpt;
-+	    *p2++ = '-';
-+	}
-+	else
-+	    *p2++ = '+';
-+	if (decpt / 100 > 0)
-+	    *p2++ = decpt / 100 + '0';
-+	if (decpt / 10 > 0)
-+	    *p2++ = (decpt % 100) / 10 + '0';
-+	*p2++ = decpt % 10 + '0';
-+    }
-+    else {
-+	if (decpt <= 0) {
-+	    if (*p1 != '0')
-+		*p2++ = '.';
-+	    while (decpt < 0) {
-+		decpt++;
-+		*p2++ = '0';
-+	    }
-+	}
-+	for (i = 1; i <= ndigit; i++) {
-+	    *p2++ = *p1++;
-+	    if (i == decpt)
-+		*p2++ = '.';
-+	}
-+	if (ndigit < decpt) {
-+	    while (ndigit++ < decpt)
-+		*p2++ = '0';
-+	    *p2++ = '.';
-+	}
-+    }
-+    if (p2[-1] == '.' && !altform)
-+	p2--;
-+    *p2 = '\0';
-+    return (buf);
-+}
-+
-+/*
-+ * The INS_CHAR macro inserts a character in the buffer and writes
-+ * the buffer back to disk if necessary
-+ * It uses the char pointers sp and bep:
-+ *      sp points to the next available character in the buffer
-+ *      bep points to the end-of-buffer+1
-+ * While using this macro, note that the nextb pointer is NOT updated.
-+ *
-+ * NOTE: Evaluation of the c argument should not have any side-effects
-+ */
-+#define INS_CHAR(c, sp, bep, cc)				\
-+	    {							\
-+		if (sp >= bep) {				\
-+		    vbuff->curpos = sp;                         \
-+		    if (flush_func(vbuff))			\
-+			return -1;				\
-+		    sp = vbuff->curpos;				\
-+		    bep = vbuff->endpos;			\
-+		} 						\
-+		*sp++ = (c);					\
-+		cc++; 						\
-+	    }
-+
-+#define NUM( c )			( c - '0' )
-+
-+#define STR_TO_DEC( str, num )		\
-+    num = NUM( *str++ ) ;		\
-+    while ( ap_isdigit( *str ) )		\
-+    {					\
-+	num *= 10 ;			\
-+	num += NUM( *str++ ) ;		\
-+    }
-+
-+/*
-+ * This macro does zero padding so that the precision
-+ * requirement is satisfied. The padding is done by
-+ * adding '0's to the left of the string that is going
-+ * to be printed.
-+ */
-+#define FIX_PRECISION( adjust, precision, s, s_len )	\
-+    if ( adjust )					\
-+	while ( s_len < precision )			\
-+	{						\
-+	    *--s = '0' ;				\
-+	    s_len++ ;					\
-+	}
-+
-+/*
-+ * Macro that does padding. The padding is done by printing
-+ * the character ch.
-+ */
-+#define PAD( width, len, ch )	do		\
-+	{					\
-+	    INS_CHAR( ch, sp, bep, cc ) ;	\
-+	    width-- ;				\
-+	}					\
-+	while ( width > len )
-+
-+/*
-+ * Prefix the character ch to the string str
-+ * Increase length
-+ * Set the has_prefix flag
-+ */
-+#define PREFIX( str, length, ch )	 *--str = ch ; length++ ; has_prefix = YES
-+
-+
-+/*
-+ * Convert num to its decimal format.
-+ * Return value:
-+ *   - a pointer to a string containing the number (no sign)
-+ *   - len contains the length of the string
-+ *   - is_negative is set to TRUE or FALSE depending on the sign
-+ *     of the number (always set to FALSE if is_unsigned is TRUE)
-+ *
-+ * The caller provides a buffer for the string: that is the buf_end argument
-+ * which is a pointer to the END of the buffer + 1 (i.e. if the buffer
-+ * is declared as buf[ 100 ], buf_end should be &buf[ 100 ])
-+ *
-+ * Note: we have 2 versions. One is used when we need to use quads
-+ * (conv_10_quad), the other when we don't (conv_10). We're assuming the
-+ * latter is faster.
-+ */
-+static char *conv_10(register wide_int num, register bool_int is_unsigned,
-+		     register bool_int *is_negative, char *buf_end,
-+		     register int *len)
-+{
-+    register char *p = buf_end;
-+    register u_wide_int magnitude;
-+
-+    if (is_unsigned) {
-+	magnitude = (u_wide_int) num;
-+	*is_negative = FALSE;
-+    }
-+    else {
-+	*is_negative = (num < 0);
-+
-+	/*
-+	 * On a 2's complement machine, negating the most negative integer 
-+	 * results in a number that cannot be represented as a signed integer.
-+	 * Here is what we do to obtain the number's magnitude:
-+	 *      a. add 1 to the number
-+	 *      b. negate it (becomes positive)
-+	 *      c. convert it to unsigned
-+	 *      d. add 1
-+	 */
-+	if (*is_negative) {
-+	    wide_int t = num + 1;
-+
-+	    magnitude = ((u_wide_int) -t) + 1;
-+	}
-+	else
-+	    magnitude = (u_wide_int) num;
-+    }
-+
-+    /*
-+     * We use a do-while loop so that we write at least 1 digit 
-+     */
-+    do {
-+	register u_wide_int new_magnitude = magnitude / 10;
-+
-+	*--p = (char) (magnitude - new_magnitude * 10 + '0');
-+	magnitude = new_magnitude;
-+    }
-+    while (magnitude);
-+
-+    *len = buf_end - p;
-+    return (p);
-+}
-+
-+static char *conv_10_quad(widest_int num, register bool_int is_unsigned,
-+		     register bool_int *is_negative, char *buf_end,
-+		     register int *len)
-+{
-+    register char *p = buf_end;
-+    u_widest_int magnitude;
-+
-+    /*
-+     * We see if we can use the faster non-quad version by checking the
-+     * number against the largest long value it can be. If <=, we
-+     * punt to the quicker version.
-+     */
-+    if ((num <= ULONG_MAX && is_unsigned) || (num <= LONG_MAX && !is_unsigned))
-+    	return(conv_10( (wide_int)num, is_unsigned, is_negative,
-+	       buf_end, len));
-+
-+    if (is_unsigned) {
-+	magnitude = (u_widest_int) num;
-+	*is_negative = FALSE;
-+    }
-+    else {
-+	*is_negative = (num < 0);
-+
-+	/*
-+	 * On a 2's complement machine, negating the most negative integer 
-+	 * results in a number that cannot be represented as a signed integer.
-+	 * Here is what we do to obtain the number's magnitude:
-+	 *      a. add 1 to the number
-+	 *      b. negate it (becomes positive)
-+	 *      c. convert it to unsigned
-+	 *      d. add 1
-+	 */
-+	if (*is_negative) {
-+	    widest_int t = num + 1;
-+
-+	    magnitude = ((u_widest_int) -t) + 1;
-+	}
-+	else
-+	    magnitude = (u_widest_int) num;
-+    }
-+
-+    /*
-+     * We use a do-while loop so that we write at least 1 digit 
-+     */
-+    do {
-+	u_widest_int new_magnitude = magnitude / 10;
-+
-+	*--p = (char) (magnitude - new_magnitude * 10 + '0');
-+	magnitude = new_magnitude;
-+    }
-+    while (magnitude);
-+
-+    *len = buf_end - p;
-+    return (p);
-+}
-+
-+
-+
-+static char *conv_in_addr(struct in_addr *ia, char *buf_end, int *len)
-+{
-+    unsigned addr = ntohl(ia->s_addr);
-+    char *p = buf_end;
-+    bool_int is_negative;
-+    int sub_len;
-+
-+    p = conv_10((addr & 0x000000FF)      , TRUE, &is_negative, p, &sub_len);
-+    *--p = '.';
-+    p = conv_10((addr & 0x0000FF00) >>  8, TRUE, &is_negative, p, &sub_len);
-+    *--p = '.';
-+    p = conv_10((addr & 0x00FF0000) >> 16, TRUE, &is_negative, p, &sub_len);
-+    *--p = '.';
-+    p = conv_10((addr & 0xFF000000) >> 24, TRUE, &is_negative, p, &sub_len);
-+
-+    *len = buf_end - p;
-+    return (p);
-+}
-+
-+
-+
-+static char *conv_sockaddr_in(struct sockaddr_in *si, char *buf_end, int *len)
-+{
-+    char *p = buf_end;
-+    bool_int is_negative;
-+    int sub_len;
-+
-+    p = conv_10(ntohs(si->sin_port), TRUE, &is_negative, p, &sub_len);
-+    *--p = ':';
-+    p = conv_in_addr(&si->sin_addr, p, &sub_len);
-+
-+    *len = buf_end - p;
-+    return (p);
-+}
-+
-+
-+
-+#ifdef INET6
-+static char *conv_sockaddr(struct sockaddr *sa, char *buf_end, int *len)
-+{
-+    char *p = buf_end;
-+    char hostnamebuf[MAXHOSTNAMELEN];
-+    char portnamebuf[MAXHOSTNAMELEN];
-+    char *q;
-+    int salen;
-+
-+#ifndef SIN6_LEN
-+    salen = SA_LEN(sa);
-+#else
-+    salen = sa->sa_len;
-+#endif
-+    if (getnameinfo(sa, salen, hostnamebuf, sizeof(hostnamebuf),
-+	    portnamebuf, sizeof(portnamebuf), NI_NUMERICHOST | NI_NUMERICSERV)) {
-+	strcpy(hostnamebuf, "???");
-+	strcpy(portnamebuf, "???");
-+    }
-+    if (strcmp(portnamebuf,"0") == 0)
-+	strcpy(portnamebuf, "*");
-+    q = portnamebuf + strlen(portnamebuf);
-+    while (portnamebuf < q)
-+	*--p = *--q;
-+    *--p = ':';
-+    q = hostnamebuf + strlen(hostnamebuf);
-+    while (hostnamebuf < q)
-+	*--p = *--q;
-+
-+    *len = buf_end - p;
-+    return (p);
-+}
-+#endif /*INET6*/
-+
-+
-+
-+/*
-+ * Convert a floating point number to a string formats 'f', 'e' or 'E'.
-+ * The result is placed in buf, and len denotes the length of the string
-+ * The sign is returned in the is_negative argument (and is not placed
-+ * in buf).
-+ */
-+static char *conv_fp(register char format, register double num,
-+    boolean_e add_dp, int precision, bool_int *is_negative,
-+    char *buf, int *len)
-+{
-+    register char *s = buf;
-+    register char *p;
-+    int decimal_point;
-+    char buf1[NDIG];
-+
-+    if (format == 'f')
-+	p = ap_fcvt(num, precision, &decimal_point, is_negative, buf1);
-+    else			/* either e or E format */
-+	p = ap_ecvt(num, precision + 1, &decimal_point, is_negative, buf1);
-+
-+    /*
-+     * Check for Infinity and NaN
-+     */
-+    if (ap_isalpha(*p)) {
-+	*len = strlen(strcpy(buf, p));
-+	*is_negative = FALSE;
-+	return (buf);
-+    }
-+
-+    if (format == 'f') {
-+	if (decimal_point <= 0) {
-+	    *s++ = '0';
-+	    if (precision > 0) {
-+		*s++ = '.';
-+		while (decimal_point++ < 0)
-+		    *s++ = '0';
-+	    }
-+	    else if (add_dp)
-+		*s++ = '.';
-+	}
-+	else {
-+	    while (decimal_point-- > 0)
-+		*s++ = *p++;
-+	    if (precision > 0 || add_dp)
-+		*s++ = '.';
-+	}
-+    }
-+    else {
-+	*s++ = *p++;
-+	if (precision > 0 || add_dp)
-+	    *s++ = '.';
-+    }
-+
-+    /*
-+     * copy the rest of p, the NUL is NOT copied
-+     */
-+    while (*p)
-+	*s++ = *p++;
-+
-+    if (format != 'f') {
-+	char temp[EXPONENT_LENGTH];	/* for exponent conversion */
-+	int t_len;
-+	bool_int exponent_is_negative;
-+
-+	*s++ = format;		/* either e or E */
-+	decimal_point--;
-+	if (decimal_point != 0) {
-+	    p = conv_10((wide_int) decimal_point, FALSE, &exponent_is_negative,
-+			&temp[EXPONENT_LENGTH], &t_len);
-+	    *s++ = exponent_is_negative ? '-' : '+';
-+
-+	    /*
-+	     * Make sure the exponent has at least 2 digits
-+	     */
-+	    if (t_len == 1)
-+		*s++ = '0';
-+	    while (t_len--)
-+		*s++ = *p++;
-+	}
-+	else {
-+	    *s++ = '+';
-+	    *s++ = '0';
-+	    *s++ = '0';
-+	}
-+    }
-+
-+    *len = s - buf;
-+    return (buf);
-+}
-+
-+
-+/*
-+ * Convert num to a base X number where X is a power of 2. nbits determines X.
-+ * For example, if nbits is 3, we do base 8 conversion
-+ * Return value:
-+ *      a pointer to a string containing the number
-+ *
-+ * The caller provides a buffer for the string: that is the buf_end argument
-+ * which is a pointer to the END of the buffer + 1 (i.e. if the buffer
-+ * is declared as buf[ 100 ], buf_end should be &buf[ 100 ])
-+ *
-+ * As with conv_10, we have a faster version which is used when
-+ * the number isn't quad size.
-+ */
-+static char *conv_p2(register u_wide_int num, register int nbits,
-+		     char format, char *buf_end, register int *len)
-+{
-+    register int mask = (1 << nbits) - 1;
-+    register char *p = buf_end;
-+    static const char low_digits[] = "0123456789abcdef";
-+    static const char upper_digits[] = "0123456789ABCDEF";
-+    register const char *digits = (format == 'X') ? upper_digits : low_digits;
-+
-+    do {
-+	*--p = digits[num & mask];
-+	num >>= nbits;
-+    }
-+    while (num);
-+
-+    *len = buf_end - p;
-+    return (p);
-+}
-+
-+static char *conv_p2_quad(u_widest_int num, register int nbits,
-+		     char format, char *buf_end, register int *len)
-+{
-+    register int mask = (1 << nbits) - 1;
-+    register char *p = buf_end;
-+    static const char low_digits[] = "0123456789abcdef";
-+    static const char upper_digits[] = "0123456789ABCDEF";
-+    register const char *digits = (format == 'X') ? upper_digits : low_digits;
-+
-+    if (num <= ULONG_MAX)
-+    	return(conv_p2( (u_wide_int)num, nbits, format, buf_end, len));
-+
-+    do {
-+	*--p = digits[num & mask];
-+	num >>= nbits;
-+    }
-+    while (num);
-+
-+    *len = buf_end - p;
-+    return (p);
-+}
-+
-+
-+/*
-+ * Do format conversion placing the output in buffer
-+ */
-+API_EXPORT(int) ap_vformatter(int (*flush_func)(ap_vformatter_buff *),
-+    ap_vformatter_buff *vbuff, const char *fmt, va_list ap)
-+{
-+    register char *sp;
-+    register char *bep;
-+    register int cc = 0;
-+    register int i;
-+
-+    register char *s = NULL;
-+    char *q;
-+    int s_len;
-+
-+    register int min_width = 0;
-+    int precision = 0;
-+    enum {
-+	LEFT, RIGHT
-+    } adjust;
-+    char pad_char;
-+    char prefix_char;
-+
-+    double fp_num;
-+    widest_int i_quad = (widest_int) 0;
-+    u_widest_int ui_quad;
-+    wide_int i_num = (wide_int) 0;
-+    u_wide_int ui_num;
-+
-+    char num_buf[NUM_BUF_SIZE];
-+    char char_buf[2];		/* for printing %% and %<unknown> */
-+
-+    enum var_type_enum {
-+    	IS_QUAD, IS_LONG, IS_SHORT, IS_INT
-+    };
-+    enum var_type_enum var_type = IS_INT;
-+
-+    /*
-+     * Flag variables
-+     */
-+    boolean_e alternate_form;
-+    boolean_e print_sign;
-+    boolean_e print_blank;
-+    boolean_e adjust_precision;
-+    boolean_e adjust_width;
-+    bool_int is_negative;
-+
-+    sp = vbuff->curpos;
-+    bep = vbuff->endpos;
-+
-+    while (*fmt) {
-+	if (*fmt != '%') {
-+	    INS_CHAR(*fmt, sp, bep, cc);
-+	}
-+	else {
-+	    /*
-+	     * Default variable settings
-+	     */
-+	    adjust = RIGHT;
-+	    alternate_form = print_sign = print_blank = NO;
-+	    pad_char = ' ';
-+	    prefix_char = NUL;
-+
-+	    fmt++;
-+
-+	    /*
-+	     * Try to avoid checking for flags, width or precision
-+	     */
-+	    if (!ap_islower(*fmt)) {
-+		/*
-+		 * Recognize flags: -, #, BLANK, +
-+		 */
-+		for (;; fmt++) {
-+		    if (*fmt == '-')
-+			adjust = LEFT;
-+		    else if (*fmt == '+')
-+			print_sign = YES;
-+		    else if (*fmt == '#')
-+			alternate_form = YES;
-+		    else if (*fmt == ' ')
-+			print_blank = YES;
-+		    else if (*fmt == '0')
-+			pad_char = '0';
-+		    else
-+			break;
-+		}
-+
-+		/*
-+		 * Check if a width was specified
-+		 */
-+		if (ap_isdigit(*fmt)) {
-+		    STR_TO_DEC(fmt, min_width);
-+		    adjust_width = YES;
-+		}
-+		else if (*fmt == '*') {
-+		    min_width = va_arg(ap, int);
-+		    fmt++;
-+		    adjust_width = YES;
-+		    if (min_width < 0) {
-+			adjust = LEFT;
-+			min_width = -min_width;
-+		    }
-+		}
-+		else
-+		    adjust_width = NO;
-+
-+		/*
-+		 * Check if a precision was specified
-+		 *
-+		 * XXX: an unreasonable amount of precision may be specified
-+		 * resulting in overflow of num_buf. Currently we
-+		 * ignore this possibility.
-+		 */
-+		if (*fmt == '.') {
-+		    adjust_precision = YES;
-+		    fmt++;
-+		    if (ap_isdigit(*fmt)) {
-+			STR_TO_DEC(fmt, precision);
-+		    }
-+		    else if (*fmt == '*') {
-+			precision = va_arg(ap, int);
-+			fmt++;
-+			if (precision < 0)
-+			    precision = 0;
-+		    }
-+		    else
-+			precision = 0;
-+		}
-+		else
-+		    adjust_precision = NO;
-+	    }
-+	    else
-+		adjust_precision = adjust_width = NO;
-+
-+	    /*
-+	     * Modifier check
-+	     */
-+	    if (*fmt == 'q') {
-+		var_type = IS_QUAD;
-+		fmt++;
-+	    }
-+	    else if (*fmt == 'l') {
-+		var_type = IS_LONG;
-+		fmt++;
-+	    }
-+	    else if (*fmt == 'h') {
-+		var_type = IS_SHORT;
-+		fmt++;
-+	    }
-+	    else {
-+		var_type = IS_INT;
-+	    }
-+
-+	    /*
-+	     * Argument extraction and printing.
-+	     * First we determine the argument type.
-+	     * Then, we convert the argument to a string.
-+	     * On exit from the switch, s points to the string that
-+	     * must be printed, s_len has the length of the string
-+	     * The precision requirements, if any, are reflected in s_len.
-+	     *
-+	     * NOTE: pad_char may be set to '0' because of the 0 flag.
-+	     *   It is reset to ' ' by non-numeric formats
-+	     */
-+	    switch (*fmt) {
-+	    case 'u':
-+	    	if (var_type == IS_QUAD) {
-+		    i_quad = va_arg(ap, u_widest_int);
-+		    s = conv_10_quad(i_quad, 1, &is_negative,
-+			    &num_buf[NUM_BUF_SIZE], &s_len);
-+		}
-+		else {
-+		    if (var_type == IS_LONG)
-+			i_num = (wide_int) va_arg(ap, u_wide_int);
-+		    else if (var_type == IS_SHORT)
-+			i_num = (wide_int) (unsigned short) va_arg(ap, unsigned int);
-+		    else
-+			i_num = (wide_int) va_arg(ap, unsigned int);
-+		    s = conv_10(i_num, 1, &is_negative,
-+			    &num_buf[NUM_BUF_SIZE], &s_len);
-+		}
-+		FIX_PRECISION(adjust_precision, precision, s, s_len);
-+		break;
-+
-+	    case 'd':
-+	    case 'i':
-+	    	if (var_type == IS_QUAD) {
-+		    i_quad = va_arg(ap, widest_int);
-+		    s = conv_10_quad(i_quad, 0, &is_negative,
-+			    &num_buf[NUM_BUF_SIZE], &s_len);
-+		}
-+		else {
-+		    if (var_type == IS_LONG)
-+			i_num = (wide_int) va_arg(ap, wide_int);
-+		    else if (var_type == IS_SHORT)
-+			i_num = (wide_int) (short) va_arg(ap, int);
-+		    else
-+			i_num = (wide_int) va_arg(ap, int);
-+		    s = conv_10(i_num, 0, &is_negative,
-+			    &num_buf[NUM_BUF_SIZE], &s_len);
-+		}
-+		FIX_PRECISION(adjust_precision, precision, s, s_len);
-+
-+		if (is_negative)
-+		    prefix_char = '-';
-+		else if (print_sign)
-+		    prefix_char = '+';
-+		else if (print_blank)
-+		    prefix_char = ' ';
-+		break;
-+
-+
-+	    case 'o':
-+		if (var_type == IS_QUAD) {
-+		    ui_quad = va_arg(ap, u_widest_int);
-+		    s = conv_p2_quad(ui_quad, 3, *fmt,
-+			    &num_buf[NUM_BUF_SIZE], &s_len);
-+		}
-+		else {
-+		    if (var_type == IS_LONG)
-+			ui_num = (u_wide_int) va_arg(ap, u_wide_int);
-+		    else if (var_type == IS_SHORT)
-+			ui_num = (u_wide_int) (unsigned short) va_arg(ap, unsigned int);
-+		    else
-+			ui_num = (u_wide_int) va_arg(ap, unsigned int);
-+		    s = conv_p2(ui_num, 3, *fmt,
-+			    &num_buf[NUM_BUF_SIZE], &s_len);
-+		}
-+		FIX_PRECISION(adjust_precision, precision, s, s_len);
-+		if (alternate_form && *s != '0') {
-+		    *--s = '0';
-+		    s_len++;
-+		}
-+		break;
-+
-+
-+	    case 'x':
-+	    case 'X':
-+		if (var_type == IS_QUAD) {
-+		    ui_quad = va_arg(ap, u_widest_int);
-+		    s = conv_p2_quad(ui_quad, 4, *fmt,
-+			    &num_buf[NUM_BUF_SIZE], &s_len);
-+		}
-+		else {
-+		    if (var_type == IS_LONG)
-+			ui_num = (u_wide_int) va_arg(ap, u_wide_int);
-+		    else if (var_type == IS_SHORT)
-+			ui_num = (u_wide_int) (unsigned short) va_arg(ap, unsigned int);
-+		    else
-+			ui_num = (u_wide_int) va_arg(ap, unsigned int);
-+		    s = conv_p2(ui_num, 4, *fmt,
-+			    &num_buf[NUM_BUF_SIZE], &s_len);
-+		}
-+		FIX_PRECISION(adjust_precision, precision, s, s_len);
-+		if (alternate_form && i_num != 0) {
-+		    *--s = *fmt;	/* 'x' or 'X' */
-+		    *--s = '0';
-+		    s_len += 2;
-+		}
-+		break;
-+
-+
-+	    case 's':
-+		s = va_arg(ap, char *);
-+		if (s != NULL) {
-+		    s_len = strlen(s);
-+		    if (adjust_precision && precision < s_len)
-+			s_len = precision;
-+		}
-+		else {
-+		    s = S_NULL;
-+		    s_len = S_NULL_LEN;
-+		}
-+		pad_char = ' ';
-+		break;
-+
-+
-+	    case 'f':
-+	    case 'e':
-+	    case 'E':
-+		fp_num = va_arg(ap, double);
-+		/*
-+		 * * We use &num_buf[ 1 ], so that we have room for the sign
-+		 */
-+#ifdef HAVE_ISNAN
-+		if (isnan(fp_num)) {
-+		    s = "nan";
-+		    s_len = 3;
-+		}
-+		else
-+#endif
-+#ifdef HAVE_ISINF
-+		if (isinf(fp_num)) {
-+		    s = "inf";
-+		    s_len = 3;
-+		}
-+		else
-+#endif
-+		{
-+		    s = conv_fp(*fmt, fp_num, alternate_form,
-+			    (adjust_precision == NO) ? FLOAT_DIGITS : precision,
-+				&is_negative, &num_buf[1], &s_len);
-+		    if (is_negative)
-+			prefix_char = '-';
-+		    else if (print_sign)
-+			prefix_char = '+';
-+		    else if (print_blank)
-+			prefix_char = ' ';
-+		}
-+	        break;
-+
-+
-+	    case 'g':
-+	    case 'G':
-+		if (adjust_precision == NO)
-+		    precision = FLOAT_DIGITS;
-+		else if (precision == 0)
-+		    precision = 1;
-+		/*
-+		 * * We use &num_buf[ 1 ], so that we have room for the sign
-+		 */
-+		s = ap_gcvt(va_arg(ap, double), precision, &num_buf[1],
-+		            alternate_form);
-+		if (*s == '-')
-+		    prefix_char = *s++;
-+		else if (print_sign)
-+		    prefix_char = '+';
-+		else if (print_blank)
-+		    prefix_char = ' ';
-+
-+		s_len = strlen(s);
-+
-+		if (alternate_form && (q = strchr(s, '.')) == NULL) {
-+		    s[s_len++] = '.';
-+		    s[s_len] = '\0'; /* delimit for following strchr() */
-+		}
-+		if (*fmt == 'G' && (q = strchr(s, 'e')) != NULL)
-+		    *q = 'E';
-+		break;
-+
-+
-+	    case 'c':
-+		char_buf[0] = (char) (va_arg(ap, int));
-+		s = &char_buf[0];
-+		s_len = 1;
-+		pad_char = ' ';
-+		break;
-+
-+
-+	    case '%':
-+		char_buf[0] = '%';
-+		s = &char_buf[0];
-+		s_len = 1;
-+		pad_char = ' ';
-+		break;
-+
-+
-+	    case 'n':
-+	    	if (var_type == IS_QUAD)
-+		    *(va_arg(ap, widest_int *)) = cc;
-+		else if (var_type == IS_LONG)
-+		    *(va_arg(ap, long *)) = cc;
-+		else if (var_type == IS_SHORT)
-+		    *(va_arg(ap, short *)) = cc;
-+		else
-+		    *(va_arg(ap, int *)) = cc;
-+		break;
-+
-+		/*
-+		 * This is where we extend the printf format, with a second
-+		 * type specifier
-+		 */
-+	    case 'p':
-+		switch(*++fmt) {
-+		    /*
-+		     * If the pointer size is equal to or smaller than the size
-+		     * of the largest unsigned int, we convert the pointer to a
-+		     * hex number, otherwise we print "%p" to indicate that we
-+		     * don't handle "%p".
-+		     */
-+		case 'p':
-+#ifdef AP_VOID_P_IS_QUAD
-+		    if (sizeof(void *) <= sizeof(u_widest_int)) {
-+		    	ui_quad = (u_widest_int) va_arg(ap, void *);
-+			s = conv_p2_quad(ui_quad, 4, 'x',
-+				&num_buf[NUM_BUF_SIZE], &s_len);
-+		    }
-+#else
-+		    if (sizeof(void *) <= sizeof(u_wide_int)) {
-+		    	ui_num = (u_wide_int) va_arg(ap, void *);
-+			s = conv_p2(ui_num, 4, 'x',
-+				&num_buf[NUM_BUF_SIZE], &s_len);
-+		    }
-+#endif
-+		    else {
-+			s = "%p";
-+			s_len = 2;
-+			prefix_char = NUL;
-+		    }
-+		    pad_char = ' ';
-+		    break;
-+
-+		    /* print a struct sockaddr_in as a.b.c.d:port */
-+		case 'I':
-+		    {
-+#ifndef INET6
-+			struct sockaddr_in *si;
-+
-+			si = va_arg(ap, struct sockaddr_in *);
-+			if (si != NULL) {
-+			    s = conv_sockaddr_in(si, &num_buf[NUM_BUF_SIZE], &s_len);
-+			    if (adjust_precision && precision < s_len)
-+				s_len = precision;
-+			}
-+#else
-+			struct sockaddr *sa;
-+
-+			sa = va_arg(ap, struct sockaddr *);
-+			if (sa != NULL) {
-+			    s = conv_sockaddr(sa, &num_buf[NUM_BUF_SIZE], &s_len);
-+			    if (adjust_precision && precision < s_len)
-+				s_len = precision;
-+			}
-+#endif
-+			else {
-+			    s = S_NULL;
-+			    s_len = S_NULL_LEN;
-+			}
-+			pad_char = ' ';
-+		    }
-+		    break;
-+
-+		    /* print a struct in_addr as a.b.c.d */
-+		case 'A':
-+		    {
-+			struct in_addr *ia;
-+
-+			ia = va_arg(ap, struct in_addr *);
-+			if (ia != NULL) {
-+			    s = conv_in_addr(ia, &num_buf[NUM_BUF_SIZE], &s_len);
-+			    if (adjust_precision && precision < s_len)
-+				s_len = precision;
-+			}
-+			else {
-+			    s = S_NULL;
-+			    s_len = S_NULL_LEN;
-+			}
-+			pad_char = ' ';
-+		    }
-+		    break;
-+
-+		case NUL:
-+		    /* if %p ends the string, oh well ignore it */
-+		    continue;
-+
-+		default:
-+		    s = "bogus %p";
-+		    s_len = 8;
-+		    prefix_char = NUL;
-+		    break;
-+		}
-+		break;
-+
-+	    case NUL:
-+		/*
-+		 * The last character of the format string was %.
-+		 * We ignore it.
-+		 */
-+		continue;
-+
-+
-+		/*
-+		 * The default case is for unrecognized %'s.
-+		 * We print %<char> to help the user identify what
-+		 * option is not understood.
-+		 * This is also useful in case the user wants to pass
-+		 * the output of format_converter to another function
-+		 * that understands some other %<char> (like syslog).
-+		 * Note that we can't point s inside fmt because the
-+		 * unknown <char> could be preceded by width etc.
-+		 */
-+	    default:
-+		char_buf[0] = '%';
-+		char_buf[1] = *fmt;
-+		s = char_buf;
-+		s_len = 2;
-+		pad_char = ' ';
-+		break;
-+	    }
-+
-+	    if (prefix_char != NUL && s != S_NULL && s != char_buf) {
-+		*--s = prefix_char;
-+		s_len++;
-+	    }
-+
-+	    if (adjust_width && adjust == RIGHT && min_width > s_len) {
-+		if (pad_char == '0' && prefix_char != NUL) {
-+		    INS_CHAR(*s, sp, bep, cc);
-+		    s++;
-+		    s_len--;
-+		    min_width--;
-+		}
-+		PAD(min_width, s_len, pad_char);
-+	    }
-+
-+	    /*
-+	     * Print the string s. 
-+	     */
-+	    for (i = s_len; i != 0; i--) {
-+		INS_CHAR(*s, sp, bep, cc);
-+		s++;
-+	    }
-+
-+	    if (adjust_width && adjust == LEFT && min_width > s_len)
-+		PAD(min_width, s_len, pad_char);
-+	}
-+	fmt++;
-+    }
-+    vbuff->curpos = sp;
-+    return cc;
-+}
-+
-+
-+static int snprintf_flush(ap_vformatter_buff *vbuff)
-+{
-+    /* if the buffer fills we have to abort immediately, there is no way
-+     * to "flush" an ap_snprintf... there's nowhere to flush it to.
-+     */
-+    return -1;
-+}
-+
-+
-+API_EXPORT(int) ap_snprintf(char *buf, size_t len, const char *format,...)
-+{
-+    int cc;
-+    va_list ap;
-+    ap_vformatter_buff vbuff;
-+
-+    if (len == 0)
-+	return 0;
-+
-+    /* save one byte for nul terminator */
-+    vbuff.curpos = buf;
-+    vbuff.endpos = buf + len - 1;
-+    va_start(ap, format);
-+    cc = ap_vformatter(snprintf_flush, &vbuff, format, ap);
-+    va_end(ap);
-+    *vbuff.curpos = '\0';
-+    return (cc == -1) ? len : cc;
-+}
-+
-+
-+API_EXPORT(int) ap_vsnprintf(char *buf, size_t len, const char *format,
-+			     va_list ap)
-+{
-+    int cc;
-+    ap_vformatter_buff vbuff;
-+
-+    if (len == 0)
-+	return 0;
-+
-+    /* save one byte for nul terminator */
-+    vbuff.curpos = buf;
-+    vbuff.endpos = buf + len - 1;
-+    cc = ap_vformatter(snprintf_flush, &vbuff, format, ap);
-+    *vbuff.curpos = '\0';
-+    return (cc == -1) ? len : cc;
-+}
-diff -Nur apache_1.3.22.orig/src/include/ap.h apache_1.3.22/src/include/ap.h
---- apache_1.3.22.orig/src/include/ap.h	Mon Jan 15 18:04:22 2001
-+++ apache_1.3.22/src/include/ap.h	Tue Dec 18 23:14:29 2001
+diff -Nur apache_1.3.23.orig/src/include/ap.h apache_1.3.23/src/include/ap.h
+--- apache_1.3.23.orig/src/include/ap.h	Mon Jan 21 22:56:43 2002
++++ apache_1.3.23/src/include/ap.h	Wed Feb  6 20:20:48 2002
 @@ -91,7 +91,8 @@
   * with some extensions.  The extensions are:
   *
@@ -1738,10 +478,10 @@ diff -Nur apache_1.3.22.orig/src/include/ap.h apache_1.3.22/src/include/ap.h
   * %pp  takes a void * and outputs it in hex
   *
   * The %p hacks are to force gcc's printf warning code to skip
-diff -Nur apache_1.3.22.orig/src/include/ap_config.h apache_1.3.22/src/include/ap_config.h
---- apache_1.3.22.orig/src/include/ap_config.h	Mon Oct  8 17:49:33 2001
-+++ apache_1.3.22/src/include/ap_config.h	Tue Dec 18 23:14:29 2001
-@@ -405,6 +405,10 @@
+diff -Nur apache_1.3.23.orig/src/include/ap_config.h apache_1.3.23/src/include/ap_config.h
+--- apache_1.3.23.orig/src/include/ap_config.h	Thu Jan 17 14:20:51 2002
++++ apache_1.3.23/src/include/ap_config.h	Wed Feb  6 20:20:48 2002
+@@ -407,6 +407,10 @@
  #endif
  #ifndef S_IWOTH
  #define S_IWOTH 000002
@@ -1752,7 +492,7 @@ diff -Nur apache_1.3.22.orig/src/include/ap_config.h apache_1.3.22/src/include/a
  #endif
  
  #define STDIN_FILENO  0
-@@ -1488,6 +1492,70 @@
+@@ -1507,6 +1511,70 @@
  #define ap_wait_t int
  #endif
  
@@ -1823,34 +563,34 @@ diff -Nur apache_1.3.22.orig/src/include/ap_config.h apache_1.3.22/src/include/a
  #ifdef __cplusplus
  }
  #endif
-diff -Nur apache_1.3.22.orig/src/include/http_conf_globals.h apache_1.3.22/src/include/http_conf_globals.h
---- apache_1.3.22.orig/src/include/http_conf_globals.h	Tue Dec 18 23:14:13 2001
-+++ apache_1.3.22/src/include/http_conf_globals.h	Tue Dec 18 23:14:29 2001
+diff -Nur apache_1.3.23.orig/src/include/http_conf_globals.h apache_1.3.23/src/include/http_conf_globals.h
+--- apache_1.3.23.orig/src/include/http_conf_globals.h	Wed Feb  6 20:17:43 2002
++++ apache_1.3.23/src/include/http_conf_globals.h	Wed Feb  6 20:23:09 2002
 @@ -82,7 +82,8 @@
  extern API_VAR_EXPORT int ap_max_requests_per_child;
  extern API_VAR_EXPORT int ap_threads_per_child;
  extern API_VAR_EXPORT int ap_excess_requests_per_child;
--extern struct in_addr ap_bind_address;
-+extern struct sockaddr_storage ap_bind_address;
+-extern API_VAR_EXPORT struct in_addr ap_bind_address;
++extern API_VAR_EXPORT struct sockaddr_storage ap_bind_address;
 +extern API_VAR_EXPORT int ap_default_family;
  extern listen_rec *ap_listeners;
  extern API_VAR_EXPORT int ap_daemons_to_start;
  extern API_VAR_EXPORT int ap_daemons_min_free;
-diff -Nur apache_1.3.22.orig/src/include/http_vhost.h apache_1.3.22/src/include/http_vhost.h
---- apache_1.3.22.orig/src/include/http_vhost.h	Mon Jan 15 18:04:37 2001
-+++ apache_1.3.22/src/include/http_vhost.h	Tue Dec 18 23:14:29 2001
+diff -Nur apache_1.3.23.orig/src/include/http_vhost.h apache_1.3.23/src/include/http_vhost.h
+--- apache_1.3.23.orig/src/include/http_vhost.h	Mon Jan 21 00:13:51 2002
++++ apache_1.3.23/src/include/http_vhost.h	Wed Feb  6 20:23:58 2002
 @@ -73,7 +73,7 @@
- const char *ap_parse_vhost_addrs(pool *p, const char *hostname, server_rec *s);
+ API_EXPORT(const char *) ap_parse_vhost_addrs(pool *p, const char *hostname, server_rec *s);
  
  /* handle NameVirtualHost directive */
--const char *ap_set_name_virtual_host (cmd_parms *cmd, void *dummy, char *arg);
-+const char *ap_set_name_virtual_host (cmd_parms *cmd, void *dummy, char *h, char *p);
+-API_EXPORT_NONSTD(const char *) ap_set_name_virtual_host (cmd_parms *cmd, void *dummy, char *arg);
++API_EXPORT_NONSTD(const char *) ap_set_name_virtual_host (cmd_parms *cmd, void *dummy, char *h, char *p);
  
  /* given an ip address only, give our best guess as to what vhost it is */
- void ap_update_vhost_given_ip(conn_rec *conn);
-diff -Nur apache_1.3.22.orig/src/include/httpd.h apache_1.3.22/src/include/httpd.h
---- apache_1.3.22.orig/src/include/httpd.h	Tue Dec 18 23:14:14 2001
-+++ apache_1.3.22/src/include/httpd.h	Tue Dec 18 23:14:29 2001
+ API_EXPORT(void) ap_update_vhost_given_ip(conn_rec *conn);
+diff -Nur apache_1.3.23.orig/src/include/httpd.h apache_1.3.23/src/include/httpd.h
+--- apache_1.3.23.orig/src/include/httpd.h	Wed Feb  6 20:17:43 2002
++++ apache_1.3.23/src/include/httpd.h	Wed Feb  6 20:24:49 2002
 @@ -912,8 +912,8 @@
  
      /* Who is the client? */
@@ -1885,15 +625,15 @@ diff -Nur apache_1.3.22.orig/src/include/httpd.h apache_1.3.22/src/include/httpd
 @@ -1184,7 +1184,7 @@
  #endif /*#ifdef CHARSET_EBCDIC*/
  
- char *ap_get_local_host(pool *);
--unsigned long ap_get_virthost_addr(char *hostname, unsigned short *port);
-+struct sockaddr *ap_get_virthost_addr(char *hostname, unsigned short *port);
+ API_EXPORT(char *) ap_get_local_host(pool *);
+-API_EXPORT(unsigned long) ap_get_virthost_addr(char *hostname, unsigned short *port);
++API_EXPORT(struct sockaddr *) ap_get_virthost_addr(char *hostname, unsigned short *port);
  
  extern API_VAR_EXPORT time_t ap_restart_time;
  
-diff -Nur apache_1.3.22.orig/src/include/sa_len.h apache_1.3.22/src/include/sa_len.h
---- apache_1.3.22.orig/src/include/sa_len.h	Thu Jan  1 01:00:00 1970
-+++ apache_1.3.22/src/include/sa_len.h	Tue Dec 18 23:14:29 2001
+diff -Nur apache_1.3.23.orig/src/include/sa_len.h apache_1.3.23/src/include/sa_len.h
+--- apache_1.3.23.orig/src/include/sa_len.h	Thu Jan  1 01:00:00 1970
++++ apache_1.3.23/src/include/sa_len.h	Wed Feb  6 20:20:48 2002
 @@ -0,0 +1,41 @@
 +/* sa_len.h : tiny version of SA_LEN (written by <yoshfuji@ecei.tohoku.ac.jp>) */
 + 
@@ -1936,9 +676,9 @@ diff -Nur apache_1.3.22.orig/src/include/sa_len.h apache_1.3.22/src/include/sa_l
 +}
 +#endif /* SA_LEN */
 +#endif /* HAVE_SOCKADDR_LEN */
-diff -Nur apache_1.3.22.orig/src/include/sockaddr_storage.h apache_1.3.22/src/include/sockaddr_storage.h
---- apache_1.3.22.orig/src/include/sockaddr_storage.h	Thu Jan  1 01:00:00 1970
-+++ apache_1.3.22/src/include/sockaddr_storage.h	Tue Dec 18 23:14:29 2001
+diff -Nur apache_1.3.23.orig/src/include/sockaddr_storage.h apache_1.3.23/src/include/sockaddr_storage.h
+--- apache_1.3.23.orig/src/include/sockaddr_storage.h	Thu Jan  1 01:00:00 1970
++++ apache_1.3.23/src/include/sockaddr_storage.h	Wed Feb  6 20:20:48 2002
 @@ -0,0 +1,53 @@
 +/*
 +struct sockaddr_storage
@@ -1993,9 +733,9 @@ diff -Nur apache_1.3.22.orig/src/include/sockaddr_storage.h apache_1.3.22/src/in
 +#define su_port		su_si.si_port
 +
 +#endif /* NEED_SOCKADDR_STORAGE */
-diff -Nur apache_1.3.22.orig/src/main/getaddrinfo.c apache_1.3.22/src/main/getaddrinfo.c
---- apache_1.3.22.orig/src/main/getaddrinfo.c	Thu Jan  1 01:00:00 1970
-+++ apache_1.3.22/src/main/getaddrinfo.c	Tue Dec 18 23:14:29 2001
+diff -Nur apache_1.3.23.orig/src/main/getaddrinfo.c apache_1.3.23/src/main/getaddrinfo.c
+--- apache_1.3.23.orig/src/main/getaddrinfo.c	Thu Jan  1 01:00:00 1970
++++ apache_1.3.23/src/main/getaddrinfo.c	Wed Feb  6 20:20:48 2002
 @@ -0,0 +1,162 @@
 +/*
 + * Copyright (C) 1995, 1996, 1997, 1998, and 1999 WIDE Project.
@@ -2159,9 +899,9 @@ diff -Nur apache_1.3.22.orig/src/main/getaddrinfo.c apache_1.3.22/src/main/getad
 +  }
 +  return EAI_NODATA;
 +}
-diff -Nur apache_1.3.22.orig/src/main/getnameinfo.c apache_1.3.22/src/main/getnameinfo.c
---- apache_1.3.22.orig/src/main/getnameinfo.c	Thu Jan  1 01:00:00 1970
-+++ apache_1.3.22/src/main/getnameinfo.c	Tue Dec 18 23:14:29 2001
+diff -Nur apache_1.3.23.orig/src/main/getnameinfo.c apache_1.3.23/src/main/getnameinfo.c
+--- apache_1.3.23.orig/src/main/getnameinfo.c	Thu Jan  1 01:00:00 1970
++++ apache_1.3.23/src/main/getnameinfo.c	Wed Feb  6 20:20:48 2002
 @@ -0,0 +1,95 @@
 +/*
 + * Copyright (C) 1995, 1996, 1997, 1998, and 1999 WIDE Project.
@@ -2258,9 +998,9 @@ diff -Nur apache_1.3.22.orig/src/main/getnameinfo.c apache_1.3.22/src/main/getna
 +	return EAI_NODATA;
 +  return 0;
 +}
-diff -Nur apache_1.3.22.orig/src/main/http_config.c apache_1.3.22/src/main/http_config.c
---- apache_1.3.22.orig/src/main/http_config.c	Tue Dec 18 23:14:13 2001
-+++ apache_1.3.22/src/main/http_config.c	Tue Dec 18 23:14:29 2001
+diff -Nur apache_1.3.23.orig/src/main/http_config.c apache_1.3.23/src/main/http_config.c
+--- apache_1.3.23.orig/src/main/http_config.c	Wed Feb  6 20:17:43 2002
++++ apache_1.3.23/src/main/http_config.c	Wed Feb  6 20:28:01 2002
 @@ -1564,7 +1564,6 @@
      ap_scoreboard_fname = DEFAULT_SCOREBOARD;
      ap_lock_fname = DEFAULT_LOCKFILE;
@@ -2284,7 +1024,7 @@ diff -Nur apache_1.3.22.orig/src/main/http_config.c apache_1.3.22/src/main/http_
      s->addrs->host_port = 0;	/* matches any port */
      s->addrs->virthost = "";	/* must be non-NULL */
      s->names = s->wild_names = NULL;
-@@ -1616,19 +1621,33 @@
+@@ -1616,21 +1621,33 @@
  static void default_listeners(pool *p, server_rec *s)
  {
      listen_rec *new;
@@ -2310,7 +1050,9 @@ diff -Nur apache_1.3.22.orig/src/main/http_config.c apache_1.3.22/src/main/http_
      new = ap_pcalloc(p, sizeof(listen_rec));
 -    new->local_addr.sin_family = AF_INET;
 -    new->local_addr.sin_addr = ap_bind_address;
--    new->local_addr.sin_port = htons(s->port ? s->port : DEFAULT_HTTP_PORT);
+-    /* Buck ugly cast to get around terniary op bug in some (MS) compilers */
+-    new->local_addr.sin_port = htons((unsigned short)(s->port ? s->port 
+-                                                        : DEFAULT_HTTP_PORT));
 +    memcpy(&new->local_addr, res0->ai_addr, res0->ai_addrlen);
      new->fd = -1;
      new->used = 0;
@@ -2321,9 +1063,9 @@ diff -Nur apache_1.3.22.orig/src/main/http_config.c apache_1.3.22/src/main/http_
  }
  
  
-diff -Nur apache_1.3.22.orig/src/main/http_core.c apache_1.3.22/src/main/http_core.c
---- apache_1.3.22.orig/src/main/http_core.c	Tue Sep  4 20:15:15 2001
-+++ apache_1.3.22/src/main/http_core.c	Tue Dec 18 23:14:29 2001
+diff -Nur apache_1.3.23.orig/src/main/http_core.c apache_1.3.23/src/main/http_core.c
+--- apache_1.3.23.orig/src/main/http_core.c	Wed Jan 16 22:34:32 2002
++++ apache_1.3.23/src/main/http_core.c	Wed Feb  6 20:20:48 2002
 @@ -71,6 +71,7 @@
  #include "util_md5.h"
  #include "scoreboard.h"
@@ -2332,7 +1074,7 @@ diff -Nur apache_1.3.22.orig/src/main/http_core.c apache_1.3.22/src/main/http_co
  
  #ifdef USE_MMAP_FILES
  #include <sys/mman.h>
-@@ -594,7 +595,9 @@
+@@ -621,7 +622,9 @@
  /* Code from Harald Hanche-Olsen <hanche@imf.unit.no> */
  static ap_inline void do_double_reverse (conn_rec *conn)
  {
@@ -2343,7 +1085,7 @@ diff -Nur apache_1.3.22.orig/src/main/http_core.c apache_1.3.22/src/main/http_co
  
      if (conn->double_reverse) {
  	/* already done */
-@@ -605,28 +608,51 @@
+@@ -632,28 +635,51 @@
  	conn->double_reverse = -1;
  	return;
      }
@@ -2408,7 +1150,7 @@ diff -Nur apache_1.3.22.orig/src/main/http_core.c apache_1.3.22/src/main/http_co
  
      /* If we haven't checked the host name, and we want to */
      if (dir_config) {
-@@ -648,10 +674,14 @@
+@@ -675,10 +701,14 @@
  	    || hostname_lookups != HOSTNAME_LOOKUP_OFF)) {
  	old_stat = ap_update_child_status(conn->child_num, SERVER_BUSY_DNS,
  					  (request_rec*)NULL);
@@ -2427,7 +1169,7 @@ diff -Nur apache_1.3.22.orig/src/main/http_core.c apache_1.3.22/src/main/http_co
  	    ap_str_tolower(conn->remote_host);
  	   
  	    if (hostname_lookups == HOSTNAME_LOOKUP_DOUBLE) {
-@@ -732,6 +762,7 @@
+@@ -759,6 +789,7 @@
  {
      conn_rec *conn = r->connection;
      core_dir_config *d;
@@ -2435,7 +1177,7 @@ diff -Nur apache_1.3.22.orig/src/main/http_core.c apache_1.3.22/src/main/http_co
  
      d = (core_dir_config *)ap_get_module_config(r->per_dir_config,
  						&core_module);
-@@ -741,23 +772,22 @@
+@@ -768,23 +799,22 @@
      }
      if (d->use_canonical_name == USE_CANONICAL_NAME_DNS) {
          if (conn->local_host == NULL) {
@@ -2471,7 +1213,7 @@ diff -Nur apache_1.3.22.orig/src/main/http_core.c apache_1.3.22/src/main/http_co
  	    (void) ap_update_child_status(conn->child_num, old_stat, r);
  	}
  	return conn->local_host;
-@@ -776,11 +806,13 @@
+@@ -803,11 +833,13 @@
  
      if (d->use_canonical_name == USE_CANONICAL_NAME_OFF
  	|| d->use_canonical_name == USE_CANONICAL_NAME_DNS) {
@@ -2490,7 +1232,7 @@ diff -Nur apache_1.3.22.orig/src/main/http_core.c apache_1.3.22/src/main/http_co
  }
  
  API_EXPORT(char *) ap_construct_url(pool *p, const char *uri,
-@@ -2503,12 +2535,25 @@
+@@ -2539,12 +2571,25 @@
  
  static const char *set_bind_address(cmd_parms *cmd, void *dummy, char *arg) 
  {
@@ -2517,7 +1259,7 @@ diff -Nur apache_1.3.22.orig/src/main/http_core.c apache_1.3.22/src/main/http_co
      return NULL;
  }
  
-@@ -2540,44 +2585,70 @@
+@@ -2576,44 +2621,70 @@
      return NULL;
  }
  
@@ -2614,7 +1356,7 @@ diff -Nur apache_1.3.22.orig/src/main/http_core.c apache_1.3.22/src/main/http_co
      new->fd = -1;
      new->used = 0;
      new->next = ap_listeners;
-@@ -3163,7 +3234,7 @@
+@@ -3328,7 +3399,7 @@
  { "ThreadStackSize", set_threadstacksize, NULL, RSRC_CONF, TAKE1,
    "Stack size each created thread will use."},
  #endif
@@ -2623,7 +1365,7 @@ diff -Nur apache_1.3.22.orig/src/main/http_core.c apache_1.3.22/src/main/http_co
    "A port number or a numeric IP address and a port number"},
  { "SendBufferSize", set_send_buffer_size, NULL, RSRC_CONF, TAKE1,
    "Send buffer size in bytes"},
-@@ -3197,7 +3268,7 @@
+@@ -3362,7 +3433,7 @@
    "Name of the config file to be included" },
  { "LogLevel", set_loglevel, NULL, RSRC_CONF, TAKE1,
    "Level of verbosity in error logging" },
@@ -2632,9 +1374,9 @@ diff -Nur apache_1.3.22.orig/src/main/http_core.c apache_1.3.22/src/main/http_co
    "A numeric IP address:port, or the name of a host" },
  #ifdef _OSD_POSIX
  { "BS2000Account", set_bs2000_account, NULL, RSRC_CONF, TAKE1,
-diff -Nur apache_1.3.22.orig/src/main/http_main.c apache_1.3.22/src/main/http_main.c
---- apache_1.3.22.orig/src/main/http_main.c	Tue Dec 18 23:14:13 2001
-+++ apache_1.3.22/src/main/http_main.c	Tue Dec 18 23:14:29 2001
+diff -Nur apache_1.3.23.orig/src/main/http_main.c apache_1.3.23/src/main/http_main.c
+--- apache_1.3.23.orig/src/main/http_main.c	Wed Feb  6 20:17:43 2002
++++ apache_1.3.23/src/main/http_main.c	Wed Feb  6 20:29:52 2002
 @@ -124,6 +124,8 @@
  #include <bstring.h>		/* for IRIX, FD_SET calls bzero() */
  #endif
@@ -2644,21 +1386,21 @@ diff -Nur apache_1.3.22.orig/src/main/http_main.c apache_1.3.22/src/main/http_ma
  #ifdef MULTITHREAD
  /* special debug stuff -- PCS */
  
-@@ -250,7 +252,12 @@
+@@ -249,7 +251,12 @@
  API_VAR_EXPORT char *ap_scoreboard_fname=NULL;
- char *ap_lock_fname;
+ API_VAR_EXPORT char *ap_lock_fname=NULL;
  API_VAR_EXPORT char *ap_server_argv0=NULL;
--struct in_addr ap_bind_address;
+-API_VAR_EXPORT struct in_addr ap_bind_address={0};
 +#ifdef INET6
 +API_VAR_EXPORT int ap_default_family = PF_INET6;
 +#else
 +API_VAR_EXPORT int ap_default_family = PF_INET;
 +#endif
-+struct sockaddr_storage ap_bind_address;
++API_VAR_EXPORT struct sockaddr_storage ap_bind_address={0};
  API_VAR_EXPORT int ap_daemons_to_start=0;
  API_VAR_EXPORT int ap_daemons_min_free=0;
  API_VAR_EXPORT int ap_daemons_max_free=0;
-@@ -1310,7 +1317,11 @@
+@@ -1384,7 +1391,11 @@
      fprintf(stderr, "Usage: %s [-D name] [-d directory] [-f file]\n", bin);
  #endif
      fprintf(stderr, "       %s [-C \"directive\"] [-c \"directive\"]\n", pad);
@@ -2671,7 +1413,7 @@ diff -Nur apache_1.3.22.orig/src/main/http_main.c apache_1.3.22/src/main/http_ma
      fprintf(stderr, "Options:\n");
  #ifdef SHARED_CORE
      fprintf(stderr, "  -R directory     : specify an alternate location for shared object files\n");
-@@ -1332,6 +1343,10 @@
+@@ -1406,6 +1417,10 @@
  #endif
      fprintf(stderr, "  -t               : run syntax check for config files (with docroot check)\n");
      fprintf(stderr, "  -T               : run syntax check for config files (without docroot check)\n");
@@ -2682,7 +1424,7 @@ diff -Nur apache_1.3.22.orig/src/main/http_main.c apache_1.3.22/src/main/http_ma
  #ifdef WIN32
      fprintf(stderr, "  -n name          : name the Apache service for -k options below;\n");
      fprintf(stderr, "  -k stop|shutdown : tell running Apache to shutdown\n");
-@@ -3495,11 +3510,13 @@
+@@ -3566,11 +3581,13 @@
  
  
  static conn_rec *new_connection(pool *p, server_rec *server, BUFF *inout,
@@ -2698,7 +1440,7 @@ diff -Nur apache_1.3.22.orig/src/main/http_main.c apache_1.3.22/src/main/http_ma
  
      /* Got a connection structure, so initialize what fields we can
       * (the rest are zeroed out by pcalloc).
-@@ -3508,17 +3525,29 @@
+@@ -3579,17 +3596,29 @@
      conn->child_num = child_num;
  
      conn->pool = p;
@@ -2734,7 +1476,7 @@ diff -Nur apache_1.3.22.orig/src/main/http_main.c apache_1.3.22/src/main/http_ma
  #ifdef EAPI
      conn->ctx = ap_ctx_new(conn->pool);
  #endif /* EAPI */
-@@ -3569,21 +3598,47 @@
+@@ -3640,21 +3669,47 @@
  #define sock_disable_nagle(s)	/* NOOP */
  #endif
  
@@ -2790,7 +1532,7 @@ diff -Nur apache_1.3.22.orig/src/main/http_main.c apache_1.3.22/src/main/http_ma
  	    ap_log_error(APLOG_MARK, APLOG_CRIT, server_conf,
  		    "make_sock: failed to get a socket for %s", addr);
  
-@@ -3686,15 +3741,19 @@
+@@ -3757,15 +3812,19 @@
  
  #ifdef MPE
  /* MPE requires CAP=PM and GETPRIVMODE to bind to ports less than 1024 */
@@ -2814,7 +1556,7 @@ diff -Nur apache_1.3.22.orig/src/main/http_main.c apache_1.3.22/src/main/http_ma
  	    GETUSERMODE();
  #endif
  
-@@ -3707,7 +3766,7 @@
+@@ -3778,7 +3837,7 @@
  	exit(1);
      }
  #ifdef MPE
@@ -2823,7 +1565,7 @@ diff -Nur apache_1.3.22.orig/src/main/http_main.c apache_1.3.22/src/main/http_ma
  	GETUSERMODE();
  #endif
  
-@@ -3854,15 +3913,17 @@
+@@ -3931,15 +3990,17 @@
      for (;;) {
  	fd = find_listener(lr);
  	if (fd < 0) {
@@ -2845,7 +1587,7 @@ diff -Nur apache_1.3.22.orig/src/main/http_main.c apache_1.3.22/src/main/http_ma
  	lr->fd = fd;
  	if (lr->next == NULL)
  	    break;
-@@ -4174,8 +4235,8 @@
+@@ -4257,8 +4318,8 @@
  static void child_main(int child_num_arg)
  {
      NET_SIZE_T clen;
@@ -2856,7 +1598,7 @@ diff -Nur apache_1.3.22.orig/src/main/http_main.c apache_1.3.22/src/main/http_ma
      listen_rec *lr;
  
      /* All of initialization is a critical section, we don't care if we're
-@@ -4340,7 +4401,7 @@
+@@ -4423,7 +4484,7 @@
  	    usr1_just_die = 0;
  	    for (;;) {
  		clen = sizeof(sa_client);
@@ -2865,7 +1607,7 @@ diff -Nur apache_1.3.22.orig/src/main/http_main.c apache_1.3.22/src/main/http_ma
  		if (csd >= 0 || errno != EINTR)
  		    break;
  		if (deferred_die) {
-@@ -4490,7 +4551,7 @@
+@@ -4586,7 +4647,7 @@
  	 */
  
  	clen = sizeof(sa_server);
@@ -2874,7 +1616,7 @@ diff -Nur apache_1.3.22.orig/src/main/http_main.c apache_1.3.22/src/main/http_ma
  	    ap_log_error(APLOG_MARK, APLOG_ERR, server_conf, "getsockname");
  	    continue;
  	}
-@@ -4535,8 +4596,8 @@
+@@ -4631,8 +4692,8 @@
  	ap_bpushfd(conn_io, csd, dupped_csd);
  
  	current_conn = new_connection(ptrans, server_conf, conn_io,
@@ -2885,7 +1627,7 @@ diff -Nur apache_1.3.22.orig/src/main/http_main.c apache_1.3.22/src/main/http_ma
  				          my_child_num);
  
  	/*
-@@ -4680,12 +4741,13 @@
+@@ -4776,12 +4837,13 @@
  
  #ifdef _OSD_POSIX
      /* BS2000 requires a "special" version of fork() before a setuid() call */
@@ -2902,7 +1644,7 @@ diff -Nur apache_1.3.22.orig/src/main/http_main.c apache_1.3.22/src/main/http_ma
  	ap_log_error(APLOG_MARK, APLOG_ERR, s, "fork: Unable to fork new process");
  
  	/* fork didn't succeed. Fix the scoreboard or else
-@@ -5294,7 +5356,10 @@
+@@ -5390,7 +5452,10 @@
      ap_setup_prelinked_modules();
  
      while ((c = getopt(argc, argv,
@@ -2914,7 +1656,7 @@ diff -Nur apache_1.3.22.orig/src/main/http_main.c apache_1.3.22/src/main/http_ma
  #ifdef DEBUG_SIGSTOP
  				    "Z:"
  #endif
-@@ -5369,8 +5434,14 @@
+@@ -5465,8 +5530,14 @@
  	    ap_configtestonly = 1;
  	    ap_docrootcheck = 0;
  	    break;
@@ -2931,7 +1673,7 @@ diff -Nur apache_1.3.22.orig/src/main/http_main.c apache_1.3.22/src/main/http_ma
  	case '?':
  	    usage(argv[0]);
  	}
-@@ -5450,9 +5521,10 @@
+@@ -5546,9 +5617,10 @@
      else {
  	conn_rec *conn;
  	request_rec *r;
@@ -2943,7 +1685,7 @@ diff -Nur apache_1.3.22.orig/src/main/http_main.c apache_1.3.22/src/main/http_ma
  
  	ap_set_version();
  	/* Yes this is called twice. */
-@@ -5499,25 +5571,32 @@
+@@ -5595,25 +5667,32 @@
  #endif
  
  	l = sizeof(sa_client);
@@ -2981,7 +1723,7 @@ diff -Nur apache_1.3.22.orig/src/main/http_main.c apache_1.3.22/src/main/http_ma
  
  	while ((r = ap_read_request(conn)) != NULL) {
  
-@@ -7696,7 +7775,11 @@
+@@ -7820,7 +7899,11 @@
       * but only handle the -L option 
       */
      llp_dir = SHARED_CORE_DIR;
@@ -2994,7 +1736,7 @@ diff -Nur apache_1.3.22.orig/src/main/http_main.c apache_1.3.22/src/main/http_ma
  	switch (c) {
  	case 'D':
  	case 'C':
-@@ -7713,6 +7796,10 @@
+@@ -7837,6 +7920,10 @@
  	case 't':
  	case 'T':
  	case 'h':
@@ -3005,9 +1747,9 @@ diff -Nur apache_1.3.22.orig/src/main/http_main.c apache_1.3.22/src/main/http_ma
  	case '?':
  	    break;
  	case 'R':
-diff -Nur apache_1.3.22.orig/src/main/http_vhost.c apache_1.3.22/src/main/http_vhost.c
---- apache_1.3.22.orig/src/main/http_vhost.c	Sat Feb 24 11:09:46 2001
-+++ apache_1.3.22/src/main/http_vhost.c	Tue Dec 18 23:14:29 2001
+diff -Nur apache_1.3.23.orig/src/main/http_vhost.c apache_1.3.23/src/main/http_vhost.c
+--- apache_1.3.23.orig/src/main/http_vhost.c	Mon Jan 21 00:13:51 2002
++++ apache_1.3.23/src/main/http_vhost.c	Wed Feb  6 20:30:51 2002
 @@ -68,6 +68,7 @@
  #include "http_log.h"
  #include "http_vhost.h"
@@ -3194,8 +1936,8 @@ diff -Nur apache_1.3.22.orig/src/main/http_vhost.c apache_1.3.22/src/main/http_v
  }
  
  
--const char *ap_set_name_virtual_host (cmd_parms *cmd, void *dummy, char *arg)
-+const char *ap_set_name_virtual_host (cmd_parms *cmd, void *dummy, char *h,
+-API_EXPORT_NONSTD(const char *) ap_set_name_virtual_host (cmd_parms *cmd, void *dummy, char *arg)
++API_EXPORT_NONSTD(const char *) ap_set_name_virtual_host (cmd_parms *cmd, void *dummy, char *h, 
 +	char *p)
  {
      /* use whatever port the main server has at this point */
@@ -3623,7 +2365,7 @@ diff -Nur apache_1.3.22.orig/src/main/http_vhost.c apache_1.3.22/src/main/http_v
      /*
       * This is in conjunction with the ServerPath code in http_core, so we
 @@ -970,10 +1187,22 @@
- void ap_update_vhost_given_ip(conn_rec *conn)
+ API_EXPORT(void) ap_update_vhost_given_ip(conn_rec *conn)
  {
      ipaddr_chain *trav;
 -    unsigned port = ntohs(conn->local_addr.sin_port);
@@ -3655,9 +2397,9 @@ diff -Nur apache_1.3.22.orig/src/main/http_vhost.c apache_1.3.22/src/main/http_v
      /* otherwise we're stuck with just the main server
       * and no name-based vhosts
       */
-diff -Nur apache_1.3.22.orig/src/main/rfc1413.c apache_1.3.22/src/main/rfc1413.c
---- apache_1.3.22.orig/src/main/rfc1413.c	Mon Jan 15 18:05:04 2001
-+++ apache_1.3.22/src/main/rfc1413.c	Tue Dec 18 23:14:29 2001
+diff -Nur apache_1.3.23.orig/src/main/rfc1413.c apache_1.3.23/src/main/rfc1413.c
+--- apache_1.3.23.orig/src/main/rfc1413.c	Sun Jan 20 21:14:37 2002
++++ apache_1.3.23/src/main/rfc1413.c	Wed Feb  6 20:20:48 2002
 @@ -82,6 +82,7 @@
  #include "http_log.h"		/* for aplog_error */
  #include "rfc1413.h"
@@ -3795,15 +2537,15 @@ diff -Nur apache_1.3.22.orig/src/main/rfc1413.c apache_1.3.22/src/main/rfc1413.c
      }
      ap_set_callback_and_alarm(NULL, 0);
      ap_pclosesocket(conn->pool, sock);
-diff -Nur apache_1.3.22.orig/src/main/util.c apache_1.3.22/src/main/util.c
---- apache_1.3.22.orig/src/main/util.c	Wed Jul 25 15:25:18 2001
-+++ apache_1.3.22/src/main/util.c	Tue Dec 18 23:14:29 2001
+diff -Nur apache_1.3.23.orig/src/main/util.c apache_1.3.23/src/main/util.c
+--- apache_1.3.23.orig/src/main/util.c	Fri Dec 28 06:03:07 2001
++++ apache_1.3.23/src/main/util.c	Wed Feb  6 20:36:21 2002
 @@ -1962,52 +1962,87 @@
   * Parses a host of the form <address>[:port]
   * :port is permitted if 'port' is not NULL
   */
--unsigned long ap_get_virthost_addr(char *w, unsigned short *ports)
-+struct sockaddr *ap_get_virthost_addr(char *w, unsigned short *ports)
+-API_EXPORT(unsigned long) ap_get_virthost_addr(char *w, unsigned short *ports)
++API_EXPORT(struct sockaddr *) ap_get_virthost_addr(char *w, unsigned short *ports)
  {
 -    struct hostent *hep;
 -    unsigned long my_addr;
@@ -4004,9 +2746,9 @@ diff -Nur apache_1.3.22.orig/src/main/util.c apache_1.3.22/src/main/util.c
 +#ifdef NEED_GETNAMEINFO
 +#include "getnameinfo.c"
 +#endif
-diff -Nur apache_1.3.22.orig/src/main/util_script.c apache_1.3.22/src/main/util_script.c
---- apache_1.3.22.orig/src/main/util_script.c	Wed May  9 07:17:11 2001
-+++ apache_1.3.22/src/main/util_script.c	Tue Dec 18 23:14:29 2001
+diff -Nur apache_1.3.23.orig/src/main/util_script.c apache_1.3.23/src/main/util_script.c
+--- apache_1.3.23.orig/src/main/util_script.c	Fri Oct 12 01:37:39 2001
++++ apache_1.3.23/src/main/util_script.c	Wed Feb  6 20:20:48 2002
 @@ -67,6 +67,7 @@
  #include "http_request.h"	/* for sub_req_lookup_uri() */
  #include "util_script.h"
@@ -4042,9 +2784,9 @@ diff -Nur apache_1.3.22.orig/src/main/util_script.c apache_1.3.22/src/main/util_
  
      if (c->user) {
  	ap_table_addn(e, "REMOTE_USER", c->user);
-diff -Nur apache_1.3.22.orig/src/main/util_uri.c apache_1.3.22/src/main/util_uri.c
---- apache_1.3.22.orig/src/main/util_uri.c	Thu Aug 23 08:38:25 2001
-+++ apache_1.3.22/src/main/util_uri.c	Tue Dec 18 23:14:29 2001
+diff -Nur apache_1.3.23.orig/src/main/util_uri.c apache_1.3.23/src/main/util_uri.c
+--- apache_1.3.23.orig/src/main/util_uri.c	Sun Jan 20 21:14:37 2002
++++ apache_1.3.23/src/main/util_uri.c	Wed Feb  6 20:20:48 2002
 @@ -419,6 +419,12 @@
           * the hostname.  If there's a port it is the first colon.
           */
@@ -4072,10 +2814,10 @@ diff -Nur apache_1.3.22.orig/src/main/util_uri.c apache_1.3.22/src/main/util_uri
      if (s == NULL) {
          return HTTP_BAD_REQUEST;
      }
-diff -Nur apache_1.3.22.orig/src/modules/proxy/mod_proxy.c apache_1.3.22/src/modules/proxy/mod_proxy.c
---- apache_1.3.22.orig/src/modules/proxy/mod_proxy.c	Tue Dec 18 23:14:13 2001
-+++ apache_1.3.22/src/modules/proxy/mod_proxy.c	Tue Dec 18 23:14:29 2001
-@@ -555,11 +555,31 @@
+diff -Nur apache_1.3.23.orig/src/modules/proxy/mod_proxy.c apache_1.3.23/src/modules/proxy/mod_proxy.c
+--- apache_1.3.23.orig/src/modules/proxy/mod_proxy.c	Wed Feb  6 20:17:43 2002
++++ apache_1.3.23/src/modules/proxy/mod_proxy.c	Wed Feb  6 20:38:49 2002
+@@ -556,11 +556,31 @@
      struct proxy_remote *new;
      char *p, *q;
      int port;
@@ -4083,7 +2825,7 @@ diff -Nur apache_1.3.22.orig/src/modules/proxy/mod_proxy.c apache_1.3.22/src/mod
  
      p = strchr(r, ':');
      if (p == NULL || p[1] != '/' || p[2] != '/' || p[3] == '\0')
- 	return "ProxyRemote: Bad syntax for a remote proxy server";
+         return "ProxyRemote: Bad syntax for a remote proxy server";
 -    q = strchr(p + 3, ':');
 +    bl = p + 3;
 +    if (*bl == '['){
@@ -4106,18 +2848,18 @@ diff -Nur apache_1.3.22.orig/src/modules/proxy/mod_proxy.c apache_1.3.22/src/mod
 +    else
 +	q = strrchr(bl, ':');
      if (q != NULL) {
- 	if (sscanf(q + 1, "%u", &port) != 1 || port > 65535)
- 	    return "ProxyRemote: Bad syntax for a remote proxy server (bad port number)";
-@@ -570,7 +590,7 @@
+         if (sscanf(q + 1, "%u", &port) != 1 || port > 65535)
+             return "ProxyRemote: Bad syntax for a remote proxy server (bad port number)";
+@@ -571,7 +591,7 @@
      *p = '\0';
      if (strchr(f, ':') == NULL)
- 	ap_str_tolower(f);		/* lowercase scheme */
--    ap_str_tolower(p + 3);		/* lowercase hostname */
-+    ap_str_tolower(bl);			/* lowercase hostname */
+         ap_str_tolower(f);              /* lowercase scheme */
+-    ap_str_tolower(p + 3);              /* lowercase hostname */
++    ap_str_tolower(bl);                 /* lowercase hostname */
  
      if (port == -1) {
- 	int i;
-@@ -583,7 +603,7 @@
+         int i;
+@@ -584,7 +604,7 @@
      new = ap_push_array(conf->proxies);
      new->scheme = f;
      new->protocol = r;
@@ -4126,10 +2868,10 @@ diff -Nur apache_1.3.22.orig/src/modules/proxy/mod_proxy.c apache_1.3.22/src/mod
      new->port = port;
      return NULL;
  }
-diff -Nur apache_1.3.22.orig/src/modules/proxy/mod_proxy.h apache_1.3.22/src/modules/proxy/mod_proxy.h
---- apache_1.3.22.orig/src/modules/proxy/mod_proxy.h	Fri Oct  5 10:19:15 2001
-+++ apache_1.3.22/src/modules/proxy/mod_proxy.h	Tue Dec 18 23:14:29 2001
-@@ -316,7 +316,7 @@
+diff -Nur apache_1.3.23.orig/src/modules/proxy/mod_proxy.h apache_1.3.23/src/modules/proxy/mod_proxy.h
+--- apache_1.3.23.orig/src/modules/proxy/mod_proxy.h	Fri Jan 18 21:26:58 2002
++++ apache_1.3.23/src/modules/proxy/mod_proxy.h	Wed Feb  6 20:20:48 2002
+@@ -308,7 +308,7 @@
  int ap_proxy_is_domainname(struct dirconn_entry *This, pool *p);
  int ap_proxy_is_hostname(struct dirconn_entry *This, pool *p);
  int ap_proxy_is_word(struct dirconn_entry *This, pool *p);
@@ -4138,11 +2880,357 @@ diff -Nur apache_1.3.22.orig/src/modules/proxy/mod_proxy.h apache_1.3.22/src/mod
  int ap_proxy_garbage_init(server_rec *, pool *);
  /* This function is called by ap_table_do() for all header lines */
  int ap_proxy_send_hdr_line(void *p, const char *key, const char *value);
-diff -Nur apache_1.3.22.orig/src/modules/proxy/proxy_connect.c apache_1.3.22/src/modules/proxy/proxy_connect.c
---- apache_1.3.22.orig/src/modules/proxy/proxy_connect.c	Fri Oct  5 10:19:15 2001
-+++ apache_1.3.22/src/modules/proxy/proxy_connect.c	Tue Dec 18 23:14:29 2001
+diff -Nur apache_1.3.23.orig/src/modules/proxy/mod_proxy.h.orig apache_1.3.23/src/modules/proxy/mod_proxy.h.orig
+--- apache_1.3.23.orig/src/modules/proxy/mod_proxy.h.orig	Thu Jan  1 01:00:00 1970
++++ apache_1.3.23/src/modules/proxy/mod_proxy.h.orig	Fri Jan 18 21:26:58 2002
+@@ -0,0 +1,342 @@
++/* ====================================================================
++ * The Apache Software License, Version 1.1
++ *
++ * Copyright (c) 2000 The Apache Software Foundation.  All rights
++ * reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ *
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in
++ *    the documentation and/or other materials provided with the
++ *    distribution.
++ *
++ * 3. The end-user documentation included with the redistribution,
++ *    if any, must include the following acknowledgment:
++ *       "This product includes software developed by the
++ *        Apache Software Foundation (http://www.apache.org/)."
++ *    Alternately, this acknowledgment may appear in the software itself,
++ *    if and wherever such third-party acknowledgments normally appear.
++ *
++ * 4. The names "Apache" and "Apache Software Foundation" must
++ *    not be used to endorse or promote products derived from this
++ *    software without prior written permission. For written
++ *    permission, please contact apache@apache.org.
++ *
++ * 5. Products derived from this software may not be called "Apache",
++ *    nor may "Apache" appear in their name, without prior written
++ *    permission of the Apache Software Foundation.
++ *
++ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
++ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
++ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
++ * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
++ * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
++ * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
++ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
++ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
++ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++ * SUCH DAMAGE.
++ * ====================================================================
++ *
++ * This software consists of voluntary contributions made by many
++ * individuals on behalf of the Apache Software Foundation.  For more
++ * information on the Apache Software Foundation, please see
++ * <http://www.apache.org/>.
++ *
++ * Portions of this software are based upon public domain software
++ * originally written at the National Center for Supercomputing Applications,
++ * University of Illinois, Urbana-Champaign.
++ */
++
++#ifndef MOD_PROXY_H
++#define MOD_PROXY_H 
++
++/*
++ * Main include file for the Apache proxy
++ */
++
++/*
++
++   Note numerous FIXMEs and CHECKMEs which should be eliminated.
++
++   If TESTING is set, then garbage collection doesn't delete ... probably a good
++   idea when hacking.
++
++ */
++
++#define TESTING 0
++
++#include "httpd.h"
++#include "http_config.h"
++#include "http_protocol.h"
++
++#include "explain.h"
++
++extern module MODULE_VAR_EXPORT proxy_module;
++
++
++/* for proxy_canonenc() */
++enum enctype {
++    enc_path, enc_search, enc_user, enc_fpath, enc_parm
++};
++
++#define HDR_APP (0)             /* append header, for proxy_add_header() */
++#define HDR_REP (1)             /* replace header, for proxy_add_header() */
++
++/* number of characters in the hash */
++#define HASH_LEN (22*2)
++
++/* maximum  'CacheDirLevels*CacheDirLength' value */
++#define CACHEFILE_LEN 20        /* must be less than HASH_LEN/2 */
++
++#define SEC_ONE_DAY             86400   /* one day, in seconds */
++#define SEC_ONE_HR              3600    /* one hour, in seconds */
++
++#define DEFAULT_FTP_DATA_PORT   20
++#define DEFAULT_FTP_PORT        21
++#define DEFAULT_GOPHER_PORT     70
++#define DEFAULT_NNTP_PORT       119
++#define DEFAULT_WAIS_PORT       210
++#define DEFAULT_HTTPS_PORT      443
++#define DEFAULT_SNEWS_PORT      563
++#define DEFAULT_PROSPERO_PORT   1525    /* WARNING: conflict w/Oracle */
++
++/* Some WWW schemes and their default ports; this is basically /etc/services */
++struct proxy_services {
++    const char *scheme;
++    int port;
++};
++
++/* static information about a remote proxy */
++struct proxy_remote {
++    const char *scheme;         /* the schemes handled by this proxy, or '*' */
++    const char *protocol;       /* the scheme used to talk to this proxy */
++    const char *hostname;       /* the hostname of this proxy */
++    int port;                   /* the port for this proxy */
++};
++
++struct proxy_alias {
++    char *real;
++    char *fake;
++};
++
++struct dirconn_entry {
++    char *name;
++    struct in_addr addr, mask;
++    struct hostent *hostentry;
++    int (*matcher) (struct dirconn_entry * This, request_rec *r);
++};
++
++struct noproxy_entry {
++    char *name;
++    struct in_addr addr;
++};
++
++struct nocache_entry {
++    char *name;
++    struct in_addr addr;
++};
++
++#define DEFAULT_CACHE_SPACE 5
++#define DEFAULT_CACHE_MAXEXPIRE SEC_ONE_DAY
++#define DEFAULT_CACHE_EXPIRE    SEC_ONE_HR
++#define DEFAULT_CACHE_LMFACTOR (0.1)
++#define DEFAULT_CACHE_COMPLETION (0.9)
++#define DEFAULT_CACHE_GCINTERVAL SEC_ONE_HR
++
++#ifndef MAX
++#define MAX(a,b)                ((a) > (b) ? (a) : (b))
++#endif
++#ifndef MIN
++#define MIN(a,b)                ((a) < (b) ? (a) : (b))
++#endif
++
++/* static information about the local cache */
++struct cache_conf {
++    const char *root;           /* the location of the cache directory */
++    off_t space;                /* Maximum cache size (in 1024 bytes) */
++    char space_set;
++    time_t maxexpire;           /* Maximum time to keep cached files in secs */
++    char maxexpire_set;
++    time_t defaultexpire;       /* default time to keep cached file in secs */
++    char defaultexpire_set;
++    double lmfactor;            /* factor for estimating expires date */
++    char lmfactor_set;
++    time_t gcinterval;          /* garbage collection interval, in seconds */
++    char gcinterval_set;
++    int dirlevels;              /* Number of levels of subdirectories */
++    char dirlevels_set;
++    int dirlength;              /* Length of subdirectory names */
++    char dirlength_set;
++    float cache_completion;     /* Force cache completion after this point */
++    char cache_completion_set;
++};
++
++typedef struct {
++    struct cache_conf cache;    /* cache configuration */
++    array_header *proxies;
++    array_header *aliases;
++    array_header *raliases;
++    array_header *noproxies;
++    array_header *dirconn;
++    array_header *nocaches;
++    array_header *allowed_connect_ports;
++    char *domain;               /* domain name to use in absence of a domain name in the request */
++    int req;                    /* true if proxy requests are enabled */
++    char req_set;
++    enum {
++      via_off,
++      via_on,
++      via_block,
++      via_full
++    } viaopt;                   /* how to deal with proxy Via: headers */
++    char viaopt_set;
++    size_t recv_buffer_size;
++    char recv_buffer_size_set;
++} proxy_server_conf;
++
++struct hdr_entry {
++    const char *field;
++    const char *value;
++};
++
++/* caching information about a request */
++typedef struct {
++    request_rec *req;           /* the request */
++    char *url;                  /* the URL requested */
++    char *filename;             /* name of the cache file,
++                                   or NULL if no cache */
++    char *tempfile;             /* name of the temporary file,
++                                   or NULL if not caching */
++    time_t ims;                 /* if-Modified-Since date of request,
++                                   -1 if no header */
++    time_t ius;                 /* if-Unmodified-Since date of request,
++                                   -1 if no header */
++    const char *im;             /* if-Match etag of request,
++                                   NULL if no header */
++    const char *inm;            /* if-None-Match etag of request,
++                                   NULL if no header */
++    BUFF *fp;                   /* the cache file descriptor if the file
++                                   is cached and may be returned,
++                                   or NULL if the file is not cached
++                                   (or must be reloaded) */
++    BUFF *origfp;               /* the old cache file descriptor if the file has
++                                   been revalidated and is being rewritten to
++                                   disk */
++    time_t expire;              /* calculated expire date of cached entity */
++    time_t lmod;                /* last-modified date of cached entity */
++    time_t date;                /* the date the cached file was last touched */
++    time_t req_time;            /* the time the request started */
++    time_t resp_time;           /* the time the response was received */
++    int version;                /* update count of the file */
++    off_t len;                  /* content length */
++    char *protocol;             /* Protocol, and major/minor number,
++                                   e.g. HTTP/1.1 */
++    int status;                 /* the status of the cached file */
++    unsigned int written;       /* total *content* bytes written to cache */
++    float cache_completion;     /* specific to this request */
++    char *resp_line;            /* the whole status line
++                                   (protocol, code + message) */
++    table *req_hdrs;            /* the original request headers */
++    table *hdrs;                /* the original HTTP response headers
++                                   of the file */
++    char *xcache;               /* the X-Cache header value
++                                   to be sent to client */
++} cache_req;
++
++struct per_thread_data {
++    struct hostent hpbuf;
++    u_long ipaddr;
++    char *charpbuf[2];
++};
++/* Function prototypes */
++
++/* proxy_cache.c */
++
++void ap_proxy_cache_tidy(cache_req *c);
++int ap_proxy_cache_check(request_rec *r, char *url, struct cache_conf *conf,
++                      cache_req **cr);
++int ap_proxy_cache_update(cache_req *c, table *resp_hdrs,
++                       const int is_HTTP1, int nocache);
++void ap_proxy_garbage_coll(request_rec *r);
++
++/* proxy_connect.c */
++
++int ap_proxy_connect_handler(request_rec *r, cache_req *c, char *url,
++                          const char *proxyhost, int proxyport);
++
++/* proxy_ftp.c */
++
++int ap_proxy_ftp_canon(request_rec *r, char *url);
++int ap_proxy_ftp_handler(request_rec *r, cache_req *c, char *url);
++
++/* proxy_http.c */
++
++int ap_proxy_http_canon(request_rec *r, char *url, const char *scheme,
++                     int def_port);
++int ap_proxy_http_handler(request_rec *r, cache_req *c, char *url,
++                       const char *proxyhost, int proxyport);
++
++/* proxy_util.c */
++
++int ap_proxy_hex2c(const char *x);
++void ap_proxy_c2hex(int ch, char *x);
++char *ap_proxy_canonenc(pool *p, const char *x, int len, enum enctype t,
++                        enum proxyreqtype isenc);
++char *ap_proxy_canon_netloc(pool *p, char **const urlp, char **userp,
++                         char **passwordp, char **hostp, int *port);
++const char *ap_proxy_date_canon(pool *p, const char *x);
++table *ap_proxy_read_headers(request_rec *r, char *buffer, int size, BUFF *f);
++long int ap_proxy_send_fb(BUFF *f, request_rec *r, cache_req *c, off_t len, int nowrite);
++void ap_proxy_write_headers(cache_req *c, const char *respline, table *t);
++int ap_proxy_liststr(const char *list, const char *key, char **val);
++void ap_proxy_hash(const char *it, char *val, int ndepth, int nlength);
++int ap_proxy_hex2sec(const char *x);
++void ap_proxy_sec2hex(int t, char *y);
++cache_req *ap_proxy_cache_error(cache_req *r);
++int ap_proxyerror(request_rec *r, int statuscode, const char *message);
++const char *ap_proxy_host2addr(const char *host, struct hostent *reqhp);
++int ap_proxy_is_ipaddr(struct dirconn_entry *This, pool *p);
++int ap_proxy_is_domainname(struct dirconn_entry *This, pool *p);
++int ap_proxy_is_hostname(struct dirconn_entry *This, pool *p);
++int ap_proxy_is_word(struct dirconn_entry *This, pool *p);
++int ap_proxy_doconnect(int sock, struct sockaddr_in *addr, request_rec *r);
++int ap_proxy_garbage_init(server_rec *, pool *);
++/* This function is called by ap_table_do() for all header lines */
++int ap_proxy_send_hdr_line(void *p, const char *key, const char *value);
++unsigned ap_proxy_bputs2(const char *data, BUFF *client, cache_req *cache);
++time_t ap_proxy_current_age(cache_req *c, const time_t age_value);
++BUFF *ap_proxy_open_cachefile(request_rec *r, char *filename);
++BUFF *ap_proxy_create_cachefile(request_rec *r, char *filename);
++void ap_proxy_clear_connection(pool *p, table *headers);
++int ap_proxy_table_replace(table *base, table *overlay);
++
++/* WARNING - PRIVATE DEFINITION BELOW */
++
++/* XXX: if you tweak this you should look at is_empty_table() and table_elts()
++ * in ap_alloc.h
++ *
++ * NOTE: this private definition is a duplicate of the one in alloc.c
++ * It's here for ap_proxy_table_replace() to avoid breaking binary compat
++ */
++struct table {
++    /* This has to be first to promote backwards compatibility with
++     * older modules which cast a table * to an array_header *...
++     * they should use the table_elts() function for most of the
++     * cases they do this for.
++     */
++    array_header a;
++#ifdef MAKE_TABLE_PROFILE
++    void *creator;
++#endif
++};
++
++#endif /*MOD_PROXY_H*/
+diff -Nur apache_1.3.23.orig/src/modules/proxy/proxy_connect.c apache_1.3.23/src/modules/proxy/proxy_connect.c
+--- apache_1.3.23.orig/src/modules/proxy/proxy_connect.c	Sun Jan 20 21:14:37 2002
++++ apache_1.3.23/src/modules/proxy/proxy_connect.c	Wed Feb  6 20:49:52 2002
 @@ -114,14 +114,15 @@
- 			  const char *proxyhost, int proxyport)
+                           const char *proxyhost, int proxyport)
  {
      struct sockaddr_in server;
 -    struct in_addr destaddr;
@@ -4161,8 +3249,8 @@ diff -Nur apache_1.3.22.orig/src/modules/proxy/proxy_connect.c apache_1.3.22/src
  
      void *sconf = r->server->module_config;
      proxy_server_conf *conf =
-@@ -129,26 +130,59 @@
-     struct noproxy_entry *npent = (struct noproxy_entry *) conf->noproxies->elts;
+@@ -129,27 +130,59 @@
+     struct noproxy_entry *npent = (struct noproxy_entry *)conf->noproxies->elts;
  
      memset(&server, '\0', sizeof(server));
 +#ifdef HAVE_SOCKADDR_LEN
@@ -4176,16 +3264,16 @@ diff -Nur apache_1.3.22.orig/src/modules/proxy/proxy_connect.c apache_1.3.22/src
 +    hoststr = url;
      p = strchr(url, ':');
 -    if (p == NULL)
--	port = DEFAULT_HTTPS_PORT;
+-        port = DEFAULT_HTTPS_PORT;
 -    else {
--	port = atoi(p + 1);
+-        port = atoi(p + 1);
 +    if (p == NULL) {
 +	char pbuf[32];
 +	ap_snprintf(pbuf, sizeof(pbuf), "%d", DEFAULT_HTTPS_PORT);
 +	portstr = pbuf;
 +    } else {
 +	portstr = p + 1;
- 	*p = '\0';
+         *p = '\0';
      }
 +    port = atoi(portstr);
 +
@@ -4202,8 +3290,9 @@ diff -Nur apache_1.3.22.orig/src/modules/proxy/proxy_connect.c apache_1.3.22/src
  /* check if ProxyBlock directive on this host */
 -    destaddr.s_addr = ap_inet_addr(host);
 -    for (i = 0; i < conf->noproxies->nelts; i++) {
--	if ((npent[i].name != NULL && strstr(host, npent[i].name) != NULL)
--	    || destaddr.s_addr == npent[i].addr.s_addr || npent[i].name[0] == '*')
+-        if ((npent[i].name != NULL && strstr(host, npent[i].name) != NULL)
+-            || destaddr.s_addr == npent[i].addr.s_addr
+-            || npent[i].name[0] == '*')
 +    for (res = res0; res; res = res = res->ai_next) {
 +	struct sockaddr_in *sin;
 +	int fail;
@@ -4224,23 +3313,23 @@ diff -Nur apache_1.3.22.orig/src/modules/proxy/proxy_connect.c apache_1.3.22/src
 +	}
 +	if (fail) {
 +	    freeaddrinfo(res0);
- 	    return ap_proxyerror(r, HTTP_FORBIDDEN,
- 				 "Connect to remote machine blocked");
+             return ap_proxyerror(r, HTTP_FORBIDDEN,
+                                  "Connect to remote machine blocked");
 +	}
      }
  
      /* Check if it is an allowed port */
-@@ -159,59 +193,64 @@
- 	    case DEFAULT_SNEWS_PORT:
- 		break;
- 	    default:
+@@ -160,33 +193,41 @@
+             case DEFAULT_SNEWS_PORT:
+                 break;
+             default:
 +		freeaddrinfo(res0);
- 		return HTTP_FORBIDDEN;
- 	}
+                 return HTTP_FORBIDDEN;
+         }
 -    } else if(!allowed_port(conf, port))
 +    } else if(!allowed_port(conf, port)) {
 +	freeaddrinfo(res0);
- 	return HTTP_FORBIDDEN;
+         return HTTP_FORBIDDEN;
 +    }
  
      if (proxyhost) {
@@ -4257,26 +3346,27 @@ diff -Nur apache_1.3.22.orig/src/modules/proxy/proxy_connect.c apache_1.3.22/src
 +	if (error)
 +	    return HTTP_INTERNAL_SERVER_ERROR;	/* XXX */
 +
- 	ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "CONNECT to remote proxy %s on port %d", proxyhost, proxyport);
+         ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server,
+             "CONNECT to remote proxy %s on port %d", proxyhost, proxyport);
      }
      else {
--	ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "CONNECT to %s on port %d", host, port);
-+	ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "CONNECT to %s on port %d", hoststr, port);
+         ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server,
+-            "CONNECT to %s on port %d", host, port);
++            "CONNECT to %s on port %d", hoststr, port);
      }
  
--    server.sin_port = (proxyport ? htons(proxyport) : htons(port));
+-    /* Nasty cast to work around broken terniary expressions on MSVC */
+-    server.sin_port = htons((unsigned short)(proxyport ? proxyport : port));
 -    err = ap_proxy_host2addr(proxyhost ? proxyhost : host, &server_hp);
 -
 -    if (err != NULL)
--	return ap_proxyerror(r,
--			     proxyhost ? HTTP_BAD_GATEWAY : HTTP_INTERNAL_SERVER_ERROR,
--			     err);
+-        return ap_proxyerror(r,
+-           proxyhost ? HTTP_BAD_GATEWAY : HTTP_INTERNAL_SERVER_ERROR, err);
 -
 -    sock = ap_psocket(r->pool, PF_INET, SOCK_STREAM, IPPROTO_TCP);
 -    if (sock == -1) {
--	ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
--		    "proxy: error creating socket");
--	return HTTP_INTERNAL_SERVER_ERROR;
+-        ap_log_rerror(APLOG_MARK, APLOG_ERR, r, "proxy: error creating socket");
+-        return HTTP_INTERNAL_SERVER_ERROR;
 -    }
 +    sock = i = -1;
 +    for (res = res0; res; res = res->ai_next) {
@@ -4285,53 +3375,33 @@ diff -Nur apache_1.3.22.orig/src/modules/proxy/proxy_connect.c apache_1.3.22/src
 +	    continue;
  
  #ifdef CHECK_FD_SETSIZE
--    if (sock >= FD_SETSIZE) {
--	ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_WARNING, r->server,
--	    "proxy_connect_handler: filedescriptor (%u) "
--	    "larger than FD_SETSIZE (%u) "
--	    "found, you probably need to rebuild Apache with a "
--	    "larger FD_SETSIZE", sock, FD_SETSIZE);
--	ap_pclosesocket(r->pool, sock);
--	return HTTP_INTERNAL_SERVER_ERROR;
--    }
-+	if (sock >= FD_SETSIZE) {
-+	    ap_log_error(APLOG_MARK, APLOG_NOERRNO|APLOG_WARNING, NULL,
-+			"proxy_connect_handler: filedescriptor (%u) "
-+			"larger than FD_SETSIZE (%u) "
-+			"found, you probably need to rebuild Apache with a "
-+			"larger FD_SETSIZE.  Anyway try to open next socket.",
-+			sock, FD_SETSIZE);
-+	    ap_pclosesocket(r->pool, sock);
-+	    continue;
-+	}
+     if (sock >= FD_SETSIZE) {
+@@ -196,19 +237,15 @@
+             "found, you probably need to rebuild Apache with a "
+             "larger FD_SETSIZE", sock, FD_SETSIZE);
+         ap_pclosesocket(r->pool, sock);
+-        return HTTP_INTERNAL_SERVER_ERROR;
++	continue;
+     }
  #endif
  
 -    j = 0;
 -    while (server_hp.h_addr_list[j] != NULL) {
--	memcpy(&server.sin_addr, server_hp.h_addr_list[j],
--	       sizeof(struct in_addr));
--	i = ap_proxy_doconnect(sock, &server, r);
+-        memcpy(&server.sin_addr, server_hp.h_addr_list[j],
+-               sizeof(struct in_addr));
+-        i = ap_proxy_doconnect(sock, &server, r);
 +	i = ap_proxy_doconnect(sock, res->ai_addr, r);
- 	if (i == 0)
- 	    break;
--	j++;
+         if (i == 0)
+             break;
+-        j++;
      }
 +    freeaddrinfo(res0);
      if (i == -1) {
- 	ap_pclosesocket(r->pool, sock);
--	return ap_proxyerror(r, HTTP_INTERNAL_SERVER_ERROR, ap_pstrcat(r->pool,
--					"Could not connect to remote machine:<br>",
--					strerror(errno), NULL));
-+	return ap_proxyerror(r, HTTP_INTERNAL_SERVER_ERROR,
-+			ap_pstrcat(r->pool,
-+				"Could not connect to remote machine:<br>",
-+				strerror(errno), NULL));
-     }
- 
-     /* If we are connecting through a remote proxy, we need to pass
-diff -Nur apache_1.3.22.orig/src/modules/proxy/proxy_ftp.c apache_1.3.22/src/modules/proxy/proxy_ftp.c
---- apache_1.3.22.orig/src/modules/proxy/proxy_ftp.c	Fri Oct  5 10:19:15 2001
-+++ apache_1.3.22/src/modules/proxy/proxy_ftp.c	Tue Dec 18 23:14:29 2001
+         ap_pclosesocket(r->pool, sock);
+         return ap_proxyerror(r, HTTP_INTERNAL_SERVER_ERROR, ap_pstrcat(r->pool,
+diff -Nur apache_1.3.23.orig/src/modules/proxy/proxy_ftp.c apache_1.3.23/src/modules/proxy/proxy_ftp.c
+--- apache_1.3.23.orig/src/modules/proxy/proxy_ftp.c	Sun Jan 20 21:14:37 2002
++++ apache_1.3.23/src/modules/proxy/proxy_ftp.c	Wed Feb  6 21:08:39 2002
 @@ -62,6 +62,7 @@
  #include "http_main.h"
  #include "http_log.h"
@@ -4353,7 +3423,7 @@ diff -Nur apache_1.3.22.orig/src/modules/proxy/proxy_ftp.c apache_1.3.22/src/mod
      struct in_addr destaddr;
      table *resp_hdrs;
      BUFF *f;
-@@ -473,11 +476,18 @@
+@@ -471,11 +474,18 @@
      unsigned int presult, h0, h1, h2, h3, p0, p1;
      unsigned int paddr;
      unsigned short pport;
@@ -4373,22 +3443,22 @@ diff -Nur apache_1.3.22.orig/src/modules/proxy/proxy_ftp.c apache_1.3.22/src/mod
  /* stuff for responses */
      char resp[MAX_STRING_LEN];
      char *size = NULL;
-@@ -547,62 +557,52 @@
+@@ -545,62 +555,52 @@
      if (parms != NULL)
- 	*(parms++) = '\0';
+         *(parms++) = '\0';
  
 -    memset(&server, 0, sizeof(struct sockaddr_in));
 -    server.sin_family = AF_INET;
--    server.sin_port = htons(port);
+-    server.sin_port = htons((unsigned short)port);
 -    err = ap_proxy_host2addr(host, &server_hp);
 -    if (err != NULL)
--	return ap_proxyerror(r, HTTP_INTERNAL_SERVER_ERROR, err);
+-        return ap_proxyerror(r, HTTP_INTERNAL_SERVER_ERROR, err);
 -
 -    sock = ap_psocket(p, PF_INET, SOCK_STREAM, IPPROTO_TCP);
 -    if (sock == -1) {
--	ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
--		     "proxy: error creating socket");
--	return HTTP_INTERNAL_SERVER_ERROR;
+-        ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
+-                     "proxy: error creating socket");
+-        return HTTP_INTERNAL_SERVER_ERROR;
 -    }
 +    ap_snprintf(portbuf, sizeof(portbuf), "%d", port);
 +    memset(&hints, 0, sizeof(hints));
@@ -4409,11 +3479,11 @@ diff -Nur apache_1.3.22.orig/src/modules/proxy/proxy_ftp.c apache_1.3.22/src/mod
  
  #if !defined(TPF) && !defined(BEOS)
 -    if (conf->recv_buffer_size > 0
--	&& setsockopt(sock, SOL_SOCKET, SO_RCVBUF,
--		       (const char *) &conf->recv_buffer_size, sizeof(int))
--	    == -1) {
--	    ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
--			 "setsockopt(SO_RCVBUF): Failed to set ProxyReceiveBufferSize, using default");
+-        && setsockopt(sock, SOL_SOCKET, SO_RCVBUF,
+-                       (const char *) &conf->recv_buffer_size, sizeof(int))
+-            == -1) {
+-            ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
+-                         "setsockopt(SO_RCVBUF): Failed to set ProxyReceiveBufferSize, using default");
 -    }
 +	if (conf->recv_buffer_size > 0
 +	    && setsockopt(sock, SOL_SOCKET, SO_RCVBUF,
@@ -4425,14 +3495,14 @@ diff -Nur apache_1.3.22.orig/src/modules/proxy/proxy_ftp.c apache_1.3.22/src/mod
  #endif
  
 -    if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (void *) &one,
--		   sizeof(one)) == -1) {
+-                   sizeof(one)) == -1) {
 +	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (void *) &one,
 +		       sizeof(one)) == -1) {
  #ifndef _OSD_POSIX /* BS2000 has this option "always on" */
--	ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
--		     "proxy: error setting reuseaddr option: setsockopt(SO_REUSEADDR)");
--	ap_pclosesocket(p, sock);
--	return HTTP_INTERNAL_SERVER_ERROR;
+-        ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
+-                     "proxy: error setting reuseaddr option: setsockopt(SO_REUSEADDR)");
+-        ap_pclosesocket(p, sock);
+-        return HTTP_INTERNAL_SERVER_ERROR;
 +	    ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
 +			 "proxy: error setting reuseaddr option: setsockopt(SO_REUSEADDR)");
 +	    ap_pclosesocket(p, sock);
@@ -4443,46 +3513,46 @@ diff -Nur apache_1.3.22.orig/src/modules/proxy/proxy_ftp.c apache_1.3.22/src/mod
 -
 -#ifdef SINIX_D_RESOLVER_BUG
 -    {
--	struct in_addr *ip_addr = (struct in_addr *) *server_hp.h_addr_list;
+-        struct in_addr *ip_addr = (struct in_addr *) *server_hp.h_addr_list;
 -
--	for (; ip_addr->s_addr != 0; ++ip_addr) {
--	    memcpy(&server.sin_addr, ip_addr, sizeof(struct in_addr));
--	    i = ap_proxy_doconnect(sock, &server, r);
--	    if (i == 0)
--		break;
- 	}
+-        for (; ip_addr->s_addr != 0; ++ip_addr) {
+-            memcpy(&server.sin_addr, ip_addr, sizeof(struct in_addr));
+-            i = ap_proxy_doconnect(sock, &server, r);
+-            if (i == 0)
+-                break;
+         }
 -    }
 -#else
 -    j = 0;
 -    while (server_hp.h_addr_list[j] != NULL) {
--	memcpy(&server.sin_addr, server_hp.h_addr_list[j],
--	       sizeof(struct in_addr));
--	i = ap_proxy_doconnect(sock, &server, r);
--	if (i == 0)
+-        memcpy(&server.sin_addr, server_hp.h_addr_list[j],
+-               sizeof(struct in_addr));
+-        i = ap_proxy_doconnect(sock, &server, r);
+-        if (i == 0)
 +
 +	i = ap_proxy_doconnect(sock, res->ai_addr, r);
 +	if (i == 0){
 +	    memcpy(&server, res->ai_addr, res->ai_addrlen);
- 	    break;
--	j++;
+             break;
+-        j++;
 +	}
 +	ap_pclosesocket(p, sock);
      }
 -#endif
 +    freeaddrinfo(res0);
      if (i == -1) {
- 	ap_pclosesocket(p, sock);
- 	return ap_proxyerror(r, HTTP_BAD_GATEWAY, ap_pstrcat(r->pool,
-@@ -806,7 +806,7 @@
+         ap_pclosesocket(p, sock);
+         return ap_proxyerror(r, HTTP_BAD_GATEWAY, ap_pstrcat(r->pool,
+@@ -807,7 +807,7 @@
      }
  
  /* try to set up PASV data connection first */
 -    dsock = ap_psocket(p, PF_INET, SOCK_STREAM, IPPROTO_TCP);
 +    dsock = ap_psocket(p, server.ss_family, SOCK_STREAM, IPPROTO_TCP);
      if (dsock == -1) {
- 	ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
- 		     "proxy: error creating PASV socket");
-@@ -825,11 +825,22 @@
+         ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
+                      "proxy: error creating PASV socket");
+@@ -826,11 +826,22 @@
      }
  #endif
  
@@ -4499,7 +3569,7 @@ diff -Nur apache_1.3.22.orig/src/modules/proxy/proxy_ftp.c apache_1.3.22/src/mod
      ap_bflush(f);
 +    Explain0("FTP: passive command issued");
      ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: PASV command issued");
--    /* possible results: 227, 421, 500, 501, 502, 530 */
+-/* possible results: 227, 421, 500, 501, 502, 530 */
 +    /* possible results: 227, 228, 229, 421, 500, 501, 502, 530 */
      /* 227 Entering Passive Mode (h1,h2,h3,h4,p1,p2). */
 +    /* 228 Entering Long Passive Mode (...). */
@@ -4507,23 +3577,23 @@ diff -Nur apache_1.3.22.orig/src/modules/proxy/proxy_ftp.c apache_1.3.22/src/mod
      /* 421 Service not available, closing control connection. */
      /* 500 Syntax error, command unrecognized. */
      /* 501 Syntax error in parameters or arguments. */
-@@ -838,7 +849,7 @@
+@@ -839,7 +850,7 @@
      i = ap_bgets(pasv, sizeof(pasv), f);
      if (i == -1) {
- 	ap_log_rerror(APLOG_MARK, APLOG_ERR|APLOG_NOERRNO, r,
--		     "PASV: control connection is toast");
-+		     "%s: control connection is toast", cmd);
- 	ap_pclosesocket(p, dsock);
- 	ap_bclose(f);
- 	ap_kill_timeout(r);
-@@ -870,10 +881,14 @@
- 	    pport = (p1 << 8) + p0;
- 	    ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: contacting host %d.%d.%d.%d:%d",
- 		     h3, h2, h1, h0, pport);
--	    data_addr.sin_family = AF_INET;
--	    data_addr.sin_addr.s_addr = htonl(paddr);
--	    data_addr.sin_port = htons(pport);
--	    i = ap_proxy_doconnect(dsock, &data_addr, r);
+         ap_log_rerror(APLOG_MARK, APLOG_ERR|APLOG_NOERRNO, r,
+-                     "PASV: control connection is toast");
++                     "%s: control connection is toast", cmd);
+         ap_pclosesocket(p, dsock);
+         ap_bclose(f);
+         ap_kill_timeout(r);
+@@ -871,10 +882,14 @@
+             pport = (p1 << 8) + p0;
+             ap_log_error(APLOG_MARK, APLOG_DEBUG|APLOG_NOERRNO, r->server, "FTP: contacting host %d.%d.%d.%d:%d",
+                      h3, h2, h1, h0, pport);
+-            data_addr.sin_family = AF_INET;
+-            data_addr.sin_addr.s_addr = htonl(paddr);
+-            data_addr.sin_port = htons(pport);
+-            i = ap_proxy_doconnect(dsock, &data_addr, r);
 +	    sin = (struct sockaddr_in *)&data_addr;
 +	    sin->sin_family = AF_INET;
 +#ifdef SIN6_LEN
@@ -4533,16 +3603,12 @@ diff -Nur apache_1.3.22.orig/src/modules/proxy/proxy_ftp.c apache_1.3.22/src/mod
 +	    sin->sin_port = htons(pport);
 +	    i = ap_proxy_doconnect(dsock, (struct sockaddr *)&data_addr, r);
  
- 	    if (i == -1) {
- 		ap_kill_timeout(r);
-@@ -881,17 +896,76 @@
- 				     ap_pstrcat(r->pool,
- 						"Could not connect to remote machine: ",
- 						strerror(errno), NULL));
-+	    } else {
-+		pasvmode = 1;
- 	    }
--	    else {
+             if (i == -1) {
+                 ap_kill_timeout(r);
+@@ -886,13 +901,73 @@
+             else {
+                 pasvmode = 1;
+             }
 +	} else if (presult == 228 && pstr != NULL
 +		&& sscanf(pstr,
 +"%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u",
@@ -4598,38 +3664,38 @@ diff -Nur apache_1.3.22.orig/src/modules/proxy/proxy_ftp.c apache_1.3.22/src/mod
 +						"Could not connect to remote machine: ",
 +						strerror(errno), NULL));
 +	    } else {
- 		pasvmode = 1;
- 	    }
++		pasvmode = 1;
++	    }
 +	} else if (!lpsvmode && strcmp(cmd, "EPSV") == 0) {
 +	    lpsvmode = 1;
 +	    goto lpsvagain;
- 	}
- 	else
- 	    ap_pclosesocket(p, dsock);	/* and try the regular way */
+         }
+         else
+             ap_pclosesocket(p, dsock);  /* and try the regular way */
      }
  
-     if (!pasvmode) {		/* set up data connection */
--	clen = sizeof(struct sockaddr_in);
+     if (!pasvmode) {            /* set up data connection */
+-        clen = sizeof(struct sockaddr_in);
 +	clen = sizeof(server);
- 	if (getsockname(sock, (struct sockaddr *) &server, &clen) < 0) {
- 	    ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
- 			 "proxy: error getting socket address");
-@@ -900,7 +974,7 @@
- 	    return HTTP_INTERNAL_SERVER_ERROR;
- 	}
+         if (getsockname(sock, (struct sockaddr *) &server, &clen) < 0) {
+             ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
+                          "proxy: error getting socket address");
+@@ -901,7 +976,7 @@
+             return HTTP_INTERNAL_SERVER_ERROR;
+         }
  
--	dsock = ap_psocket(p, PF_INET, SOCK_STREAM, IPPROTO_TCP);
-+	dsock = ap_psocket(p, server.ss_family, SOCK_STREAM, IPPROTO_TCP);
- 	if (dsock == -1) {
- 	    ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
- 			 "proxy: error creating socket");
-@@ -921,13 +995,26 @@
+-        dsock = ap_psocket(p, PF_INET, SOCK_STREAM, IPPROTO_TCP);
++        dsock = ap_psocket(p, server.ss_family, SOCK_STREAM, IPPROTO_TCP);
+         if (dsock == -1) {
+             ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
+                          "proxy: error creating socket");
+@@ -922,13 +997,26 @@
  #endif /*_OSD_POSIX*/
- 	}
+         }
  
--	if (bind(dsock, (struct sockaddr *) &server,
--		 sizeof(struct sockaddr_in)) == -1) {
--	    char buff[22];
+-        if (bind(dsock, (struct sockaddr *) &server,
+-                 sizeof(struct sockaddr_in)) == -1) {
+-            char buff[22];
 +#ifndef SIN6_LEN
 +	if (bind(dsock, (struct sockaddr *) &server, SA_LEN((struct sockaddr *)&server)) == -1)
 +#else
@@ -4638,7 +3704,6 @@ diff -Nur apache_1.3.22.orig/src/modules/proxy/proxy_ftp.c apache_1.3.22/src/mod
 +	{
 +	    char hostnamebuf[MAXHOSTNAMELEN], portnamebuf[MAXHOSTNAMELEN];
  
--	    ap_snprintf(buff, sizeof(buff), "%s:%d", inet_ntoa(server.sin_addr), server.sin_port);
 +	    getnameinfo((struct sockaddr *)&server,
 +#ifndef SIN6_LEN
 +		    SA_LEN((struct sockaddr *)&server),
@@ -4648,29 +3713,30 @@ diff -Nur apache_1.3.22.orig/src/modules/proxy/proxy_ftp.c apache_1.3.22/src/mod
 +		hostnamebuf, sizeof(hostnamebuf),
 +		portnamebuf, sizeof(portnamebuf),
 +		NI_NUMERICHOST | NI_NUMERICSERV);
- 	    ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
--			 "proxy: error binding to ftp data socket %s", buff);
-+			 "proxy: error binding to ftp data socket %s:%s",
+-            ap_snprintf(buff, sizeof(buff), "%s:%d", inet_ntoa(server.sin_addr), server.sin_port);
+             ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
+-                         "proxy: error binding to ftp data socket %s", buff);
++                         "proxy: error binding to ftp data socket %s:%s",
 +			 hostnamebuf, portnamebuf);
- 	    ap_bclose(f);
- 	    ap_pclosesocket(p, dsock);
- 	    return HTTP_INTERNAL_SERVER_ERROR;
-@@ -1186,7 +1273,7 @@
+             ap_bclose(f);
+             ap_pclosesocket(p, dsock);
+             return HTTP_INTERNAL_SERVER_ERROR;
+@@ -1187,7 +1276,7 @@
  
-     if (!pasvmode) {		/* wait for connection */
- 	ap_hard_timeout("proxy ftp data connect", r);
--	clen = sizeof(struct sockaddr_in);
-+	clen = sizeof(server);
- 	do
- 	    csd = accept(dsock, (struct sockaddr *) &server, &clen);
- 	while (csd == -1 && errno == EINTR);
-diff -Nur apache_1.3.22.orig/src/modules/proxy/proxy_http.c apache_1.3.22/src/modules/proxy/proxy_http.c
---- apache_1.3.22.orig/src/modules/proxy/proxy_http.c	Tue Dec 18 23:14:13 2001
-+++ apache_1.3.22/src/modules/proxy/proxy_http.c	Tue Dec 18 23:14:29 2001
-@@ -177,9 +177,8 @@
+     if (!pasvmode) {            /* wait for connection */
+         ap_hard_timeout("proxy ftp data connect", r);
+-        clen = sizeof(struct sockaddr_in);
++        clen = sizeof(server);
+         do
+             csd = accept(dsock, (struct sockaddr *) &server, &clen);
+         while (csd == -1 && errno == EINTR);
+diff -Nur apache_1.3.23.orig/src/modules/proxy/proxy_http.c apache_1.3.23/src/modules/proxy/proxy_http.c
+--- apache_1.3.23.orig/src/modules/proxy/proxy_http.c	Wed Feb  6 20:17:43 2002
++++ apache_1.3.23/src/modules/proxy/proxy_http.c	Wed Feb  6 21:18:32 2002
+@@ -155,9 +155,8 @@
+     table *req_hdrs, *resp_hdrs;
      array_header *reqhdrs_arr;
-     table *resp_hdrs;
-     table_entry *reqhdrs;
+     table_entry *reqhdrs_elts;
 -    struct sockaddr_in server;
 -    struct in_addr destaddr;
 -    struct hostent server_hp;
@@ -4679,18 +3745,18 @@ diff -Nur apache_1.3.22.orig/src/modules/proxy/proxy_http.c apache_1.3.22/src/mo
      BUFF *f;
      char buffer[HUGE_STRING_LEN];
      char portstr[32];
-@@ -201,9 +200,6 @@
-     struct nocache_entry *ncent = (struct nocache_entry *) conf->nocaches->elts;
-     int nocache = 0;
+@@ -179,9 +178,6 @@
+ 
+     if (conf->cache.root == NULL) nocache = 1;
  
 -    memset(&server, '\0', sizeof(server));
 -    server.sin_family = AF_INET;
 -
- /* We break the URL into host, port, path-search */
+     /* We break the URL into host, port, path-search */
  
      urlptr = strstr(url, "://");
-@@ -211,6 +207,8 @@
- 	return HTTP_BAD_REQUEST;
+@@ -189,6 +185,8 @@
+         return HTTP_BAD_REQUEST;
      urlptr += 3;
      destport = DEFAULT_HTTP_PORT;
 +    ap_snprintf(portstr, sizeof(portstr), "%d", DEFAULT_HTTP_PORT);
@@ -4698,9 +3764,9 @@ diff -Nur apache_1.3.22.orig/src/modules/proxy/proxy_http.c apache_1.3.22/src/mo
  #ifdef EAPI
      ap_hook_use("ap::mod_proxy::http::handler::set_destport", 
                  AP_HOOK_SIG2(int,ptr), 
-@@ -229,7 +227,20 @@
- 	urlptr = strp;
- 	desthost = q;
+@@ -207,7 +205,20 @@
+         urlptr = strp;
+         desthost = q;
      }
 -
 +   if (*desthost == '['){
@@ -4719,11 +3785,11 @@ diff -Nur apache_1.3.22.orig/src/modules/proxy/proxy_http.c apache_1.3.22/src/mo
 +   } else
      strp2 = strchr(desthost, ':');
      if (strp2 != NULL) {
- 	*(strp2++) = '\0';
-@@ -240,41 +251,69 @@
+         *(strp2++) = '\0';
+@@ -218,45 +229,69 @@
      }
  
- /* check if ProxyBlock directive on this host */
+     /* check if ProxyBlock directive on this host */
 -    destaddr.s_addr = ap_inet_addr(desthost);
 -    for (i = 0; i < conf->noproxies->nelts; i++) {
 -        if (destaddr.s_addr == npent[i].addr.s_addr ||
@@ -4762,37 +3828,15 @@ diff -Nur apache_1.3.22.orig/src/modules/proxy/proxy_http.c apache_1.3.22/src/mo
 +                   }
 +           }
 +       if (fail) {
-+           freeaddrinfo(res0);                  
++           freeaddrinfo(res0);
              return ap_proxyerror(r, HTTP_FORBIDDEN,
                                   "Connect to remote machine blocked");
 -    }
 -
 -    if (proxyhost != NULL) {
--	server.sin_port = htons(proxyport);
--	err = ap_proxy_host2addr(proxyhost, &server_hp);
--	if (err != NULL)
--	    return DECLINED;	/* try another */
--#ifdef EAPI
--	peer = ap_psprintf(p, "%s:%u", proxyhost, proxyport);  
--#endif
--    }
--    else {
--	server.sin_port = htons(destport);
--	err = ap_proxy_host2addr(desthost, &server_hp);
--	if (err != NULL)
--	    return ap_proxyerror(r, HTTP_INTERNAL_SERVER_ERROR, err);
--#ifdef EAPI
--	peer =  ap_psprintf(p, "%s:%u", desthost, destport);  
--#endif
--    }
--
--    sock = ap_psocket(p, PF_INET, SOCK_STREAM, IPPROTO_TCP);
--    if (sock == -1) {
--	ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
--		    "proxy: error creating socket");
--	return HTTP_INTERNAL_SERVER_ERROR;
--    }
--
+-        server.sin_port = htons((unsigned short)proxyport);
+-        err = ap_proxy_host2addr(proxyhost, &server_hp);
+-        if (err != NULL)
 +       }
 +      }
 +  
@@ -4807,7 +3851,32 @@ diff -Nur apache_1.3.22.orig/src/modules/proxy/proxy_http.c apache_1.3.22/src/mo
 +       hints.ai_protocol = IPPROTO_TCP;
 +       error = getaddrinfo(proxyhost, pbuf, &hints, &res0);
 +       if (error)
-+            return DECLINED;    /* try another */
+             return DECLINED;    /* try another */
+-#ifdef EAPI
+-	peer = ap_psprintf(p, "%s:%u", proxyhost, proxyport);  
+-#endif
+-    }
+-    else {
+-        server.sin_port = htons((unsigned short)destport);
+-        err = ap_proxy_host2addr(desthost, &server_hp);
+-        if (err != NULL)
+-            return ap_proxyerror(r, HTTP_INTERNAL_SERVER_ERROR, err);
+-#ifdef EAPI
+-	peer =  ap_psprintf(p, "%s:%u", desthost, destport);  
+-#endif
+-    }
+-
+-
+-    /* we have worked out who exactly we are going to connect to, now
+-     * make that connection...
+-     */
+-    sock = ap_psocket(p, PF_INET, SOCK_STREAM, IPPROTO_TCP);
+-    if (sock == -1) {
+-        ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
+-                    "proxy: error creating socket");
+-        return HTTP_INTERNAL_SERVER_ERROR;
+-    }
+-
 +  #ifdef EAPI
 +        peer = ap_psprintf(p, "%s:%u", proxyhost, proxyport);  
 +  #endif
@@ -4822,41 +3891,41 @@ diff -Nur apache_1.3.22.orig/src/modules/proxy/proxy_http.c apache_1.3.22/src/mo
 +    
  #if !defined(TPF) && !defined(BEOS)
      if (conf->recv_buffer_size) {
- 	if (setsockopt(sock, SOL_SOCKET, SO_RCVBUF,
-@@ -286,28 +325,12 @@
+         if (setsockopt(sock, SOL_SOCKET, SO_RCVBUF,
+@@ -268,28 +303,12 @@
      }
  #endif
  
 -#ifdef SINIX_D_RESOLVER_BUG
 -    {
--	struct in_addr *ip_addr = (struct in_addr *) *server_hp.h_addr_list;
+-        struct in_addr *ip_addr = (struct in_addr *) *server_hp.h_addr_list;
 -
--	for (; ip_addr->s_addr != 0; ++ip_addr) {
--	    memcpy(&server.sin_addr, ip_addr, sizeof(struct in_addr));
--	    i = ap_proxy_doconnect(sock, &server, r);
--	    if (i == 0)
--		break;
--	}
+-        for (; ip_addr->s_addr != 0; ++ip_addr) {
+-            memcpy(&server.sin_addr, ip_addr, sizeof(struct in_addr));
+-            i = ap_proxy_doconnect(sock, &server, r);
+-            if (i == 0)
+-                break;
+-        }
 -    }
 -#else
 -    j = 0;
 -    while (server_hp.h_addr_list[j] != NULL) {
--	memcpy(&server.sin_addr, server_hp.h_addr_list[j],
--	       sizeof(struct in_addr));
--	i = ap_proxy_doconnect(sock, &server, r);
+-        memcpy(&server.sin_addr, server_hp.h_addr_list[j],
+-               sizeof(struct in_addr));
+-        i = ap_proxy_doconnect(sock, &server, r);
 +	i = ap_proxy_doconnect(sock, res->ai_addr, r);
- 	if (i == 0)
- 	    break;
--	j++;
+         if (i == 0)
+             break;
+-        j++;
 +	ap_pclosesocket(p, sock); 
      }
 -#endif
 +    freeaddrinfo(res0);
      if (i == -1) {
- 	if (proxyhost != NULL)
- 	    return DECLINED;	/* try again another way */
-@@ -527,17 +550,31 @@
-     }
+         if (proxyhost != NULL)
+             return DECLINED;    /* try again another way */
+@@ -544,16 +563,30 @@
+       ap_table_set(resp_hdrs, "Content-Location", proxy_location_reverse_map(r , urlstr));
  
  /* check if NoCache directive on this host */
 +  {
@@ -4866,13 +3935,13 @@ diff -Nur apache_1.3.22.orig/src/modules/proxy/proxy_http.c apache_1.3.22/src/mo
 +#endif
 +
      if (nocache == 0) {
- 	for (i = 0; i < conf->nocaches->nelts; i++) {
--	    if (destaddr.s_addr == ncent[i].addr.s_addr ||
--	        (ncent[i].name != NULL &&
--		  (ncent[i].name[0] == '*' ||
--		   strstr(desthost, ncent[i].name) != NULL))) {
--	       nocache = 1;
--	       break;
+         for (i = 0; i < conf->nocaches->nelts; i++) {
+-            if (destaddr.s_addr == ncent[i].addr.s_addr ||
+-                (ncent[i].name != NULL &&
+-                  (ncent[i].name[0] == '*' ||
+-                   strstr(desthost, ncent[i].name) != NULL))) {
+-               nocache = 1;
+-               break;
 +	    if (ncent[i].name != NULL && 
 +		(ncent[i].name[0] == '*' ||
 +		 strstr(desthost, ncent[i].name) != NULL)) {
@@ -4886,20 +3955,19 @@ diff -Nur apache_1.3.22.orig/src/modules/proxy/proxy_http.c apache_1.3.22/src/mo
 +		    nocache = 1;
 +		    break;
 +		}
- 	    }
- 	}
-     }
+             }
+         }
 +  }
  
-     i = ap_proxy_cache_update(c, resp_hdrs, !backasswards, nocache);
-     if (i != DECLINED) {
-diff -Nur apache_1.3.22.orig/src/modules/proxy/proxy_util.c apache_1.3.22/src/modules/proxy/proxy_util.c
---- apache_1.3.22.orig/src/modules/proxy/proxy_util.c	Mon Sep 24 22:14:27 2001
-+++ apache_1.3.22/src/modules/proxy/proxy_util.c	Tue Dec 18 23:14:29 2001
+     /* update the cache file, possibly even fulfilling the request if
+      * it turns out a conditional allowed us to serve the object from the
+diff -Nur apache_1.3.23.orig/src/modules/proxy/proxy_util.c apache_1.3.23/src/modules/proxy/proxy_util.c
+--- apache_1.3.23.orig/src/modules/proxy/proxy_util.c	Fri Jan 18 21:26:58 2002
++++ apache_1.3.23/src/modules/proxy/proxy_util.c	Wed Feb  6 21:25:17 2002
 @@ -64,6 +64,7 @@
  #include "http_log.h"
  #include "util_uri.h"
- #include "util_date.h"	/* get ap_checkmask() decl. */
+ #include "util_date.h"  /* get ap_checkmask() decl. */
 +#include "sa_len.h"
  
  static int proxy_match_ipaddr(struct dirconn_entry *This, request_rec *r);
@@ -4911,16 +3979,16 @@ diff -Nur apache_1.3.22.orig/src/modules/proxy/proxy_util.c apache_1.3.22/src/mo
 +    char *t = NULL, *u = NULL, *v = NULL;
  
      if (url[0] != '/' || url[1] != '/')
- 	return "Malformed URL";
+         return "Malformed URL";
 @@ -256,11 +258,22 @@
- 	*passwordp = password;
+         *passwordp = password;
      }
  
 -    strp = strrchr(host, ':');
 -    if (strp != NULL) {
--	*(strp++) = '\0';
+-        *(strp++) = '\0';
 -
--	for (i = 0; strp[i] != '\0'; i++)
+-        for (i = 0; strp[i] != '\0'; i++)
 +    v = host;
 +    if (*host == '['){
 +	u = strrchr(host, ']');
@@ -4935,18 +4003,18 @@ diff -Nur apache_1.3.22.orig/src/modules/proxy/proxy_util.c apache_1.3.22/src/mo
 +	*t = '\0';
 +	strp = t + 1;
 +    }
-+    if (strp){
++    if (strp) {
 +	for (i=0; strp[i] != '\0'; i++)
- 	    if (!ap_isdigit(strp[i]))
- 		break;
+             if (!ap_isdigit(strp[i]))
+                 break;
  
 @@ -278,17 +291,29 @@
- 	return "Missing host in URL";
+         return "Missing host in URL";
  /* check hostname syntax */
      for (i = 0; host[i] != '\0'; i++)
--	if (!ap_isdigit(host[i]) && host[i] != '.')
-+	if (!ap_isxdigit(host[i]) && host[i] != '.' && host[i] != ':')
- 	    break;
+-        if (!ap_isdigit(host[i]) && host[i] != '.')
++        if (!ap_isdigit(host[i]) && host[i] != '.' && host[i] != ':')
+             break;
      /* must be an IP address */
  #if defined(WIN32) || defined(NETWARE) || defined(TPF) || defined(BEOS)
      if (host[i] == '\0' && (inet_addr(host) == -1))
@@ -4966,15 +4034,15 @@ diff -Nur apache_1.3.22.orig/src/modules/proxy/proxy_util.c apache_1.3.22/src/mo
 +	    return "Bad IP address in URL";
  #endif
 -    {
--	return "Bad IP address in URL";
+-        return "Bad IP address in URL";
 +	}
 +	freeaddrinfo(res0);
      }
 +#endif
  
-     *urlp = url;
-     *hostp = host;
-@@ -1237,22 +1262,45 @@
+ /*    if (strchr(host,'.') == NULL && domain != NULL)
+    host = pstrcat(p, host, domain, NULL);
+@@ -1284,22 +1309,45 @@
      return host != NULL && strstr(host, This->name) != NULL;
  }
  
@@ -5004,11 +4072,11 @@ diff -Nur apache_1.3.22.orig/src/modules/proxy/proxy_util.c apache_1.3.22/src/mo
 +    }
 +#endif
      do {
--	i = connect(sock, (struct sockaddr *) addr, sizeof(struct sockaddr_in));
-+	i = connect(sock,  addr, salen);
+-        i = connect(sock, (struct sockaddr *) addr, sizeof(struct sockaddr_in));
++        i = connect(sock, addr, salen);
  #if defined(WIN32) || defined(NETWARE)
- 	if (i == SOCKET_ERROR)
- 	    errno = WSAGetLastError();
+         if (i == SOCKET_ERROR)
+             errno = WSAGetLastError();
  #endif /* WIN32 */
      } while (i == -1 && errno == EINTR);
      if (i == -1) {
@@ -5017,16 +4085,16 @@ diff -Nur apache_1.3.22.orig/src/modules/proxy/proxy_util.c apache_1.3.22/src/mo
 +	    strcpy(hbuf, "?");
 +	    strcpy(pbuf, "?");
 +	}
- 	ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
--		     "proxy connect to %s port %d failed",
--		     inet_ntoa(addr->sin_addr), ntohs(addr->sin_port));
-+		     "proxy connect to %s port %s failed", hbuf, pbuf);
+         ap_log_rerror(APLOG_MARK, APLOG_ERR, r,
+-                     "proxy connect to %s port %d failed",
+-                     inet_ntoa(addr->sin_addr), ntohs(addr->sin_port));
++                     "proxy connect to %s port %d failed", hbuf, pbuf);
      }
      ap_kill_timeout(r);
  
-diff -Nur apache_1.3.22.orig/src/modules/standard/mod_access.c apache_1.3.22/src/modules/standard/mod_access.c
---- apache_1.3.22.orig/src/modules/standard/mod_access.c	Mon Jan 15 18:05:34 2001
-+++ apache_1.3.22/src/modules/standard/mod_access.c	Tue Dec 18 23:14:29 2001
+diff -Nur apache_1.3.23.orig/src/modules/standard/mod_access.c apache_1.3.23/src/modules/standard/mod_access.c
+--- apache_1.3.23.orig/src/modules/standard/mod_access.c	Mon Jan 15 18:05:34 2001
++++ apache_1.3.23/src/modules/standard/mod_access.c	Wed Feb  6 20:20:48 2002
 @@ -74,7 +74,10 @@
      T_ALL,
      T_IP,
@@ -5418,9 +4486,9 @@ diff -Nur apache_1.3.22.orig/src/modules/standard/mod_access.c apache_1.3.22/src
  
  	case T_HOST:
  	    if (!gothost) {
-diff -Nur apache_1.3.22.orig/src/modules/standard/mod_unique_id.c apache_1.3.22/src/modules/standard/mod_unique_id.c
---- apache_1.3.22.orig/src/modules/standard/mod_unique_id.c	Tue Oct  2 18:11:13 2001
-+++ apache_1.3.22/src/modules/standard/mod_unique_id.c	Tue Dec 18 23:14:29 2001
+diff -Nur apache_1.3.23.orig/src/modules/standard/mod_unique_id.c apache_1.3.23/src/modules/standard/mod_unique_id.c
+--- apache_1.3.23.orig/src/modules/standard/mod_unique_id.c	Tue Oct  2 18:11:13 2001
++++ apache_1.3.23/src/modules/standard/mod_unique_id.c	Wed Feb  6 20:20:48 2002
 @@ -67,10 +67,22 @@
  #include "http_config.h"
  #include "http_log.h"
@@ -5550,9 +4618,9 @@ diff -Nur apache_1.3.22.orig/src/modules/standard/mod_unique_id.c apache_1.3.22/
  
      /*
       * If we use 0 as the initial counter we have a little less protection
-diff -Nur apache_1.3.22.orig/src/support/ab.c apache_1.3.22/src/support/ab.c
---- apache_1.3.22.orig/src/support/ab.c	Mon Oct  8 19:54:42 2001
-+++ apache_1.3.22/src/support/ab.c	Tue Dec 18 23:17:14 2001
+diff -Nur apache_1.3.23.orig/src/support/ab.c apache_1.3.23/src/support/ab.c
+--- apache_1.3.23.orig/src/support/ab.c	Mon Oct  8 19:54:42 2001
++++ apache_1.3.23/src/support/ab.c	Wed Feb  6 20:20:48 2002
 @@ -158,6 +158,8 @@
  #include <sys/uio.h>
  #endif
@@ -5697,9 +4765,9 @@ diff -Nur apache_1.3.22.orig/src/support/ab.c apache_1.3.22/src/support/ab.c
 +#ifdef NEED_GETADDRINFO
 +#include "../main/getaddrinfo.c"
 +#endif
-diff -Nur apache_1.3.22.orig/src/support/logresolve.c apache_1.3.22/src/support/logresolve.c
---- apache_1.3.22.orig/src/support/logresolve.c	Wed May 23 00:52:21 2001
-+++ apache_1.3.22/src/support/logresolve.c	Tue Dec 18 23:14:29 2001
+diff -Nur apache_1.3.23.orig/src/support/logresolve.c apache_1.3.23/src/support/logresolve.c
+--- apache_1.3.23.orig/src/support/logresolve.c	Wed May 23 00:52:21 2001
++++ apache_1.3.23/src/support/logresolve.c	Wed Feb  6 20:20:48 2002
 @@ -54,7 +54,9 @@
  #endif /* BEOS */
  #endif /* !MPE && !WIN32*/
