@@ -167,7 +167,7 @@ Apache et le binaire APXS dont vous aurez besoin pour construire des
 Objets Dynamiques Partages (DSOs) pour Apache.
 
 %description devel -l pl
-Pliki nag³ówkowe i inne zasoby niezbdne przy budowaniu modu³ow DOS
+Pliki nag³ówkowe i inne zasoby niezbdne przy budowaniu modu³ow DSO
 (Dynamic Shared Objects) dla apache.
 
 %description devel -l ru
