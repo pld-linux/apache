@@ -30,7 +30,6 @@ Version:	1.3.27
 Release:	5
 License:	Apache Group 
 Group:		Networking/Daemons
-URL:		http://www.apache.org/
 Source0:	http://www.apache.org/dist/httpd/%{name}_%{version}.tar.gz
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
@@ -64,25 +63,26 @@ Patch19:	%{name}-PLD-nov6.patch
 Patch20:	%{name}-configdir_skip_backups.patch
 Patch21:	%{name}-apxs-quiet.patch
 Patch22:	%{name}-security_htdigest_bufferoverflow.patch
-BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
+URL:		http://www.apache.org/
 BuildRequires:	db3-devel
 BuildRequires:	mm-devel >= 1.1.3
 %{?_with_rewrite_ldap:BuildRequires: openldap-devel}
-PreReq:		rc-scripts
 PreReq:		mm
 PreReq:		perl
-Requires(pre):	/usr/bin/getgid
+PreReq:		rc-scripts
 Requires(pre):	/bin/id
+Requires(pre):	/usr/bin/getgid
 Requires(pre):	/usr/sbin/useradd
 Requires(post,preun):	/sbin/chkconfig
-Requires(postun):	/usr/sbin/userdel
 Requires(postun):	/usr/sbin/groupdel
-Requires:	mailcap
-Requires:	/etc/mime.types
-Requires:	psmisc >= 20.1
-Provides:	httpd
-Provides:	webserver
+Requires(postun):	/usr/sbin/userdel
 Provides:	%{name}(EAPI) = %{version}
+Requires:	/etc/mime.types
+Provides:	httpd
+Requires:	mailcap
+Requires:	psmisc >= 20.1
+Provides:	webserver
+BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 Obsoletes:	httpd
 Obsoletes:	webserver
 Obsoletes:	apache-extra
@@ -706,10 +706,12 @@ OPTIM="%{rpmcflags} -DHARD_SERVER_LIMIT=2048" \
 %{__make} LIBS1="-lm -lcrypt -lmm -ldl"
 
 rm -f src/modules/standard/mod_auth_db.so
-%{__make} -C src/modules/standard mod_auth_db.so LIBS_SHLIB="-ldb"
+%{__make} -C src/modules/standard mod_auth_db.so \
+	LIBS_SHLIB="-ldb"
 
 rm -f src/modules/standard/mod_rewrite.so
-%{__make} -C src/modules/standard mod_rewrite.so LIBS_SHLIB="-ldb %{?_with_rewrite_ldap:-lldap -llber}"
+%{__make} -C src/modules/standard mod_rewrite.so \
+	LIBS_SHLIB="-ldb %{?_with_rewrite_ldap:-lldap -llber}"
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -717,7 +719,8 @@ install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig} \
 	$RPM_BUILD_ROOT%{_datadir}/errordocs \
 	$RPM_BUILD_ROOT/var/{log/{httpd,archiv/httpd},run/apache}
 
-%{__make} install-quiet root="$RPM_BUILD_ROOT"
+%{__make} install-quiet \
+	root="$RPM_BUILD_ROOT"
 
 mv -f $RPM_BUILD_ROOT%{_datadir}/html/manual $RPM_BUILD_ROOT%{_datadir}
 
