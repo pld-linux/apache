@@ -34,7 +34,7 @@ Summary(ru):	óÁÍÙÊ ÐÏÐÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.0.53
-Release:	3.2
+Release:	3.3
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -89,6 +89,7 @@ Patch23:	%{name}-apr1.patch
 Patch24:	%{name}-normalize-path.patch
 # http://issues.apache.org/bugzilla/attachment.cgi?id=13377 external pcre
 Patch25:	%{name}2-pcre-patch.diff         
+Patch26:	%{name}-bug_33382.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	automake
 BuildRequires:	apr-devel >= 1:1.0.0
@@ -760,6 +761,7 @@ CRYPT (domy¶lnym), MD5 i SHA1.
 %patch23 -p1
 %patch24 -p1
 %{?with_external_pcre:%patch25 -p2}
+%patch26 -p1
 
 %{__perl} -pi -e "s@/usr/local/bin/perl@%{__perl}@" $(grep -rl "/usr/local/bin/perl" *)
 %{__perl} -pi -e "s@BUILD_SUBDIRS.*@BUILD_SUBDIRS =@g" srclib/Makefile.in
