@@ -79,7 +79,7 @@ Patch19:	%{name}-v6only-ENOPROTOOPT.patch
 Patch20:	%{name}-conffile-path.patch
 Patch21:	%{name}-apxs.patch
 # http://www.telana.com/peruser.php
-Patch22:	httpd-2.0.50-peruser-r2.patch
+Patch22:	httpd-2.0.50-peruser-r3.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	automake
 BuildRequires:	apr-devel >= 1:0.9.5-6
