@@ -1,5 +1,5 @@
 # _without_ssl	- don't build with SSL support
-# _with_ldap	- build with LDAP support
+# _without_ldap	- don't build with LDAP support
 # TODO:
 # - mod_case_filter
 # - mod_case_filter_in
@@ -66,7 +66,7 @@ BuildRequires:	db-devel
 BuildRequires:	expat-devel
 BuildRequires:	gdbm-devel >= 1.8.3
 BuildRequires:	libtool >= 1.5
-%{?_with_ldap:BuildRequires:	openldap-devel}
+%{!?_without_ldap:BuildRequires:	openldap-devel}
 %{!?_without_ssl:BuildRequires:	openssl-devel >= 0.9.7c}
 %{!?_without_ssl:BuildRequires:	openssl-tools >= 0.9.7c}
 BuildRequires:	perl-devel >= 5.004
@@ -656,8 +656,8 @@ install /usr/share/automake/config.* build/
 	--enable-optional-hook-import \
 	--enable-optional-fn-import \
 	--enable-optional-fn-export \
-	%{?_with_ldap:--enable-ldap} \
-	%{?_with_ldap:--enable-auth-ldap} \
+	%{!?_without_ldap:--enable-ldap} \
+	%{!?_without_ldap:--enable-auth-ldap} \
 	--enable-dav \
 	--enable-info \
 	--enable-suexec \
@@ -1282,7 +1282,7 @@ fi
 %attr(755,root,root) %{_libexecdir}/mod_auth_anon.so
 %{_datadir}/manual/mod/mod_auth_anon.html.en
 
-%if %{?_with_ldap:1}%{!?_with_ldap:0}
+%if %{!?_without_ldap:1}%{?_without_ldap:0}
 %files mod_auth_ldap
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_auth_ldap.conf
@@ -1290,7 +1290,7 @@ fi
 %{_datadir}/manual/mod/mod_auth_ldap.html.en
 %endif
 
-%if %{?_with_ldap:1}%{!?_with_ldap:0}
+%if %{!?_without_ldap:1}%{?_without_ldap:0}
 %files mod_ldap
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_ldap.conf
