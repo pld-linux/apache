@@ -20,6 +20,7 @@ Copyright:	BSD-like
 Obsoletes:	apache-extra
 Obsoletes:	apache6
 Provides:	httpd
+Provides:	webserver
 Prereq:		/sbin/chkconfig
 URL:		http://www.apache.org/
 BuildRoot:	/tmp/%{name}-%{version}-root
