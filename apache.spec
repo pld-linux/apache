@@ -171,8 +171,9 @@ Summary(pt_BR):	Arquivos de inclusão do Apache para desenvolvimento de módulos
 Summary(ru):	óÒÅÄÓÔ×Á ÒÁÚÒÁÂÏÔËÉ ÍÏÄÕÌÅÊ ÄÌÑ ×ÅÂ-ÓÅÒ×ÅÒÁ Apache
 Group:		Networking/Utilities
 Requires:	%{name} = %{version}
-Requires:	apr-devel >= 1:0.9.3
+Requires:	apr-util-devel >= 1:0.9.3
 Requires:	libtool
+Obsoletes:	%{name}-static
 
 %description devel
 The apache-devel package contains header files for Apache.
@@ -200,18 +201,6 @@ Este pacote contem os arquivos de inclusão para o Apache, bem como o
 utilitário apxs para a construção de objetos compartilhados dinâmicos
 (DSOs). Este pacote precisa ser instalado se você deseja compilar ou
 desenvolver módulos adicionais para o Apache.
-
-%package static
-Summary:	Static Apache web server libraries
-Summary(pl):	Statyczne biblioteki serwera WWW Apache
-Group:		Development/Libraries
-Requires:	%{name}-devel = %{version}
-
-%description static
-The apache-static package contains static libraries for Apache.
-
-%description static -l pl
-Statyczne biblioteki serwera Apache.
 
 %package mod_actions
 Summary:	Apache module for run CGI whenever a file of a certain type is requested
@@ -1222,17 +1211,12 @@ fi
 
 %files devel
 %defattr(644,root,root,755)
-%{_includedir}/[!a]*
-%{_includedir}/ap[!r]*
+%{_includedir}
 %{_libexecdir}/*.exp
 %attr(755,root,root) %dir %{_libexecdir}/build
 %attr(644,root,root) %{_libexecdir}/build/*.mk
 %attr(755,root,root) %{_libexecdir}/build/*.sh
 %attr(755,root,root) %{_libexecdir}/build/libtool
-
-%files static
-%defattr(644,root,root,755)
-%{_libdir}/lib*.a
 
 %files mod_actions
 %defattr(644,root,root,755)
