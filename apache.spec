@@ -32,7 +32,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.0.49
-Release:	3
+Release:	4
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -90,8 +90,8 @@ BuildRequires:	libtool >= 1.5
 %{?with_ldap:BuildRequires:	openldap-devel}
 %{?with_ssl:BuildRequires:	openssl-devel >= 0.9.7d}
 %{?with_ssl:BuildRequires:	openssl-tools >= 0.9.7d}
-BuildRequires:	perl-devel >= 5.004
-BuildRequires:	rpm-perlprov >= 4.0.4
+BuildRequires:	perl-devel >= 1:5.6
+BuildRequires:	rpm-perlprov >= 4.1-13
 BuildRequires:	zlib-devel
 PreReq:		perl-base
 PreReq:		rc-scripts
