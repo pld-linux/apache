@@ -52,17 +52,17 @@ Patch2:		%{name}-suexec.patch
 Patch3:		%{name}-nolibs.patch
 Patch4:		%{name}-apr.patch
 URL:		http://httpd.apache.org/
+BuildRequires:	apr-devel >= 1:0.9.4-1
+BuildRequires:	apr-util-devel >= 1:0.9.4-1
 BuildRequires:	db-devel
 BuildRequires:	expat-devel
 BuildRequires:	gdbm-devel >= 1.8.3
+BuildRequires:	libtool >= 1.5
 %{!?_without_ssl:BuildRequires:	openssl-devel >= 0.9.7c}
 %{!?_without_ssl:BuildRequires:	openssl-tools >= 0.9.7c}
 BuildRequires:	perl-devel >= 5.004
 BuildRequires:	rpm-perlprov >= 4.0.4
 BuildRequires:	zlib-devel
-BuildRequires:	libtool >= 1.5
-BuildRequires:	apr-devel >= 1:0.9.4-1
-BuildRequires:	apr-util-devel >= 1:0.9.4-1
 PreReq:		perl-base
 PreReq:		rc-scripts
 Requires(pre):	/bin/id
@@ -74,6 +74,7 @@ Requires(postun):	/usr/sbin/groupdel
 Requires(post,preun):	/sbin/chkconfig
 Requires(post,postun):	/sbin/ldconfig
 Requires(post):	fileutils
+Requires:	apr-util >= 1:0.9.4-1
 Requires:	/etc/mime.types
 Requires:	mailcap
 Requires:	psmisc >= 20.1
