@@ -772,7 +772,7 @@ install %{SOURCE8} $RPM_BUILD_ROOT%{_sysconfdir}/mod_vhost_alias.conf
 install %{SOURCE9} $RPM_BUILD_ROOT%{_sysconfdir}/mod_status.conf
 install %{SOURCE10} $RPM_BUILD_ROOT%{_sysconfdir}/mod_proxy.conf
 install %{SOURCE11} $RPM_BUILD_ROOT%{_sysconfdir}/mod_autoindex.conf
-install %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/monit
+install %{SOURCE7} $RPM_BUILD_ROOT/etc/monit
 
 ln -sf index.html.en $RPM_BUILD_ROOT%{_datadir}/html/index.html
 
