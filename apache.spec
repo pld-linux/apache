@@ -149,7 +149,7 @@ fi
 %attr(755, root, root, 755) /usr/libexec/apache
 %dir /home/httpd/icons
 /home/httpd/icons/*.gif
-/usr/bin/*
+%attr(755, root, root) /usr/bin/*
 %attr(755, root, root) /usr/sbin/ab
 %attr(755, root, root) /usr/sbin/apachectl
 %attr(755, root, root) /usr/sbin/apxs
