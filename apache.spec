@@ -25,6 +25,7 @@ Patch3:		apache-errordocs.patch
 Patch4:		apache-apxs.patch
 Patch5:		apache-phhttpd.patch
 Patch6:		apache-EAPI.patch
+Patch7:		apache-v6-PLD-1.patch.gz
 Copyright:	BSD-like
 Provides:	httpd
 Provides:	webserver
@@ -289,6 +290,7 @@ of this document.
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
+%patch7 -p1
 
 %build
 
@@ -315,7 +317,8 @@ OPTIM="$RPM_OPT_FLAGS" \
 	--suexec-uidmin=500 \
 	--suexec-gidmin=500 \
 	--disable-rule=WANTHSREGEX \
-	--enable-rule=EAPI
+	--enable-rule=EAPI \
+	--enable-rule=INET6
 make
 
 %install
