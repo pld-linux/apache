@@ -6,9 +6,9 @@
 ##                      |_____|         
 ## ____________________________________________________________________________
 ##
-## Annotated patch file: ssldoc.patch
+## Annotated patch file: addon.patch
 ## Copyright (c) 1998-2001 Ralf S. Engelschall, All Rights Reserved. 
-## Created on: 16-Oct-2001
+## Created on: 01-Feb-2002
 ##
 ## This file assembles changes to existing Apache source files
 ## between the original Apache and the patched variant. It can be
@@ -16,218 +16,143 @@
 ## 'patch' tool to upgrade those files.  Each patch snippet is
 ## annotated with a short description.
 ##
-## This file contains all patches to the Apache source
-## tree which link the SSL documentation into the Apache
-## documents tree.
-##
 
 +---------------------------------------------------------------------------
-| Adjust the English frontdoor webpage where we now indicate that
-| this is an SSL-aware Apache, give additional hyperlinks to mod_ssl and
-| provide the three new "powered by Apache", "secured by mod_ssl" and
-| "includes OpenSSL" buttons.
+| Add an entry for mod_define.
 +---------------------------------------------------------------------------
-Index: htdocs/index.html.en
---- htdocs/index.html.en	2001/05/20 08:16:29	1.1.1.3
-+++ htdocs/index.html.en	2001/05/20 08:23:01	1.4
-@@ -1,38 +1,87 @@
--<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
--    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
--<html xmlns="http://www.w3.org/1999/xhtml">
--<head>
--<title>Test Page for Apache Installation</title>
--</head>
--<!-- Background white, links blue (unvisited), navy (visited), red
--(active) -->
--<body bgcolor="#FFFFFF" text="#000000" link="#0000FF"
--vlink="#000080" alink="#FF0000">
--<p>If you can see this, it means that the installation of the <a
--href="http://www.apache.org/foundation/preFAQ.html">Apache web
--server</a> software on this system was successful. You may now add
--content to this directory and replace this page.</p>
--
--<hr width="50%" size="8" />
--<h2 align="center">Seeing this instead of the website you
--expected?</h2>
--
--<p>This page is here because the site administrator has changed the
--configuration of this web server. Please <strong>contact the person
--responsible for maintaining this server with questions.</strong>
--The Apache Software Foundation, which wrote the web server software
--this site administrator is using, has nothing to do with
--maintaining this site and cannot help resolve configuration
--issues.</p>
--
--<hr width="50%" size="8" />
--<p>The Apache <a href="manual/">documentation</a> has been included
--with this distribution.</p>
--
--<p>You are free to use the image below on an Apache-powered web
--server. Thanks for using Apache!</p>
--
--<div align="center"><img src="apache_pb.gif" alt="" /></div>
--</body>
--</html>
--
-+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
-+<HTML>
-+ <HEAD>
-+  <TITLE>Test Page for the SSL/TLS-aware Apache Installation on Web Site</TITLE>
-+  <STYLE TYPE="text/css">
-+  H1 {
-+      font-weight: bold;
-+      font-size: 18pt;
-+      line-height: 18pt;
-+      font-family: arial,helvetica;
-+      font-variant: normal;
-+      font-style: normal;
-+  }
-+  BODY {
-+      color: black;
-+      background-color: white;
-+      background-image: url(manual/images/feather.jpg);
-+      background-repeat: no-repeat;
-+  }
-+  </STYLE>
-+ </HEAD>
-+<!-- Background white, links blue (unvisited), navy (visited), red (active) -->
-+ <BODY
-+  BGCOLOR="#FFFFFF"
-+  TEXT="#000000"
-+  LINK="#0000FF"
-+  VLINK="#0000FF"
-+  ALINK="#FF0000"
-+ >
-+  <BLOCKQUOTE>
-+  <BLOCKQUOTE>
-+  <BR>
-+  <H1>
-+  Hey, it worked <I>!</I><BR>
-+  The SSL/TLS-aware Apache webserver was<BR>
-+  successfully installed on this website.
-+  </H1>
-+  <P>
-+  If you can see this page, then the people who own this website have just
-+  installed the <A HREF="http://www.apache.org/">Apache Web server</A>
-+  software and the <A HREF="http://www.modssl.org/">Apache
-+  Interface to OpenSSL (mod_ssl)</A> successfully.  They now have to add
-+  content to this directory and replace this placeholder page, or else point
-+  the server at their real content.
-+  </P>
-+  <BLOCKQUOTE>
-+   <STRONG>ATTENTION!</STRONG><BR>
-+   If you are seeing this page instead of the site you expected, please
-+   <STRONG>contact the administrator of the site involved.</STRONG>
-+   (Try sending mail to <SAMP>&lt;webmaster@<EM>domain</EM>&gt;</SAMP>.)
-+   Although this site is
-+   running the Apache software it almost certainly has no other connection
-+   to the Apache Group, so please do not send mail about this site or its
-+   contents to the Apache authors.  If you do, your message will be
-+   <STRONG>ignored</STRONG>.
-+  </BLOCKQUOTE>
-+  <P>
-+  The Apache online
-+  <A
-+   HREF="manual/index.html"
-+  >documentation</A>
-+  has been included with this distribution.<BR>
-+  Especially also read the 
-+  <A
-+   HREF="manual/mod/mod_ssl/"
-+  >mod_ssl User Manual</A>
-+  carefully.
-+  </P>
-+  <P>
-+  Your are allowed to use the images below on your SSL-aware Apache Web server.<BR>
-+  Thanks for using Apache, mod_ssl and OpenSSL!
-+  </P>
-+  <P>
-+  <DIV ALIGN="CENTER">
-+   <A HREF="http://www.apache.org/"
-+   ><IMG SRC="manual/images/apache_pb.gif" ALT="Apache Webserver" BORDER=0></A>
-+   &nbsp;
-+   <A HREF="http://www.modssl.org/"
-+   ><IMG SRC="manual/images/mod_ssl_sb.gif" ALT="mod_ssl Interface" BORDER=0></A>
-+   &nbsp;
-+   <A HREF="http://www.openssl.org/"
-+   ><IMG SRC="manual/images/openssl_ics.gif" ALT="OpenSSL Toolkit" BORDER=0></A>
-+  </DIV>
-+  </BLOCKQUOTE>
-+  </BLOCKQUOTE>
-+ </BODY>
-+</HTML>
+Index: src/Configuration.tmpl
+--- src/Configuration.tmpl	2002/01/28 19:21:21	1.1.1.7
++++ src/Configuration.tmpl	2002/01/28 19:40:56	1.23
+@@ -258,6 +313,11 @@
+ 
+ AddModule modules/standard/mod_env.o
+ 
++## mod_define expands variables on arbitrary directive lines.
++## It requires Extended API (EAPI).
++
++# AddModule modules/extra/mod_define.o
++
+ ##
+ ## Request logging modules
+ ##
 
 +---------------------------------------------------------------------------
-| Add a hyperlink to the mod_ssl document.
+| Add more beautiful optic to the status page table..
++---------------------------------------------------------------------------
+Index: src/modules/standard/mod_status.c
+--- src/modules/standard/mod_status.c	2002/01/28 19:21:28	1.1.1.13
++++ src/modules/standard/mod_status.c	2002/01/28 19:40:57	1.10
+@@ -484,12 +484,33 @@
+ 	    if (no_table_report)
+ 		ap_rputs("<p><hr><h2>Server Details</h2>\n\n", r);
+ 	    else
++#ifndef NO_PRETTYPRINT
++		ap_rputs("<p>\n\n<table bgcolor=\"#ffffff\" border=\"0\">"
++			"<tr bgcolor=000000>"
++			"<td><font face=\"Arial,Helvetica\" color=\"#ffffff\"><b>Srv</b></font></td>"
++			"<td><font face=\"Arial,Helvetica\" color=\"#ffffff\"><b>PID</b></font></td>"
++			"<td><font face=\"Arial,Helvetica\" color=\"#ffffff\"><b>Acc</b></font></td>"
++			"<td><font face=\"Arial,Helvetica\" color=\"#ffffff\"><b>M</b></font></td>"
++#ifndef NO_TIMES
++			"<td><font face=\"Arial,Helvetica\" color=\"#ffffff\"><b>CPU</b></font></td>"
++#endif
++			"<td><font face=\"Arial,Helvetica\" color=\"#ffffff\"><b>SS</b></font></td>"
++			"<td><font face=\"Arial,Helvetica\" color=\"#ffffff\"><b>Req</b></font></td>"
++			"<td><font face=\"Arial,Helvetica\" color=\"#ffffff\"><b>Conn</b></font></td>"
++			"<td><font face=\"Arial,Helvetica\" color=\"#ffffff\"><b>Child</b></font></td>"
++			"<td><font face=\"Arial,Helvetica\" color=\"#ffffff\"><b>Slot</b></font></td>"
++			"<td><font face=\"Arial,Helvetica\" color=\"#ffffff\"><b>Host</b></font></td>"
++			"<td><font face=\"Arial,Helvetica\" color=\"#ffffff\"><b>VHost</b></font></td>"
++			"<td><font face=\"Arial,Helvetica\" color=\"#ffffff\"><b>Request</b></td>"
++			"</tr>\n", r);      
++#else /* NO_PRETTYPRINT */
+ #ifdef NO_TIMES
+ 		/* Allow for OS/2 not having CPU stats */
+ 		ap_rputs("<p>\n\n<table border=0><tr><th>Srv<th>PID<th>Acc<th>M\n<th>SS<th>Req<th>Conn<th>Child<th>Slot<th>Client<th>VHost<th>Request</tr>\n\n", r);
+ #else
+ 		ap_rputs("<p>\n\n<table border=0><tr><th>Srv<th>PID<th>Acc<th>M<th>CPU\n<th>SS<th>Req<th>Conn<th>Child<th>Slot<th>Client<th>VHost<th>Request</tr>\n\n", r);
+ #endif
++#endif /* NO_PRETTYPRINT */
+ 	}
+ 
+ 	for (i = 0; i < HARD_SERVER_LIMIT; ++i) {
+@@ -607,14 +628,19 @@
+ 				vhost->server_hostname) : "(unavailable)");
+ 		    }
+ 		    else {		/* !no_table_report */
++#ifndef NO_PRETTYPRINT
++			ap_rprintf(r,"<tr bgcolor=\"#ffffff\">");
++#else
++			ap_rprintf(r,"<tr>");
++#endif
+ 			if (score_record.status == SERVER_DEAD)
+ 			    ap_rprintf(r,
+-				"<tr><td><b>%d-%d</b><td>-<td>%d/%lu/%lu",
++				"<td><b>%d-%d</b><td>-<td>%d/%lu/%lu",
+ 				i, (int) ps_record.generation,
+ 				(int) conn_lres, my_lres, lres);
+ 			else
+ 			    ap_rprintf(r,
+-				"<tr><td><b>%d-%d</b><td>%d<td>%d/%lu/%lu",
++				"<td><b>%d-%d</b><td>%d<td>%d/%lu/%lu",
+ 				i, (int) ps_record.generation,
+ 				(int) ps_record.pid, (int) conn_lres,
+ 				my_lres, lres);
+@@ -674,12 +700,23 @@
+ 			    ap_rprintf(r,
+ 			     "<td>?<td nowrap>?<td nowrap>..reading.. </tr>\n\n");
+ 			else
++#ifndef NO_PRETTYPRINT
++			    ap_rprintf(r,
++			     "<td nowrap><font face=\"Arial,Helvetica\" size=\"-1\">%s</font>"
++			     "<td nowrap><font face=\"Arial,Helvetica\" size=\"-1\">%s</font>"
++			     "<td nowrap><font face=\"Arial,Helvetica\" size=\"-1\">%s</font>"
++			     "</tr>\n\n",
++			     score_record.client,
++			     vhost ? vhost->server_hostname : "(unavailable)",
++			     ap_escape_html(r->pool, score_record.request));
++#else
+ 			    ap_rprintf(r,
+ 			     "<td>%s<td nowrap>%s<td nowrap>%s</tr>\n\n",
+ 			     ap_escape_html(r->pool, score_record.client),
+ 			     vhost ? ap_escape_html(r->pool, 
+ 				vhost->server_hostname) : "(unavailable)",
+ 			     ap_escape_html(r->pool, score_record.request));
++#endif
+ 		    }		/* no_table_report */
+ 		}			/* !short_report */
+ 	    }			/* if (<active child>) */
+
++---------------------------------------------------------------------------
+| Add a hyperlink to the mod_define.html document.
 +---------------------------------------------------------------------------
 Index: htdocs/manual/mod/index.html.en
---- htdocs/manual/mod/index.html.en	2001/10/16 11:46:59	1.1.1.1
-+++ htdocs/manual/mod/index.html.en	2001/10/16 12:17:00	1.2
-@@ -214,6 +218,11 @@
+--- htdocs/manual/mod/index.html.en	2002/01/28 19:21:43	1.1.1.2
++++ htdocs/manual/mod/index.html.en	2002/01/28 19:40:56	1.3
+@@ -101,6 +101,10 @@
+       <dd>Support for Netscape-like cookies. Replaced in Apache 1.2
+       by mod_usertrack</dd>
  
-       <dt><a href="mod_speling.html">mod_speling</a> Apache 1.3 and
++      <dt><a href="mod_define.html">mod_define</a></dt>
++
++      <dd>Variable Definition for Arbitrary Directives</dd>
++
+       <dt><a href="mod_digest.html">mod_digest</a> Apache 1.1 and
        up</dt>
-+
-+      <dt><a href="mod_ssl/index.html">mod_ssl</a> Apache 1.3 with mod_ssl
-+      applied</dt>
-+      
-+      <dd>Apache SSL interface to OpenSSL</dd>
- 
-       <dd>Automatically correct minor typos in URLs</dd>
  
 
 +---------------------------------------------------------------------------
-| Add a hyperlink to the mod_ssl document.
-+---------------------------------------------------------------------------
-Index: htdocs/manual/mod/index-bytype.html.en
---- htdocs/manual/mod/index-bytype.html.en	2001/10/16 11:46:59	1.1.1.1
-+++ htdocs/manual/mod/index-bytype.html.en	2001/10/16 12:17:00	1.2
-@@ -254,6 +254,11 @@
- 
-       <dd>Experimental file caching, mapping files into memory to
-       improve performace</dd>
-+
-+      <dt><a href="mod_ssl/index.html">mod_ssl</a> Apache 1.3 with mod_ssl
-+      applied</dt>
-+      
-+      <dd>Apache SSL interface to OpenSSL</dd>
-     </dl>
- 
-     <h2>Development</h2>
-
-+---------------------------------------------------------------------------
-| Add hyperlinks for all SSL directives which are
-| documented inside the mod_ssl document.
+| Add a hyperlink for the Define directives.
 +---------------------------------------------------------------------------
 Index: htdocs/manual/mod/directives.html.en
---- htdocs/manual/mod/directives.html.en	2001/10/16 11:46:59	1.1.1.1
-+++ htdocs/manual/mod/directives.html.en	2001/10/16 12:17:00	1.2
-@@ -526,6 +528,28 @@
-       href="mod_setenvif.html#SetEnvIfNoCase">SetEnvIfNoCase</a></li>
+--- htdocs/manual/mod/directives.html.en	2002/01/28 19:21:43	1.1.1.2
++++ htdocs/manual/mod/directives.html.en	2002/01/28 19:40:56	1.3
+@@ -214,6 +214,8 @@
  
-       <li><a href="mod_mime.html#sethandler">SetHandler</a></li>
+       <li><a href="core.html#defaulttype">DefaultType</a></li>
+ 
++      <li><a href="mod_define.html#define">Define</a>
 +
-+      <li><a href="mod_ssl/ssl_reference.html#SSLPassPhraseDialog">SSLPassPhraseDialog</a>
-+      <li><a href="mod_ssl/ssl_reference.html#SSLMutex">SSLMutex</a>
-+      <li><a href="mod_ssl/ssl_reference.html#SSLRandomSeed">SSLRandomSeed</a>
-+      <li><a href="mod_ssl/ssl_reference.html#SSLSessionCache">SSLSessionCache</a>
-+      <li><a href="mod_ssl/ssl_reference.html#SSLSessionCacheTimeout">SSLSessionCacheTimeout</a>
-+      <li><a href="mod_ssl/ssl_reference.html#SSLEngine">SSLEngine</a>
-+      <li><a href="mod_ssl/ssl_reference.html#SSLProtocol">SSLProtocol</a>
-+      <li><a href="mod_ssl/ssl_reference.html#SSLCipherSuite">SSLCipherSuite</a>
-+      <li><a href="mod_ssl/ssl_reference.html#SSLCertificateFile">SSLCertificateFile</a>
-+      <li><a href="mod_ssl/ssl_reference.html#SSLCertificateKeyFile">SSLCertificateKeyFile</a>
-+      <li><a href="mod_ssl/ssl_reference.html#SSLCACertificatePath">SSLCACertificatePath</a>
-+      <li><a href="mod_ssl/ssl_reference.html#SSLCACertificateFile">SSLCACertificateFile</a>
-+      <li><a href="mod_ssl/ssl_reference.html#SSLCARevocationPath">SSLCARevocationPath</a>
-+      <li><a href="mod_ssl/ssl_reference.html#SSLCARevocationFile">SSLCARevocationFile</a>
-+      <li><a href="mod_ssl/ssl_reference.html#SSLVerifyClient">SSLVerifyClient</a>
-+      <li><a href="mod_ssl/ssl_reference.html#SSLVerifyDepth">SSLVerifyDepth</a>
-+      <li><a href="mod_ssl/ssl_reference.html#SSLLog">SSLLog</a>
-+      <li><a href="mod_ssl/ssl_reference.html#SSLLogLevel">SSLLogLevel</a>
-+      <li><a href="mod_ssl/ssl_reference.html#SSLOptions">SSLOptions</a>
-+      <li><a href="mod_ssl/ssl_reference.html#SSLRequireSSL">SSLRequireSSL</a>
-+      <li><a href="mod_ssl/ssl_reference.html#SSLRequire">SSLRequire</a>
+       <li><a href="mod_access.html#deny">Deny</a></li>
  
-       <li><a href="core.html#startservers">StartServers</a></li>
- 
+       <li><a href="core.html#directory">&lt;Directory&gt;</a></li>
