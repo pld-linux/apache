@@ -1823,3 +1823,16 @@ diff -ur httpd-2.0.52.org/support/Makefile.in httpd-2.0.52/support/Makefile.in
  
  checkgid_OBJECTS = checkgid.lo
  checkgid: $(checkgid_OBJECTS)
+diff -ur httpd-2.0.52.org/modules/experimental/util_ldap.c httpd-2.0.52/modules/experimental/util_ldap.c
+--- httpd-2.0.52.org/modules/experimental/util_ldap.c	2004-10-02 22:10:30.732572635 +0200
++++ httpd-2.0.52/modules/experimental/util_ldap.c	2004-10-03 00:59:18.141012892 +0200
+@@ -42,6 +42,8 @@
+ #error mod_ldap requires APR-util to have LDAP support built in
+ #endif
+ 
++#define	const_cast(x)	(x)
++
+     /* defines for certificate file types
+     */
+ #define LDAP_CA_TYPE_UNKNOWN            0
+
