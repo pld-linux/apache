@@ -6,7 +6,7 @@ Summary(pl):	Serwer WWW (World Wide Web)
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	1.3.12
-Release:	12
+Release:	26
 License:	BSD-like
 Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
@@ -38,6 +38,7 @@ Prereq:		/usr/sbin/useradd
 Prereq:		/usr/bin/getgid
 Prereq:		/bin/id
 Prereq:		sh-utils
+BuildRequires:	db2-devel
 BuildRequires:	mm-devel >= 1.1.3
 Requires:	rc-scripts
 Requires:	mailcap
@@ -136,6 +137,18 @@ much easier to execute scripts that process files.
 Ten modu³ pozwala na uruchamianie skryptów w momencie gdy nadchodzi
 ¿±danie pobrania pliku okre¶lonego typu.
 
+%package mod_auth
+Summary:	Apache module with user authentication using textual files
+Group:		Networking/Daemons
+Group(de):	Netzwerkwesen/Server
+Group(pl):	Sieciowe/Serwery
+Prereq:		%{_sbindir}/apxs
+Requires:	%{name}(EAPI) = %{version}
+
+%description mod_auth
+This package contains mod_auth module. It provides for user
+authentication using textual files.
+
 %package mod_auth_anon
 Summary:	Apache module with "anonymous" user access authentication
 Summary(pl):	Modu³ apache oferuj±cy anonimow± autoryzacjê u¿ytkownia
@@ -161,6 +174,25 @@ independent and it allows users to share URLs.
 Ten modu³ oferuje anonimow± autoryzacjê u¿ytkownia podobnie do
 anonimowych serwerów ftp (u¿ytkownik ,,anonymous'' oraz has³o w
 postaci adresu pocztowego u¿ytkownika).
+
+%package mod_auth_db
+Summary:	Apache module with user authentication which uses Berkeley DB files
+Summary(pl):	Modu³ apache z mechanizmem autentykacji u¿ywaj±cym plików Berkeley DB
+Group:		Networking/Daemons
+Group(de):	Netzwerkwesen/Server
+Group(pl):	Sieciowe/Serwery
+Prereq:		%{_sbindir}/apxs
+Requires:	%{name}(EAPI) = %{version}
+
+%description mod_auth_db
+This package contains mod_auth_db module. It provides for user
+authentication using Berkeley DB files. It is an alternative to DBM
+files for those systems which support DB and not DBM. It is only
+available in Apache 1.1 and later.
+
+%description -l pl mod_auth_db
+Ten modu³ zawiera modu³ mod_auth_db. Modu³ ten s³u¿y do autentykacji
+ale jako plików danych u¿ywa Berkeley DB.
 
 %package mod_define
 Summary:	Apache module - authentication variables for arbitrary directives
@@ -415,7 +447,6 @@ Requires:	%{name}(EAPI) = %{version}
 
 %build
 OPTIM="%{!?debug:$RPM_OPT_FLAGS}%{?debug:-O -g}" \
-LDFLAGS="%{!?debug:-s}" \
 ./configure \
 	--prefix=%{_prefix} \
 	--sysconfdir=%{_sysconfdir} \
@@ -429,6 +460,7 @@ LDFLAGS="%{!?debug:-s}" \
 	--with-layout=PLD \
 	--without-confadjust \
 	--enable-module=all \
+	--disable-module=auth_dbm \
 	--enable-shared=max \
 	--proxycachedir=/var/cache/apache \
 	--with-perl=%{_bindir}/perl \
@@ -440,7 +472,10 @@ LDFLAGS="%{!?debug:-s}" \
 	--disable-rule=WANTHSREGEX \
 	--enable-rule=EAPI \
 	--enable-rule=INET6
-%{__make}
+%{__make} LIBS1="-lm -lcrypt -lmm -ldl"
+
+rm -f src/modules/standard/mod_auth_db.so
+%{__make} -C src/modules/standard mod_auth_db.so LIBS_SHLIB="-ldb"
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -468,10 +503,7 @@ install %{SOURCE10} $RPM_BUILD_ROOT%{_sysconfdir}/mod_proxy.conf
 
 ln -sf index.html.en $RPM_BUILD_ROOT%{_datadir}/html/index.html
 
-strip --strip-unneeded $RPM_BUILD_ROOT%{_libexecdir}/*.so
-
-gzip -9nf $RPM_BUILD_ROOT%{_mandir}/man*/* \
-	ABOUT_APACHE src/CHANGES KEYS README
+gzip -9nf ABOUT_APACHE src/CHANGES KEYS README
 
 %pre
 if [ -n "`getgid http`" ]; then
@@ -502,9 +534,6 @@ fi
 %{_sbindir}/apxs -e -a -n access %{_libexecdir}/mod_access.so 1>&2
 %{_sbindir}/apxs -e -a -n alias %{_libexecdir}/mod_alias.so 1>&2
 %{_sbindir}/apxs -e -a -n asis %{_libexecdir}/mod_asis.so 1>&2
-%{_sbindir}/apxs -e -a -n auth %{_libexecdir}/mod_auth.so 1>&2
-%{_sbindir}/apxs -e -a -n auth_db %{_libexecdir}/mod_auth_db.so 1>&2
-%{_sbindir}/apxs -e -a -n auth_dbm %{_libexecdir}/mod_auth_dbm.so 1>&2
 %{_sbindir}/apxs -e -a -n autoindex %{_libexecdir}/mod_autoindex.so 1>&2
 %{_sbindir}/apxs -e -a -n cern_meta %{_libexecdir}/mod_cern_meta.so 1>&2
 %{_sbindir}/apxs -e -a -n cgi %{_libexecdir}/mod_cgi.so 1>&2
@@ -532,9 +561,6 @@ if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n access %{_libexecdir}/mod_access.so 1>&2
 	%{_sbindir}/apxs -e -A -n alias %{_libexecdir}/mod_alias.so 1>&2
 	%{_sbindir}/apxs -e -A -n asis %{_libexecdir}/mod_asis.so 1>&2
-	%{_sbindir}/apxs -e -A -n auth %{_libexecdir}/mod_auth.so 1>&2
-	%{_sbindir}/apxs -e -A -n auth_db %{_libexecdir}/mod_auth_db.so 1>&2
-	%{_sbindir}/apxs -e -A -n auth_dbm %{_libexecdir}/mod_auth_dbm.so 1>&2
 	%{_sbindir}/apxs -e -A -n autoindex %{_libexecdir}/mod_autoindex.so 1>&2
 	%{_sbindir}/apxs -e -A -n cern_meta %{_libexecdir}/mod_cern_meta.so 1>&2
 	%{_sbindir}/apxs -e -A -n cgi %{_libexecdir}/mod_cgi.so 1>&2
@@ -583,6 +609,22 @@ if [ "$1" = "0" ]; then
 	fi
 fi
 
+%post mod_auth
+%{_sbindir}/apxs -e -a -n auth %{_libexecdir}/mod_auth.so 1>&2
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+fi
+
+%preun mod_auth
+if [ "$1" = "0" ]; then
+	%{_sbindir}/apxs -e -A -n auth %{_libexecdir}/mod_auth.so 1>&2
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2
+	fi
+fi
+
 %post mod_auth_anon
 %{_sbindir}/apxs -e -a -n auth_anon %{_libexecdir}/mod_auth_anon.so 1>&2
 if [ -f /var/lock/subsys/httpd ]; then
@@ -594,6 +636,22 @@ fi
 %preun mod_auth_anon
 if [ "$1" = "0" ]; then
 	%{_sbindir}/apxs -e -A -n auth_anon %{_libexecdir}/mod_auth_anon.so 1>&2
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2
+	fi
+fi
+
+%post mod_auth_db
+%{_sbindir}/apxs -e -a -n auth_db %{_libexecdir}/mod_auth_db.so 1>&2
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache http daemon."
+fi
+
+%preun mod_auth_db
+if [ "$1" = "0" ]; then
+	%{_sbindir}/apxs -e -A -n auth_db %{_libexecdir}/mod_auth_db.so 1>&2
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
@@ -891,9 +949,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/manual/mod/mod_access.html
 %{_datadir}/manual/mod/mod_alias.html
 %{_datadir}/manual/mod/mod_asis.html
-%{_datadir}/manual/mod/mod_auth.html
-%{_datadir}/manual/mod/mod_auth_db.html
-%{_datadir}/manual/mod/mod_auth_dbm.html
 %{_datadir}/manual/mod/mod_autoindex.html
 %{_datadir}/manual/mod/mod_cgi.html
 %{_datadir}/manual/mod/mod_cookies.html
@@ -946,9 +1001,6 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libexecdir}/mod_access.so
 %attr(755,root,root) %{_libexecdir}/mod_alias.so
 %attr(755,root,root) %{_libexecdir}/mod_asis.so
-%attr(755,root,root) %{_libexecdir}/mod_auth.so
-%attr(755,root,root) %{_libexecdir}/mod_auth_db.so
-%attr(755,root,root) %{_libexecdir}/mod_auth_dbm.so
 %attr(755,root,root) %{_libexecdir}/mod_autoindex.so
 %attr(755,root,root) %{_libexecdir}/mod_cern_meta.so
 %attr(755,root,root) %{_libexecdir}/mod_cgi.so
@@ -964,9 +1016,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libexecdir}/mod_speling.so
 %attr(755,root,root) %{_libexecdir}/mod_userdir.so
 
-%attr(755,root,root) %{_bindir}/dbmmanage 
 %attr(755,root,root) %{_bindir}/htdigest
-%attr(755,root,root) %{_bindir}/htpasswd
 
 %attr(755,root,root) %{_sbindir}/ab
 %attr(755,root,root) %{_sbindir}/apachectl
@@ -977,7 +1027,8 @@ rm -rf $RPM_BUILD_ROOT
 
 %dir %attr(750,http,http) /var/lib/apache
 
-%{_mandir}/man[18]/*
+%{_mandir}/man1/htdigest.1*
+%{_mandir}/man8/*
 
 %attr(750,root,root) %dir /var/log/httpd
 %attr(750,root,root) %dir /var/log/archiv/httpd
@@ -996,10 +1047,24 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libexecdir}/mod_actions.so
 %{_datadir}/manual/mod/mod_actions.html
 
+%files mod_auth
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libexecdir}/mod_auth.so
+%{_datadir}/manual/mod/mod_auth.html
+
 %files mod_auth_anon
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_auth_anon.so
 %{_datadir}/manual/mod/mod_auth_anon.html
+
+%files mod_auth_db
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libexecdir}/mod_auth_db.so
+%attr(755,root,root) %{_bindir}/dbmmanage 
+%attr(755,root,root) %{_bindir}/htpasswd
+%{_datadir}/manual/mod/mod_auth_db.html
+%{_mandir}/man1/dbmmanage.1*
+%{_mandir}/man1/htpasswd.1*
 
 %files mod_define
 %defattr(644,root,root,755)
