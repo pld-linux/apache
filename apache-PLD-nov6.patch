@@ -5,8 +5,8 @@ diff -urN apache_1.3.17/src/main/http_main.c apache_1.3.17-new/src/main/http_mai
      ap_setup_prelinked_modules();
  
      while ((c = getopt(argc, argv,
--				    "D:C:c:xXd:f:vVlLR:StTh"
-+				    "D:C:c:xXd:f:vVlLR:StTh4"
+-				    "D:C:c:xXd:Ff:vVlLR:StTh"
++				    "D:C:c:xXd:Ff:vVlLR:StTh4"
  #ifdef DEBUG_SIGSTOP
  				    "Z:"
  #endif
