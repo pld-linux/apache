@@ -1,0 +1,443 @@
+diff -x {arch} -x .arch-ids -urN orig/apache2/Makefile.in mod/apache2/Makefile.in
+--- orig/apache2/Makefile.in	2004-03-07 03:18:24.000000000 -0500
++++ mod/apache2/Makefile.in	2004-03-07 01:18:10.000000000 -0500
+@@ -178,7 +178,9 @@
+ 	@cp -p $(srcdir)/modules/http/mod_core.h $(DESTDIR)$(includedir)
+ 	@cp -p $(srcdir)/modules/proxy/mod_proxy.h $(DESTDIR)$(includedir)
+ 	@cp -p $(srcdir)/modules/ssl/*.h $(DESTDIR)$(includedir)
+-	@cp -p $(srcdir)/srclib/pcre/pcre*.h $(DESTDIR)$(includedir)
++	@if test "$(AP_EXTERN_PCRE)" != "0"; then \
++		cp -p $(srcdir)/srclib/pcre/pcre*.h $(DESTDIR)$(includedir); \
++	fi;
+ 	@cp -p $(srcdir)/os/$(OS_DIR)/*.h $(DESTDIR)$(includedir)
+ 	@chmod 644 $(DESTDIR)$(includedir)/*.h
+ 
+diff -x {arch} -x .arch-ids -urN orig/apache2/acinclude.m4 mod/apache2/acinclude.m4
+--- orig/apache2/acinclude.m4	2004-03-07 03:18:24.000000000 -0500
++++ mod/apache2/acinclude.m4	2004-03-07 01:18:09.000000000 -0500
+@@ -494,6 +494,58 @@
+ ])
+ 
+ dnl
++dnl APACHE_CHECK_PCRE
++dnl Apache includes it's own version of PCRE; however, if PCRE exists
++dnl on the build system, we link against that instead of building
++dnl Apache's own PCRE.
++dnl
++AC_DEFUN(APACHE_CHECK_PCRE, [
++  AC_MSG_CHECKING(for external PCRE library)
++  ap_pcre_base=""
++  ap_test_pcre=1
++  AP_EXTERN_PCRE=0
++
++  AC_ARG_WITH([pcre], AS_HELP_STRING([--with-external-pcre],
++      [use external libpcre (versus apache-supplied pcre)]), [
++    if test "x$withval" = "xno"; then
++      ap_test_pcre=0;
++    elif test "x$withval" != "xyes" -a "x$withval" != "x"; then
++      ap_pcre_base="$withval"
++    fi
++  ])
++
++  if test "$ap_test_pcre" != "0"; then
++    ap_pcre_conf="pcre-config"
++    if test -f "$ap_pcre_base"; then
++      ap_pcre_conf="$ap_pcre_base";
++    elif test -f "$ap_pcre_base/pcre-config"; then
++      ap_pcre_conf="$ap_pcre_base/pcre-config";
++    elif test -f "$ap_pcre_base/bin/pcre-config"; then
++      ap_pcre_conf="$ap_pcre_base/bin/pcre-config";
++    fi
++
++    ap_save_CFLAGS="$CFLAGS"
++    ap_save_LIBS="$LIBS"
++    CFLAGS="$CFLAGS `$ap_pcre_conf --cflags 2>/dev/null`"
++    LIBS="$LIBS `$ap_pcre_conf --libs 2>/dev/null`"
++    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <pcre.h>]],
++        [[char *foo = pcre_version();]])], [
++      AP_EXTERN_PCRE=1
++    ], [
++      CFLAGS="$ap_save_CFLAGS"
++      LIBS="$ap_save_LIBS"
++    ])
++  fi
++
++  if test "$AP_EXTERN_PCRE" = "1"; then
++    AC_MSG_RESULT(yes)
++  else
++    AC_MSG_RESULT(no)
++  fi
++  AC_SUBST(AP_EXTERN_PCRE)
++])
++
++dnl
+ dnl APACHE_EXPORT_ARGUMENTS
+ dnl Export (via APACHE_SUBST) the various path-related variables that
+ dnl apache will use while generating scripts like autoconf and apxs and
+diff -x {arch} -x .arch-ids -urN orig/apache2/configure.in mod/apache2/configure.in
+--- orig/apache2/configure.in	2004-03-07 03:18:27.000000000 -0500
++++ mod/apache2/configure.in	2004-03-07 01:18:08.000000000 -0500
+@@ -114,10 +114,14 @@
+ AC_PROG_CC
+ AC_PROG_CPP
+ 
+-echo $ac_n "${nl}Configuring PCRE regular expression library ...${nl}"
+-
+-APR_SUBDIR_CONFIG(srclib/pcre,
+-                  [--prefix=$prefix --exec-prefix=$exec_prefix --libdir=$libdir --includedir=$includedir --bindir=$bindir])
++APACHE_CHECK_PCRE
++if test "$AP_EXTERN_PCRE" = "0"; then
++  echo $ac_n "${nl}Configuring PCRE regular expression library ...${nl}"
++  APR_SUBDIR_CONFIG(srclib/pcre,
++      [--prefix=$prefix --exec-prefix=$exec_prefix --libdir=$libdir --includedir=$includedir --bindir=$bindir])
++  AP_BUILD_SRCLIB_DIRS="$AP_BUILD_SRCLIB_DIRS pcre"
++  AP_CLEAN_SRCLIB_DIRS="pcre $AP_CLEAN_SRCLIB_DIRS"
++fi
+ 
+ echo $ac_n "${nl}Configuring Apache httpd ...${nl}"
+ 
+@@ -466,9 +470,6 @@
+ APACHE_HELP_STRING(--with-suexec-umask,umask for suexec'd process),[
+   AC_DEFINE_UNQUOTED(AP_SUEXEC_UMASK, 0$withval, [umask for suexec'd process] ) ] )
+ 
+-dnl AP_LIBS specifies the actual libraries. note we have some required libs.
+-AP_LIBS="$abs_builddir/srclib/pcre/libpcre.la $AP_LIBS"
+-
+ dnl APR should go after the other libs, so the right symbols can be picked up
+ AP_LIBS="$AP_LIBS `$apu_config --link-libtool --libs` `$apr_config --link-libtool --libs`"
+ APACHE_SUBST(AP_LIBS)
+diff -x {arch} -x .arch-ids -urN orig/apache2/server/Makefile.in mod/apache2/server/Makefile.in
+--- orig/apache2/server/Makefile.in	2004-03-07 03:18:46.000000000 -0500
++++ mod/apache2/server/Makefile.in	2004-03-07 02:52:53.000000000 -0500
+@@ -9,7 +9,7 @@
+ LTLIBRARY_NAME    = libmain.la
+ LTLIBRARY_SOURCES = \
+     test_char.h \
+-	config.c log.c main.c vhost.c util.c \
++	config.c log.c main.c vhost.c util.c util_pcre.c \
+ 	util_script.c util_md5.c util_cfgtree.c util_ebcdic.c util_time.c \
+ 	rfc1413.c connection.c listen.c \
+ 	mpm_common.c util_charset.c util_debug.c util_xml.c \
+diff -x {arch} -x .arch-ids -urN orig/apache2/server/util.c mod/apache2/server/util.c
+--- orig/apache2/server/util.c	2004-03-07 03:18:48.000000000 -0500
++++ mod/apache2/server/util.c	2004-03-07 03:03:54.000000000 -0500
+@@ -298,7 +298,7 @@
+ 
+ static apr_status_t regex_cleanup(void *preg)
+ {
+-    regfree((regex_t *) preg);
++    ap_regfree((regex_t *) preg);
+     return APR_SUCCESS;
+ }
+ 
+@@ -307,7 +307,7 @@
+ {
+     regex_t *preg = apr_palloc(p, sizeof(regex_t));
+ 
+-    if (regcomp(preg, pattern, cflags)) {
++    if (ap_regcomp(preg, pattern, cflags)) {
+         return NULL;
+     }
+ 
+@@ -319,7 +319,7 @@
+ 
+ AP_DECLARE(void) ap_pregfree(apr_pool_t *p, regex_t * reg)
+ {
+-    regfree(reg);
++    ap_regfree(reg);
+     apr_pool_cleanup_kill(p, (void *) reg, regex_cleanup);
+ }
+ 
+@@ -386,25 +386,6 @@
+     return bigstring;
+ }
+ 
+-/* 
+- * Apache stub function for the regex libraries regexec() to make sure the
+- * whole regex(3) API is available through the Apache (exported) namespace.
+- * This is especially important for the DSO situations of modules.
+- * DO NOT MAKE A MACRO OUT OF THIS FUNCTION!
+- */
+-AP_DECLARE(int) ap_regexec(regex_t *preg, const char *string,
+-                           size_t nmatch, regmatch_t pmatch[], int eflags)
+-{
+-    return regexec(preg, string, nmatch, pmatch, eflags);
+-}
+-
+-AP_DECLARE(size_t) ap_regerror(int errcode, const regex_t *preg, char *errbuf,
+-                               size_t errbuf_size)
+-{
+-    return regerror(errcode, preg, errbuf, errbuf_size);
+-}
+-
+-
+ /* This function substitutes for $0-$9, filling in regular expression
+  * submatches. Pass it the same nmatch and pmatch arguments that you
+  * passed ap_regexec(). pmatch should not be greater than the maximum number
+diff -x {arch} -x .arch-ids -urN orig/apache2/server/util_pcre.c mod/apache2/server/util_pcre.c
+--- orig/apache2/server/util_pcre.c	1969-12-31 19:00:00.000000000 -0500
++++ mod/apache2/server/util_pcre.c	2004-03-07 03:14:49.000000000 -0500
+@@ -0,0 +1,254 @@
++/*************************************************
++*      Perl-Compatible Regular Expressions       *
++*************************************************/
++
++/*
++This is a library of functions to support regular expressions whose syntax
++and semantics are as close as possible to those of the Perl 5 language. See
++the file Tech.Notes for some information on the internals.
++
++This module is a wrapper that provides a POSIX API to the underlying PCRE
++functions.
++
++Written by: Philip Hazel <ph10@cam.ac.uk>
++
++           Copyright (c) 1997-2003 University of Cambridge
++	   Copyright (C) 2004  Andres Salomon <dilinger@voxel.net>
++
++-----------------------------------------------------------------------------
++Permission is granted to anyone to use this software for any purpose on any
++computer system, and to redistribute it freely, subject to the following
++restrictions:
++
++1. This software is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
++
++2. The origin of this software must not be misrepresented, either by
++   explicit claim or by omission.
++
++3. Altered versions must be plainly marked as such, and must not be
++   misrepresented as being the original software.
++
++4. If PCRE is embedded in any software that is released under the GNU
++   General Purpose Licence (GPL), then the terms of that licence shall
++   supersede any condition above with which it is incompatible.
++----------------------------------------------------------------------------
++*/
++
++#include "apr.h"
++#include "apr_strings.h"
++#include "apr_lib.h"
++                                                                                
++#define APR_WANT_STDIO
++#define APR_WANT_STRFUNC
++#include "apr_want.h"
++                                                                                
++#if APR_HAVE_UNISTD_H
++#include <unistd.h>
++#endif
++#if APR_HAVE_NETDB_H
++#include <netdb.h>              /* for gethostbyname() */
++#endif
++
++#define CORE_PRIVATE
++                                                                                
++#include "ap_config.h"
++#include "apr_base64.h"
++#include "httpd.h"
++#include "http_main.h"
++#include "http_log.h"
++#include "http_protocol.h"
++#include "http_config.h"
++#include "util_ebcdic.h"
++                                                                                
++#include <pcre.h>
++
++#ifndef PCRE_CONFIG_POSIX_MALLOC_THRESHOLD
++#define PCRE_CONFIG_POSIX_MALLOC_THRESHOLD 3
++#endif
++
++/* Table of texts corresponding to POSIX error codes */
++
++static const char *pstring[] = {
++  "",                                /* Dummy for value 0 */
++  "internal error",                  /* REG_ASSERT */
++  "invalid repeat counts in {}",     /* BADBR      */
++  "pattern error",                   /* BADPAT     */
++  "? * + invalid",                   /* BADRPT     */
++  "unbalanced {}",                   /* EBRACE     */
++  "unbalanced []",                   /* EBRACK     */
++  "collation error - not relevant",  /* ECOLLATE   */
++  "bad class",                       /* ECTYPE     */
++  "bad escape sequence",             /* EESCAPE    */
++  "empty expression",                /* EMPTY      */
++  "unbalanced ()",                   /* EPAREN     */
++  "bad range inside []",             /* ERANGE     */
++  "expression too big",              /* ESIZE      */
++  "failed to get memory",            /* ESPACE     */
++  "bad back reference",              /* ESUBREG    */
++  "bad argument",                    /* INVARG     */
++  "match failed"                     /* NOMATCH    */
++};
++
++
++
++
++/*************************************************
++*          Translate error code to string        *
++*************************************************/
++
++AP_DECLARE(size_t)
++ap_regerror(int errcode, const regex_t *preg, char *errbuf, size_t errbuf_size)
++{
++const char *message, *addmessage;
++size_t length, addlength;
++
++message = (errcode >= (int)(sizeof(pstring)/sizeof(char *)))?
++  "unknown error code" : pstring[errcode];
++length = strlen(message) + 1;
++
++addmessage = " at offset ";
++addlength = (preg != NULL && (int)preg->re_erroffset != -1)?
++  strlen(addmessage) + 6 : 0;
++
++if (errbuf_size > 0)
++  {
++  if (addlength > 0 && errbuf_size >= length + addlength)
++    sprintf(errbuf, "%s%s%-6d", message, addmessage, (int)preg->re_erroffset);
++  else
++    {
++    strncpy(errbuf, message, errbuf_size - 1);
++    errbuf[errbuf_size-1] = 0;
++    }
++  }
++
++return length + addlength;
++}
++
++
++
++
++/*************************************************
++*           Free store held by a regex           *
++*************************************************/
++
++void
++ap_regfree(regex_t *preg)
++{
++(pcre_free)(preg->re_pcre);
++}
++
++
++
++
++/*************************************************
++*            Compile a regular expression        *
++*************************************************/
++
++/*
++Arguments:
++  preg        points to a structure for recording the compiled expression
++  pattern     the pattern to compile
++  cflags      compilation flags
++
++Returns:      0 on success
++              various non-zero codes on failure
++*/
++
++int
++ap_regcomp(regex_t *preg, const char *pattern, int cflags)
++{
++const char *errorptr;
++int erroffset;
++int options = 0;
++
++if ((cflags & REG_ICASE) != 0) options |= PCRE_CASELESS;
++if ((cflags & REG_NEWLINE) != 0) options |= PCRE_MULTILINE;
++
++preg->re_pcre = pcre_compile(pattern, options, &errorptr, &erroffset, NULL);
++preg->re_erroffset = erroffset;
++
++if (preg->re_pcre == NULL) return 1;
++
++preg->re_nsub = pcre_info(preg->re_pcre, NULL, NULL);
++return 0;
++}
++
++
++
++
++/*************************************************
++*              Match a regular expression        *
++*************************************************/
++
++/* Unfortunately, PCRE requires 3 ints of working space for each captured
++substring, so we have to get and release working store instead of just using
++the POSIX structures as was done in earlier releases when PCRE needed only 2
++ints. However, if the number of possible capturing brackets is small, use a
++block of store on the stack, to reduce the use of malloc/free. The threshold is
++in a macro that can be changed at configure time. */
++
++AP_DECLARE(int)
++ap_regexec(regex_t *preg, const char *string, size_t nmatch,
++  regmatch_t pmatch[], int eflags)
++{
++int rc;
++int options = 0;
++int *ovector = NULL;
++int small_ovector[PCRE_CONFIG_POSIX_MALLOC_THRESHOLD * 3];
++int allocated_ovector = 0;
++
++if ((eflags & REG_NOTBOL) != 0) options |= PCRE_NOTBOL;
++if ((eflags & REG_NOTEOL) != 0) options |= PCRE_NOTEOL;
++
++((regex_t *)preg)->re_erroffset = (size_t)(-1);  /* Only has meaning after compile */
++
++if (nmatch > 0)
++  {
++  if (nmatch <= PCRE_CONFIG_POSIX_MALLOC_THRESHOLD)
++    {
++    ovector = &(small_ovector[0]);
++    }
++  else
++    {
++    ovector = (int *)malloc(sizeof(int) * nmatch * 3);
++    if (ovector == NULL) return REG_ESPACE;
++    allocated_ovector = 1;
++    }
++  }
++
++rc = pcre_exec(preg->re_pcre, NULL, string, (int)strlen(string), 0, options,
++  ovector, nmatch * 3);
++
++if (rc == 0) rc = nmatch;    /* All captured slots were filled in */
++
++if (rc >= 0)
++  {
++  size_t i;
++  for (i = 0; i < (size_t)rc; i++)
++    {
++    pmatch[i].rm_so = ovector[i*2];
++    pmatch[i].rm_eo = ovector[i*2+1];
++    }
++  if (allocated_ovector) free(ovector);
++  for (; i < nmatch; i++) pmatch[i].rm_so = pmatch[i].rm_eo = -1;
++  return 0;
++  }
++
++else
++  {
++  if (allocated_ovector) free(ovector);
++  switch(rc)
++    {
++    case PCRE_ERROR_NOMATCH: return REG_NOMATCH;
++    case PCRE_ERROR_NULL: return REG_INVARG;
++    case PCRE_ERROR_BADOPTION: return REG_INVARG;
++    case PCRE_ERROR_BADMAGIC: return REG_INVARG;
++    case PCRE_ERROR_UNKNOWN_NODE: return REG_ASSERT;
++    case PCRE_ERROR_NOMEMORY: return REG_ESPACE;
++    default: return REG_ASSERT;
++    }
++  }
++}
++
+diff -x {arch} -x .arch-ids -urN orig/apache2/srclib/Makefile.in mod/apache2/srclib/Makefile.in
+--- orig/apache2/srclib/Makefile.in	2004-03-07 03:18:49.000000000 -0500
++++ mod/apache2/srclib/Makefile.in	2004-03-07 01:18:07.000000000 -0500
+@@ -1,5 +1,5 @@
+ 
+-SUBDIRS = pcre
++SUBDIRS = 
+ BUILD_SUBDIRS = $(AP_BUILD_SRCLIB_DIRS)
+ CLEAN_SUBDIRS = $(AP_CLEAN_SRCLIB_DIRS)
