@@ -923,7 +923,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files mod_proxy
 %config(noreplace) %{_sysconfdir}/mod_proxy.conf
-%attr(644,root,root) %{_sysconfdir}/mod_proxy.conf
+%attr(640,root,root) %{_sysconfdir}/mod_proxy.conf
 %attr(755,root,root) %{_libexecdir}/libproxy.so
 %attr(644,root,root) %{_datadir}/manual/mod/mod_proxy.html
 %dir %attr(750,http,http) /var/cache/apache
@@ -934,7 +934,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files mod_status
 %config(noreplace) %{_sysconfdir}/mod_status.conf
-%attr(644,root,root) %{_sysconfdir}/mod_status.conf
+%attr(640,root,root) %{_sysconfdir}/mod_status.conf
 %attr(755,root,root) %{_libexecdir}/mod_status.so
 %attr(644,root,root) %{_datadir}/manual/mod/mod_status.html
 
