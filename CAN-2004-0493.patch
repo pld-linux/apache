@@ -1,0 +1,32 @@
+Index: server/protocol.c
+===================================================================
+RCS file: /home/cvspublic/httpd-2.0/server/protocol.c,v
+retrieving revision 1.148
+diff -u -r1.148 protocol.c
+--- server/protocol.c	22 Apr 2004 22:38:03 -0000	1.148
++++ server/protocol.c	13 Jun 2004 19:47:36 -0000
+@@ -716,6 +716,23 @@
+                  * continuations that span many many lines.
+                  */
+                 apr_size_t fold_len = last_len + len + 1; /* trailing null */
++
++                if ((fold_len - 1) > r->server->limit_req_fieldsize) {
++                    r->status = HTTP_BAD_REQUEST;
++                    /* report what we have accumulated so far before the
++                     * overflow (last_field) as the field with the problem
++                     */
++                    apr_table_setn(r->notes, "error-notes",
++                                   apr_pstrcat(r->pool,
++                                               "Size of a request header field " 
++                                               "after folding "
++                                               "exceeds server limit.<br />\n"
++                                               "<pre>\n",
++                                               ap_escape_html(r->pool, last_field),
++                                               "</pre>\n", NULL));
++                    return;
++                }
++
+                 if (fold_len > alloc_len) {
+                     char *fold_buf;
+                     alloc_len += alloc_len;
+
