@@ -15,7 +15,7 @@ Summary(pt_BR):	Servidor HTTPD para prover serviços WWW
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.0.35
-Release:	0.5
+Release:	0.6
 License:	Apache Group License
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/
@@ -31,6 +31,8 @@ Source10:	%{name}-mod_proxy.conf
 Source11:	%{name}-mod_info.conf
 Source12:	%{name}-mod_ssl.conf
 Source13:	%{name}-mod_dav.conf
+Source20:	%{name}-server.crt
+Source21:	%{name}-server.key
 Patch0:		%{name}-apxs.patch
 Patch1:		%{name}-configdir_skip_backups.patch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -660,6 +662,10 @@ install %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/apache
 install %{SOURCE4} $RPM_BUILD_ROOT/etc/sysconfig/apache
 
 touch $RPM_BUILD_ROOT/var/log/httpd/{access,error,agent,referer}_log
+
+install -d $RPM_BUILD_ROOT%{_sysconfdir}/ssl
+install %{SOURCE20} $RPM_BUILD_ROOT%{_sysconfdir}/ssl/server.crt
+install %{SOURCE21} $RPM_BUILD_ROOT%{_sysconfdir}/ssl/server.key
 
 CFG="$RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf/"
 
@@ -1313,6 +1319,8 @@ fi
 
 %files mod_ssl
 %defattr(644,root,root,755)
+%attr(750,root,root) %dir %{_sysconfdir}/ssl
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/ssl/server.*
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_ssl.conf
 %attr(755,root,root) %{_libexecdir}/mod_ssl.so
 %{_datadir}/manual/ssl
