@@ -7,9 +7,7 @@
 #		HTML files and CGI.
 # processname:	httpd
 # pidfile:	/var/run/httpd.pid
-# config:	/etc/httpd/conf/access.conf
-# config:	/etc/httpd/conf/httpd.conf
-# config:	/etc/httpd/conf/srm.conf
+# config:	/etc/httpd/httpd.conf
 
 
 # Source function library
