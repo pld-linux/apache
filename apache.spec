@@ -650,10 +650,13 @@ install -d $RPM_BUILD_ROOT%{_var}/{run,cache}/apache
 	logdir=$RPM_BUILD_ROOT%{_var}/log/httpd \
 	proxycachedir=$RPM_BUILD_ROOT%{_var}/cache/httpd
 
-cp $RPM_BUILD_ROOT%{_sysconfdir}/build/config_vars.mk \
-	$RPM_BUILD_ROOT%{_sysconfdir}/build/config_vars.mk.old
-sed -e "s#$RPM_BUILD_ROOT##g" $RPM_BUILD_ROOT%{_sysconfdir}/build/config_vars.mk.old \
-	> $RPM_BUILD_ROOT%{_sysconfdir}/build/config_vars.mk
+mv -f $RPM_BUILD_ROOT%{_sysconfdir}/build \
+	$RPM_BUILD_ROOT%{_libexecdir}/build
+cp $RPM_BUILD_ROOT%{_libexecdir}/build/config_vars.mk \
+	$RPM_BUILD_ROOT%{_libexecdir}/build/config_vars.mk.old
+sed -e "s#$RPM_BUILD_ROOT##g" $RPM_BUILD_ROOT%{_libexecdir}/build/config_vars.mk.old \
+	> $RPM_BUILD_ROOT%{_libexecdir}/build/config_vars.mk
+ln -s %{_libexecdir}/build $RPM_BUILD_ROOT%{_sysconfdir}/build
 
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/apache
@@ -1174,9 +1177,10 @@ fi
 %attr(750,root,root) %dir %{_sysconfdir}
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf
 %attr(640,root,root) %{_sysconfdir}/magic
-%attr(750,root,root) %dir %{_sysconfdir}/build
-%{_sysconfdir}/build/*.mk
-%attr(755,root,root) %{_sysconfdir}/build/*.sh
+%attr(755,root,root) %dir %{_sysconfdir}/build
+%attr(755,root,root) %dir %{_libexecdir}/build
+%attr(755,root,root) %{_libexecdir}/build/*.mk
+%attr(755,root,root) %{_libexecdir}/build/*.sh
 
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) /etc/sysconfig/*
 %attr(640,root,root) %config(noreplace) /etc/logrotate.d/*
