@@ -24,7 +24,7 @@
 # Check that networking is up.
 if is_no "${NETWORKING}"; then
         # nls "ERROR: Networking is down. %s can't be run." <service>
-        msg_Network_Down httpd
+        msg_network_down httpd
         exit 1
 fi
 
@@ -42,7 +42,7 @@ case "$1" in
 	        RETVAL=$?
     		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/httpd
 	else
-        	msg_Already_Running httpd
+        	msg_already_running httpd
 	        exit 1
 	fi
 	;;
@@ -53,7 +53,7 @@ case "$1" in
                 killproc httpd
                 rm -f /var/lock/subsys/httpd /var/run/httpd.pid /var/run/httpd.loc* >/dev/null 2>&1
         else
-		msg_Not_Running httpd
+		msg_not_running httpd
 	        exit 1
 	fi
 	;;
@@ -67,7 +67,7 @@ case "$1" in
 	$0 start
 	;;
   *)
-	msg_Usage "$0 {start|stop|restart|status}"
+	msg_usage "$0 {start|stop|restart|status}"
 	exit 1
 	;;
 esac
