@@ -1063,8 +1063,8 @@ diff -Nur apache_1.3.28.orig/src/main/http_config.c apache_1.3.28/src/main/http_
  }
  
  
---- apache_1.3.31/src/main/http_core.c.orig	Mon May  3 22:15:26 2004
-+++ apache_1.3.31/src/main/http_core.c	Sat May 15 00:06:26 2004
+--- apache_1.3.32/src/main/http_core.c.orig	Mon May  3 22:15:26 2004
++++ apache_1.3.32/src/main/http_core.c	Sat May 15 00:06:26 2004
 @@ -28,6 +28,7 @@
  #include "util_md5.h"
  #include "scoreboard.h"
@@ -1076,9 +1076,9 @@ diff -Nur apache_1.3.28.orig/src/main/http_config.c apache_1.3.28/src/main/http_
 @@ -564,7 +565,7 @@
       * file if you care. So the adhoc value should do.
       */
-     return ap_psprintf(r->pool,"%pp%pp%pp%pp%pp",
--           (void *)&((r->connection->local_addr).sin_addr ),
-+           (void *)&(((struct sockaddr_in *)&(r->connection->local_addr))->sin_addr),
+     return ap_psprintf(r->pool,"%pI%pp%pp%pp%pp",
+-           &r->connection->local_addr.sin_addr,
++           &((struct sockaddr_in *)&(r->connection->local_addr))->sin_addr,
             (void *)ap_user_name,
             (void *)ap_listeners,
             (void *)ap_server_argv0,
