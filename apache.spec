@@ -14,6 +14,9 @@
 # - add %%post/%%postun to suexec
 # - --with-suexec-gidmin=500 or =100 ?
 # - --with-suexec-uidmin=500 or =1000 ?
+# - multiple MPM support in subpackages like apache-mpm-worker, apache-mpm-prefork
+#   and so on. See SuSE 9 apache rpm for idea how to do this.
+#
 %include	/usr/lib/rpm/macros.perl
 # this is internal macro, don't change to %%apache_modules_api
 %define		_apache_modules_api 20020903
@@ -52,6 +55,8 @@ Patch1:		%{name}-layout.patch
 Patch2:		%{name}-suexec.patch
 Patch3:		%{name}-nolibs.patch
 Patch4:		%{name}-apr.patch
+# taken from suse. project homepage http://www.metux.de/mpm/en/?patpage=index
+Patch5:		httpd-2.0.47-metuxmpm-r6.diff
 URL:		http://httpd.apache.org/
 BuildRequires:	automake
 BuildRequires:	apr-devel >= 1:0.9.4-1
@@ -601,6 +606,7 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
+#%patch5 -p1
 
 %build
 # sanity check
