@@ -41,7 +41,7 @@ Requires:	rc-scripts
 Requires:	mailcap
 Requires:	/etc/mime.types
 URL:		http://www.apache.org/
-BuildRoot:	/tmp/%{name}-%{version}-root
+BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 Provides:	apache(EAPI)
 Obsoletes:	apache-extra
 Obsoletes:	apache6
@@ -401,7 +401,6 @@ else
 		/usr/bin/update-db 1>&2
 	fi
 fi
-
 
 %post
 /sbin/chkconfig --add httpd
