@@ -47,8 +47,8 @@ Patch1:		%{name}-configdir_skip_backups.patch
 Patch2:		%{name}-layout.patch
 Patch3:		%{name}-suexec.patch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
-%{!?_without_ssl:BuildRequires:	openssl-devel >= 0.9.6f}
-%{!?_without_ssl:BuildRequires:	openssl-tools}
+%{!?_without_ssl:BuildRequires:	openssl-devel >= 0.9.7}
+%{!?_without_ssl:BuildRequires:	openssl-tools >= 0.9.7}
 BuildRequires:	db-devel
 BuildRequires:	zlib-devel
 BuildRequires:	expat-devel
