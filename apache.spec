@@ -11,7 +11,7 @@ Summary(pl):	Serwer WWW (World Wide Web)
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	1.3.17
-Release:	5
+Release:	6
 License:	Apache Group License
 Group:		Networking/Daemons
 Group(de):	Netzwerkwesen/Server
@@ -64,6 +64,7 @@ Prereq:		mm
 Prereq:		perl
 Requires:	mailcap
 Requires:	/etc/mime.types
+Requires:	psmisc >= 20.1
 Obsoletes:	apache-extra
 Obsoletes:	apache6
 Obsoletes:	apache-doc
@@ -510,7 +511,7 @@ wa¿no¶ci mo¿e byæ ustalana w zale¿no¶ci od czasu modyfikacji plików
 %patch19 -p1
 %{?bcond_off_apache_ipv6:%patch20 -p1}
 %build
-OPTIM="%{?debug:-O0 -g}%{!?debug:$RPM_OPT_FLAGS}" \
+OPTIM="%{rpmcflags}" \
 ./configure \
 	--prefix=%{_prefix} \
 	--sysconfdir=%{_sysconfdir} \
