@@ -1,31 +1,40 @@
 #!/bin/sh
 #
-# Startup script for the Apache Web Server
+# apache	Apache Web Server
 #
-# chkconfig: 345 85 15
-# description: Apache is a World Wide Web server.  It is used to serve \
-# HTML files and CGI.
-# processname: httpd
-# pidfile: /var/run/httpd.pid
-# config: /etc/httpd/conf/access.conf
-# config: /etc/httpd/conf/httpd.conf
-# config: /etc/httpd/conf/srm.conf
+# chkconfig:	345 85 15
+# description:	Apache is a World Wide Web server.  It is used to serve \
+#		HTML files and CGI.
+# processname:	httpd
+# pidfile:	/var/run/httpd.pid
+# config:	/etc/httpd/conf/access.conf
+# config:	/etc/httpd/conf/httpd.conf
+# config:	/etc/httpd/conf/srm.conf
 
-# Source function library.
+
+# Source function library
 . /etc/rc.d/init.d/functions
 
-# Check that networking is up.
-[ "${NETWORKING}" = "no" ] && exit0
+# Get network config
+. /etc/sysconfig/network
 
-# Try set service nice level
-if [ -f /etc/sysconfig/apache ]; then
-    . /etc/sysconfig/apache
-fi    
+# Get service config
+[ -f /etc/sysconfig/apache ] && . /etc/sysconfig/apache
+
+# Check that networking is up.
+[ "${NETWORKING}" = "no" ] && echo "Error: Networking is down"; exit 0
+
+
 # See how we were called.
 case "$1" in
   start)
-	show Starting httpd
-	daemon httpd 
+	# Check if the service is already running?
+	if [ ! -f /var/lock/subsys/httpd ]; then
+		show Starting httpd
+		daemon httpd
+	else
+		echo "httpd already is running"
+	fi
 	touch /var/lock/subsys/httpd
 	;;
   stop)
@@ -36,7 +45,7 @@ case "$1" in
   status)
 	status httpd
 	;;
-  restart)
+  restart|reload)
 	$0 stop
 	$0 start
 	;;
