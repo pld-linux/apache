@@ -81,6 +81,7 @@ Patch20:	%{name}-conffile-path.patch
 Patch21:	%{name}-apxs.patch
 # http://www.telana.com/peruser.php
 Patch22:	httpd-2.0.50-peruser-r3.patch
+Patch23:	%{name}-apr1.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	automake
 %if %{with apr1}
@@ -697,6 +698,7 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 %patch20 -p1
 %patch21 -p1
 %patch22 -p1
+%{?with_apr1:%patch23 -p1}
 
 %{__perl} -pi -e "s@/usr/local/bin/perl@%{__perl}@" $(grep -rl "/usr/local/bin/perl" *)
 
