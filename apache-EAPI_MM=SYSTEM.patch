@@ -1,0 +1,12 @@
+diff -Nru apache_1.3.12/src/Configuration.tmpl apache_1.3.12.new/src/Configuration.tmpl
+--- apache_1.3.12/src/Configuration.tmpl	Tue Mar 14 02:04:30 2000
++++ apache_1.3.12.new/src/Configuration.tmpl	Tue Mar 14 02:05:17 2000
+@@ -83,7 +83,7 @@
+ #   course.
+ 
+ Rule EAPI=no
+-#EAPI_MM=SYSTEM
++EAPI_MM=SYSTEM
+ 
+ ################################################################
+ # Dynamic Shared Object (DSO) support
