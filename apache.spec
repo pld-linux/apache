@@ -12,9 +12,6 @@
 # - --with-suexec-gidmin=500 or =100 ?
 # - --with-suexec-uidmin=500 or =1000 ?
 # - subpackages for MPMs
-# - change _prefix to /etc/httpd, _exec_prefix to /usr, fix configs to Load modules/xyz.so
-#   + provide /etc/httpd/modules symlink to /usr/lib{,64}/apache (see for example fedora apache.spec}
-#   This will fix path problems with AMD64.
 # - check if all modules (*.so) are exactly the same for different MPMs
 #
 # Conditional build:
@@ -35,7 +32,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.0.49
-Release:	0.3
+Release:	1
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
