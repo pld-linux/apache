@@ -1361,47 +1361,6 @@ diff -ur httpd-2.0.52.org/server/mpm/worker/worker.c httpd-2.0.52/server/mpm/wor
                  /* handled */
  #endif
              }
-diff -ur httpd-2.0.52.org/server/mpm_common.c httpd-2.0.52/server/mpm_common.c
---- httpd-2.0.52.org/server/mpm_common.c	2004-10-02 18:25:57.275944728 +0200
-+++ httpd-2.0.52/server/mpm_common.c	2004-10-02 18:26:13.700426168 +0200
-@@ -150,7 +150,7 @@
-         }
- 
- #if APR_HAS_OTHER_CHILD
--        apr_proc_other_child_check();
-+        apr_proc_other_child_refresh_all(APR_OC_REASON_RESTART);
- #endif
- 
-         if (!not_dead_yet) {
-@@ -371,8 +371,8 @@
-                           APR_UNSPEC, ap_listeners->bind_addr->port, 0, p);
- 
-     /* close these before exec. */
--    apr_file_unset_inherit((*pod)->pod_in);
--    apr_file_unset_inherit((*pod)->pod_out);
-+    apr_file_inherit_unset((*pod)->pod_in);
-+    apr_file_inherit_unset((*pod)->pod_out);
- 
-     return APR_SUCCESS;
- }
-@@ -445,7 +445,7 @@
-         return rv;
-     }
- 
--    rv = apr_socket_create(&sock, pod->sa->family, SOCK_STREAM, p);
-+    rv = apr_socket_create(&sock, pod->sa->family, SOCK_STREAM, APR_PROTO_TCP, p);
-     if (rv != APR_SUCCESS) {
-         ap_log_error(APLOG_MARK, APLOG_WARNING, rv, ap_server_conf,
-                      "get socket to connect to listener");
-@@ -466,7 +466,7 @@
-         return rv;
-     }
- 
--    rv = apr_connect(sock, pod->sa);
-+    rv = apr_socket_connect(sock, pod->sa);
-     if (rv != APR_SUCCESS) {
-         int log_level = APLOG_WARNING;
- 
 diff -ur httpd-2.0.52.org/server/protocol.c httpd-2.0.52/server/protocol.c
 --- httpd-2.0.52.org/server/protocol.c	2004-10-02 18:25:57.276944514 +0200
 +++ httpd-2.0.52/server/protocol.c	2004-10-02 18:26:13.704425311 +0200
@@ -1807,3 +1766,43 @@ diff -ur httpd-2.0.52.org/modules/experimental/util_ldap.c httpd-2.0.52/modules/
      */
  #define LDAP_CA_TYPE_UNKNOWN            0
 
+--- httpd-2.0.54/server/mpm_common.c	2005-03-30 09:42:15.000000000 +0000
++++ httpd-2.0.54.new/server/mpm_common.c	2005-04-18 07:11:07.869583928 +0000
+@@ -252,7 +252,7 @@
+         }
+ 
+ #if APR_HAS_OTHER_CHILD
+-        apr_proc_other_child_check();
++        apr_proc_other_child_refresh_all(APR_OC_REASON_RESTART);
+ #endif
+ 
+     } while (not_dead_yet > 0 &&
+@@ -466,8 +466,8 @@
+     (*pod)->p = p;
+ 
+     /* close these before exec. */
+-    apr_file_unset_inherit((*pod)->pod_in);
+-    apr_file_unset_inherit((*pod)->pod_out);
++    apr_file_inherit_unset((*pod)->pod_in);
++    apr_file_inherit_unset((*pod)->pod_out);
+ 
+     return APR_SUCCESS;
+ }
+@@ -540,7 +540,7 @@
+         return rv;
+     }
+ 
+-    rv = apr_socket_create(&sock, ap_listeners->bind_addr->family, SOCK_STREAM, p);
++    rv = apr_socket_create(&sock, pod->sa->family, SOCK_STREAM, APR_PROTO_TCP, p);
+     if (rv != APR_SUCCESS) {
+         ap_log_error(APLOG_MARK, APLOG_WARNING, rv, ap_server_conf,
+                      "get socket to connect to listener");
+@@ -561,7 +561,7 @@
+         return rv;
+     }
+ 
+-    rv = apr_connect(sock, ap_listeners->bind_addr);
++    rv = apr_socket_connect(sock, pod->sa);
+     if (rv != APR_SUCCESS) {
+         int log_level = APLOG_WARNING;
+ 
