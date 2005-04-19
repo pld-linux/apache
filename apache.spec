@@ -1466,11 +1466,13 @@ fi
 %lang(ko) %{_datadir}/manual/mod/module-dict.html.ko.euc-kr
 %{_datadir}/manual/mod/mpm_common.html.en
 %lang(de) %{_datadir}/manual/mod/mpm_common.html.de
+%lang(es) %{_datadir}/manual/mod/mpm_common.html.es
 %lang(ja) %{_datadir}/manual/mod/mpm_common.html.ja*
 %{_datadir}/manual/mod/mod_access.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_access.html.ja*
 %{_datadir}/manual/mod/mod_alias.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_alias.html.ja*
+%lang(ko) %{_datadir}/manual/mod/mod_alias.html.ko.euc-kr
 %{_datadir}/manual/mod/mod_asis.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_asis.html.ja*
 %lang(ko) %{_datadir}/manual/mod/mod_asis.html.ko.euc-kr
@@ -1493,6 +1495,8 @@ fi
 %{_datadir}/manual/mod/mod_include.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_include.html.ja*
 %{_datadir}/manual/mod/mod_log_config.html.en
+%lang(ja) %{_datadir}/manual/mod/mod_log_config.html.ja.euc-jp
+%lang(ko) %{_datadir}/manual/mod/mod_log_config.html.ko.euc-kr
 %{_datadir}/manual/mod/mod_log_forensic.html.en
 %{_datadir}/manual/mod/mod_mime*.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_mime*.html.ja*
@@ -1528,12 +1532,15 @@ fi
 %{_datadir}/manual/mod/mod_ldap.html.en
 %{_datadir}/manual/mod/mod_auth_dbm.html.en
 %{_datadir}/manual/mod/mod_auth_digest.html.en
+%lang(ko) %{_datadir}/manual/mod/mod_auth_digest.html.ko.euc-kr
 %{_datadir}/manual/mod/mod_cache.html.en
 %lang(ko) %{_datadir}/manual/mod/mod_cache.html.ko.euc-kr
 %{_datadir}/manual/mod/mod_disk_cache.html.en
 %lang(ko) %{_datadir}/manual/mod/mod_disk_cache.html.ko.euc-kr
 %{_datadir}/manual/mod/mod_mem_cache.html.en
+%lang(ko) %{_datadir}/manual/mod/mod_mem_cache.html.ko.euc-kr
 %{_datadir}/manual/mod/mod_cgid.html.en
+%lang(ja) %{_datadir}/manual/mod/mod_cgid.html.ja.euc-jp
 %lang(ko) %{_datadir}/manual/mod/mod_cgid.html.ko.euc-kr
 %{_datadir}/manual/mod/mod_charset_lite.html.en
 %lang(ko) %{_datadir}/manual/mod/mod_charset_lite.html.ko.euc-kr
@@ -1547,21 +1554,35 @@ fi
 %lang(ja) %{_datadir}/manual/mod/mod_dir.html.ja*
 %lang(ko) %{_datadir}/manual/mod/mod_dir.html.ko.euc-kr
 %{_datadir}/manual/mod/mod_expires.html.en
+%lang(ja) %{_datadir}/manual/mod/mod_expires.html.ja.euc-jp
 %lang(ko) %{_datadir}/manual/mod/mod_expires.html.ko.euc-kr
 %{_datadir}/manual/mod/mod_file_cache.html.en
 %lang(ko) %{_datadir}/manual/mod/mod_file_cache.html.ko.euc-kr
 %{_datadir}/manual/mod/mod_headers.html.en
+%lang(ko) %{_datadir}/manual/mod/mod_headers.html.ko.euc-kr
 %{_datadir}/manual/mod/mod_imap.html.en
+%lang(ko) %{_datadir}/manual/mod/mod_imap.html.ko.euc-kr
 %{_datadir}/manual/mod/mod_info.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_info.html.ja*
+%lang(ko) %{_datadir}/manual/mod/mod_info.html.ko.euc-kr
 %{_datadir}/manual/mod/mod_proxy*.html.en
 %{_datadir}/manual/mod/mod_rewrite.html.en
+%{_datadir}/manual/mod/mod_so.html.en
+%lang(ja) %{_datadir}/manual/mod/mod_so.html.ja.euc-jp
+%lang(ko) %{_datadir}/manual/mod/mod_so.html.ko.euc-kr
 %{_datadir}/manual/images/mod_rewrite*
+%dir %{_datadir}/manual/rewrite
+%{_datadir}/manual/rewrite/index.html.en
+%{_datadir}/manual/rewrite/rewrite_guide.html.en
+%{_datadir}/manual/rewrite/rewrite_guide_advanced.html.en
+%{_datadir}/manual/rewrite/rewrite_intro.html.en
+%{_datadir}/manual/rewrite/rewrite_tech.html.en
 %dir %{_datadir}/manual/ssl
 %{_datadir}/manual/ssl/*.html.en
 %lang(ja) %{_datadir}/manual/ssl/*.html.ja*
 %{_datadir}/manual/mod/mod_ssl.html.en
 %{_datadir}/manual/mod/mod_status.html.en
+%lang(ja) %{_datadir}/manual/mod/mod_status.html.ja.euc-jp
 %lang(ko) %{_datadir}/manual/mod/mod_status.html.ko.euc-kr
 %{_datadir}/manual/mod/mod_usertrack.html.en
 %{_datadir}/manual/mod/mod_unique_id.html.en
