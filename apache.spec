@@ -866,7 +866,7 @@ done
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig,monit} \
-	$RPM_BUILD_ROOT%{_var}/{log/{httpd,archiv/httpd},{run,cache}/apache}
+	$RPM_BUILD_ROOT%{_var}/{log/{httpd,archiv/httpd},{run,cache}/apache,lock/mod_dav}
 
 # prefork is default one
 %{__make} -C buildmpm-prefork install \
@@ -1697,6 +1697,7 @@ fi
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd.conf/*_mod_dav.conf
 %attr(755,root,root) %{_libexecdir}/mod_dav*.so
+%dir %attr(770,root,http) /var/lock/mod_dav
 
 %files mod_deflate
 %defattr(644,root,root,755)
