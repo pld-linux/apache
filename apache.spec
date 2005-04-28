@@ -112,7 +112,6 @@ Requires(pre):	/usr/sbin/useradd
 Requires(postun):	/usr/sbin/userdel
 Requires(postun):	/usr/sbin/groupdel
 Requires(post,preun):	/sbin/chkconfig
-Requires(post,postun):	/sbin/ldconfig
 Requires(post):	fileutils
 Requires:	/etc/mime.types
 Requires:	apr >= 1:1.0.0-2
@@ -968,16 +967,16 @@ ln -sf %{_bindir}/htpasswd $RPM_BUILD_ROOT%{_sbindir}/
 rm -rf $RPM_BUILD_ROOT
 
 %pre
-if [ -n "`getgid http`" ]; then
-	if [ "`getgid http`" != "51" ]; then
+if [ -n "`/usr/bin/getgid http`" ]; then
+	if [ "`/usr/bin/getgid http`" != "51" ]; then
 		echo "Error: group http doesn't have gid=51. Correct this before installing apache." 1>&2
 		exit 1
 	fi
 else
-	/usr/sbin/groupadd -g 51 -r -f http
+	/usr/sbin/groupadd -g 51 http
 fi
-if [ -n "`id -u http 2>/dev/null`" ]; then
-	if [ "`id -u http`" != "51" ]; then
+if [ -n "`/bin/id -u http 2>/dev/null`" ]; then
+	if [ "`/bin/id -u http`" != "51" ]; then
 		echo "Error: user http doesn't have uid=51. Correct this before installing apache." 1>&2
 		exit 1
 	fi
@@ -986,7 +985,6 @@ else
 fi
 
 %post
-/sbin/ldconfig
 /sbin/chkconfig --add httpd
 umask 137
 touch /var/log/httpd/{access,error,agent,referer}_log
@@ -1005,7 +1003,6 @@ if [ "$1" = "0" ]; then
 fi
 
 %postun
-/sbin/ldconfig
 if [ "$1" = "0" ]; then
 	%userremove http
 	%groupremove http
