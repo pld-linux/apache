@@ -66,27 +66,28 @@ Patch4:		%{name}-apr.patch
 # project homepage http://www.metux.de/mpm/en/?patpage=index
 # http://www.sannes.org/metuxmpm/
 Patch5:		httpd-2.0.48-metuxmpm-r8.patch
+# what about this? it isn't applied...
 Patch6:		httpd-2.0.40-xfsz.patch
 Patch7:		httpd-2.0.45-davetag.patch
 Patch8:		httpd-2.0.45-encode.patch
 Patch9:		httpd-2.0.45-export.patch
 Patch10:	httpd-2.0.46-dav401dest.patch
 Patch11:	httpd-2.0.46-md5dig.patch
-Patch13:	httpd-2.0.46-sslmutex.patch
-Patch14:	httpd-2.0.47-sslcleanup.patch
-Patch15:	httpd-2.0.48-corelimit.patch
-Patch16:	httpd-2.0.48-debuglog.patch
-Patch17:	httpd-2.0.48-dynlimit.patch
-Patch18:	httpd-2.0.48-sslpphrase.patch
-Patch19:	%{name}-v6only-ENOPROTOOPT.patch
-Patch20:	%{name}-conffile-path.patch
-Patch21:	%{name}-apxs.patch
+Patch12:	httpd-2.0.46-sslmutex.patch
+Patch13:	httpd-2.0.47-sslcleanup.patch
+Patch14:	httpd-2.0.48-corelimit.patch
+Patch15:	httpd-2.0.48-debuglog.patch
+Patch16:	httpd-2.0.48-dynlimit.patch
+Patch17:	httpd-2.0.48-sslpphrase.patch
+Patch18:	%{name}-v6only-ENOPROTOOPT.patch
+Patch19:	%{name}-conffile-path.patch
+Patch20:	%{name}-apxs.patch
 # http://www.telana.com/peruser.php
-Patch22:	httpd-2.0.50-peruser-r3.patch
-Patch23:	%{name}-apr1.patch
-Patch24:	%{name}-normalize-path.patch
+Patch21:	httpd-2.0.50-peruser-r3.patch
+Patch22:	%{name}-apr1.patch
+Patch23:	%{name}-normalize-path.patch
 # http://issues.apache.org/bugzilla/attachment.cgi?id=13377 external pcre
-Patch25:	%{name}2-pcre-patch.diff
+Patch24:	%{name}2-pcre-patch.diff
 URL:		http://httpd.apache.org/
 BuildRequires:	automake
 BuildRequires:	apr-devel >= 1:1.0.0
@@ -744,6 +745,7 @@ zakodowane algorytmami CRYPT (domy¶lnym), MD5 i SHA1.
 %patch9 -p1
 %patch10 -p1
 %patch11 -p1
+%patch12 -p1
 %patch13 -p1
 %patch14 -p1
 %patch15 -p1
@@ -755,8 +757,7 @@ zakodowane algorytmami CRYPT (domy¶lnym), MD5 i SHA1.
 %patch21 -p1
 %patch22 -p1
 %patch23 -p1
-%patch24 -p1
-%{?with_external_pcre:%patch25 -p2}
+%{?with_external_pcre:%patch24 -p2}
 
 %{__perl} -pi -e "s@/usr/local/bin/perl@%{__perl}@" $(grep -rl "/usr/local/bin/perl" *)
 %{__perl} -pi -e "s@BUILD_SUBDIRS.*@BUILD_SUBDIRS =@g" srclib/Makefile.in
