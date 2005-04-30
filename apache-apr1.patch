@@ -1793,7 +1793,7 @@ diff -ur httpd-2.0.52.org/modules/experimental/util_ldap.c httpd-2.0.52/modules/
      }
  
 -    rv = apr_socket_create(&sock, ap_listeners->bind_addr->family, SOCK_STREAM, p);
-+    rv = apr_socket_create(&sock, pod->sa->family, SOCK_STREAM, APR_PROTO_TCP, p);
++    rv = apr_socket_create(&sock, ap_listeners->bind_addr->family, SOCK_STREAM, APR_PROTO_TCP, p);
      if (rv != APR_SUCCESS) {
          ap_log_error(APLOG_MARK, APLOG_WARNING, rv, ap_server_conf,
                       "get socket to connect to listener");
@@ -1802,7 +1802,7 @@ diff -ur httpd-2.0.52.org/modules/experimental/util_ldap.c httpd-2.0.52/modules/
      }
  
 -    rv = apr_connect(sock, ap_listeners->bind_addr);
-+    rv = apr_socket_connect(sock, pod->sa);
++    rv = apr_socket_connect(sock, ap_listeners->bind_addr);
      if (rv != APR_SUCCESS) {
          int log_level = APLOG_WARNING;
  
