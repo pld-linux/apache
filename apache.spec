@@ -102,7 +102,7 @@ BuildRequires:	libtool >= 2:1.5
 %{?with_external_pcre:BuildRequires:	pcre-devel}
 BuildRequires:	perl-devel >= 1:5.6
 BuildRequires:	rpm-perlprov >= 4.1-13
-BuildRequires:	rpmbuild(macros) >= 1.159
+BuildRequires:	rpmbuild(macros) >= 1.202
 BuildRequires:	zlib-devel
 PreReq:		perl-base
 PreReq:		rc-scripts
@@ -968,22 +968,8 @@ ln -sf %{_bindir}/htpasswd $RPM_BUILD_ROOT%{_sbindir}/
 rm -rf $RPM_BUILD_ROOT
 
 %pre
-if [ -n "`/usr/bin/getgid http`" ]; then
-	if [ "`/usr/bin/getgid http`" != "51" ]; then
-		echo "Error: group http doesn't have gid=51. Correct this before installing apache." 1>&2
-		exit 1
-	fi
-else
-	/usr/sbin/groupadd -g 51 http
-fi
-if [ -n "`/bin/id -u http 2>/dev/null`" ]; then
-	if [ "`/bin/id -u http`" != "51" ]; then
-		echo "Error: user http doesn't have uid=51. Correct this before installing apache." 1>&2
-		exit 1
-	fi
-else
-	/usr/sbin/useradd -u 51 -r -d /home/services/httpd -s /bin/false -c "HTTP User" -g http http 1>&2
-fi
+%groupadd -g 51 http
+%useradd -u 51 -r -d /home/services/httpd -s /bin/false -c "HTTP User" -g http http
 
 %post
 /sbin/chkconfig --add httpd
