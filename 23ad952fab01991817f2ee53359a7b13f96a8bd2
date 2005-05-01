@@ -1,0 +1,4 @@
+- make install works
+- new %doc
+- I believe ssl was broken... no idea how it had worked before... somebody
+  check it
