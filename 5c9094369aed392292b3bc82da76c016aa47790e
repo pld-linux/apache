@@ -1,0 +1,2 @@
+- more specific Requires, fixed messages in %pre
+- removed BR: byacc (not used if ssl_expr_parse.y is not modified)
