@@ -1,0 +1,1 @@
+- rel 5; auth_ldap requires ldap module; fix apr1 patch for ldap once more
