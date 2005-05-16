@@ -986,7 +986,8 @@ if [ "$1" = "0" ]; then
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd stop 1>&2
 	fi
-	/sbin/chkconfig --del httpd
+	# see http://thread.gmane.org/gmane.linux.pld.devel.english/712
+	[ ! -x /sbin/chkconfig ] || /sbin/chkconfig --del httpd
 fi
 
 %postun
