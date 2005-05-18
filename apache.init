@@ -61,9 +61,9 @@ case "$1" in
 	if [ -f /var/lock/subsys/httpd ]; then
 		msg_stopping httpd.${HTTPD_MPM}
 		daemon --waitforname httpd.${HTTPD_MPM} --waitfortime 60 httpd.${HTTPD_MPM} $CFG -k stop
-		RET=$?
+		RETVAL=$?
 		# Delete pidfile only when apache was called successfully
-		if [ $RET -eq 0 ]; then
+		if [ $RETVAL -eq 0 ]; then
 			rm -f /var/lock/subsys/httpd /var/run/httpd.pid /var/run/httpd.loc* >/dev/null 2>&1
 		fi
 	else
@@ -83,13 +83,13 @@ case "$1" in
 	if [ -f /var/lock/subsys/httpd ]; then
 		msg_reloading httpd.${HTTPD_MPM}
 		httpd.${HTTPD_MPM} $CFG -t > /dev/null 2>&1
-		if [ $? -eq 0 ]; then
+		RETVAL=$?
+		if [ $RETVAL -eq 0 ]; then
 		    daemon httpd.${HTTPD_MPM} $CFG -k graceful
 		else
 		    fail
 		    echo "Configuration file syntax test failed."
 		fi
-		RETVAL=$?
 	else
 		msg_not_running httpd.${HTTPD_MPM} >&2
 		RETVAL=7
