@@ -85,6 +85,7 @@ case "$1" in
 		RETVAL=$?
 		if [ $RETVAL -eq 0 ]; then
 			daemon httpd.${HTTPD_MPM} $CFG -k graceful
+			RETVAL=$?
 		else
 			fail
 			echo "Configuration file syntax test failed."
