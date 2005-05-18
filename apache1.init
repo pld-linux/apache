@@ -43,7 +43,7 @@ case "$1" in
 		msg_starting apache
 		daemon apache $HTTPD_OPTS
 		RETVAL=$?
-    		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/apache
+  		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/apache
 	else
 		msg_already_running apache
 	fi
@@ -77,8 +77,8 @@ case "$1" in
 		if [ $RETVAL -eq 0 ]; then
 			killproc apache -HUP
 		else
-		    fail
-		    echo "Configuration file syntax test failed."
+			fail
+			echo "Configuration file syntax test failed."
 		fi
 	else
 		msg_not_running apache >&2
@@ -94,8 +94,8 @@ case "$1" in
 		if [ $RETVAL -eq 0 ]; then
 			killproc apache -USR1
 		else
-		    fail
-		    echo "Configuration file syntax test failed."
+			fail
+			echo "Configuration file syntax test failed."
 		fi
 	else
 		msg_not_running apache >&2

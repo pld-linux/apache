@@ -33,7 +33,7 @@ else
 fi
 
 [ -z "$HTTPD_MPM" ] && HTTPD_MPM="prefork"
-if   [ -d "${HTTPD_CONF:-'/etc/httpd/httpd.conf'}" ]; then
+if [ -d "${HTTPD_CONF:-'/etc/httpd/httpd.conf'}" ]; then
 	CFG="-f ${HTTPD_CONF:-'/etc/httpd/httpd.conf'}"
 elif [ -n "$HTTPD_CONF" ]; then
 	echo "error: HTTPD_CONF='$HTTPD_CONF': not a file, not a directory"
@@ -85,10 +85,10 @@ case "$1" in
 		httpd.${HTTPD_MPM} $CFG -t > /dev/null 2>&1
 		RETVAL=$?
 		if [ $RETVAL -eq 0 ]; then
-		    daemon httpd.${HTTPD_MPM} $CFG -k graceful
+			daemon httpd.${HTTPD_MPM} $CFG -k graceful
 		else
-		    fail
-		    echo "Configuration file syntax test failed."
+			fail
+			echo "Configuration file syntax test failed."
 		fi
 	else
 		msg_not_running httpd.${HTTPD_MPM} >&2
