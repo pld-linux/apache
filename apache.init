@@ -60,7 +60,8 @@ case "$1" in
 	# Stop daemons.
 	if [ -f /var/lock/subsys/httpd ]; then
 		msg_stopping httpd.${HTTPD_MPM}
-		daemon --waitforname httpd.${HTTPD_MPM} --waitfortime 60 httpd.${HTTPD_MPM} $CFG -k stop
+		[ -n "$(pidofproc httpd.${HTTPD_MPM})" ] && OPT="--waitforname httpd.${HTTPD_MPM} --waitfortime 60" || OPT=
+		daemon $OPT httpd.${HTTPD_MPM} $CFG -k stop
 		# Delete pidfile only when apache was called successfully
 		if [ $? -eq 0 ]; then
 			rm -f /var/lock/subsys/httpd /var/run/httpd.pid /var/run/httpd.loc* >/dev/null 2>&1
