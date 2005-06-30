@@ -1,0 +1,7 @@
+- cgi demo/test programs print-env and test-cgi have been
+  released in separate subpackage `apache-cgi_test' and
+  added appropriate configs and info about it
+- mv print-env and test-cgi to /usr/lib/cgi-bin/apache dir
+- Req: FHS >= 2.3-12 (always use /usr/lib/cgi-bin dir even
+  on archs with /usr/lib64
+- rel. 3
