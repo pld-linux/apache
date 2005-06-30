@@ -34,7 +34,7 @@ Summary(ru):	óÁÍÙÊ ÐÏÐÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.0.54
-Release:	2
+Release:	3
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -117,6 +117,7 @@ Requires(post):	fileutils
 Requires:	/etc/mime.types
 Requires:	apr >= 1:1.0.0-2
 Requires:	%{name}-apxs = %{version}-%{release}
+Requires:	FHS >= 2.3-12
 Requires:	mailcap
 Requires:	psmisc >= 20.1
 Provides:	apache(modules-api) = %{_apache_modules_api}
@@ -147,6 +148,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_includedir	%{_prefix}/include/apache
 %define		_datadir	/home/services/httpd
 %define		_libexecdir	%{_libdir}/apache
+%define		_cgibindir	%{_prefix}/lib/cgi-bin/%{name}
 
 %description
 Apache is a powerful, full-featured, efficient and freely-available
@@ -732,6 +734,18 @@ uwierzytelnienia u¿ytkowników HTTP. Ten pakiet zawiera htpasswd z
 Apache'a 2; ta wersja obs³uguje has³a zapisane czystym tekstem oraz
 zakodowane algorytmami CRYPT (domy¶lnym), MD5 i SHA1.
 
+%package cgi_test
+Summary:	cgi test/demo programs
+Summary(pl):	Programy testowe/przyk³adowe cgi
+Group:		Networking/Utilities
+Requires:	%{name} = %{version}-%{release}
+
+%description cgi_test
+Two cgi test/demo programs: test-cgi and print-env.
+
+%description cgi_test -l pl
+Dwa programy testowe/przyk³adowe cgi: test-cgi and print-env.
+
 %prep
 %setup -q -n httpd-%{version}
 %patch0 -p1
@@ -866,7 +880,8 @@ done
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig,monit} \
-	$RPM_BUILD_ROOT%{_var}/{log/{httpd,archiv/httpd},{run,cache}/apache,lock/mod_dav}
+	$RPM_BUILD_ROOT%{_var}/{log/{httpd,archiv/httpd},{run,cache}/apache,lock/mod_dav} \
+	$RPM_BUILD_ROOT%{_datadir}/cgi-bin
 
 # prefork is default one
 %{__make} -C buildmpm-prefork install \
@@ -878,7 +893,7 @@ install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig,monit} \
 	errordir=%{_datadir}/error \
 	htdocsdir=%{_datadir}/html \
 	manualdir=%{_datadir}/manual \
-	cgidir=%{_datadir}/cgi-bin \
+	cgidir=%{_cgibindir} \
 	runtimedir=%{_var}/run \
 	logdir=%{_var}/log/httpd \
 	proxycachedir=%{_var}/cache/httpd
@@ -964,6 +979,12 @@ find $RPM_BUILD_ROOT%{_datadir}/manual -type f \
 mv $RPM_BUILD_ROOT%{_sbindir}/htpasswd $RPM_BUILD_ROOT%{_bindir}/
 ln -sf %{_bindir}/htpasswd $RPM_BUILD_ROOT%{_sbindir}/
 
+# cgi_test: create config file with ScriptAlias
+cat << EOF > $CFG/09_cgi_test.conf
+ScriptAlias /cgi-bin/printenv %{_cgibindir}/printenv
+ScriptAlias /cgi-bin/test-cgi %{_cgibindir}/test-cgi
+EOF
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -1002,6 +1023,19 @@ echo "Since that version autoindex module has been separated to package %{name}-
 echo "If you want to have the same functionality do:"
 echo "poldek --upgrade %{name}-mod_autoindex"
 echo
+
+%triggerpostun -- %{name} <= 2.0.54-2
+echo '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!                                                      !!!
+!!! WARNING!!!                                           !!!
+!!!                                                      !!!
+!!! CGI demo/test programs -  printenv, test-cgi  - have !!!
+!!! been released form package apache into separate      !!!
+!!! subpackage apache-cgi_test. If you need printenv     !!!
+!!! and/or test-cgi, please install apache-cgi_test      !!!
+!!! package, e.g. by running poldek -Uv apache-cgi_test  !!!
+!!!                                                      !!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
 
 %post mod_actions
 if [ -f /var/lock/subsys/httpd ]; then
@@ -1339,6 +1373,20 @@ if [ "$1" = "0" ]; then
 	fi
 fi
 
+%post cgi_test
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+else
+	echo "Run \"/etc/rc.d/init.d/httpd start\" to start apache HTTP daemon."
+fi
+
+%preun cgi_test
+if [ "$1" = "0" ]; then
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2
+	fi
+fi
+
 %files
 %defattr(644,root,root,755)
 %doc ABOUT_APACHE CHANGES README
@@ -1407,10 +1455,9 @@ fi
 
 %dir %{_datadir}
 
-%attr(755,root,root) %dir %{_datadir}/html
+%dir %{_datadir}/cgi-bin
+%dir %{_datadir}/html
 %{_datadir}/icons
-%attr(755,root,root) %{_datadir}/cgi-bin
-
 %{_datadir}/error
 
 %files doc
@@ -1763,3 +1810,9 @@ fi
 %attr(755,root,root) %{_bindir}/htpasswd
 %{_sbindir}/htpasswd
 %{_mandir}/man1/htpasswd.1*
+
+%files cgi_test
+%defattr(644,root,root,755)
+%dir %{_cgibindir}
+%attr(755,root,root) %{_cgibindir}/*
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/09_cgi_test.conf
