@@ -15,6 +15,7 @@
 # - subpackages for MPMs
 # - check if all modules (*.so) are exactly the same for different MPMs
 # - install stage fails with distcc (make -jN)
+# - /var/run/apache is also owned by apache1.spec, so rename it to /var/run/httpd spec here (NOTE: if you fix this also adjust apache-mod_fastcgi.spec)
 #
 # Conditional build:
 %bcond_without	ssl		# build without SSL support
