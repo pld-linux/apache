@@ -1031,7 +1031,7 @@ echo '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! WARNING!!!                                           !!!
 !!!                                                      !!!
 !!! CGI demo/test programs -  printenv, test-cgi  - have !!!
-!!! been released form package apache into separate      !!!
+!!! been released from package apache into separate      !!!
 !!! subpackage apache-cgi_test. If you need printenv     !!!
 !!! and/or test-cgi, please install apache-cgi_test      !!!
 !!! package, e.g. by running poldek -Uv apache-cgi_test  !!!
