@@ -35,7 +35,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.0.54
-Release:	3
+Release:	3.1
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -925,7 +925,7 @@ ln -sf %{_libexecdir}/build $RPM_BUILD_ROOT%{_sysconfdir}/build
 
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/apache
-install %{SOURCE4} $RPM_BUILD_ROOT/etc/sysconfig/apache
+install %{SOURCE4} $RPM_BUILD_ROOT/etc/sysconfig/httpd
 install %{SOURCE5} $RPM_BUILD_ROOT/etc/monit
 
 touch $RPM_BUILD_ROOT/var/log/httpd/{access,error,agent,referer,suexec}_log
@@ -1026,7 +1026,7 @@ Since apache-2.0.50-6 autoindex module has been separated to package
 poldek -Uv %{name}-mod_autoindex
 EOF
 
-%triggerpostun -- %{name} <= 2.0.54-2
+%triggerpostun -- %{name} < 2.0.54-3
 %banner %{name}-2.0.54-2 << EOF
 WARNING!!!
 CGI demo/test programs - printenv and test-cgi, have been released
@@ -1034,6 +1034,12 @@ from package apache into separate subpackage apache-cgi_test. If you
 need printenv and/or test-cgi, please install apache-cgi_test package,
 e.g. by running poldek -Uv apache-cgi_test
 EOF
+
+# update /etc/sysconfig/apache -> httpd rename
+if [ -f /etc/sysconfig/apache.rpmsave ]; then
+	cp -f /etc/sysconfig/httpd{,.rpmnew}
+	mv -f /etc/sysconfig/{apache.rpmsave,httpd}
+fi
 
 %post mod_actions
 if [ -f /var/lock/subsys/httpd ]; then
@@ -1397,7 +1403,7 @@ fi
 %attr(750,root,root) %dir %{_sysconfdir}/run
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_httpd.conf
 %attr(640,root,root) %{_sysconfdir}/magic
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/*
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/httpd
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/*
 %attr(750,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/monit/*.monitrc
 
