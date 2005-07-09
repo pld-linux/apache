@@ -19,7 +19,7 @@
 . /etc/sysconfig/network
 
 # Get service config
-[ -f /etc/sysconfig/apache ] && . /etc/sysconfig/apache
+[ -f /etc/sysconfig/httpd ] && . /etc/sysconfig/httpd
 
 # Check that networking is up.
 if is_yes "${NETWORKING}"; then
