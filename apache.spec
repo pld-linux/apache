@@ -1023,22 +1023,16 @@ fi
 WARNING!!!
 Since apache-2.0.50-6 autoindex module has been separated to package
 %{name}-mod_autoindex If you want to have the same functionality do:
-poldek --upgrade %{name}-mod_autoindex
+poldek -Uv %{name}-mod_autoindex
 EOF
 
 %triggerpostun -- %{name} <= 2.0.54-2
 %banner %{name}-2.0.54-2 << EOF
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!!                                                      !!!
-!!! WARNING!!!                                           !!!
-!!!                                                      !!!
-!!! CGI demo/test programs - printenv and test-cgi, have !!!
-!!! been released from package apache into separate      !!!
-!!! subpackage apache-cgi_test. If you need printenv     !!!
-!!! and/or test-cgi, please install apache-cgi_test      !!!
-!!! package, e.g. by running poldek -Uv apache-cgi_test  !!!
-!!!                                                      !!!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+WARNING!!!
+CGI demo/test programs - printenv and test-cgi, have been released
+from package apache into separate subpackage apache-cgi_test. If you
+need printenv and/or test-cgi, please install apache-cgi_test package,
+e.g. by running poldek -Uv apache-cgi_test
 EOF
 
 %post mod_actions
