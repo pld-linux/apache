@@ -35,7 +35,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.0.54
-Release:	3.1
+Release:	4
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -1026,7 +1026,7 @@ Since apache-2.0.50-6 autoindex module has been separated to package
 poldek -Uv %{name}-mod_autoindex
 EOF
 
-%triggerpostun -- %{name} < 2.0.54-3
+%triggerpostun -- %{name} < 2.0.54-4
 %banner %{name}-2.0.54-2 << EOF
 WARNING!!!
 CGI demo/test programs - printenv and test-cgi, have been released
