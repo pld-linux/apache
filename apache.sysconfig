@@ -22,4 +22,4 @@ HTTPD_MPM="prefork"
 # Enable this if you run a production server and don't want rpm upgrade restart
 # your webserver like 20 times.
 # NOTE: You should be aware of that you need then restart the webserver manually.
-RPM_SKIP_AUTO_RESTART=no
+#RPM_SKIP_AUTO_RESTART=no
