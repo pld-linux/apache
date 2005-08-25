@@ -1,4 +1,5 @@
 # TODO:
+# - security http://security.gentoo.org/glsa/glsa-200508-15.xml
 # - mod_case_filter
 # - mod_case_filter_in
 # - mod_optional_fn_{export,import}
