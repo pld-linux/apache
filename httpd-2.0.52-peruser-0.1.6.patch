@@ -5,8 +5,8 @@ diff -Nur httpd-2.0.52/server/mpm/config.m4 httpd-2.0.52-peruser/server/mpm/conf
  AC_MSG_CHECKING(which MPM to use)
  AC_ARG_WITH(mpm,
  APACHE_HELP_STRING(--with-mpm=MPM,Choose the process model for Apache to use.
--                          MPM={beos|worker|prefork|mpmt_os2|perchild|leader|threadpool}),[
-+                          MPM={beos|worker|prefork|mpmt_os2|perchild|peruser|leader|threadpool}),[
+-                          MPM={beos|worker|prefork|mpmt_os2|perchild|leader|threadpool|metuxmpm}),[
++                          MPM={beos|worker|prefork|mpmt_os2|perchild|peruser|leader|threadpool|metuxmpm}),[
    APACHE_MPM=$withval
  ],[
    if test "x$APACHE_MPM" = "x"; then
@@ -14,8 +14,8 @@ diff -Nur httpd-2.0.52/server/mpm/config.m4 httpd-2.0.52-peruser/server/mpm/conf
  APACHE_FAST_OUTPUT(server/mpm/Makefile)
  
  MPM_NAME=$apache_cv_mpm
--if test "$MPM_NAME" = "leader" -o "$MPM_NAME" = "threadpool" -o "$MPM_NAME" = "perchild"; then
-+if test "$MPM_NAME" = "leader" -o "$MPM_NAME" = "threadpool" -o "$MPM_NAME" = "perchild" -o "$MPM_NAME" = "peruser"; then
+-if test "$MPM_NAME" = "leader" -o "$MPM_NAME" = "threadpool" -o "$MPM_NAME" = "perchild" -o "$MPM_NAME" = "metuxmpm"; then
++if test "$MPM_NAME" = "leader" -o "$MPM_NAME" = "threadpool" -o "$MPM_NAME" = "perchild" -o "$MPM_NAME" = "metuxmpm" -o "$MPM_NAME" = "peruser"; then
    AC_MSG_WARN(You have selected an EXPERIMENTAL MPM.  Be warned!)
    MPM_SUBDIR_NAME=experimental/$MPM_NAME
  else
