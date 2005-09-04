@@ -1148,10 +1148,10 @@ diff -Nur httpd-2.0.52/server/mpm/experimental/peruser/peruser.c httpd-2.0.52-pe
 +            net = filter->ctx;
 +            net->in_ctx = apr_palloc(conn->pool, sizeof(*net->in_ctx));
 +            net->in_ctx->b = bb;
-+/*
++
 +            net->in_ctx->tmpbb = apr_brigade_create(net->in_ctx->b->p, 
 +                net->in_ctx->b->bucket_alloc);
-+*/
++
 +        }
 +    }
 +    _DBG("leaving (DECLINED)", 0);
