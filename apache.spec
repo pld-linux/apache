@@ -35,7 +35,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.0.54
-Release:	5
+Release:	6
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -84,7 +84,7 @@ Patch18:	%{name}-v6only-ENOPROTOOPT.patch
 Patch19:	%{name}-conffile-path.patch
 Patch20:	%{name}-apxs.patch
 # http://www.telana.com/peruser.php
-Patch21:	httpd-2.0.50-peruser-r3.patch
+Patch21:	httpd-2.0.52-peruser-0.1.6.patch
 Patch22:	%{name}-apr1.patch
 Patch23:	%{name}-normalize-path.patch
 # http://issues.apache.org/bugzilla/attachment.cgi?id=13377 external pcre
