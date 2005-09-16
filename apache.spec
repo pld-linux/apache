@@ -105,6 +105,7 @@ BuildRequires:	libtool >= 2:1.5
 %{?with_ssl:BuildRequires:	openssl-tools >= 0.9.7d}
 %{?with_external_pcre:BuildRequires:	pcre-devel}
 BuildRequires:	perl-devel >= 1:5.6
+BuildRequires:	postgresql-devel
 BuildRequires:	rpm-perlprov >= 4.1-13
 BuildRequires:	rpmbuild(macros) >= 1.202
 BuildRequires:	zlib-devel
