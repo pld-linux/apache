@@ -1,0 +1,2 @@
+- use %banner macro instead of `echo' (not tested)
+- formatting %banner messages
