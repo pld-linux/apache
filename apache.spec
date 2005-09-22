@@ -108,7 +108,6 @@ BuildRequires:	libtool >= 2:1.5
 %{?with_external_pcre:BuildRequires:	pcre-devel}
 BuildRequires:	perl-devel >= 1:5.6
 BuildRequires:	rpm-build >= 4.4.0
-BuildRequires:	postgresql-devel
 BuildRequires:	rpm-perlprov >= 4.1-13
 BuildRequires:	rpmbuild(macros) >= 1.228
 BuildRequires:	zlib-devel
