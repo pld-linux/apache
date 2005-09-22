@@ -27,7 +27,7 @@ Summary(uk):	Найпопулярн╕ший Web-Server
 Summary(zh_CN):	Internet иос╕сцвН╧Ц╥╨╣д Web ╥ЧнЯЁлпР║ё
 Name:		apache
 Version:	1.3.33
-Release:	2
+Release:	3
 License:	Apache Group
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/%{name}_%{version}.tar.gz
