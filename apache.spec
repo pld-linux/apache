@@ -604,7 +604,7 @@ Summary(pl):	ModuЁ SSL/TSL dla serwera Apache
 Summary(ru):	Модуль SSL/TLS для веб-сервера Apache
 Group:		Networking/Daemons
 Epoch:		1
-Provides:	apache(mod_ssl) = %{version}-%{release}
+Provides:	apache(mod_ssl) = 1:%{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
 
 %description mod_ssl
