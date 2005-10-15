@@ -17,8 +17,6 @@
 # - install stage fails with distcc (make -jN)
 # - /var/run/apache is also owned by apache1.spec, so rename it to /var/run/httpd spec here (NOTE: if you fix this also adjust apache-mod_fastcgi.spec)
 # - does main package really need apxs dep?
-# - review: http://securitytracker.com/alerts/2005/Aug/1014826.html
-# - http://www.gentoo.org/security/en/glsa/glsa-200509-12.xml (ssl and pcre)
 #
 # Conditional build:
 %bcond_without	ssl		# build without SSL support
@@ -37,12 +35,12 @@ Summary(pt_BR):	Servidor HTTPD para prover serviços WWW
 Summary(ru):	óÁÍÙÊ ÐÏÐÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
-Version:	2.0.54
-Release:	6
+Version:	2.0.55
+Release:	0.1
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
-# Source0-md5:	772503748ffb85301385d47fb2b96eca
+# Source0-md5:	b45f16a9878e709497820565d42b00b9
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}-icons.tar.gz
@@ -92,8 +90,6 @@ Patch22:	%{name}-apr1.patch
 Patch23:	%{name}-normalize-path.patch
 # http://issues.apache.org/bugzilla/attachment.cgi?id=13377 external pcre
 Patch24:	%{name}2-pcre-patch.diff
-# http://issues.apache.org/bugzilla/attachment.cgi?id=16102 DoS
-Patch25:	%{name}2-byterange.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	automake
 BuildRequires:	apr-devel >= 1:1.0.0
@@ -252,7 +248,7 @@ APache eXtenSion tool.
 
 %description apxs -l pl
 Narzêdzie do rozszerzania Apache'a.
- 
+
 %package devel
 Summary:	Module development tools for the Apache web server
 Summary(es):	Archivos de inclusión del Apache para desarrollo de módulos
@@ -781,7 +777,6 @@ Dwa programy testowe/przyk³adowe cgi: test-cgi and print-env.
 %patch22 -p1
 %patch23 -p1
 %{?with_external_pcre:%patch24 -p2}
-%patch25 -p0
 
 %{__perl} -pi -e "s@/usr/local/bin/perl@%{__perl}@" $(grep -rl "/usr/local/bin/perl" *)
 %{__perl} -pi -e "s@BUILD_SUBDIRS.*@BUILD_SUBDIRS =@g" srclib/Makefile.in
