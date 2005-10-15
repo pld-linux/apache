@@ -36,7 +36,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.0.55
-Release:	0.1
+Release:	1
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -1529,6 +1529,7 @@ fi
 %attr(755,root,root) %{_sbindir}/dbmmanage
 %attr(755,root,root) %{_sbindir}/htdbm
 %{_mandir}/man1/dbmmanage.1*
+%{_mandir}/man1/htdbm.1*
 
 %files mod_auth_digest
 %defattr(644,root,root,755)
