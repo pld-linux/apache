@@ -1063,8 +1063,8 @@ diff -Nur apache_1.3.28.orig/src/main/http_config.c apache_1.3.28/src/main/http_
  }
  
  
---- apache_1.3.32/src/main/http_core.c.orig	Mon May  3 22:15:26 2004
-+++ apache_1.3.32/src/main/http_core.c	Sat May 15 00:06:26 2004
+--- apache_1.3.34/src/main/http_core.c.orig	2005-06-28 20:03:25.000000000 +0200
++++ apache_1.3.34/src/main/http_core.c	2005-10-18 10:14:09.000000000 +0200
 @@ -28,6 +28,7 @@
  #include "util_md5.h"
  #include "scoreboard.h"
@@ -1073,16 +1073,16 @@ diff -Nur apache_1.3.28.orig/src/main/http_config.c apache_1.3.28/src/main/http_
  
  #ifdef USE_MMAP_FILES
  #include <sys/mman.h>
-@@ -564,7 +565,7 @@
+@@ -570,7 +571,7 @@
       * file if you care. So the adhoc value should do.
       */
-     return ap_psprintf(r->pool,"%pI%pp%pp%pp%pp",
+     return ap_psprintf(r->pool,"%pA%pp%pp%pp%pp",
 -           &r->connection->local_addr.sin_addr,
 +           &((struct sockaddr_in *)&(r->connection->local_addr))->sin_addr,
             (void *)ap_user_name,
             (void *)ap_listeners,
             (void *)ap_server_argv0,
-@@ -660,7 +661,9 @@
+@@ -666,7 +667,9 @@
   */
  static ap_inline void do_double_reverse (conn_rec *conn)
  {
@@ -1093,7 +1093,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_config.c apache_1.3.28/src/main/http_
  
      if (conn->double_reverse) {
  	/* already done */
-@@ -672,30 +675,54 @@
+@@ -678,30 +681,54 @@
          conn->remote_host = ""; /* prevent another lookup */
  	return;
      }
@@ -1162,7 +1162,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_config.c apache_1.3.28/src/main/http_
  
      /* If we haven't checked the host name, and we want to */
      if (dir_config) {
-@@ -717,10 +744,14 @@
+@@ -723,10 +750,14 @@
  	    || hostname_lookups != HOSTNAME_LOOKUP_OFF)) {
  	old_stat = ap_update_child_status(conn->child_num, SERVER_BUSY_DNS,
  					  (request_rec*)NULL);
@@ -1181,7 +1181,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_config.c apache_1.3.28/src/main/http_
  	    ap_str_tolower(conn->remote_host);
  	   
  	    if (hostname_lookups == HOSTNAME_LOOKUP_DOUBLE) {
-@@ -798,6 +829,7 @@
+@@ -804,6 +835,7 @@
  {
      conn_rec *conn = r->connection;
      core_dir_config *d;
@@ -1189,7 +1189,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_config.c apache_1.3.28/src/main/http_
  
      d = (core_dir_config *)ap_get_module_config(r->per_dir_config,
  						&core_module);
-@@ -807,23 +839,22 @@
+@@ -813,23 +845,22 @@
      }
      if (d->use_canonical_name == USE_CANONICAL_NAME_DNS) {
          if (conn->local_host == NULL) {
@@ -1225,7 +1225,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_config.c apache_1.3.28/src/main/http_
  	    (void) ap_update_child_status(conn->child_num, old_stat, r);
  	}
  	return conn->local_host;
-@@ -835,7 +866,7 @@
+@@ -841,7 +872,7 @@
  API_EXPORT(unsigned) ap_get_server_port(const request_rec *r)
  {
      unsigned port;
@@ -1234,7 +1234,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_config.c apache_1.3.28/src/main/http_
      core_dir_config *d =
        (core_dir_config *)ap_get_module_config(r->per_dir_config, &core_module);
      
-@@ -2621,12 +2652,25 @@
+@@ -2647,12 +2678,25 @@
  
  static const char *set_bind_address(cmd_parms *cmd, void *dummy, char *arg) 
  {
@@ -1261,7 +1261,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_config.c apache_1.3.28/src/main/http_
      return NULL;
  }
  
-@@ -2658,48 +2702,71 @@
+@@ -2684,48 +2728,71 @@
      return NULL;
  }
  
@@ -1363,7 +1363,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_config.c apache_1.3.28/src/main/http_
      new->fd = -1;
      new->used = 0;
      new->next = ap_listeners;
-@@ -3602,7 +3669,7 @@
+@@ -3650,7 +3717,7 @@
  { "ThreadStackSize", set_threadstacksize, NULL, RSRC_CONF, TAKE1,
    "Stack size each created thread will use."},
  #endif
@@ -1372,7 +1372,7 @@ diff -Nur apache_1.3.28.orig/src/main/http_config.c apache_1.3.28/src/main/http_
    "A port number or a numeric IP address and a port number"},
  { "SendBufferSize", set_send_buffer_size, NULL, RSRC_CONF, TAKE1,
    "Send buffer size in bytes"},
-@@ -3636,7 +3703,7 @@
+@@ -3684,7 +3751,7 @@
    "Name of the config file to be included" },
  { "LogLevel", set_loglevel, NULL, RSRC_CONF, TAKE1,
    "Level of verbosity in error logging" },
@@ -3404,8 +3404,8 @@ diff -Nur apache_1.3.28.orig/src/modules/proxy/proxy_ftp.c apache_1.3.28/src/mod
          do
              csd = accept(dsock, (struct sockaddr *)&server, &clen);
          while (csd == -1 && errno == EINTR);
---- apache_1.3.31/src/modules/proxy/proxy_http.c.orig	Wed May 12 12:56:16 2004
-+++ apache_1.3.31/src/modules/proxy/proxy_http.c	Wed May 12 14:09:27 2004
+--- apache_1.3.34/src/modules/proxy/proxy_http.c.orig	2005-10-18 09:56:15.000000000 +0200
++++ apache_1.3.34/src/modules/proxy/proxy_http.c	2005-10-18 10:15:06.000000000 +0200
 @@ -113,9 +113,8 @@
      table *req_hdrs, *resp_hdrs;
      array_header *reqhdrs_arr;
@@ -3424,7 +3424,7 @@ diff -Nur apache_1.3.28.orig/src/modules/proxy/proxy_ftp.c apache_1.3.28/src/mod
  
 -    memset(&server, '\0', sizeof(server));
 -    server.sin_family = AF_INET;
--
+-    
      /* We break the URL into host, port, path-search */
  
      urlptr = strstr(url, "://");
@@ -3597,7 +3597,7 @@ diff -Nur apache_1.3.28.orig/src/modules/proxy/proxy_ftp.c apache_1.3.28/src/mod
      if (i == -1) {
          if (proxyhost != NULL)
              return DECLINED;    /* try again another way */
-@@ -564,17 +575,30 @@
+@@ -591,17 +602,30 @@
          ap_table_set(resp_hdrs, "Content-Location", proxy_location_reverse_map(r, urlstr));
  
  /* check if NoCache directive on this host */
