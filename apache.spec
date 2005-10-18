@@ -120,7 +120,6 @@ Requires(post):	fileutils
 Requires:	/etc/mime.types
 Requires:	apr >= 1:1.0.0-2
 Requires:	%{name}-apxs = %{version}-%{release}
-Requires:	FHS >= 2.3-12
 Requires:	mailcap
 Requires:	psmisc >= 20.1
 Provides:	apache(modules-api) = %{_apache_modules_api}
@@ -744,6 +743,7 @@ Summary:	cgi test/demo programs
 Summary(pl):	Programy testowe/przyk³adowe cgi
 Group:		Networking/Utilities
 Requires:	%{name} = %{version}-%{release}
+Requires:	FHS >= 2.3-12
 
 %description cgi_test
 Two cgi test/demo programs: test-cgi and print-env.
