@@ -64,9 +64,18 @@ case "$1" in
 	/usr/sbin/apache -S
 	;;
   restart)
-	$0 stop
-	$0 start
-	exit $?
+	apache -t > /dev/null 2>&1
+	RETVAL=$?
+	if [ $RETVAL -eq 0 ]; then
+		$0 stop
+		RETVAL=$((RETVAL + $?))
+		$0 start
+		RETVAL=$((RETVAL + $?))
+	else
+		fail
+		echo "Configuration file syntax test failed."
+	fi
+
 	;;
   reload|force-reload)
   	if [ -f /var/lock/subsys/apache ]; then
