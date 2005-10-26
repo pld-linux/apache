@@ -6,7 +6,6 @@
 # - mod_ext_filter
 # - mod_echo
 # - config examples for mod_*
-# - check if all modules are (de)registered in %%post/%%postun
 # - find smart way to deregister module if its moved from main package
 #   to subpackage (maybe test -f ?)
 # - add %%post/%%postun to suexec
@@ -16,7 +15,6 @@
 # - check if all modules (*.so) are exactly the same for different MPMs
 # - install stage fails with distcc (make -jN)
 # - /var/run/apache is also owned by apache1.spec, so rename it to /var/run/httpd spec here (NOTE: if you fix this also adjust apache-mod_fastcgi.spec)
-# - does main package really need apxs dep?
 #
 # Conditional build:
 %bcond_without	ssl		# build without SSL support
@@ -120,7 +118,6 @@ Requires(post):	fileutils
 Requires:	/sbin/chkconfig
 Requires:	/etc/mime.types
 Requires:	apr >= 1:1.0.0-2
-Requires:	%{name}-apxs = %{version}-%{release}
 Requires:	mailcap
 Requires:	psmisc >= 20.1
 Provides:	apache(modules-api) = %{_apache_modules_api}
