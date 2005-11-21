@@ -34,7 +34,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.0.55
-Release:	2
+Release:	2.3
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -884,6 +884,7 @@ done
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig,monit} \
 	$RPM_BUILD_ROOT%{_var}/{log/{httpd,archiv/httpd},{run,cache}/apache,lock/mod_dav} \
+	$RPM_BUILD_ROOT%{_sysconfdir}/{webapps.d,conf.d} \
 	$RPM_BUILD_ROOT%{_datadir}/cgi-bin
 
 # prefork is default one
@@ -1037,6 +1038,15 @@ if [ -f /etc/sysconfig/apache.rpmsave ]; then
 	cp -f /etc/sysconfig/httpd{,.rpmnew}
 	mv -f /etc/sysconfig/{apache.rpmsave,httpd}
 fi
+
+%triggerpostun -- %{name} < 2.0.55-2.3
+# make sure webapps.d is included
+cp -f /etc/httpd/httpd.conf/10_httpd.conf{,.rpmsave}
+# this file is ugly, so just append new lines
+cat <<EOF >> /etc/httpd/httpd.conf/10_httpd.conf
+# Include webapps config
+Include webapps.d/*.conf
+EOF
 
 %posttrans
 # minimizing apache restarts logics. we restart webserver:
@@ -1224,7 +1234,9 @@ fi
 
 %attr(754,root,root) /etc/rc.d/init.d/httpd
 
+# TODO: switch to conf.d, instead of confusing *dir* httpd.conf
 %attr(750,root,root) %dir %{_sysconfdir}/httpd.conf
+%attr(750,root,root) %dir %{_sysconfdir}/webapps.d
 %attr(750,root,root) %dir %{_sysconfdir}/modules
 %attr(750,root,root) %dir %{_sysconfdir}/run
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_httpd.conf
