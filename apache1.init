@@ -111,8 +111,11 @@ case "$1" in
 		RETVAL=7
 	fi
 	;;
+  configtest)
+	apache -t
+	;;
   *)
-	msg_usage "$0 {start|stop|restart|reload|force-reload|graceful|status}"
+	msg_usage "$0 {start|stop|restart|reload|force-reload|graceful|configtest|status}"
 	exit 3
 	;;
 esac
