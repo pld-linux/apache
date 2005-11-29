@@ -42,7 +42,7 @@ case "$1" in
 	if [ -x /usr/lib/apache1/lingerd ]; then
 		if [ ! -f /var/lock/subsys/lingerd ]; then
 			msg_starting lingerd
-			daemon --user http /usr/lib/apache1/lingerd
+			SERVICE_UMASK=002 daemon --user http /usr/lib/apache1/lingerd
 			RETVAL=$?
 			[ $RETVAL -eq 0 ] && touch /var/lock/subsys/lingerd
 		else
