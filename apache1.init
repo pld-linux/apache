@@ -39,6 +39,16 @@ RETVAL=0
 case "$1" in
   start)
 	# Check if the service is already running?
+	if [ -x /usr/lib/apache1/lingerd ]; then
+		if [ ! -f /var/lock/subsys/lingerd ]; then
+			msg_starting lingerd
+			daemon --user http /usr/lib/apache1/lingerd
+			RETVAL=$?
+			[ $RETVAL -eq 0 ] && touch /var/lock/subsys/lingerd
+		else
+			msg_already_running lingerd
+		fi
+	fi
 	if [ ! -f /var/lock/subsys/apache ]; then
 		msg_starting apache
 		daemon apache $HTTPD_OPTS
@@ -56,6 +66,15 @@ case "$1" in
 		rm -f /var/lock/subsys/apache /var/run/apache.pid /var/run/apache.loc* >/dev/null 2>&1
 	else
 		msg_not_running apache
+	fi
+	if [ -x /usr/lib/apache1/lingerd ]; then
+		if [ -f /var/lock/subsys/lingerd ]; then
+			msg_stopping lingerd
+			/usr/lib/apache1/lingerd -k && ok || fail
+			rm -f /var/lock/subsys/lingerd >/dev/null 2>&1
+		else
+			msg_not_running lingerd
+		fi
 	fi
 	;;
   status)
