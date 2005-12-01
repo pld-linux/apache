@@ -34,7 +34,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.0.55
-Release:	3
+Release:	3.2
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -929,7 +929,7 @@ ln -sf %{_libexecdir}/build $RPM_BUILD_ROOT%{_sysconfdir}/build
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/apache
 install %{SOURCE4} $RPM_BUILD_ROOT/etc/sysconfig/httpd
-install %{SOURCE5} $RPM_BUILD_ROOT/etc/monit
+install %{SOURCE5} $RPM_BUILD_ROOT/etc/monit/httpd.monitrc
 
 touch $RPM_BUILD_ROOT/var/log/httpd/{access,error,agent,referer,suexec}_log
 
@@ -1039,7 +1039,8 @@ if [ -f /etc/sysconfig/apache.rpmsave ]; then
 	mv -f /etc/sysconfig/{apache.rpmsave,httpd}
 fi
 
-%triggerpostun -- %{name} < 2.0.55-2.3
+%triggerpostun -- %{name} < 2.0.55-3.1
+if ! grep -q 'Include webapps.d/' /etc/httpd/httpd.conf/10_httpd.conf; then
 # make sure webapps.d is included
 cp -f /etc/httpd/httpd.conf/10_httpd.conf{,.rpmsave}
 # this file is ugly, so just append new lines
@@ -1047,6 +1048,13 @@ cat <<EOF >> /etc/httpd/httpd.conf/10_httpd.conf
 # Include webapps config
 Include webapps.d/*.conf
 EOF
+fi
+
+# rename monitrc to be service name like other files
+if [ -f /etc/monit/apache.monitrc.rpmsave ]; then
+	mv -f /etc/monit/httpd.monitrc{,.rpmnew}
+	mv -f /etc/monit/{apache.monitrc.rpmsave,httpd.monitrc}
+fi
 
 %posttrans
 # minimizing apache restarts logics. we restart webserver:
@@ -1243,7 +1251,7 @@ fi
 %attr(640,root,root) %{_sysconfdir}/magic
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/httpd
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/*
-%attr(750,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/monit/*.monitrc
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/monit/*.monitrc
 
 %attr(755,root,root) %{_libexecdir}/mod_access.so
 %attr(755,root,root) %{_libexecdir}/mod_alias.so
