@@ -1,11 +1,11 @@
-
 * don't HTML-escape the SERVER_NAME variable
 * do escape SERVER_NAME in error docs
 * remove dates from error pages (#86474), since they won't be in the right
 language
 
---- httpd-2.0.45/docs/error/include/bottom.html.encode	2003-04-28 11:40:00.000000000 +0100
-+++ httpd-2.0.45/docs/error/include/bottom.html	2003-04-28 11:32:42.000000000 +0100
+diff -ur httpd-2.2.0.org/docs/error/include/bottom.html httpd-2.2.0/docs/error/include/bottom.html
+--- httpd-2.2.0.org/docs/error/include/bottom.html	2004-11-20 21:16:24.000000000 +0100
++++ httpd-2.2.0/docs/error/include/bottom.html	2005-12-02 23:04:57.540690250 +0100
 @@ -5,10 +5,8 @@
  
  <h2>Error <!--#echo encoding="none" var="REDIRECT_STATUS" --></h2>
@@ -19,15 +19,16 @@ language
  </address>
  </body>
  </html>
---- httpd-2.0.45/server/util_script.c.encode	2003-04-28 11:39:45.000000000 +0100
-+++ httpd-2.0.45/server/util_script.c	2003-04-28 11:39:23.000000000 +0100
-@@ -266,8 +266,7 @@
+diff -ur httpd-2.2.0.org/server/util_script.c httpd-2.2.0/server/util_script.c
+--- httpd-2.2.0.org/server/util_script.c	2005-11-10 16:20:05.000000000 +0100
++++ httpd-2.2.0/server/util_script.c	2005-12-02 23:04:50.848272000 +0100
+@@ -224,8 +224,7 @@
  
      apr_table_addn(e, "SERVER_SIGNATURE", ap_psignature("", r));
      apr_table_addn(e, "SERVER_SOFTWARE", ap_get_server_version());
 -    apr_table_addn(e, "SERVER_NAME",
 -                   ap_escape_html(r->pool, ap_get_server_name(r)));
 +    apr_table_addn(e, "SERVER_NAME", ap_get_server_name(r));
-     apr_table_addn(e, "SERVER_ADDR", r->connection->local_ip);	/* Apache */
+     apr_table_addn(e, "SERVER_ADDR", r->connection->local_ip);  /* Apache */
      apr_table_addn(e, "SERVER_PORT",
- 		  apr_psprintf(r->pool, "%u", ap_get_server_port(r)));
+                   apr_psprintf(r->pool, "%u", ap_get_server_port(r)));
