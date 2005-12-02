@@ -22,7 +22,6 @@
 %bcond_without	ldap		# build without LDAP support
 %bcond_without	metuxmpm
 %bcond_without	peruser
-%bcond_without	external_pcre	# build with external PCRE support (Apache bug #27550)
 %bcond_with     distcache
 #
 %include	/usr/lib/rpm/macros.perl
@@ -65,33 +64,22 @@ Source21:	%{name}-server.key
 Patch0:		%{name}-configdir_skip_backups.patch
 Patch1:		%{name}-layout.patch
 Patch2:		%{name}-suexec.patch
-Patch3:		%{name}-nolibs.patch
 Patch4:		%{name}-apr.patch
 # project homepage http://www.metux.de/mpm/en/?patpage=index
 # http://www.sannes.org/metuxmpm/
 Patch5:		httpd-2.0.48-metuxmpm-r8.patch
 # what about this? it isn't applied...
 Patch6:		httpd-2.0.40-xfsz.patch
-Patch7:		httpd-2.0.45-davetag.patch
 Patch8:		httpd-2.0.45-encode.patch
-Patch9:		httpd-2.0.45-export.patch
 Patch10:	httpd-2.0.46-dav401dest.patch
-Patch11:	httpd-2.0.46-md5dig.patch
 Patch12:	httpd-2.0.46-sslmutex.patch
-Patch13:	httpd-2.0.47-sslcleanup.patch
 Patch14:	httpd-2.0.48-corelimit.patch
 Patch15:	httpd-2.0.48-debuglog.patch
-Patch16:	httpd-2.0.48-dynlimit.patch
-Patch17:	httpd-2.0.48-sslpphrase.patch
 Patch18:	%{name}-v6only-ENOPROTOOPT.patch
 Patch19:	%{name}-conffile-path.patch
 Patch20:	%{name}-apxs.patch
 # http://www.telana.com/peruser.php
 Patch21:	httpd-2.0.52-peruser-0.1.6.patch
-Patch22:	%{name}-apr1.patch
-Patch23:	%{name}-normalize-path.patch
-# http://issues.apache.org/bugzilla/attachment.cgi?id=13377 external pcre
-Patch24:	%{name}2-pcre-patch.diff
 URL:		http://httpd.apache.org/
 BuildRequires:	automake
 BuildRequires:	apr-devel >= 1:1.0.0
@@ -759,41 +747,17 @@ Dwa programy testowe/przyk³adowe cgi: test-cgi and print-env.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
-# DROP, we don't use internal apr
-#%patch3 -p1
 %patch4 -p1
-# FIXME, UPDATE
-#%patch5 -p1
-# APPLIED?
-#%patch7 -p1
-# APPLIED?
-#%patch8 -p1
-# seems applied
-#%patch9 -p1
+%patch5 -p1
+%patch8 -p1
 %patch10 -p1
-# CHECK
-#%patch11 -p1
-# CHECK
-#%patch12 -p1
-# CHECK
-#%patch13 -p1
+%patch12 -p1
 %patch14 -p1
 %patch15 -p1
-# seems applied
-#%patch16 -p1
-# CHECK
-#%patch17 -p1
 %patch18 -p1
 %patch19 -p1
 %patch20 -p1
-# UPDATE
-#%patch21 -p1
-# DROP, apache2 already uses apr1 api
-#%patch22 -p1
-# seems applied
-# %patch23 -p1
-# DROP?
-#%{?with_external_pcre:%patch24 -p2}
+%patch21 -p1
 
 %{__perl} -pi -e "s@/usr/local/bin/perl@%{__perl}@" $(grep -rl "/usr/local/bin/perl" *)
 %{__perl} -pi -e "s@BUILD_SUBDIRS.*@BUILD_SUBDIRS =@g" srclib/Makefile.in
