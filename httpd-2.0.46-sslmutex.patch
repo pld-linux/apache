@@ -1,11 +1,14 @@
---- httpd-2.0.46/modules/ssl/ssl_engine_mutex.c.sslmutex
-+++ httpd-2.0.46/modules/ssl/ssl_engine_mutex.c
-@@ -73,6 +73,8 @@
-     if (mc->nMutexMode == SSL_MUTEXMODE_NONE) 
+diff -urbB httpd-2.2.0.org/modules/ssl/ssl_engine_mutex.c httpd-2.2.0/modules/ssl/ssl_engine_mutex.c
+--- httpd-2.2.0.org/modules/ssl/ssl_engine_mutex.c	2005-11-10 16:20:05.000000000 +0100
++++ httpd-2.2.0/modules/ssl/ssl_engine_mutex.c	2005-12-02 23:11:09.183916500 +0100
+@@ -45,6 +45,10 @@
+     if (mc->pMutex) {
          return TRUE;
- 
-+    if (mc->szMutexFile) apr_file_remove(mc->szMutexFile, p);
+     }
++
++    if (mc->szMutexFile)
++	    apr_file_remove(mc->szMutexFile, p);
 +
      if ((rv = apr_global_mutex_create(&mc->pMutex, mc->szMutexFile,
-                                 mc->nMutexMech, p)) != APR_SUCCESS) {
-         if (mc->szMutexFile)
+                                       mc->nMutexMech, s->process->pool))
+             != APR_SUCCESS) {
