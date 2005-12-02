@@ -1,26 +1,24 @@
 diff -Nru httpd-2.0.48.orig/server/config.c httpd-2.0.48/server/config.c
 --- httpd-2.0.48.orig/server/config.c	2003-10-14 05:43:18.000000000 +0200
 +++ httpd-2.0.48/server/config.c	2003-10-28 10:09:44.618490512 +0100
-@@ -1458,6 +1458,7 @@
+@@ -1537,6 +1537,7 @@
          apr_dir_t *dirp;
          apr_finfo_t dirent;
          int current;
 +	size_t slen;
          apr_array_header_t *candidates = NULL;
          fnames *fnew;
-         apr_status_t rv;
-@@ -1478,8 +1479,14 @@
- 
+         char *path = apr_pstrdup(p, fname);
+@@ -1563,7 +1564,11 @@
          candidates = apr_array_make(p, 1, sizeof(fnames));
          while (apr_dir_read(&dirent, APR_FINFO_DIRENT, dirp) == APR_SUCCESS) {
-+	    slen = strlen(dirent.name);
              /* strip out '.' and '..' */
-             if (strcmp(dirent.name, ".")
-+		&& (dirent.name)[slen-1] != '~'
-+		&& (dirent.name)[0] != '.'
-+		&& (slen < 8 || strcmp((dirent.name + slen - 7), ".rpmnew"))
-+		&& (slen < 9 || ( strcmp((dirent.name + slen - 8), ".rpmorig")
-+				&& strcmp((dirent.name + slen - 8), ".rpmsave")))
+-            if (strcmp(dirent.name, ".")
++            if (strcmp(dirent.name, ".") && (dirent.name)[slen-1] != '~'
++			    && (dirent.name)[0] != '.'
++			    && (slen < 8 || strcmp((dirent.name + slen - 7), ".rpmnew"))
++			    && (slen < 9 || ( strcmp((dirent.name + slen - 8), ".rpmorig")
++					    && strcmp((dirent.name + slen - 8), ".rpmsave")))
                  && strcmp(dirent.name, "..")) {
                  fnew = (fnames *) apr_array_push(candidates);
                  fnew->fname = ap_make_full_path(p, path, dirent.name);
