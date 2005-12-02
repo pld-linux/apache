@@ -1,45 +1,36 @@
-diff -Nur httpd-2.0.48/server/mpm/config.m4 httpd-2.0.48-metuxmpm-r8/server/mpm/config.m4
---- httpd-2.0.48/server/mpm/config.m4	2003-03-11 00:07:52.000000000 -0700
-+++ httpd-2.0.48-metuxmpm-r8/server/mpm/config.m4	2004-03-19 10:03:32.132460289 -0700
+diff -urN httpd-2.2.0.org/server/mpm/config.m4 httpd-2.2.0/server/mpm/config.m4
+--- httpd-2.2.0.org/server/mpm/config.m4	2005-10-30 18:05:26.000000000 +0100
++++ httpd-2.2.0/server/mpm/config.m4	2005-12-02 22:06:33.105676750 +0100
 @@ -1,7 +1,7 @@
  AC_MSG_CHECKING(which MPM to use)
  AC_ARG_WITH(mpm,
  APACHE_HELP_STRING(--with-mpm=MPM,Choose the process model for Apache to use.
--                          MPM={beos|worker|prefork|mpmt_os2|perchild|leader|threadpool}),[
-+                          MPM={beos|worker|prefork|mpmt_os2|perchild|leader|threadpool|metuxmpm}),[
+-                          MPM={beos|event|worker|prefork|mpmt_os2}),[
++                          MPM={beos|event|worker|prefork|mpmt_os2|metuxmpm}),[
    APACHE_MPM=$withval
  ],[
    if test "x$APACHE_MPM" = "x"; then
-@@ -12,7 +12,7 @@
- 
- apache_cv_mpm=$APACHE_MPM
+@@ -14,7 +14,7 @@
  	
--if test "$apache_cv_mpm" = "worker" -o "$apache_cv_mpm" = "perchild" -o "$apache_cv_mpm" = "leader" -o "$apache_cv_mpm" = "threadpool" ; then
-+if test "$apache_cv_mpm" = "worker" -o "$apache_cv_mpm" = "perchild" -o "$apache_cv_mpm" = "metuxmpm" -o "$apache_cv_mpm" = "leader" -o "$apache_cv_mpm" = "threadpool" ; then
-   APR_CHECK_APR_DEFINE(APR_HAS_THREADS)
+ ap_mpm_is_threaded ()
+ {
+-    if test "$apache_cv_mpm" = "worker" -o "$apache_cv_mpm" = "event" ; then
++    if test "$apache_cv_mpm" = "worker" -o "$apache_cv_mpm" = "event" -o "$apache_cv_mpm" = "metuxmpm"; then
+         return 0
+     else
+         return 1
+@@ -23,7 +23,7 @@
  
-   if test "x$ac_cv_define_APR_HAS_THREADS" = "xno"; then
-@@ -26,7 +26,7 @@
- APACHE_FAST_OUTPUT(server/mpm/Makefile)
- 
- MPM_NAME=$apache_cv_mpm
--if test "$MPM_NAME" = "leader" -o "$MPM_NAME" = "threadpool" -o "$MPM_NAME" = "perchild"; then
-+if test "$MPM_NAME" = "leader" -o "$MPM_NAME" = "threadpool" -o "$MPM_NAME" = "perchild" -o "$MPM_NAME" = "metuxmpm"; then
-   AC_MSG_WARN(You have selected an EXPERIMENTAL MPM.  Be warned!)
-   MPM_SUBDIR_NAME=experimental/$MPM_NAME
- else
-diff -Nur httpd-2.0.48/server/mpm/experimental/metuxmpm/Makefile.in httpd-2.0.48-metuxmpm-r8/server/mpm/experimental/metuxmpm/Makefile.in
---- httpd-2.0.48/server/mpm/experimental/metuxmpm/Makefile.in	1969-12-31 17:00:00.000000000 -0700
-+++ httpd-2.0.48-metuxmpm-r8/server/mpm/experimental/metuxmpm/Makefile.in	2004-03-19 10:03:32.132460289 -0700
-@@ -0,0 +1,5 @@
-+
-+LTLIBRARY_NAME    = libmetuxmpm.la
-+LTLIBRARY_SOURCES = metuxmpm.c
-+
-+include $(top_srcdir)/build/ltlib.mk
-diff -Nur httpd-2.0.48/server/mpm/experimental/metuxmpm/config5.m4 httpd-2.0.48-metuxmpm-r8/server/mpm/experimental/metuxmpm/config5.m4
---- httpd-2.0.48/server/mpm/experimental/metuxmpm/config5.m4	1969-12-31 17:00:00.000000000 -0700
-+++ httpd-2.0.48-metuxmpm-r8/server/mpm/experimental/metuxmpm/config5.m4	2004-03-19 10:03:32.133460146 -0700
+ ap_mpm_is_experimental ()
+ {
+-    if test "$apache_cv_mpm" = "event" ; then
++    if test "$apache_cv_mpm" = "event" -o "$apache_cv_mpm" = "metuxmpm"; then
+         return 0
+     else
+         return 1
+diff -urN httpd-2.2.0.org/server/mpm/experimental/metuxmpm/config5.m4 httpd-2.2.0/server/mpm/experimental/metuxmpm/config5.m4
+--- httpd-2.2.0.org/server/mpm/experimental/metuxmpm/config5.m4	1970-01-01 01:00:00.000000000 +0100
++++ httpd-2.2.0/server/mpm/experimental/metuxmpm/config5.m4	2005-12-02 22:05:16.484888250 +0100
 @@ -0,0 +1,6 @@
 +dnl ## XXX - Need a more thorough check of the proper flags to use
 +
@@ -47,10 +38,19 @@ diff -Nur httpd-2.0.48/server/mpm/experimental/metuxmpm/config5.m4 httpd-2.0.48-
 +    AC_CHECK_FUNCS(pthread_kill) 
 +    APACHE_FAST_OUTPUT(server/mpm/$MPM_SUBDIR_NAME/Makefile)
 +fi
-diff -Nur httpd-2.0.48/server/mpm/experimental/metuxmpm/metuxmpm.c httpd-2.0.48-metuxmpm-r8/server/mpm/experimental/metuxmpm/metuxmpm.c
---- httpd-2.0.48/server/mpm/experimental/metuxmpm/metuxmpm.c	1969-12-31 17:00:00.000000000 -0700
-+++ httpd-2.0.48-metuxmpm-r8/server/mpm/experimental/metuxmpm/metuxmpm.c	2004-03-19 10:57:21.869478056 -0700
-@@ -0,0 +1,2594 @@
+diff -urN httpd-2.2.0.org/server/mpm/experimental/metuxmpm/Makefile.in httpd-2.2.0/server/mpm/experimental/metuxmpm/Makefile.in
+--- httpd-2.2.0.org/server/mpm/experimental/metuxmpm/Makefile.in	1970-01-01 01:00:00.000000000 +0100
++++ httpd-2.2.0/server/mpm/experimental/metuxmpm/Makefile.in	2005-12-02 22:05:16.480888000 +0100
+@@ -0,0 +1,5 @@
++
++LTLIBRARY_NAME    = libmetuxmpm.la
++LTLIBRARY_SOURCES = metuxmpm.c
++
++include $(top_srcdir)/build/ltlib.mk
+diff -urN httpd-2.2.0.org/server/mpm/experimental/metuxmpm/metuxmpm.c httpd-2.2.0/server/mpm/experimental/metuxmpm/metuxmpm.c
+--- httpd-2.2.0.org/server/mpm/experimental/metuxmpm/metuxmpm.c	1970-01-01 01:00:00.000000000 +0100
++++ httpd-2.2.0/server/mpm/experimental/metuxmpm/metuxmpm.c	2005-12-02 22:35:32.190362750 +0100
+@@ -0,0 +1,2599 @@
 +/* ====================================================================
 + * The Apache Software License, Version 1.1
 + *
@@ -872,7 +872,7 @@ diff -Nur httpd-2.0.48/server/mpm/experimental/metuxmpm/metuxmpm.c httpd-2.0.48-
 +    if (workers_may_exit) return APR_SUCCESS;
 +    
 +    apr_thread_mutex_lock(pipe_of_death_mutex);
-+    ret = apr_recv(lr->sd, &pipe_read_char, &n);
++    ret = apr_socket_recv(lr->sd, &pipe_read_char, &n);
 +    if (APR_STATUS_IS_EAGAIN(ret)) 
 +    {
 +            /* It lost the lottery. It must continue to suffer
@@ -1046,12 +1046,17 @@ diff -Nur httpd-2.0.48/server/mpm/experimental/metuxmpm/metuxmpm.c httpd-2.0.48-
 +
 +        /* -- setup pollset -- */
 +        /* NOTE: we do _not_ do this upwards anylonger */
-+        apr_poll_setup(&pollset, num_listensocks, tpool);
-+        apr_poll_setup(&pollset, num_listensocks, ptrans);
++        apr_pollset_create(&pollset, num_listensocks, tpool, 0);
++        apr_pollset_create(&pollset, num_listensocks, ptrans, 0);
 +        for(lr_walk = ap_listeners; lr_walk != NULL; lr_walk = lr_walk->next) 
 +        {
 +	    int fd;
-+    	    apr_poll_socket_add(pollset, lr_walk->sd, APR_POLLIN);
++	    apr_pollfd_t new_pollfd;
++	    new_pollfd.desc_type = APR_POLL_SOCKET;
++	    new_pollfd.reqevents = APR_POLLIN;
++	    new_pollfd.desc.s = lr_walk->sd;
++	    new_pollfd.client_data = lr_walk;
++	    apr_pollset_add(pollset, &new_pollfd);
 +    	    apr_os_sock_get(&fd, lr_walk->sd);
 +	    _DBG("adding fd %d to pollset", fd);
 +        }
@@ -1641,7 +1646,7 @@ diff -Nur httpd-2.0.48/server/mpm/experimental/metuxmpm/metuxmpm.c httpd-2.0.48-
 +                }
 +#if APR_HAS_OTHER_CHILD
 +            }
-+            else if (apr_proc_other_child_read(&pid, status) == 0) 
++            else if (apr_proc_other_child_alert(&pid, APR_OC_REASON_DEATH, status) == 0) 
 +	    {
 +            /* handled */
 +#endif
@@ -2645,113 +2650,9 @@ diff -Nur httpd-2.0.48/server/mpm/experimental/metuxmpm/metuxmpm.c httpd-2.0.48-
 +    metuxmpm_hooks              /* register_hooks */
 +};
 +
-diff -Nur httpd-2.0.48/server/mpm/experimental/metuxmpm/mpm.h httpd-2.0.48-metuxmpm-r8/server/mpm/experimental/metuxmpm/mpm.h
---- httpd-2.0.48/server/mpm/experimental/metuxmpm/mpm.h	1969-12-31 17:00:00.000000000 -0700
-+++ httpd-2.0.48-metuxmpm-r8/server/mpm/experimental/metuxmpm/mpm.h	2004-03-19 10:03:32.137459576 -0700
-@@ -0,0 +1,100 @@
-+/* ====================================================================
-+ * The Apache Software License, Version 1.1
-+ *
-+ * Copyright (c) 2000-2002 The Apache Software Foundation.  All rights
-+ * reserved.
-+ *
-+ * Redistribution and use in source and binary forms, with or without
-+ * modification, are permitted provided that the following conditions
-+ * are met:
-+ *
-+ * 1. Redistributions of source code must retain the above copyright
-+ *    notice, this list of conditions and the following disclaimer.
-+ *
-+ * 2. Redistributions in binary form must reproduce the above copyright
-+ *    notice, this list of conditions and the following disclaimer in
-+ *    the documentation and/or other materials provided with the
-+ *    distribution.
-+ *
-+ * 3. The end-user documentation included with the redistribution,
-+ *    if any, must include the following acknowledgment:
-+ *       "This product includes software developed by the
-+ *        Apache Software Foundation (http://www.apache.org/)."
-+ *    Alternately, this acknowledgment may appear in the software itself,
-+ *    if and wherever such third-party acknowledgments normally appear.
-+ *
-+ * 4. The names "Apache" and "Apache Software Foundation" must
-+ *    not be used to endorse or promote products derived from this
-+ *    software without prior written permission. For written
-+ *    permission, please contact apache@apache.org.
-+ *
-+ * 5. Products derived from this software may not be called "Apache",
-+ *    nor may "Apache" appear in their name, without prior written
-+ *    permission of the Apache Software Foundation.
-+ *
-+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
-+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-+ * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
-+ * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
-+ * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
-+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-+ * SUCH DAMAGE.
-+ * ====================================================================
-+ *
-+ * This software consists of voluntary contributions made by many
-+ * individuals on behalf of the Apache Software Foundation.  For more
-+ * information on the Apache Software Foundation, please see
-+ * <http://www.apache.org/>.
-+ *
-+ * Portions of this software are based upon public domain software
-+ * originally written at the National Center for Supercomputing Applications,
-+ * University of Illinois, Urbana-Champaign.
-+ */
-+
-+#include "httpd.h"
-+#include "mpm_default.h"
-+#include "unixd.h"
-+
-+#ifndef APACHE_MPM_METUXMPM_H
-+#define APACHE_MPM_METUXMPM_H
-+
-+#define METUXMPM_MPM
-+
-+#define MPM_NAME "metuxmpm"
-+
-+#define AP_MPM_WANT_RECLAIM_CHILD_PROCESSES
-+#define AP_MPM_WANT_WAIT_OR_TIMEOUT
-+#define AP_MPM_WANT_PROCESS_CHILD_STATUS
-+#define AP_MPM_WANT_SET_PIDFILE
-+#define AP_MPM_WANT_SET_SCOREBOARD
-+#define AP_MPM_WANT_SET_LOCKFILE
-+#define AP_MPM_WANT_SET_MAX_REQUESTS
-+#define AP_MPM_WANT_SET_COREDUMPDIR
-+#define AP_MPM_WANT_SET_ACCEPT_LOCK_MECH
-+#define AP_MPM_WANT_SIGNAL_SERVER
-+#define AP_MPM_USES_POD
-+
-+#define MPM_CHILD_PID(i) (ap_scoreboard_image->parent[i].pid)
-+#define MPM_NOTE_CHILD_KILLED(i) (MPM_CHILD_PID(i) = 0)
-+#define MPM_ACCEPT_FUNC unixd_accept
-+
-+/* Table of child status */
-+#define SERVER_DEAD 0
-+#define SERVER_DYING 1
-+#define SERVER_ALIVE 2
-+
-+typedef struct ap_ctable{
-+    pid_t pid;
-+    unsigned char status;
-+} ap_ctable;
-+
-+extern int ap_threads_per_child;
-+extern int ap_max_daemons_limit;
-+extern server_rec *ap_server_conf;
-+
-+#endif /* APACHE_MPM_METUXMPM_H */
-diff -Nur httpd-2.0.48/server/mpm/experimental/metuxmpm/mpm_default.h httpd-2.0.48-metuxmpm-r8/server/mpm/experimental/metuxmpm/mpm_default.h
---- httpd-2.0.48/server/mpm/experimental/metuxmpm/mpm_default.h	1969-12-31 17:00:00.000000000 -0700
-+++ httpd-2.0.48-metuxmpm-r8/server/mpm/experimental/metuxmpm/mpm_default.h	2004-03-19 10:03:32.138459433 -0700
+diff -urN httpd-2.2.0.org/server/mpm/experimental/metuxmpm/mpm_default.h httpd-2.2.0/server/mpm/experimental/metuxmpm/mpm_default.h
+--- httpd-2.2.0.org/server/mpm/experimental/metuxmpm/mpm_default.h	1970-01-01 01:00:00.000000000 +0100
++++ httpd-2.2.0/server/mpm/experimental/metuxmpm/mpm_default.h	2005-12-02 22:05:16.488888500 +0100
 @@ -0,0 +1,115 @@
 +/* ====================================================================
 + * The Apache Software License, Version 1.1
@@ -2868,10 +2769,114 @@ diff -Nur httpd-2.0.48/server/mpm/experimental/metuxmpm/mpm_default.h httpd-2.0.
 +#endif
 +
 +#endif /* AP_MPM_DEFAULT_H */
-diff -Nur httpd-2.0.48/srclib/apr/network_io/unix/sockets.c httpd-2.0.48-metuxmpm-r8/srclib/apr/network_io/unix/sockets.c
---- httpd-2.0.48/srclib/apr/network_io/unix/sockets.c	2003-07-08 06:53:11.000000000 -0600
-+++ httpd-2.0.48-metuxmpm-r8/srclib/apr/network_io/unix/sockets.c	2004-03-19 10:03:32.138459433 -0700
-@@ -411,7 +411,36 @@
+diff -urN httpd-2.2.0.org/server/mpm/experimental/metuxmpm/mpm.h httpd-2.2.0/server/mpm/experimental/metuxmpm/mpm.h
+--- httpd-2.2.0.org/server/mpm/experimental/metuxmpm/mpm.h	1970-01-01 01:00:00.000000000 +0100
++++ httpd-2.2.0/server/mpm/experimental/metuxmpm/mpm.h	2005-12-02 22:05:16.484888250 +0100
+@@ -0,0 +1,100 @@
++/* ====================================================================
++ * The Apache Software License, Version 1.1
++ *
++ * Copyright (c) 2000-2002 The Apache Software Foundation.  All rights
++ * reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ *
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in
++ *    the documentation and/or other materials provided with the
++ *    distribution.
++ *
++ * 3. The end-user documentation included with the redistribution,
++ *    if any, must include the following acknowledgment:
++ *       "This product includes software developed by the
++ *        Apache Software Foundation (http://www.apache.org/)."
++ *    Alternately, this acknowledgment may appear in the software itself,
++ *    if and wherever such third-party acknowledgments normally appear.
++ *
++ * 4. The names "Apache" and "Apache Software Foundation" must
++ *    not be used to endorse or promote products derived from this
++ *    software without prior written permission. For written
++ *    permission, please contact apache@apache.org.
++ *
++ * 5. Products derived from this software may not be called "Apache",
++ *    nor may "Apache" appear in their name, without prior written
++ *    permission of the Apache Software Foundation.
++ *
++ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
++ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
++ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
++ * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
++ * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
++ * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
++ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
++ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
++ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++ * SUCH DAMAGE.
++ * ====================================================================
++ *
++ * This software consists of voluntary contributions made by many
++ * individuals on behalf of the Apache Software Foundation.  For more
++ * information on the Apache Software Foundation, please see
++ * <http://www.apache.org/>.
++ *
++ * Portions of this software are based upon public domain software
++ * originally written at the National Center for Supercomputing Applications,
++ * University of Illinois, Urbana-Champaign.
++ */
++
++#include "httpd.h"
++#include "mpm_default.h"
++#include "unixd.h"
++
++#ifndef APACHE_MPM_METUXMPM_H
++#define APACHE_MPM_METUXMPM_H
++
++#define METUXMPM_MPM
++
++#define MPM_NAME "metuxmpm"
++
++#define AP_MPM_WANT_RECLAIM_CHILD_PROCESSES
++#define AP_MPM_WANT_WAIT_OR_TIMEOUT
++#define AP_MPM_WANT_PROCESS_CHILD_STATUS
++#define AP_MPM_WANT_SET_PIDFILE
++#define AP_MPM_WANT_SET_SCOREBOARD
++#define AP_MPM_WANT_SET_LOCKFILE
++#define AP_MPM_WANT_SET_MAX_REQUESTS
++#define AP_MPM_WANT_SET_COREDUMPDIR
++#define AP_MPM_WANT_SET_ACCEPT_LOCK_MECH
++#define AP_MPM_WANT_SIGNAL_SERVER
++#define AP_MPM_USES_POD
++
++#define MPM_CHILD_PID(i) (ap_scoreboard_image->parent[i].pid)
++#define MPM_NOTE_CHILD_KILLED(i) (MPM_CHILD_PID(i) = 0)
++#define MPM_ACCEPT_FUNC unixd_accept
++
++/* Table of child status */
++#define SERVER_DEAD 0
++#define SERVER_DYING 1
++#define SERVER_ALIVE 2
++
++typedef struct ap_ctable{
++    pid_t pid;
++    unsigned char status;
++} ap_ctable;
++
++extern int ap_threads_per_child;
++extern int ap_max_daemons_limit;
++extern server_rec *ap_server_conf;
++
++#endif /* APACHE_MPM_METUXMPM_H */
+diff -urN httpd-2.2.0.org/srclib/apr/network_io/unix/sockets.c httpd-2.2.0/srclib/apr/network_io/unix/sockets.c
+--- httpd-2.2.0.org/srclib/apr/network_io/unix/sockets.c	2005-09-09 10:21:17.000000000 +0200
++++ httpd-2.2.0/srclib/apr/network_io/unix/sockets.c	2005-12-02 22:05:16.488888500 +0100
+@@ -416,7 +416,36 @@
          set_socket_vars(*sock, APR_INET, SOCK_STREAM, 0);
          (*sock)->timeout = -1;
      }
@@ -2909,3 +2914,4 @@ diff -Nur httpd-2.0.48/srclib/apr/network_io/unix/sockets.c httpd-2.0.48-metuxmp
      (*sock)->remote_addr_unknown = 1;
      (*sock)->socketdes = *thesock;
      return APR_SUCCESS;
+
