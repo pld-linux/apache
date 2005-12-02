@@ -1,4 +1,5 @@
 # TODO:
+# - distcache.spec
 # - mod_case_filter
 # - mod_case_filter_in
 # - mod_optional_fn_{export,import}
@@ -19,11 +20,14 @@
 # Conditional build:
 %bcond_without	ssl		# build without SSL support
 %bcond_without	ldap		# build without LDAP support
-%bcond_with	external_pcre	# build with external PCRE support (Apache bug #27550)
+%bcond_without	metuxmpm
+%bcond_without	peruser
+%bcond_without	external_pcre	# build with external PCRE support (Apache bug #27550)
+%bcond_with     distcache
 #
 %include	/usr/lib/rpm/macros.perl
 # this is internal macro, don't change to %%apache_modules_api
-%define		_apache_modules_api 20020903
+%define		_apache_modules_api 20051115
 Summary:	The most widely used Web server on the Internet
 Summary(de):	Leading World Wide Web-Server
 Summary(es):	Servidor HTTPD para proveer servicios WWW
@@ -33,12 +37,12 @@ Summary(pt_BR):	Servidor HTTPD para prover serviços WWW
 Summary(ru):	óÁÍÙÊ ÐÏÐÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
-Version:	2.0.55
-Release:	3.2
+Version:	2.2.0
+Release:	0.1
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
-# Source0-md5:	b45f16a9878e709497820565d42b00b9
+# Source0-md5:	760aecf26a071e15141170636af43456
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}-icons.tar.gz
@@ -93,6 +97,7 @@ BuildRequires:	automake
 BuildRequires:	apr-devel >= 1:1.0.0
 BuildRequires:	apr-util-devel >= 1:1.0.0
 BuildRequires:	db-devel
+%{?with_distcache:BuildRequires:	distcache-libs-devel or distcache-devel}
 BuildRequires:	expat-devel
 BuildRequires:	gdbm-devel >= 1.8.3
 BuildRequires:	libtool >= 2:1.5
@@ -121,7 +126,7 @@ Requires:	apr >= 1:1.0.0-2
 Requires:	mailcap
 Requires:	psmisc >= 20.1
 Provides:	apache(modules-api) = %{_apache_modules_api}
-Provides:	apache(mod_access)
+#Provides:	apache(mod_access)
 Provides:	apache(mod_alias)
 Provides:	apache(mod_asis)
 Provides:	apache(mod_autoindex)
@@ -754,27 +759,41 @@ Dwa programy testowe/przyk³adowe cgi: test-cgi and print-env.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
-%patch3 -p1
+# DROP, we don't use internal apr
+#%patch3 -p1
 %patch4 -p1
-%patch5 -p1
-%patch7 -p1
-%patch8 -p1
-%patch9 -p1
+# FIXME, UPDATE
+#%patch5 -p1
+# APPLIED?
+#%patch7 -p1
+# APPLIED?
+#%patch8 -p1
+# seems applied
+#%patch9 -p1
 %patch10 -p1
-%patch11 -p1
-%patch12 -p1
-%patch13 -p1
+# CHECK
+#%patch11 -p1
+# CHECK
+#%patch12 -p1
+# CHECK
+#%patch13 -p1
 %patch14 -p1
 %patch15 -p1
-%patch16 -p1
-%patch17 -p1
+# seems applied
+#%patch16 -p1
+# CHECK
+#%patch17 -p1
 %patch18 -p1
 %patch19 -p1
 %patch20 -p1
-%patch21 -p1
-%patch22 -p1
-%patch23 -p1
-%{?with_external_pcre:%patch24 -p2}
+# UPDATE
+#%patch21 -p1
+# DROP, apache2 already uses apr1 api
+#%patch22 -p1
+# seems applied
+# %patch23 -p1
+# DROP?
+#%{?with_external_pcre:%patch24 -p2}
 
 %{__perl} -pi -e "s@/usr/local/bin/perl@%{__perl}@" $(grep -rl "/usr/local/bin/perl" *)
 %{__perl} -pi -e "s@BUILD_SUBDIRS.*@BUILD_SUBDIRS =@g" srclib/Makefile.in
@@ -796,53 +815,69 @@ rm -rf srclib/apr*
 %{__perl} -pi -e "s:apu-config:apu-1-config:g" support/apxs.in
 install /usr/share/automake/config.* build/
 CPPFLAGS="-DMAX_SERVER_LIMIT=200000 -DBIG_SECURITY_HOLE=1"
-for mpm in metuxmpm peruser perchild prefork worker; do
+for mpm in %{?with_metuxmpm:metuxmpm} %{?with_peruser:peruser} prefork worker; do
 install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
 ../%configure \
 	--prefix=%{_sysconfdir} \
 	--exec-prefix=%{_libexecdir} \
 	--with-installbuilddir=%{_libdir}/apache/build \
+	--disable-v4-mapped \
 	--enable-layout=PLD \
 	--enable-modules=all \
 	--enable-mods-shared=all \
 	--enable-auth-anon \
 	--enable-auth-dbm \
+	--enable-authn-dbd \
+	--enable-authn-alias \
+	--enable-authz-dbm \
+	--enable-authz-owner \
+	%{?with_ldap:--enable-authnz-ldap} \
 	--enable-auth-digest \
 	--enable-file-cache \
-	--enable-echo \
 	--enable-cache \
-	--enable-charset-lite \
-	--enable-mem-cache \
 	--enable-disk-cache \
+	--enable-mem-cache \
+	--enable-dbd \
+	--enable-bucketeer \
+	--enable-dumpio \
+	--enable-echo \
+	--enable-charset-lite \
+	--enable-deflate \
+	%{?with_ldap:--enable-ldap} \
 	--enable-ext-filter \
 	--enable-case-filter \
 	--enable-case-filter-in \
-	--enable-deflate \
+	--enable-log-forensic \
+	--enable-logio \
 	--with-z=%{_prefix} \
 	--enable-mime-magic \
 	--enable-cern-meta \
 	--enable-expires \
 	--enable-headers \
+	--enable-ident \
 	--enable-usertrack \
 	--enable-unique-id \
 	--enable-proxy \
 	--enable-proxy-connect \
 	--enable-proxy-ftp \
 	--enable-proxy-http \
-	%{?with_ssl:--enable-ssl} \
+	--enable-proxy-ajp \
+	--enable-proxy-balancer \
+	%{?with_ssl:--enable-ssl %{?with_distcache:--enable-distcache}} \
 	--enable-optional-hook-export \
 	--enable-optional-hook-import \
 	--enable-optional-fn-import \
 	--enable-optional-fn-export \
-	%{?with_ldap:--enable-ldap} \
-	%{?with_ldap:--enable-auth-ldap} \
+	--enable-http \
 	--enable-dav \
 	--enable-info \
 	--enable-suexec \
 	--enable-cgi \
 	--enable-cgid \
 	--enable-dav-fs \
+	--enable-dav-lock \
 	--enable-vhost-alias \
+	--enable-imagemap \
 	--enable-speling \
 	--enable-rewrite \
 	--enable-so \
@@ -862,7 +897,7 @@ install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
 	--with-suexec-umask=077 \
 	--with-apr=%{_bindir}/apr-1-config \
 	--with-apr-util=%{_bindir}/apu-1-config \
-	%{?with_external_pcre:--with-external-pcre}
+	%{?with_external_pcre:--with-pcre}
 
 %{__make}
 ./httpd.${mpm} -l | grep -v "${mpm}" > modules-inside
@@ -872,7 +907,7 @@ find include -name '*.h' | xargs perl -pi -e "s#/httpd\.(.*?)\.conf#/etc/httpd/h
 cd ..
 done
 
-for mpm in metuxmpm peruser perchild worker; do
+for mpm in %{?with_metuxmpm:metuxmpm} %{?with_peruser:peruser} worker; do
 	if ! cmp -s buildmpm-prefork/modules-inside buildmpm-${mpm}/modules-inside; then
 		echo "List of compiled modules is different between prefork-MPM and ${mpm}-MPM!"
 		echo "Build failed."
@@ -902,7 +937,7 @@ install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig,monit} \
 	logdir=%{_var}/log/httpd \
 	proxycachedir=%{_var}/cache/httpd
 
-for mpm in metuxmpm peruser perchild worker; do
+for mpm in %{?with_metuxmpm:metuxmpm} %{?with_peruser:peruser} worker; do
 	install buildmpm-${mpm}/httpd.${mpm} $RPM_BUILD_ROOT%{_sbindir}/httpd.${mpm}
 	ln -s httpd.conf $RPM_BUILD_ROOT%{_sysconfdir}/httpd.${mpm}.conf
 done
@@ -1253,7 +1288,7 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/*
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/monit/*.monitrc
 
-%attr(755,root,root) %{_libexecdir}/mod_access.so
+#%attr(755,root,root) %{_libexecdir}/mod_access.so
 %attr(755,root,root) %{_libexecdir}/mod_alias.so
 %attr(755,root,root) %{_libexecdir}/mod_asis.so
 %attr(755,root,root) %{_libexecdir}/mod_cern_meta.so
@@ -1350,8 +1385,8 @@ fi
 %lang(de) %{_datadir}/manual/mod/mpm_common.html.de
 %lang(es) %{_datadir}/manual/mod/mpm_common.html.es
 %lang(ja) %{_datadir}/manual/mod/mpm_common.html.ja*
-%{_datadir}/manual/mod/mod_access.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_access.html.ja*
+#%{_datadir}/manual/mod/mod_access.html.en
+#%lang(ja) %{_datadir}/manual/mod/mod_access.html.ja*
 %{_datadir}/manual/mod/mod_alias.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_alias.html.ja*
 %lang(ko) %{_datadir}/manual/mod/mod_alias.html.ko.euc-kr
