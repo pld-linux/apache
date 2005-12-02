@@ -17,6 +17,184 @@
 # - install stage fails with distcc (make -jN)
 # - /var/run/apache is also owned by apache1.spec, so rename it to /var/run/httpd spec here (NOTE: if you fix this also adjust apache-mod_fastcgi.spec)
 #
+#
+#  /home/services/httpd/manual/convenience.map
+#  /home/services/httpd/manual/faq/all_in_one.html.ja.euc-jp
+#  /home/services/httpd/manual/faq/error.html.ja.euc-jp
+#  /home/services/httpd/manual/faq/index.html.ja.euc-jp
+#  /home/services/httpd/manual/faq/support.html.ja.euc-jp
+#  /home/services/httpd/manual/howto/htaccess.html.pt-br
+#  /home/services/httpd/manual/images/mod_filter_new.gif
+#  /home/services/httpd/manual/images/mod_filter_new.png
+#  /home/services/httpd/manual/images/mod_filter_old.gif
+#  /home/services/httpd/manual/index.html.pt-br
+#  /home/services/httpd/manual/mod/beos.html.de
+#  /home/services/httpd/manual/mod/beos.html.en
+#  /home/services/httpd/manual/mod/beos.html.es
+#  /home/services/httpd/manual/mod/beos.html.ko.euc-kr
+#  /home/services/httpd/manual/mod/event.html.en
+#  /home/services/httpd/manual/mod/mod_actions.html.de
+#  /home/services/httpd/manual/mod/mod_auth_basic.html.en
+#  /home/services/httpd/manual/mod/mod_auth_basic.html.ja.euc-jp
+#  /home/services/httpd/manual/mod/mod_auth_basic.html.ko.euc-kr
+#  /home/services/httpd/manual/mod/mod_auth_digest.html.en
+#  /home/services/httpd/manual/mod/mod_authn_alias.html.en
+#  /home/services/httpd/manual/mod/mod_authn_anon.html.en
+#  /home/services/httpd/manual/mod/mod_authn_anon.html.ja.euc-jp
+#  /home/services/httpd/manual/mod/mod_authn_anon.html.ko.euc-kr
+#  /home/services/httpd/manual/mod/mod_authn_dbd.html.en
+#  /home/services/httpd/manual/mod/mod_authn_dbm.html.en
+#  /home/services/httpd/manual/mod/mod_authn_dbm.html.ja.euc-jp
+#  /home/services/httpd/manual/mod/mod_authn_dbm.html.ko.euc-kr
+#  /home/services/httpd/manual/mod/mod_authn_default.html.en
+#  /home/services/httpd/manual/mod/mod_authn_default.html.ja.euc-jp
+#  /home/services/httpd/manual/mod/mod_authn_default.html.ko.euc-kr
+#  /home/services/httpd/manual/mod/mod_authn_file.html.en
+#  /home/services/httpd/manual/mod/mod_authn_file.html.ja.euc-jp
+#  /home/services/httpd/manual/mod/mod_authn_file.html.ko.euc-kr
+#  /home/services/httpd/manual/mod/mod_authnz_ldap.html.en
+#  /home/services/httpd/manual/mod/mod_authz_dbm.html.en
+#  /home/services/httpd/manual/mod/mod_authz_dbm.html.ko.euc-kr
+#  /home/services/httpd/manual/mod/mod_authz_default.html.en
+#  /home/services/httpd/manual/mod/mod_authz_default.html.ja.euc-jp
+#  /home/services/httpd/manual/mod/mod_authz_default.html.ko.euc-kr
+#  /home/services/httpd/manual/mod/mod_authz_groupfile.html.en
+#  /home/services/httpd/manual/mod/mod_authz_groupfile.html.ja.euc-jp
+#  /home/services/httpd/manual/mod/mod_authz_groupfile.html.ko.euc-kr
+#  /home/services/httpd/manual/mod/mod_authz_host.html.en
+#  /home/services/httpd/manual/mod/mod_authz_host.html.ja.euc-jp
+#  /home/services/httpd/manual/mod/mod_authz_host.html.ko.euc-kr
+#  /home/services/httpd/manual/mod/mod_authz_owner.html.en
+#  /home/services/httpd/manual/mod/mod_authz_owner.html.ja.euc-jp
+#  /home/services/httpd/manual/mod/mod_authz_owner.html.ko.euc-kr
+#  /home/services/httpd/manual/mod/mod_authz_user.html.en
+#  /home/services/httpd/manual/mod/mod_authz_user.html.ja.euc-jp
+#  /home/services/httpd/manual/mod/mod_authz_user.html.ko.euc-kr
+#  /home/services/httpd/manual/mod/mod_cache.html.ja.euc-jp
+#  /home/services/httpd/manual/mod/mod_dbd.html.en
+#  /home/services/httpd/manual/mod/mod_disk_cache.html.ja.euc-jp
+#  /home/services/httpd/manual/mod/mod_dumpio.html.en
+#  /home/services/httpd/manual/mod/mod_dumpio.html.ja.euc-jp
+#  /home/services/httpd/manual/mod/mod_example.html.en
+#  /home/services/httpd/manual/mod/mod_example.html.ko.euc-kr
+#  /home/services/httpd/manual/mod/mod_ext_filter.html.ja.euc-jp
+#  /home/services/httpd/manual/mod/mod_filter.html.en
+#  /home/services/httpd/manual/mod/mod_headers.html.ja.euc-jp
+#  /home/services/httpd/manual/mod/mod_ident.html.en
+#  /home/services/httpd/manual/mod/mod_ident.html.ko.euc-kr
+#  /home/services/httpd/manual/mod/mod_imagemap.html.en
+#  /home/services/httpd/manual/mod/mod_imagemap.html.ko.euc-kr
+#  /home/services/httpd/manual/mod/mod_isapi.html.en
+#  /home/services/httpd/manual/mod/mod_isapi.html.ko.euc-kr
+#  /home/services/httpd/manual/mod/mod_log_forensic.html.ja.euc-jp
+#  /home/services/httpd/manual/mod/mod_logio.html.en
+#  /home/services/httpd/manual/mod/mod_logio.html.ja.euc-jp
+#  /home/services/httpd/manual/mod/mod_logio.html.ko.euc-kr
+#  /home/services/httpd/manual/mod/mod_mem_cache.html.ja.euc-jp
+#  /home/services/httpd/manual/mod/mod_nw_ssl.html.en
+#  /home/services/httpd/manual/mod/mod_proxy.html.ja.euc-jp
+#  /home/services/httpd/manual/mod/mod_proxy_ajp.html.ja.euc-jp
+#  /home/services/httpd/manual/mod/mod_proxy_balancer.html.ja.euc-jp
+#  /home/services/httpd/manual/mod/mod_version.html.en
+#  /home/services/httpd/manual/mod/mod_version.html.ja.euc-jp
+#  /home/services/httpd/manual/mod/mod_version.html.ko.euc-kr
+#  /home/services/httpd/manual/mod/mpm_netware.html.en
+#  /home/services/httpd/manual/mod/mpm_winnt.html.de
+#  /home/services/httpd/manual/mod/mpm_winnt.html.en
+#  /home/services/httpd/manual/mod/mpm_winnt.html.ja.euc-jp
+#  /home/services/httpd/manual/mod/mpmt_os2.html.en
+#  /home/services/httpd/manual/new_features_2_0.html.pt-br
+#  /home/services/httpd/manual/new_features_2_2.html.pt-br
+#  /home/services/httpd/manual/platform/ebcdic.html.en
+#  /home/services/httpd/manual/platform/ebcdic.html.ko.euc-kr
+#  /home/services/httpd/manual/platform/index.html.en
+#  /home/services/httpd/manual/platform/index.html.ko.euc-kr
+#  /home/services/httpd/manual/platform/netware.html.en
+#  /home/services/httpd/manual/platform/netware.html.ko.euc-kr
+#  /home/services/httpd/manual/platform/perf-hp.html.en
+#  /home/services/httpd/manual/platform/perf-hp.html.ko.euc-kr
+#  /home/services/httpd/manual/platform/win_compiling.html.en
+#  /home/services/httpd/manual/platform/win_compiling.html.ko.euc-kr
+#  /home/services/httpd/manual/platform/windows.html.en
+#  /home/services/httpd/manual/platform/windows.html.ko.euc-kr
+#  /home/services/httpd/manual/style/build.properties
+#  /home/services/httpd/manual/style/common.dtd
+#  /home/services/httpd/manual/style/faq.dtd
+#  /home/services/httpd/manual/style/lang.dtd
+#  /home/services/httpd/manual/style/latex/atbeginend.sty
+#  /home/services/httpd/manual/style/latex/common.xsl
+#  /home/services/httpd/manual/style/latex/directiveindex.xsl
+#  /home/services/httpd/manual/style/latex/faq.xsl
+#  /home/services/httpd/manual/style/latex/html.xsl
+#  /home/services/httpd/manual/style/latex/latex.xsl
+#  /home/services/httpd/manual/style/latex/manualpage.xsl
+#  /home/services/httpd/manual/style/latex/moduleindex.xsl
+#  /home/services/httpd/manual/style/latex/quickreference.xsl
+#  /home/services/httpd/manual/style/latex/synopsis.xsl
+#  /home/services/httpd/manual/style/manual.de.xsl
+#  /home/services/httpd/manual/style/manual.en.xsl
+#  /home/services/httpd/manual/style/manual.es.xsl
+#  /home/services/httpd/manual/style/manual.fr.xsl
+#  /home/services/httpd/manual/style/manual.ja.xsl
+#  /home/services/httpd/manual/style/manual.ko.xsl
+#  /home/services/httpd/manual/style/manual.pt-br.xsl
+#  /home/services/httpd/manual/style/manual.ru.xsl
+#  /home/services/httpd/manual/style/manualpage.dtd
+#  /home/services/httpd/manual/style/modulesynopsis.dtd
+#  /home/services/httpd/manual/style/sitemap.dtd
+#  /home/services/httpd/manual/style/version.ent
+#  /home/services/httpd/manual/style/xsl/common.xsl
+#  /home/services/httpd/manual/style/xsl/convmap.xsl
+#  /home/services/httpd/manual/style/xsl/directiveindex.xsl
+#  /home/services/httpd/manual/style/xsl/faq.xsl
+#  /home/services/httpd/manual/style/xsl/hhc.xsl
+#  /home/services/httpd/manual/style/xsl/hhp.xsl
+#  /home/services/httpd/manual/style/xsl/indexpage.xsl
+#  /home/services/httpd/manual/style/xsl/language.xsl
+#  /home/services/httpd/manual/style/xsl/maf.xsl
+#  /home/services/httpd/manual/style/xsl/manualpage.xsl
+#  /home/services/httpd/manual/style/xsl/moduleindex.xsl
+#  /home/services/httpd/manual/style/xsl/nroff.xsl
+#  /home/services/httpd/manual/style/xsl/quickreference.xsl
+#  /home/services/httpd/manual/style/xsl/sitemap.xsl
+#  /home/services/httpd/manual/style/xsl/synopsis.xsl
+#  /home/services/httpd/manual/style/xsl/typemap.xsl
+#  /home/services/httpd/manual/style/xsl/util/modtrans.xsl
+#  /home/services/httpd/manual/upgrading.html.pt-br
+#  /home/services/httpd/manual/vhosts/details.html.fr
+#  /home/services/httpd/manual/vhosts/examples.html.fr
+#  /home/services/httpd/manual/vhosts/fd-limits.html.fr
+#  /home/services/httpd/manual/vhosts/index.html.fr
+#  /home/services/httpd/manual/vhosts/ip-based.html.fr
+#  /home/services/httpd/manual/vhosts/name-based.html.fr
+#  /usr/lib64/apache/build/config.nice
+#  /usr/lib64/apache/mod_auth_basic.so
+#  /usr/lib64/apache/mod_authn_alias.so
+#  /usr/lib64/apache/mod_authn_anon.so
+#  /usr/lib64/apache/mod_authn_dbd.so
+#  /usr/lib64/apache/mod_authn_dbm.so
+#  /usr/lib64/apache/mod_authn_default.so
+#  /usr/lib64/apache/mod_authn_file.so
+#  /usr/lib64/apache/mod_authnz_ldap.so
+#  /usr/lib64/apache/mod_authz_dbm.so
+#  /usr/lib64/apache/mod_authz_default.so
+#  /usr/lib64/apache/mod_authz_groupfile.so
+#  /usr/lib64/apache/mod_authz_host.so
+#  /usr/lib64/apache/mod_authz_owner.so
+#  /usr/lib64/apache/mod_authz_user.so
+#  /usr/lib64/apache/mod_bucketeer.so
+#  /usr/lib64/apache/mod_dbd.so
+#  /usr/lib64/apache/mod_dumpio.so
+#  /usr/lib64/apache/mod_filter.so
+#  /usr/lib64/apache/mod_ident.so
+#  /usr/lib64/apache/mod_imagemap.so
+#  /usr/lib64/apache/mod_logio.so
+#  /usr/lib64/apache/mod_version.so
+#  /usr/sbin/htcacheclean
+#  /usr/sbin/httxt2dbm
+#  /usr/share/man/man8/htcacheclean.8.gz
+
+#
 # Conditional build:
 %bcond_without	ssl		# build without SSL support
 %bcond_without	ldap		# build without LDAP support
@@ -92,7 +270,7 @@ BuildRequires:	libtool >= 2:1.5
 %{?with_ldap:BuildRequires:	openldap-devel}
 %{?with_ssl:BuildRequires:	openssl-devel >= 0.9.7d}
 %{?with_ssl:BuildRequires:	openssl-tools >= 0.9.7d}
-%{?with_external_pcre:BuildRequires:	pcre-devel}
+BuildRequires:	pcre-devel
 BuildRequires:	perl-devel >= 1:5.6
 BuildRequires:	rpm-build >= 4.4.0
 BuildRequires:	rpm-perlprov >= 4.1-13
@@ -861,7 +1039,7 @@ install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
 	--with-suexec-umask=077 \
 	--with-apr=%{_bindir}/apr-1-config \
 	--with-apr-util=%{_bindir}/apu-1-config \
-	%{?with_external_pcre:--with-pcre}
+	--with-pcre
 
 %{__make}
 ./httpd.${mpm} -l | grep -v "${mpm}" > modules-inside
@@ -1341,13 +1519,13 @@ fi
 %lang(es) %{_datadir}/manual/mod/[cdfhilpqtw]*.html.es
 %lang(ja) %{_datadir}/manual/mod/[cdfhilpqtw]*.html.ja*
 %lang(ko) %{_datadir}/manual/mod/[cdfhilpqtw]*.html.ko.euc-kr
-%lang(ru) %{_datadir}/manual/mod/[cdfhilpqtw]*.html.ru.koi8-r
+#%lang(ru) %{_datadir}/manual/mod/[cdfhilpqtw]*.html.ru.koi8-r
 %{_datadir}/manual/mod/module-dict.html.en
 %lang(ja) %{_datadir}/manual/mod/module-dict.html.ja*
 %lang(ko) %{_datadir}/manual/mod/module-dict.html.ko.euc-kr
 %{_datadir}/manual/mod/mpm_common.html.en
 %lang(de) %{_datadir}/manual/mod/mpm_common.html.de
-%lang(es) %{_datadir}/manual/mod/mpm_common.html.es
+#%lang(es) %{_datadir}/manual/mod/mpm_common.html.es
 %lang(ja) %{_datadir}/manual/mod/mpm_common.html.ja*
 #%{_datadir}/manual/mod/mod_access.html.en
 #%lang(ja) %{_datadir}/manual/mod/mod_access.html.ja*
@@ -1396,7 +1574,7 @@ fi
 %{_datadir}/manual/programs/*.html.en
 %lang(es) %{_datadir}/manual/programs/*.html.es
 %lang(ko) %{_datadir}/manual/programs/*.html.ko.euc-kr
-%lang(ru) %{_datadir}/manual/programs/*.html.ru.koi8-r
+#%lang(ru) %{_datadir}/manual/programs/*.html.ru.koi8-r
 %dir %{_datadir}/manual/style
 %{_datadir}/manual/style/css
 
@@ -1406,13 +1584,13 @@ fi
 %{_datadir}/manual/mod/mod_actions.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_actions.html.ja*
 %lang(ko) %{_datadir}/manual/mod/mod_actions.html.ko.euc-kr
-%{_datadir}/manual/mod/mod_auth.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_auth.html.ja*
-%{_datadir}/manual/mod/mod_auth_anon.html.en
-%{_datadir}/manual/mod/mod_auth_ldap.html.en
+#%{_datadir}/manual/mod/mod_auth.html.en
+#%lang(ja) %{_datadir}/manual/mod/mod_auth.html.ja*
+#%{_datadir}/manual/mod/mod_auth_anon.html.en
+#%{_datadir}/manual/mod/mod_auth_ldap.html.en
 %{_datadir}/manual/mod/mod_ldap.html.en
-%{_datadir}/manual/mod/mod_auth_dbm.html.en
-%{_datadir}/manual/mod/mod_auth_digest.html.en
+#%{_datadir}/manual/mod/mod_auth_dbm.html.en
+#%{_datadir}/manual/mod/mod_auth_digest.html.en
 %lang(ko) %{_datadir}/manual/mod/mod_auth_digest.html.ko.euc-kr
 %{_datadir}/manual/mod/mod_cache.html.en
 %lang(ko) %{_datadir}/manual/mod/mod_cache.html.ko.euc-kr
@@ -1441,8 +1619,8 @@ fi
 %lang(ko) %{_datadir}/manual/mod/mod_file_cache.html.ko.euc-kr
 %{_datadir}/manual/mod/mod_headers.html.en
 %lang(ko) %{_datadir}/manual/mod/mod_headers.html.ko.euc-kr
-%{_datadir}/manual/mod/mod_imap.html.en
-%lang(ko) %{_datadir}/manual/mod/mod_imap.html.ko.euc-kr
+#%{_datadir}/manual/mod/mod_imap.html.en
+#%lang(ko) %{_datadir}/manual/mod/mod_imap.html.ko.euc-kr
 %{_datadir}/manual/mod/mod_info.html.en
 %lang(ja) %{_datadir}/manual/mod/mod_info.html.ja*
 %lang(ko) %{_datadir}/manual/mod/mod_info.html.ko.euc-kr
@@ -1473,10 +1651,10 @@ fi
 %dir %{_datadir}/manual/vhosts
 %{_datadir}/manual/vhosts/*.html.en
 %lang(de) %{_datadir}/manual/vhosts/*.html.de
-%lang(es) %{_datadir}/manual/vhosts/*.html.es
+#%lang(es) %{_datadir}/manual/vhosts/*.html.es
 %lang(ja) %{_datadir}/manual/vhosts/*.html.ja*
 %lang(ko) %{_datadir}/manual/vhosts/*.html.ko.euc-kr
-%lang(ru) %{_datadir}/manual/vhosts/*.html.ru.koi8-r
+#%lang(ru) %{_datadir}/manual/vhosts/*.html.ru.koi8-r
 
 %files suexec
 %defattr(644,root,root,755)
@@ -1518,18 +1696,18 @@ fi
 %files mod_auth
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth.conf
-%attr(755,root,root) %{_libexecdir}/mod_auth.so
+#%attr(755,root,root) %{_libexecdir}/mod_auth.so
 
 %files mod_auth_anon
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth_anon.conf
-%attr(755,root,root) %{_libexecdir}/mod_auth_anon.so
+#%attr(755,root,root) %{_libexecdir}/mod_auth_anon.so
 
 %if %{with ldap}
 %files mod_auth_ldap
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth_ldap.conf
-%attr(755,root,root) %{_libexecdir}/mod_auth_ldap.so
+#%attr(755,root,root) %{_libexecdir}/mod_auth_ldap.so
 %endif
 
 %if %{with ldap}
@@ -1542,7 +1720,7 @@ fi
 %files mod_auth_dbm
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth_dbm.conf
-%attr(755,root,root) %{_libexecdir}/mod_auth_dbm.so
+#%attr(755,root,root) %{_libexecdir}/mod_auth_dbm.so
 %attr(755,root,root) %{_sbindir}/dbmmanage
 %attr(755,root,root) %{_sbindir}/htdbm
 %{_mandir}/man1/dbmmanage.1*
@@ -1609,7 +1787,7 @@ fi
 %files mod_imap
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_imap.conf
-%attr(755,root,root) %{_libexecdir}/mod_imap.so
+#%attr(755,root,root) %{_libexecdir}/mod_imap.so
 
 %files mod_info
 %defattr(644,root,root,755)
