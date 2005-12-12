@@ -190,9 +190,6 @@
 #  /usr/lib64/apache/mod_imagemap.so
 #  /usr/lib64/apache/mod_logio.so
 #  /usr/lib64/apache/mod_version.so
-#  /usr/sbin/htcacheclean
-#  /usr/sbin/httxt2dbm
-#  /usr/share/man/man8/htcacheclean.8.gz
 
 #
 # Conditional build:
@@ -258,6 +255,7 @@ Patch19:	%{name}-conffile-path.patch
 Patch20:	%{name}-apxs.patch
 # http://www.telana.com/peruser.php
 Patch21:	httpd-2.0.52-peruser-0.1.6.patch
+Patch22:	%{name}-libtool.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	automake
 BuildRequires:	apr-devel >= 1:1.0.0
@@ -276,8 +274,8 @@ BuildRequires:	rpm-build >= 4.4.0
 BuildRequires:	rpm-perlprov >= 4.1-13
 BuildRequires:	rpmbuild(macros) >= 1.228
 BuildRequires:	zlib-devel
-PreReq:		perl-base
-PreReq:		rc-scripts >= 0.4.0.15
+Requires:	perl-base
+Requires:	rc-scripts >= 0.4.0.15
 Requires(pre):	/bin/id
 Requires(pre):	/usr/bin/getgid
 Requires(pre):	/usr/sbin/groupadd
@@ -568,8 +566,8 @@ Provides:	apache(mod_autoindex) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
 
 %description mod_autoindex
-This package contains mod_autoindex module. It provides
-generation index of files.
+This package contains mod_autoindex module. It provides generation
+index of files.
 
 %description mod_autoindex -l pl
 Ten pakiet dostarcza modu³ autoindex, który generuje indeks plików.
@@ -936,26 +934,45 @@ Dwa programy testowe/przyk³adowe cgi: test-cgi and print-env.
 %patch19 -p1
 %patch20 -p1
 %patch21 -p1
+%patch22 -p1
 
-%{__perl} -pi -e "s@/usr/local/bin/perl@%{__perl}@" $(grep -rl "/usr/local/bin/perl" *)
-%{__perl} -pi -e "s@BUILD_SUBDIRS.*@BUILD_SUBDIRS =@g" srclib/Makefile.in
-%{__perl} -pi -e "s@CLEAN_SUBDIRS.*@CLEAN_SUBDIRS =@g" srclib/Makefile.in
+# using system apr, apr-util and pcre
+rm -rf srclib/{apr,apr-util,pcre}
+# nothing left in srclib, remove it
+sed -i -e '/^SUBDIRS/s/srclib//' Makefile.in
 
-%build
+# fixup perl path
+sed -i -e '1s@/usr/local/bin/perl@%{__perl}@' docs/cgi-examples/printenv
+
+# fix location of build dir in generated apxs
+sed -i -e '
+s:@exp_installbuilddir@:%{_libdir}/apache/build:g
+' support/apxs.in
+
 # sanity check
 MODULES_API=`awk '/#define MODULE_MAGIC_NUMBER_MAJOR/ {print $3}' include/ap_mmn.h`
 if [ "$MODULES_API" != "%_apache_modules_api" ]; then
 	echo "Set %%_apache_modules_api to $MODULES_API and rerun."
 	exit 1
 fi
-./buildconf
-rm -rf srclib/apr*
-# Before configure; fix location of build dir in generated apxs
-%{__perl} -pi -e "s:\@exp_installbuilddir\@:%{_libdir}/apache/build:g" \
-	support/apxs.in
-%{__perl} -pi -e "s:apr-config:apr-1-config:g" support/apxs.in
-%{__perl} -pi -e "s:apu-config:apu-1-config:g" support/apxs.in
-install /usr/share/automake/config.* build/
+
+%build
+cp /usr/share/apr/build/apr_common.m4 build
+cp /usr/share/libtool/ltmain.sh build
+cp /usr/share/automake/config.* build
+%{__autoheader}
+%{__autoconf}
+
+# from ./buildconf
+: fixing timestamps for mod_ssl sources
+cd modules/ssl
+touch ssl_expr_parse.y
+sleep 1
+touch ssl_expr_parse.c ssl_expr_parse.h ssl_expr_scan.l
+sleep 1
+touch ssl_expr_scan.c
+cd ../..
+
 CPPFLAGS="-DMAX_SERVER_LIMIT=200000 -DBIG_SECURITY_HOLE=1"
 for mpm in %{?with_metuxmpm:metuxmpm} %{?with_peruser:peruser} prefork worker; do
 install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
@@ -1739,9 +1756,11 @@ fi
 %files mod_cache
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_cache.conf
+%attr(755,root,root) %{_sbindir}/htcacheclean
 %attr(755,root,root) %{_libexecdir}/mod_cache.so
 %attr(755,root,root) %{_libexecdir}/mod_disk_cache.so
 %attr(755,root,root) %{_libexecdir}/mod_mem_cache.so
+%{_mandir}/man8/htcacheclean.8*
 
 %files mod_cgid
 %defattr(644,root,root,755)
@@ -1801,6 +1820,7 @@ fi
 
 %files mod_rewrite
 %defattr(644,root,root,755)
+%attr(755,root,root) %{_sbindir}/httxt2dbm
 %attr(755,root,root) %{_libexecdir}/mod_rewrite.so
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_rewrite.conf
 
@@ -1836,7 +1856,7 @@ fi
 %files -n htpasswd-%{name}
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/htpasswd
-%{_sbindir}/htpasswd
+%attr(755,root,root) %{_sbindir}/htpasswd
 %{_mandir}/man1/htpasswd.1*
 
 %files cgi_test
