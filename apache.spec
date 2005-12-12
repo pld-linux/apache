@@ -195,7 +195,7 @@
 # Conditional build:
 %bcond_without	ssl		# build without SSL support
 %bcond_without	ldap		# build without LDAP support
-%bcond_with	metuxmpm
+%bcond_without	metuxmpm
 %bcond_without	peruser
 %bcond_with     distcache
 #
