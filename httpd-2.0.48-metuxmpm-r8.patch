@@ -1,6 +1,6 @@
 diff -urN httpd-2.2.0.org/server/mpm/config.m4 httpd-2.2.0/server/mpm/config.m4
 --- httpd-2.2.0.org/server/mpm/config.m4	2005-10-30 18:05:26.000000000 +0100
-+++ httpd-2.2.0/server/mpm/config.m4	2005-12-02 22:06:33.105676750 +0100
++++ httpd-2.2.0/server/mpm/config.m4	2005-12-12 11:37:00.900963000 +0100
 @@ -1,7 +1,7 @@
  AC_MSG_CHECKING(which MPM to use)
  AC_ARG_WITH(mpm,
@@ -30,7 +30,7 @@ diff -urN httpd-2.2.0.org/server/mpm/config.m4 httpd-2.2.0/server/mpm/config.m4
          return 1
 diff -urN httpd-2.2.0.org/server/mpm/experimental/metuxmpm/config5.m4 httpd-2.2.0/server/mpm/experimental/metuxmpm/config5.m4
 --- httpd-2.2.0.org/server/mpm/experimental/metuxmpm/config5.m4	1970-01-01 01:00:00.000000000 +0100
-+++ httpd-2.2.0/server/mpm/experimental/metuxmpm/config5.m4	2005-12-02 22:05:16.484888250 +0100
++++ httpd-2.2.0/server/mpm/experimental/metuxmpm/config5.m4	2005-12-12 11:37:00.900963000 +0100
 @@ -0,0 +1,6 @@
 +dnl ## XXX - Need a more thorough check of the proper flags to use
 +
@@ -40,7 +40,7 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/metuxmpm/config5.m4 httpd-2.2.
 +fi
 diff -urN httpd-2.2.0.org/server/mpm/experimental/metuxmpm/Makefile.in httpd-2.2.0/server/mpm/experimental/metuxmpm/Makefile.in
 --- httpd-2.2.0.org/server/mpm/experimental/metuxmpm/Makefile.in	1970-01-01 01:00:00.000000000 +0100
-+++ httpd-2.2.0/server/mpm/experimental/metuxmpm/Makefile.in	2005-12-02 22:05:16.480888000 +0100
++++ httpd-2.2.0/server/mpm/experimental/metuxmpm/Makefile.in	2005-12-12 11:37:00.900963000 +0100
 @@ -0,0 +1,5 @@
 +
 +LTLIBRARY_NAME    = libmetuxmpm.la
@@ -49,8 +49,8 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/metuxmpm/Makefile.in httpd-2.2
 +include $(top_srcdir)/build/ltlib.mk
 diff -urN httpd-2.2.0.org/server/mpm/experimental/metuxmpm/metuxmpm.c httpd-2.2.0/server/mpm/experimental/metuxmpm/metuxmpm.c
 --- httpd-2.2.0.org/server/mpm/experimental/metuxmpm/metuxmpm.c	1970-01-01 01:00:00.000000000 +0100
-+++ httpd-2.2.0/server/mpm/experimental/metuxmpm/metuxmpm.c	2005-12-02 22:35:32.190362750 +0100
-@@ -0,0 +1,2599 @@
++++ httpd-2.2.0/server/mpm/experimental/metuxmpm/metuxmpm.c	2005-12-12 11:35:35.000000000 +0100
+@@ -0,0 +1,2627 @@
 +/* ====================================================================
 + * The Apache Software License, Version 1.1
 + *
@@ -418,6 +418,34 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/metuxmpm/metuxmpm.c httpd-2.2.
 +	_DBG("omitted unlocking thread_accept_mutex",0);
 +
 +#endif
++
++
++static apr_pollfd_t *find_poll_sock(apr_pollfd_t *aprset, apr_socket_t *sock)
++{
++    apr_pollfd_t *curr = aprset;
++
++    while (curr->desc.s != sock) {
++        if (curr->desc_type == APR_POLL_LASTDESC) {
++            return NULL;
++        }
++        curr++;
++    }
++
++    return curr;
++}
++
++static apr_status_t apr_poll_revents_get(apr_int16_t *event, apr_socket_t *sock, apr_pollfd_t *aprset)
++{
++    apr_pollfd_t *curr = find_poll_sock(aprset, sock);
++    if (curr == NULL) {
++        return APR_NOTFOUND;
++    }
++
++    (*event) = curr->rtnevents;
++    return APR_SUCCESS;
++}
++
++
 +/* == Keep track of the number of worker threads currently active == */
 +static int worker_thread_count = 0;
 +static apr_thread_mutex_t *worker_thread_count_mutex;
@@ -2652,7 +2680,7 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/metuxmpm/metuxmpm.c httpd-2.2.
 +
 diff -urN httpd-2.2.0.org/server/mpm/experimental/metuxmpm/mpm_default.h httpd-2.2.0/server/mpm/experimental/metuxmpm/mpm_default.h
 --- httpd-2.2.0.org/server/mpm/experimental/metuxmpm/mpm_default.h	1970-01-01 01:00:00.000000000 +0100
-+++ httpd-2.2.0/server/mpm/experimental/metuxmpm/mpm_default.h	2005-12-02 22:05:16.488888500 +0100
++++ httpd-2.2.0/server/mpm/experimental/metuxmpm/mpm_default.h	2005-12-12 11:37:00.910963000 +0100
 @@ -0,0 +1,115 @@
 +/* ====================================================================
 + * The Apache Software License, Version 1.1
@@ -2771,7 +2799,7 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/metuxmpm/mpm_default.h httpd-2
 +#endif /* AP_MPM_DEFAULT_H */
 diff -urN httpd-2.2.0.org/server/mpm/experimental/metuxmpm/mpm.h httpd-2.2.0/server/mpm/experimental/metuxmpm/mpm.h
 --- httpd-2.2.0.org/server/mpm/experimental/metuxmpm/mpm.h	1970-01-01 01:00:00.000000000 +0100
-+++ httpd-2.2.0/server/mpm/experimental/metuxmpm/mpm.h	2005-12-02 22:05:16.484888250 +0100
++++ httpd-2.2.0/server/mpm/experimental/metuxmpm/mpm.h	2005-12-12 11:37:00.910963000 +0100
 @@ -0,0 +1,100 @@
 +/* ====================================================================
 + * The Apache Software License, Version 1.1
@@ -2875,7 +2903,7 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/metuxmpm/mpm.h httpd-2.2.0/ser
 +#endif /* APACHE_MPM_METUXMPM_H */
 diff -urN httpd-2.2.0.org/srclib/apr/network_io/unix/sockets.c httpd-2.2.0/srclib/apr/network_io/unix/sockets.c
 --- httpd-2.2.0.org/srclib/apr/network_io/unix/sockets.c	2005-09-09 10:21:17.000000000 +0200
-+++ httpd-2.2.0/srclib/apr/network_io/unix/sockets.c	2005-12-02 22:05:16.488888500 +0100
++++ httpd-2.2.0/srclib/apr/network_io/unix/sockets.c	2005-12-12 11:37:00.910963000 +0100
 @@ -416,7 +416,36 @@
          set_socket_vars(*sock, APR_INET, SOCK_STREAM, 0);
          (*sock)->timeout = -1;
@@ -2914,4 +2942,3 @@ diff -urN httpd-2.2.0.org/srclib/apr/network_io/unix/sockets.c httpd-2.2.0/srcli
      (*sock)->remote_addr_unknown = 1;
      (*sock)->socketdes = *thesock;
      return APR_SUCCESS;
-
