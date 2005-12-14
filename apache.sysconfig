@@ -5,7 +5,7 @@
 SERVICE_RUN_NICE_LEVEL="+5"
 
 # config dir/file path
-HTTPD_CONF="/etc/httpd/httpd.conf"
+HTTPD_CONF="/etc/httpd/apache.conf"
 
 # other command-line options
 HTTPD_OPTS=""

@@ -32,13 +32,14 @@ else
 fi
 
 [ -z "$HTTPD_MPM" ] && HTTPD_MPM="prefork"
-if [ -d "${HTTPD_CONF:-'/etc/httpd/httpd.conf'}" ]; then
-	CFG="-f ${HTTPD_CONF:-'/etc/httpd/httpd.conf'}"
-elif [ -n "$HTTPD_CONF" ]; then
-	echo "error: HTTPD_CONF='$HTTPD_CONF': not a file, not a directory"
-	exit 1
-else
-	CFG=""
+
+if [ -n "${HTTPD_CONF}" ]; then
+	if [ -d "${HTTPD_CONF}" ] || [ -f "${HTTPD_CONF}" ]; then
+		CFG="-f ${HTTPD_CONF}"
+	else
+		echo "error: HTTPD_CONF='$HTTPD_CONF': not a file, not a directory"
+		exit 1
+	fi
 fi
 
 RETVAL=0
