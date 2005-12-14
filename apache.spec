@@ -39,7 +39,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.2.0
-Release:	0.9
+Release:	0.13
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -64,6 +64,7 @@ Source16:	%{name}-mod_deflate.conf
 Source17:	%{name}-mod_autoindex.conf
 Source20:	%{name}-server.crt
 Source21:	%{name}-server.key
+Source22:	%{name}-mod_userdir.conf
 Patch0:		%{name}-configdir_skip_backups.patch
 Patch1:		%{name}-layout.patch
 Patch2:		%{name}-suexec.patch
@@ -1136,6 +1137,7 @@ done
 ln -s httpd.prefork $RPM_BUILD_ROOT%{_sbindir}/httpd
 ln -s %{_libdir}/apache $RPM_BUILD_ROOT%{_sysconfdir}/modules
 ln -s %{_localstatedir}/run/apache $RPM_BUILD_ROOT%{_sysconfdir}/run
+ln -s %{_var}/log/httpd $RPM_BUILD_ROOT%{_sysconfdir}/logs
 
 rm -f $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
@@ -1172,6 +1174,7 @@ install %{SOURCE14} $CFG/59_mod_dir.conf
 install %{SOURCE15} $CFG/13_mod_suexec.conf
 install %{SOURCE16} $CFG/58_mod_deflate.conf
 install %{SOURCE17} $CFG/57_mod_autoindex.conf
+install %{SOURCE22} $CFG/16_mod_userdir.conf
 
 echo "LoadModule ldap_module	%{_libexecdir}/mod_ldap.so" > $CFG/49_mod_ldap.conf
 echo "LoadModule actions_module	%{_libexecdir}/mod_actions.so" > $CFG/50_mod_actions.conf
@@ -1597,12 +1600,13 @@ fi
 
 %attr(754,root,root) /etc/rc.d/init.d/httpd
 
-# TODO: switch to conf.d, instead of confusing *dir* httpd.conf
 %attr(751,root,root) %dir %{_sysconfdir}
+%{_sysconfdir}/modules
+%{_sysconfdir}/run
+%{_sysconfdir}/logs
+# TODO: switch to conf.d, instead of confusing *dir* httpd.conf
 %attr(750,root,root) %dir %{_sysconfdir}/httpd.conf
 %attr(750,root,root) %dir %{_sysconfdir}/webapps.d
-%attr(750,root,root) %dir %{_sysconfdir}/modules
-%attr(750,root,root) %dir %{_sysconfdir}/run
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/apache.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_common.conf
 %attr(640,root,root) %{_sysconfdir}/magic
