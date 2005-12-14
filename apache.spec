@@ -169,18 +169,13 @@
 #  /home/services/httpd/manual/vhosts/name-based.html.fr
 #  /usr/lib64/apache/build/config.nice
 #
-#   /usr/lib64/apache/mod_bucketeer.so
-#   /usr/sbin/dbmmanage
-#   /usr/sbin/htdbm
-#   /usr/share/man/man1/dbmmanage.1.gz
-#   /usr/share/man/man1/htdbm.1.gz
-#
 # Conditional build:
 %bcond_without	ssl		# build without SSL support
 %bcond_without	ldap		# build without LDAP support
 %bcond_without	metuxmpm
 %bcond_without	peruser
 %bcond_with     distcache
+%bcond_with	bucketeer	# debug one
 #
 %include	/usr/lib/rpm/macros.perl
 # this is internal macro, don't change to %%apache_modules_api
@@ -633,6 +628,15 @@ index of files.
 %description mod_autoindex -l pl
 Ten pakiet dostarcza modu³ autoindex, który generuje indeks plików.
 
+%package mod_bucketeer
+Summary:	Split buckets whenever we find a control-char
+Group:		Networking/Daemons
+Provides:	apache(mod_bucketeer) = %{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
+
+%description mod_bucketeer
+Split buckets whenever we find a control-char.
+
 %package mod_cache
 Summary:	Content cache keyed to URIs
 Summary(pl):	Pamiêæ podrêczna wg klucza URI
@@ -1057,6 +1061,14 @@ uwierzytelnienia u¿ytkowników HTTP. Ten pakiet zawiera htpasswd z
 Apache'a 2; ta wersja obs³uguje has³a zapisane czystym tekstem oraz
 zakodowane algorytmami CRYPT (domy¶lnym), MD5 i SHA1.
 
+%package dbmtools
+Summary:	Apache 2 tools for manipulating DBM files
+Group:          Networking/Utilities
+Requires:       %{name} = %{version}-%{release}
+
+%description dbmtools
+Apache 2 tools for manipulating DBM files.
+
 %package cgi_test
 Summary:	cgi test/demo programs
 Summary(pl):	Programy testowe/przyk³adowe cgi
@@ -1149,7 +1161,7 @@ install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
 	--enable-disk-cache \
 	--enable-mem-cache \
 	--enable-dbd \
-	--enable-bucketeer \
+	%{?with_bucketeer:--enable-bucketeer} \
 	--enable-dumpio \
 	--enable-echo \
 	--enable-charset-lite \
@@ -1928,10 +1940,12 @@ fi
 #%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth.conf
 %attr(755,root,root) %{_libexecdir}/mod_authn_file.so
 
+%if %{with ldap}
 %files mod_authnz_ldap
 %defattr(644,root,root,755)
 #%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth.conf
 %attr(755,root,root) %{_libexecdir}/mod_authnz_ldap.so
+%endif
 
 %files mod_authz_dbm
 %defattr(644,root,root,755)
@@ -1968,10 +1982,12 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_autoindex.conf
 %attr(755,root,root) %{_libexecdir}/mod_autoindex.so
 
-#%files mod_bucketeer
-#%defattr(644,root,root,755)
+%if %{with bucketeer}
+%files mod_bucketeer
+%defattr(644,root,root,755)
 #%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth.conf
-#%attr(755,root,root) %{_libexecdir}/mod_bucketeer.so
+%attr(755,root,root) %{_libexecdir}/mod_bucketeer.so
+%endif
 
 %files mod_cache
 %defattr(644,root,root,755)
@@ -2120,6 +2136,13 @@ fi
 %attr(755,root,root) %{_bindir}/htpasswd
 %attr(755,root,root) %{_sbindir}/htpasswd
 %{_mandir}/man1/htpasswd.1*
+
+%files dbmtools
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_sbindir}/dbmmanage
+%attr(755,root,root) %{_sbindir}/htdbm
+%{_mandir}/man1/dbmmanage.1*
+%{_mandir}/man1/htdbm.1*
 
 %files cgi_test
 %defattr(644,root,root,755)
