@@ -1,5 +1,4 @@
 # TODO:
-# - distcache.spec
 # - mod_case_filter
 # - mod_case_filter_in
 # - mod_optional_fn_{export,import}
@@ -15,8 +14,8 @@
 # - subpackages for MPMs
 # - check if all modules (*.so) are exactly the same for different MPMs
 # - install stage fails with distcc (make -jN)
-# - /var/run/apache is also owned by apache1.spec, so rename it to /var/run/httpd spec here (NOTE: if you fix this also adjust apache-mod_fastcgi.spec)
-#
+# - /var/run/apache is also owned by apache1.spec, so rename it to /var/run/httpd spec here
+#   (NOTE: if you fix this also adjust apache-mod_fastcgi.spec)
 
 # Conditional build:
 %bcond_without	ssl		# build without SSL support
@@ -40,7 +39,7 @@ Summary(ru):	óÁÍÙÊ ÐÏÐÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.2.0
-Release:	0.3
+Release:	0.5
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -363,7 +362,7 @@ Requires:	%{name} = %{version}-%{release}
 # compat
 Provides:	apache-mod_auth_anon = %{version}-%{release}
 Provides:	apache(mod_auth_anon) = %{version}-%{release}
-Obsoletes:	apache-mod_auth_anon < 2.2.0
+Obsoletes:	apache-mod_auth_anon < 2.2.0-0.5
 
 %description mod_authn_anon
 This module provides authentication front-ends such as mod_auth_basic
@@ -423,7 +422,7 @@ Requires:	%{name} = %{version}-%{release}
 # compat
 Provides:	apache(mod_auth_ldap) = %{version}-%{release}
 Provides:	apache-mod_auth_ldap = %{version}-%{release}
-Obsoletes:	apache-mod_auth_ldap < 2.2.0
+Obsoletes:	apache-mod_auth_ldap < 2.2.0-0.5
 
 %description mod_authnz_ldap
 This module provides authentication front-ends such as mod_auth_basic
@@ -727,21 +726,6 @@ This module processes .map files, thereby replacing the functionality
 of the imagemap CGI program. Any directory or document type configured
 to use the handler imap-file (using either AddHandler or SetHandler)
 will be processed by this module.
-
-%package mod_imap
-Summary:	Apache module with imap-file handler
-Summary(pl):	Modu³ Apache'a z obs³ug± imap-file
-Group:		Networking/Daemons
-Provides:	apache(mod_imap) = %{version}-%{release}
-Requires:	%{name} = %{version}-%{release}
-
-%description mod_imap
-This package contains mod_imap module. It provides for .map files,
-replacing the functionality of the imagemap CGI program. Any directory
-or document type configured to use the handler imap-file.
-
-%description mod_imap -l pl
-Modu³ umo¿liwiaj±cy obs³ugê plików .map (imap-file handler).
 
 %package mod_info
 Summary:	Apache module with comprehensive overview of the server configuration
@@ -1197,20 +1181,17 @@ install %{SOURCE17} $CFG/57_mod_autoindex.conf
 
 echo "LoadModule ldap_module	%{_libexecdir}/mod_ldap.so" > $CFG/49_mod_ldap.conf
 echo "LoadModule actions_module	%{_libexecdir}/mod_actions.so" > $CFG/50_mod_actions.conf
-echo "LoadModule auth_module	%{_libexecdir}/mod_auth.so" > $CFG/51_mod_auth.conf
-#echo "LoadModule auth_anon_module	%{_libexecdir}/mod_auth_anon.so" > $CFG/52_mod_auth_anon.conf
-#echo "LoadModule auth_dbm_module	%{_libexecdir}/mod_auth_dbm.so" > $CFG/53_mod_auth_dbm.conf
 echo "LoadModule auth_digest_module	%{_libexecdir}/mod_auth_digest.so" > $CFG/54_mod_auth_digest.conf
 echo "LoadModule cache_module	%{_libexecdir}/mod_cache.so
 LoadModule mem_cache_module	%{_libexecdir}/mod_mem_cache.so
 LoadModule disk_cache_module	%{_libexecdir}/mod_disk_cache.so" > $CFG/55_mod_cache.conf
 echo "LoadModule cgid_module	%{_libexecdir}/mod_cgid.so" > $CFG/56_mod_cgid.conf
 echo "LoadModule charset_lite_module	%{_libexecdir}/mod_charset_lite.so" > $CFG/57_mod_charset_lite.conf
-echo "LoadModule auth_ldap_module	%{_libexecdir}/mod_auth_ldap.so" > $CFG/59_mod_auth_ldap.conf
+#echo "LoadModule auth_ldap_module	%{_libexecdir}/mod_auth_ldap.so" > $CFG/59_mod_auth_ldap.conf
 echo "LoadModule expires_module	%{_libexecdir}/mod_expires.so" > $CFG/60_mod_expires.conf
 echo "LoadModule file_cache_module	%{_libexecdir}/mod_file_cache.so" > $CFG/61_mod_file_cache.conf
 echo "LoadModule headers_module	%{_libexecdir}/mod_headers.so" > $CFG/62_mod_headers.conf
-echo "LoadModule imap_module	%{_libexecdir}/mod_imap.so" > $CFG/63_mod_imap.conf
+#echo "LoadModule imap_module	%{_libexecdir}/mod_imap.so" > $CFG/63_mod_imap.conf
 echo "LoadModule rewrite_module	%{_libexecdir}/mod_rewrite.so" > $CFG/64_mod_rewrite.conf
 echo "LoadModule usertrack_module	%{_libexecdir}/mod_usertrack.so" > $CFG/65_mod_usertrack.conf
 echo "LoadModule unique_id_module	%{_libexecdir}/mod_unique_id.so" > $CFG/66_mod_unique_id.conf
@@ -1350,28 +1331,106 @@ fi
 %postun mod_actions
 %module_postun
 
-#%post mod_auth
-#%module_post
-#
-#%postun mod_auth
-#%module_postun
+%post mod_auth_basic
+%module_post
 
-#%post mod_auth_anon
-#%module_post
-#
-#%postun mod_auth_anon
-#%module_postun
+%postun mod_auth_basic
+%module_postun
 
-#%post mod_auth_dbm
-#%module_post
-#
-#%postun mod_auth_dbm
-#%module_postun
+%post mod_auth_digest
+%module_post
+
+%postun mod_auth_digest
+%module_postun
+
+%post mod_authn_alias
+%module_post
+
+%postun mod_authn_alias
+%module_postun
+
+%post mod_authn_anon
+%module_post
+
+%postun mod_authn_anon
+%module_postun
+
+%post mod_authn_dbd
+%module_post
+
+%postun mod_authn_dbd
+%module_postun
+
+%post mod_authn_dbm
+%module_post
+
+%postun mod_authn_dbm
+%module_postun
+
+%post mod_authn_default
+%module_post
+
+%postun mod_authn_default
+%module_postun
+
+%post mod_authn_file
+%module_post
+
+%postun mod_authn_file
+%module_postun
+
+%post mod_authnz_ldap
+%module_post
+
+%postun mod_authnz_ldap
+%module_postun
+
+%post mod_authz_dbm
+%module_post
+
+%postun mod_authz_dbm
+%module_postun
+
+%post mod_authz_default
+%module_post
+
+%postun mod_authz_default
+%module_postun
+
+%post mod_authz_groupfile
+%module_post
+
+%postun mod_authz_groupfile
+%module_postun
+
+%post mod_authz_host
+%module_post
+
+%postun mod_authz_host
+%module_postun
+
+%post mod_authz_owner
+%module_post
+
+%postun mod_authz_owner
+%module_postun
+
+%post mod_authz_user
+%module_post
+
+%postun mod_authz_user
+%module_postun
 
 %post mod_autoindex
 %module_post
 
 %postun mod_autoindex
+%module_postun
+
+%post mod_bucketeer
+%module_post
+
+%postun mod_bucketeer
 %module_postun
 
 %post mod_cache
@@ -1398,11 +1457,11 @@ fi
 %postun mod_dav
 %module_postun
 
-#%post mod_auth_digest
-#%module_post
-#
-#%postun mod_auth_digest
-#%module_postun
+%post mod_dbd
+%module_post
+
+%postun mod_dbd
+%module_postun
 
 %post mod_deflate
 %module_post
@@ -1414,6 +1473,12 @@ fi
 %module_post
 
 %postun mod_dir
+%module_postun
+
+%post mod_dumpio
+%module_post
+
+%postun mod_dumpio
 %module_postun
 
 %post mod_expires
@@ -1428,22 +1493,46 @@ fi
 %postun mod_file_cache
 %module_postun
 
+%post mod_filter
+%module_post
+
+%postun mod_filter
+%module_postun
+
 %post mod_headers
 %module_post
 
 %postun mod_headers
 %module_postun
 
-%post mod_imap
+%post mod_ident
 %module_post
 
-%postun mod_imap
+%postun mod_ident
+%module_postun
+
+%post mod_imagemap
+%module_post
+
+%postun mod_imagemap
 %module_postun
 
 %post mod_info
 %module_post
 
 %postun mod_info
+%module_postun
+
+%post mod_ldap
+%module_post
+
+%postun mod_ldap
+%module_postun
+
+%post mod_logio
+%module_post
+
+%postun mod_logio
 %module_postun
 
 %post mod_proxy
@@ -1470,16 +1559,22 @@ fi
 %postun mod_status
 %module_postun
 
+%post mod_unique_id
+%module_post
+
+%postun mod_unique_id
+%module_postun
+
 %post mod_usertrack
 %module_post
 
 %postun mod_usertrack
 %module_postun
 
-%post mod_unique_id
+%post mod_version
 %module_post
 
-%postun mod_unique_id
+%postun mod_version
 %module_postun
 
 %post mod_vhost_alias
@@ -1616,11 +1711,6 @@ fi
 %files mod_auth
 %defattr(644,root,root,755)
 
-#%files mod_auth_anon
-#%defattr(644,root,root,755)
-#%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth_anon.conf
-#%attr(755,root,root) %{_libexecdir}/mod_auth_anon.so
-
 %files mod_auth_basic
 %defattr(644,root,root,755)
 #%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth.conf
@@ -1633,13 +1723,6 @@ fi
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth_digest.conf
 %attr(755,root,root) %{_libexecdir}/mod_auth_digest.so
-
-#%if %{with ldap}
-#%files mod_auth_ldap
-#%defattr(644,root,root,755)
-#%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth_ldap.conf
-#%attr(755,root,root) %{_libexecdir}/mod_auth_ldap.so
-#%endif
 
 %files mod_authn_alias
 %defattr(644,root,root,755)
@@ -1794,11 +1877,6 @@ fi
 %defattr(644,root,root,755)
 #%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth.conf
 %attr(755,root,root) %{_libexecdir}/mod_imagemap.so
-
-#%files mod_imap
-#%defattr(644,root,root,755)
-#%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_imap.conf
-#%attr(755,root,root) %{_libexecdir}/mod_imap.so
 
 %files mod_info
 %defattr(644,root,root,755)
