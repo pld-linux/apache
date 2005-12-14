@@ -23,6 +23,7 @@
 %bcond_without	ldap		# build without LDAP support
 %bcond_without	metuxmpm
 %bcond_without	peruser
+%bcond_without	event
 %bcond_with     distcache
 %bcond_with	bucketeer	# debug one
 #
@@ -1021,7 +1022,7 @@ touch ssl_expr_scan.c
 cd ../..
 
 CPPFLAGS="-DMAX_SERVER_LIMIT=200000 -DBIG_SECURITY_HOLE=1"
-for mpm in %{?with_metuxmpm:metuxmpm} %{?with_peruser:peruser} prefork worker event; do
+for mpm in %{?with_metuxmpm:metuxmpm} %{?with_peruser:peruser} prefork worker %{?with_event:event}; do
 install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
 ../%configure \
 	--prefix=%{_sysconfdir} \
@@ -1113,7 +1114,7 @@ find include -name '*.h' | xargs perl -pi -e "s#/httpd\.(.*?)\.conf#/etc/httpd/h
 cd ..
 done
 
-for mpm in %{?with_metuxmpm:metuxmpm} %{?with_peruser:peruser} worker event; do
+for mpm in %{?with_metuxmpm:metuxmpm} %{?with_peruser:peruser} worker %{?with_event:event}; do
 	if ! cmp -s buildmpm-prefork/modules-inside buildmpm-${mpm}/modules-inside; then
 		echo "List of compiled modules is different between prefork-MPM and ${mpm}-MPM!"
 		echo "Build failed."
@@ -1143,7 +1144,7 @@ install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig,monit} \
 	logdir=%{_var}/log/httpd \
 	proxycachedir=%{_var}/cache/httpd
 
-for mpm in %{?with_metuxmpm:metuxmpm} %{?with_peruser:peruser} worker event; do
+for mpm in %{?with_metuxmpm:metuxmpm} %{?with_peruser:peruser} worker %{?with_event:event}; do
 	install buildmpm-${mpm}/httpd.${mpm} $RPM_BUILD_ROOT%{_sbindir}/httpd.${mpm}
 	ln -s httpd.conf $RPM_BUILD_ROOT%{_sysconfdir}/httpd.${mpm}.conf
 done
