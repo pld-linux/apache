@@ -241,6 +241,7 @@ BuildRequires:	apr-util-devel >= 1:1.0.0
 BuildRequires:	db-devel
 %{?with_distcache:BuildRequires:	distcache-libs-devel or distcache-devel}
 BuildRequires:	expat-devel
+BuildRequires:	findutils
 BuildRequires:	gdbm-devel >= 1.8.3
 BuildRequires:	libtool >= 2:1.5
 %{?with_ldap:BuildRequires:	openldap-devel}
@@ -1337,6 +1338,27 @@ find $RPM_BUILD_ROOT%{_datadir}/manual -type f \
 	-name '*.xml' -o -name '*.xml.*' -o -name '*.html' \
 	| xargs rm -f
 
+# drop more
+rm -rf $RPM_BUILD_ROOT%{_datadir}/manual/style
+
+# find manual files
+:> manual.files
+cur=$(pwd)
+echo "%{_datadir}/manual/LICENSE" >> "$cur/manual.files"
+cd $RPM_BUILD_ROOT
+find ./%{_datadir}/manual -type d -printf "%%%%dir %{_datadir}/manual/%%P\n" >> "$cur/manual.files"
+find ./%{_datadir}/manual -type f -printf "%{_datadir}/manual/%%P\n" | awk '
+/\.(en|map|gif|png|jpg|ico)$/ { print $0; }
+/\.de$/ { print "%%lang(de) ", $0; }
+/\.es$/ { print "%%lang(es) ", $0; }
+/\.fr$/ { print "%%lang(fr) ", $0; }
+/\.ja.*$/ { print "%%lang(ja) ", $0; }
+/\.ko.*$/ { print "%%lang(ko) ", $0; }
+/\.pt-br$/ { print "%%lang(pt_BR) ", $0; }
+/\.ru.*$/ { print "%%lang(ru) ", $0; }
+' >> "$cur/manual.files"
+cd $cur
+
 # htpasswd goes to %{_bindir}
 mv $RPM_BUILD_ROOT%{_sbindir}/htpasswd $RPM_BUILD_ROOT%{_bindir}/
 ln -sf %{_bindir}/htpasswd $RPM_BUILD_ROOT%{_sbindir}/
@@ -1668,174 +1690,9 @@ fi
 %{_datadir}/icons
 %{_datadir}/error
 
-%files doc
+%files doc -f manual.files
 %defattr(644,root,root,755)
 %dir %{_datadir}/manual
-%{_datadir}/manual/LICENSE
-%{_datadir}/manual/*.html.en
-%lang(de) %{_datadir}/manual/*.html.de
-%lang(es) %{_datadir}/manual/*.html.es
-%lang(fr) %{_datadir}/manual/*.html.fr
-%lang(ja) %{_datadir}/manual/*.html.ja*
-%lang(ko) %{_datadir}/manual/*.html.ko.euc-kr
-%lang(ru) %{_datadir}/manual/*.html.ru.koi8-r
-%dir %{_datadir}/manual/developer
-%{_datadir}/manual/developer/*.html.en
-%lang(ja) %{_datadir}/manual/developer/*.html.ja*
-%dir %{_datadir}/manual/faq
-%{_datadir}/manual/faq/*.html.en
-%lang(ko) %{_datadir}/manual/faq/*.html.ko.euc-kr
-%dir %{_datadir}/manual/howto
-%{_datadir}/manual/howto/*.html.en
-%lang(ja) %{_datadir}/manual/howto/*.html.ja*
-%lang(ko) %{_datadir}/manual/howto/*.html.ko.euc-kr
-%dir %{_datadir}/manual/images
-%{_datadir}/manual/images/[!m]*
-%dir %{_datadir}/manual/misc
-%{_datadir}/manual/misc/*.html.en
-%lang(ko) %{_datadir}/manual/misc/*.html.ko.euc-kr
-%dir %{_datadir}/manual/mod
-%{_datadir}/manual/mod/[cdfhilpqtw]*.html.en
-%lang(de) %{_datadir}/manual/mod/[cdfhilpqtw]*.html.de
-%lang(es) %{_datadir}/manual/mod/[cdfhilpqtw]*.html.es
-%lang(ja) %{_datadir}/manual/mod/[cdfhilpqtw]*.html.ja*
-%lang(ko) %{_datadir}/manual/mod/[cdfhilpqtw]*.html.ko.euc-kr
-#%lang(ru) %{_datadir}/manual/mod/[cdfhilpqtw]*.html.ru.koi8-r
-%{_datadir}/manual/mod/module-dict.html.en
-%lang(ja) %{_datadir}/manual/mod/module-dict.html.ja*
-%lang(ko) %{_datadir}/manual/mod/module-dict.html.ko.euc-kr
-%{_datadir}/manual/mod/mpm_common.html.en
-%lang(de) %{_datadir}/manual/mod/mpm_common.html.de
-#%lang(es) %{_datadir}/manual/mod/mpm_common.html.es
-%lang(ja) %{_datadir}/manual/mod/mpm_common.html.ja*
-#%{_datadir}/manual/mod/mod_access.html.en
-#%lang(ja) %{_datadir}/manual/mod/mod_access.html.ja*
-%{_datadir}/manual/mod/mod_alias.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_alias.html.ja*
-%lang(ko) %{_datadir}/manual/mod/mod_alias.html.ko.euc-kr
-%{_datadir}/manual/mod/mod_asis.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_asis.html.ja*
-%lang(ko) %{_datadir}/manual/mod/mod_asis.html.ko.euc-kr
-%{_datadir}/manual/mod/mod_autoindex.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_autoindex.html.ja*
-%lang(ko) %{_datadir}/manual/mod/mod_autoindex.html.ko.euc-kr
-%{_datadir}/manual/mod/mod_cern_meta.html.en
-%lang(ko) %{_datadir}/manual/mod/mod_cern_meta.html.ko.euc-kr
-%{_datadir}/manual/mod/mod_cgi.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_cgi.html.ja*
-%lang(ko) %{_datadir}/manual/mod/mod_cgi.html.ko.euc-kr
-%{_datadir}/manual/mod/mod_echo.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_echo.html.ja*
-%lang(ko) %{_datadir}/manual/mod/mod_echo.html.ko.euc-kr
-%{_datadir}/manual/mod/mod_env.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_env.html.ja*
-%lang(ko) %{_datadir}/manual/mod/mod_env.html.ko.euc-kr
-%{_datadir}/manual/mod/mod_ext_filter.html.en
-%lang(ko) %{_datadir}/manual/mod/mod_ext_filter.html.ko.euc-kr
-%{_datadir}/manual/mod/mod_include.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_include.html.ja*
-%{_datadir}/manual/mod/mod_log_config.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_log_config.html.ja.euc-jp
-%lang(ko) %{_datadir}/manual/mod/mod_log_config.html.ko.euc-kr
-%{_datadir}/manual/mod/mod_log_forensic.html.en
-%{_datadir}/manual/mod/mod_mime*.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_mime*.html.ja*
-%{_datadir}/manual/mod/mod_negotiation.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_negotiation.html.ja*
-%{_datadir}/manual/mod/mod_setenvif.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_setenvif.html.ja*
-%lang(ko) %{_datadir}/manual/mod/mod_setenvif.html.ko.euc-kr
-%{_datadir}/manual/mod/mod_speling.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_speling.html.ja*
-%lang(ko) %{_datadir}/manual/mod/mod_speling.html.ko.euc-kr
-%{_datadir}/manual/mod/mod_userdir.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_userdir.html.ja*
-%lang(ko) %{_datadir}/manual/mod/mod_userdir.html.ko.euc-kr
-%dir %{_datadir}/manual/programs
-%{_datadir}/manual/programs/*.html.en
-%lang(es) %{_datadir}/manual/programs/*.html.es
-%lang(ko) %{_datadir}/manual/programs/*.html.ko.euc-kr
-#%lang(ru) %{_datadir}/manual/programs/*.html.ru.koi8-r
-%dir %{_datadir}/manual/style
-%{_datadir}/manual/style/css
-
-%{_datadir}/manual/mod/mod_suexec.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_suexec.html.ja*
-%lang(ko) %{_datadir}/manual/mod/mod_suexec.html.ko.euc-kr
-%{_datadir}/manual/mod/mod_actions.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_actions.html.ja*
-%lang(ko) %{_datadir}/manual/mod/mod_actions.html.ko.euc-kr
-#%{_datadir}/manual/mod/mod_auth.html.en
-#%lang(ja) %{_datadir}/manual/mod/mod_auth.html.ja*
-#%{_datadir}/manual/mod/mod_auth_anon.html.en
-#%{_datadir}/manual/mod/mod_auth_ldap.html.en
-%{_datadir}/manual/mod/mod_ldap.html.en
-#%{_datadir}/manual/mod/mod_auth_dbm.html.en
-#%{_datadir}/manual/mod/mod_auth_digest.html.en
-%lang(ko) %{_datadir}/manual/mod/mod_auth_digest.html.ko.euc-kr
-%{_datadir}/manual/mod/mod_cache.html.en
-%lang(ko) %{_datadir}/manual/mod/mod_cache.html.ko.euc-kr
-%{_datadir}/manual/mod/mod_disk_cache.html.en
-%lang(ko) %{_datadir}/manual/mod/mod_disk_cache.html.ko.euc-kr
-%{_datadir}/manual/mod/mod_mem_cache.html.en
-%lang(ko) %{_datadir}/manual/mod/mod_mem_cache.html.ko.euc-kr
-%{_datadir}/manual/mod/mod_cgid.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_cgid.html.ja.euc-jp
-%lang(ko) %{_datadir}/manual/mod/mod_cgid.html.ko.euc-kr
-%{_datadir}/manual/mod/mod_charset_lite.html.en
-%lang(ko) %{_datadir}/manual/mod/mod_charset_lite.html.ko.euc-kr
-%{_datadir}/manual/mod/mod_dav*.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_dav*.html.ja*
-%lang(ko) %{_datadir}/manual/mod/mod_dav*.html.ko.euc-kr
-%{_datadir}/manual/mod/mod_deflate.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_deflate.html.ja*
-%lang(ko) %{_datadir}/manual/mod/mod_deflate.html.ko.euc-kr
-%{_datadir}/manual/mod/mod_dir.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_dir.html.ja*
-%lang(ko) %{_datadir}/manual/mod/mod_dir.html.ko.euc-kr
-%{_datadir}/manual/mod/mod_expires.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_expires.html.ja.euc-jp
-%lang(ko) %{_datadir}/manual/mod/mod_expires.html.ko.euc-kr
-%{_datadir}/manual/mod/mod_file_cache.html.en
-%lang(ko) %{_datadir}/manual/mod/mod_file_cache.html.ko.euc-kr
-%{_datadir}/manual/mod/mod_headers.html.en
-%lang(ko) %{_datadir}/manual/mod/mod_headers.html.ko.euc-kr
-#%{_datadir}/manual/mod/mod_imap.html.en
-#%lang(ko) %{_datadir}/manual/mod/mod_imap.html.ko.euc-kr
-%{_datadir}/manual/mod/mod_info.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_info.html.ja*
-%lang(ko) %{_datadir}/manual/mod/mod_info.html.ko.euc-kr
-%{_datadir}/manual/mod/mod_proxy*.html.en
-%{_datadir}/manual/mod/mod_rewrite.html.en
-%{_datadir}/manual/mod/mod_so.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_so.html.ja.euc-jp
-%lang(ko) %{_datadir}/manual/mod/mod_so.html.ko.euc-kr
-%{_datadir}/manual/images/mod_rewrite*
-%dir %{_datadir}/manual/rewrite
-%{_datadir}/manual/rewrite/index.html.en
-%{_datadir}/manual/rewrite/rewrite_guide.html.en
-%{_datadir}/manual/rewrite/rewrite_guide_advanced.html.en
-%{_datadir}/manual/rewrite/rewrite_intro.html.en
-%{_datadir}/manual/rewrite/rewrite_tech.html.en
-%dir %{_datadir}/manual/ssl
-%{_datadir}/manual/ssl/*.html.en
-%lang(ja) %{_datadir}/manual/ssl/*.html.ja*
-%{_datadir}/manual/mod/mod_ssl.html.en
-%{_datadir}/manual/mod/mod_status.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_status.html.ja.euc-jp
-%lang(ko) %{_datadir}/manual/mod/mod_status.html.ko.euc-kr
-%{_datadir}/manual/mod/mod_usertrack.html.en
-%{_datadir}/manual/mod/mod_unique_id.html.en
-%lang(ja) %{_datadir}/manual/mod/mod_unique_id.html.ja*
-%lang(ko) %{_datadir}/manual/mod/mod_unique_id.html.ko.euc-kr
-%{_datadir}/manual/mod/mod_vhost_alias.html.en
-%dir %{_datadir}/manual/vhosts
-%{_datadir}/manual/vhosts/*.html.en
-%lang(de) %{_datadir}/manual/vhosts/*.html.de
-#%lang(es) %{_datadir}/manual/vhosts/*.html.es
-%lang(ja) %{_datadir}/manual/vhosts/*.html.ja*
-%lang(ko) %{_datadir}/manual/vhosts/*.html.ko.euc-kr
-#%lang(ru) %{_datadir}/manual/vhosts/*.html.ru.koi8-r
 
 %files suexec
 %defattr(644,root,root,755)
