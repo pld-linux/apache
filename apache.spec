@@ -39,7 +39,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.2.0
-Release:	0.5
+Release:	0.7
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -88,7 +88,7 @@ BuildRequires:	apr-devel >= 1:1.0.0
 BuildRequires:	apr-util-devel >= 1:1.0.0
 BuildRequires:	automake
 BuildRequires:	db-devel
-%{?with_distcache:BuildRequires:	distcache-libs-devel or distcache-devel}
+%{?with_distcache:BuildRequires:	distcache-devel}
 BuildRequires:	expat-devel
 BuildRequires:	findutils
 BuildRequires:	gdbm-devel >= 1.8.3
@@ -101,6 +101,7 @@ BuildRequires:	perl-devel >= 1:5.6
 BuildRequires:	rpm-build >= 4.4.0
 BuildRequires:	rpm-perlprov >= 4.1-13
 BuildRequires:	rpmbuild(macros) >= 1.228
+BuildRequires:	sed >= 4.0
 BuildRequires:	zlib-devel
 Requires(post):	fileutils
 Requires(post,preun):	/sbin/chkconfig
@@ -110,6 +111,7 @@ Requires(pre):	/bin/id
 Requires(pre):	/usr/bin/getgid
 Requires(pre):	/usr/sbin/groupadd
 Requires(pre):	/usr/sbin/useradd
+Requires:	%{name}-mod_version = %{version}-%{release}
 Requires:	/etc/mime.types
 Requires:	/sbin/chkconfig
 Requires:	apr >= 1:1.0.0-2
@@ -118,7 +120,6 @@ Requires:	perl-base
 Requires:	psmisc >= 20.1
 Requires:	rc-scripts >= 0.4.0.15
 Provides:	apache(modules-api) = %{_apache_modules_api}
-#Provides:	apache(mod_access)
 Provides:	apache(mod_alias)
 Provides:	apache(mod_asis)
 Provides:	apache(mod_autoindex)
@@ -974,7 +975,7 @@ rm -rf srclib/{apr,apr-util,pcre}
 sed -i -e '/^SUBDIRS/s/srclib//' Makefile.in
 
 # fixup perl path
-sed -i -e '1s@/usr/local/bin/perl@%{__perl}@' docs/cgi-examples/printenv
+sed -i -e '1s@#!.*local/bin/perl@#!%{__perl}@' docs/cgi-examples/printenv
 
 # fix location of build dir in generated apxs
 sed -i -e '
@@ -1134,23 +1135,14 @@ for mpm in %{?with_metuxmpm:metuxmpm} %{?with_peruser:peruser} worker %{?with_ev
 done
 
 ln -s httpd.prefork $RPM_BUILD_ROOT%{_sbindir}/httpd
-
 ln -s %{_libdir}/apache $RPM_BUILD_ROOT%{_sysconfdir}/modules
 ln -s %{_localstatedir}/run/apache $RPM_BUILD_ROOT%{_sysconfdir}/run
-ln -s %{_libdir}/apache/build $RPM_BUILD_ROOT%{_sysconfdir}/build
 
 rm -f $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
 
-mv -f $RPM_BUILD_ROOT%{_sysconfdir}/build \
-	$RPM_BUILD_ROOT%{_libexecdir}/build
-
-%{__perl} -pi -e "s#$RPM_BUILD_ROOT##g" $RPM_BUILD_ROOT%{_libexecdir}/build/*
-%{__perl} -pi -e "s#$RPM_BUILD_DIR#%{_usrsrc}#g" $RPM_BUILD_ROOT%{_libexecdir}/build/*
-%{__perl} -pi -e "s#-pthread#-lpthread#g" $RPM_BUILD_ROOT%{_libdir}/lib*.la
-%{__perl} -pi -e 's#/etc/httpd/build#%{_libexecdir}/build#g' $RPM_BUILD_ROOT%{_libexecdir}/build/*
-ln -sf %{_bindir}/libtool $RPM_BUILD_ROOT%{_libexecdir}/build/libtool
-ln -sf %{_libexecdir}/build $RPM_BUILD_ROOT%{_sysconfdir}/build
+mv $RPM_BUILD_ROOT{%{_sysconfdir},%{_libexecdir}}/build
+ln -s %{_libdir}/apache/build $RPM_BUILD_ROOT%{_sysconfdir}/build
 
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/apache
@@ -1232,6 +1224,9 @@ cat << EOF > $CFG/09_cgi_test.conf
 ScriptAlias /cgi-bin/printenv %{_cgibindir}/printenv
 ScriptAlias /cgi-bin/test-cgi %{_cgibindir}/test-cgi
 EOF
+
+# no value
+rm $RPM_BUILD_ROOT%{_libexecdir}/build/config.nice
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -1601,6 +1596,7 @@ fi
 %attr(754,root,root) /etc/rc.d/init.d/httpd
 
 # TODO: switch to conf.d, instead of confusing *dir* httpd.conf
+%attr(751,root,root) %dir %{_sysconfdir}
 %attr(750,root,root) %dir %{_sysconfdir}/httpd.conf
 %attr(750,root,root) %dir %{_sysconfdir}/webapps.d
 %attr(750,root,root) %dir %{_sysconfdir}/modules
@@ -1611,7 +1607,7 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/*
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/monit/*.monitrc
 
-#%attr(755,root,root) %{_libexecdir}/mod_access.so
+%dir %{_libexecdir}
 %attr(755,root,root) %{_libexecdir}/mod_alias.so
 %attr(755,root,root) %{_libexecdir}/mod_asis.so
 %attr(755,root,root) %{_libexecdir}/mod_cern_meta.so
@@ -1688,8 +1684,6 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_sbindir}/apxs
 %attr(755,root,root) %{_sbindir}/envvars*
-%attr(751,root,root) %dir %{_sysconfdir}
-%dir %{_libexecdir}
 %dir %{_libexecdir}/build
 %{_libexecdir}/build/config_vars.mk
 %{_mandir}/man8/apxs.8*
@@ -1698,10 +1692,10 @@ fi
 %defattr(644,root,root,755)
 %{_includedir}
 %{_libexecdir}/*.exp
-%attr(750,root,root) %dir %{_sysconfdir}/build
+# is this symlink needed?
+%{_sysconfdir}/build
 %{_libexecdir}/build/[lprs]*.mk
 %attr(755,root,root) %{_libexecdir}/build/*.sh
-%attr(755,root,root) %{_libexecdir}/build/libtool
 
 %files mod_actions
 %defattr(644,root,root,755)
