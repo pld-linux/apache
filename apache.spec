@@ -135,7 +135,6 @@ Provides:	apache(mod_setenvif)
 Provides:	apache(mod_speling)
 Provides:	apache(mod_userdir)
 Provides:	group(http)
-Provides:	httpd = %{version}
 Provides:	user(http)
 Provides:	webserver = apache
 Obsoletes:	apache-extra
