@@ -757,6 +757,50 @@ right before SSL encoding (for output). As can be expected, this can
 produce extreme volumes of data, and should only be used when
 debugging problems.
 
+%package mod_expires
+Summary:	Apache module which generates Expires HTTP headers
+Summary(pl):	Modu³ Apache'a generuj±cy nag³ówki HTTP Expires
+Group:		Networking/Daemons
+Provides:	apache(mod_expires) = %{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
+
+%description mod_expires
+This module controls the setting of the Expires HTTP header in server
+responses. The expiration date can set to be relative to either the
+time the source file was last modified, or to the time of the client
+access.
+
+%description mod_expires -l pl
+Modu³ kontroluje ustawianie nag³ówka HTTP Expires. Data wyga¶niêcia
+wa¿no¶ci mo¿e byæ ustalana w zale¿no¶ci od czasu modyfikacji plików
+¼ród³owych lub odwo³ania klienta.
+
+%package mod_file_cache
+Summary:	Apache module: caches a static list of files in memory
+Summary(pl):	Modu³ Apache'a cache'uj±cy statyczn± listê plików w pamiêci
+Group:		Networking/Daemons
+Obsoletes:	apache-mmap_static
+Provides:	apache(mod_file_cache) = %{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
+
+%description mod_file_cache
+Caches a static list of files in memory.
+
+%description mod_file_cache -l pl
+Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
+
+%package mod_filter
+Summary:	Context-sensitive smart filter configuration module
+Group:		Networking/Daemons
+Provides:	apache(mod_filter) = %{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
+
+%description mod_filter
+This module enables smart, context-sensitive configuration of output
+content filters. For example, apache can be configured to process
+different content-types through different filters, even when the
+content-type is not known in advance (e.g. in a proxy).
+
 %package mod_headers
 Summary:	Apache module allows for the customization of HTTP response headers
 Summary(pl):	Modu³ Apache'a pozwalaj±cy na modyfikacjê nag³ówków HTTP
@@ -928,6 +972,28 @@ browser).
 Modu³ pozwala administratorowi na przegl±danie statystyk dotycz±cych
 pracy serwera Apache (w postaci strony HTML).
 
+%package mod_unique_id
+Summary:	Apache module which provides a magic token for each request
+Summary(pl):	Modu³ Apache'a nadaj±cy ka¿demu zapytaniu unikalny token
+Group:		Networking/Daemons
+Provides:	apache(mod_unique_id) = %{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
+
+%description mod_unique_id
+This package contains the mod_unique_id. This module provides a magic
+token for each request which is guaranteed to be unique across "all"
+requests under very specific conditions. The unique identifier is even
+unique across multiple machines in a properly configured cluster of
+machines. The environment variable UNIQUE_ID is set to the identifier
+for each request. Unique identifiers are useful for various reasons
+which are beyond the scope of this document.
+
+%description mod_unique_id -l pl
+Modu³ nadaje ka¿demu zapytaniu token unikalny w ramach wszystkich
+zapytañ, nawet w ramach poprawnie skonfigurowanego klastra z wielu
+maszyn. Modu³ ustawia przy ka¿dym zapytaniu zmienn± ¶rodowiskow±
+UNIQUE_ID.
+
 %package mod_usertrack
 Summary:	Apache module for user tracking using cookies
 Summary(pl):	Modu³ Apache'a s³u¿±cy do ¶ledzenia "ciasteczek"
@@ -970,72 +1036,6 @@ dynamically configured mass virtual hosting.
 %description mod_vhost_alias -l pl
 Modu³ umo¿liwia na dynamiczne konfigurowanie masowej ilo¶ci serwerów
 wirtualnych.
-
-%package mod_unique_id
-Summary:	Apache module which provides a magic token for each request
-Summary(pl):	Modu³ Apache'a nadaj±cy ka¿demu zapytaniu unikalny token
-Group:		Networking/Daemons
-Provides:	apache(mod_unique_id) = %{version}-%{release}
-Requires:	%{name} = %{version}-%{release}
-
-%description mod_unique_id
-This package contains the mod_unique_id. This module provides a magic
-token for each request which is guaranteed to be unique across "all"
-requests under very specific conditions. The unique identifier is even
-unique across multiple machines in a properly configured cluster of
-machines. The environment variable UNIQUE_ID is set to the identifier
-for each request. Unique identifiers are useful for various reasons
-which are beyond the scope of this document.
-
-%description mod_unique_id -l pl
-Modu³ nadaje ka¿demu zapytaniu token unikalny w ramach wszystkich
-zapytañ, nawet w ramach poprawnie skonfigurowanego klastra z wielu
-maszyn. Modu³ ustawia przy ka¿dym zapytaniu zmienn± ¶rodowiskow±
-UNIQUE_ID.
-
-%package mod_expires
-Summary:	Apache module which generates Expires HTTP headers
-Summary(pl):	Modu³ Apache'a generuj±cy nag³ówki HTTP Expires
-Group:		Networking/Daemons
-Provides:	apache(mod_expires) = %{version}-%{release}
-Requires:	%{name} = %{version}-%{release}
-
-%description mod_expires
-This module controls the setting of the Expires HTTP header in server
-responses. The expiration date can set to be relative to either the
-time the source file was last modified, or to the time of the client
-access.
-
-%description mod_expires -l pl
-Modu³ kontroluje ustawianie nag³ówka HTTP Expires. Data wyga¶niêcia
-wa¿no¶ci mo¿e byæ ustalana w zale¿no¶ci od czasu modyfikacji plików
-¼ród³owych lub odwo³ania klienta.
-
-%package mod_file_cache
-Summary:	Apache module: caches a static list of files in memory
-Summary(pl):	Modu³ Apache'a cache'uj±cy statyczn± listê plików w pamiêci
-Group:		Networking/Daemons
-Obsoletes:	apache-mmap_static
-Provides:	apache(mod_file_cache) = %{version}-%{release}
-Requires:	%{name} = %{version}-%{release}
-
-%description mod_file_cache
-Caches a static list of files in memory.
-
-%description mod_file_cache -l pl
-Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
-
-%package mod_filter
-Summary:	Context-sensitive smart filter configuration module
-Group:		Networking/Daemons
-Provides:	apache(mod_filter) = %{version}-%{release}
-Requires:	%{name} = %{version}-%{release}
-
-%description mod_filter
-This module enables smart, context-sensitive configuration of output
-content filters. For example, apache can be configured to process
-different content-types through different filters, even when the
-content-type is not known in advance (e.g. in a proxy).
 
 %package -n htpasswd-%{name}
 Summary:	Apache 2 htpasswd utility: manage user files for basic authentication
