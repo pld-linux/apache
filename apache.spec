@@ -168,29 +168,12 @@
 #  /home/services/httpd/manual/vhosts/ip-based.html.fr
 #  /home/services/httpd/manual/vhosts/name-based.html.fr
 #  /usr/lib64/apache/build/config.nice
-#  /usr/lib64/apache/mod_auth_basic.so
-#  /usr/lib64/apache/mod_authn_alias.so
-#  /usr/lib64/apache/mod_authn_anon.so
-#  /usr/lib64/apache/mod_authn_dbd.so
-#  /usr/lib64/apache/mod_authn_dbm.so
-#  /usr/lib64/apache/mod_authn_default.so
-#  /usr/lib64/apache/mod_authn_file.so
-#  /usr/lib64/apache/mod_authnz_ldap.so
-#  /usr/lib64/apache/mod_authz_dbm.so
-#  /usr/lib64/apache/mod_authz_default.so
-#  /usr/lib64/apache/mod_authz_groupfile.so
-#  /usr/lib64/apache/mod_authz_host.so
-#  /usr/lib64/apache/mod_authz_owner.so
-#  /usr/lib64/apache/mod_authz_user.so
-#  /usr/lib64/apache/mod_bucketeer.so
-#  /usr/lib64/apache/mod_dbd.so
-#  /usr/lib64/apache/mod_dumpio.so
-#  /usr/lib64/apache/mod_filter.so
-#  /usr/lib64/apache/mod_ident.so
-#  /usr/lib64/apache/mod_imagemap.so
-#  /usr/lib64/apache/mod_logio.so
-#  /usr/lib64/apache/mod_version.so
-
+#
+#   /usr/lib64/apache/mod_bucketeer.so
+#   /usr/sbin/dbmmanage
+#   /usr/sbin/htdbm
+#   /usr/share/man/man1/dbmmanage.1.gz
+#   /usr/share/man/man1/htdbm.1.gz
 #
 # Conditional build:
 %bcond_without	ssl		# build without SSL support
@@ -212,7 +195,7 @@ Summary(ru):	óÁÍÙÊ ÐÏÐÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.2.0
-Release:	0.1
+Release:	0.3
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -478,7 +461,18 @@ Provides:	apache(mod_auth_basic) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
 
 %description mod_auth_basic
-This module allows the use of HTTP Basic Authentication to restrict access by looking up users in the given providers.
+This module allows the use of HTTP Basic Authentication to restrict
+access by looking up users in the given providers.
+
+%package mod_auth_digest
+Summary:	User authentication using MD5 Digest Authentication
+Group:		Networking/Daemons
+Provides:	apache(mod_auth_digest) = %{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
+
+%description mod_auth_digest
+This module implements HTTP Digest Authentication. However, it has not
+been extensively tested and is therefore marked experimental.
 
 %package mod_authn_alias
 Summary:	Apache module that provides the ability to create extended authentication
@@ -487,7 +481,8 @@ Provides:	apache(mod_authn_alias) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
 
 %description mod_authn_alias
-This module allows extended authentication providers to be created within the configuration file and assigned an alias name.
+This module allows extended authentication providers to be created
+within the configuration file and assigned an alias name.
 
 %package mod_authn_anon
 Summary:	Apache module that allows "anonymous" user access to authenticated areas
@@ -496,7 +491,10 @@ Provides:	apache(mod_authn_anon) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
 
 %description mod_authn_anon
-This module provides authentication front-ends such as mod_auth_basic to authenticate users similar to anonymous-ftp sites, i.e. have a 'magic' user id 'anonymous' and the email address as a password. These email addresses can be logged.
+This module provides authentication front-ends such as mod_auth_basic
+to authenticate users similar to anonymous-ftp sites, i.e. have a
+'magic' user id 'anonymous' and the email address as a password. These
+email addresses can be logged.
 
 %package mod_authn_dbd
 Summary:	Apache module that allows user authentication using an SQL
@@ -505,7 +503,9 @@ Provides:	apache(mod_authn_dbd) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
 
 %description mod_authn_dbd
-This module provides authentication front-ends such as mod_auth_digest and mod_auth_basic to authenticate users by looking up users in SQL tables.
+This module provides authentication front-ends such as mod_auth_digest
+and mod_auth_basic to authenticate users by looking up users in SQL
+tables.
 
 %package mod_authn_dbm
 Summary:	Apache module that allows user authentication using DBM files
@@ -514,7 +514,9 @@ Provides:	apache(mod_authn_dbm) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
 
 %description mod_authn_dbm
-This module provides authentication front-ends such as mod_auth_digest and mod_auth_basic to authenticate users by looking up users in dbm password files.
+This module provides authentication front-ends such as mod_auth_digest
+and mod_auth_basic to authenticate users by looking up users in dbm
+password files.
 
 %package mod_authn_default
 Summary:	Apache module that rejects any credentials supplied by the user
@@ -523,7 +525,9 @@ Provides:	apache(mod_authn_default) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
 
 %description mod_authn_default
-This module is designed to be the fallback module, if you don't have configured an authentication module like mod_auth_basic. It simply rejects any credentials supplied by the user.
+This module is designed to be the fallback module, if you don't have
+configured an authentication module like mod_auth_basic. It simply
+rejects any credentials supplied by the user.
 
 %package mod_authn_file
 Summary:	Apache module that allows user authentication using text files
@@ -532,7 +536,9 @@ Provides:	apache(mod_authn_file) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
 
 %description mod_authn_file
-This module provides authentication front-ends such as mod_auth_digest and mod_auth_basic to authenticate users by looking up users in plain text password files.
+This module provides authentication front-ends such as mod_auth_digest
+and mod_auth_basic to authenticate users by looking up users in plain
+text password files.
 
 %package mod_authnz_ldap
 Summary:	Apache module that allows an LDAP directory to be used to store the database for HTTP Basic authentication
@@ -541,7 +547,8 @@ Provides:	apache(mod_authnz_ldap) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
 
 %description mod_authnz_ldap
-This module provides authentication front-ends such as mod_auth_basic to authenticate users through an ldap directory.
+This module provides authentication front-ends such as mod_auth_basic
+to authenticate users through an ldap directory.
 
 %package mod_authz_dbm
 Summary:	Apache module that allows group authorization using DBM files
@@ -550,7 +557,9 @@ Provides:	apache(mod_authz_dbm) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
 
 %description mod_authz_dbm
-This module provides authorization capabilities so that authenticated users can be allowed or denied access to portions of the web site by group membership.
+This module provides authorization capabilities so that authenticated
+users can be allowed or denied access to portions of the web site by
+group membership.
 
 %package mod_authz_default
 Summary:	Apache module that rejects any authorization request
@@ -559,7 +568,9 @@ Provides:	apache(mod_authz_default) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
 
 %description mod_authz_default
-This module is designed to be the fallback module, if you don't have configured an authorization module like mod_authz_user or mod_authz_groupfile. It simply rejects any authorization request.
+This module is designed to be the fallback module, if you don't have
+configured an authorization module like mod_authz_user or
+mod_authz_groupfile. It simply rejects any authorization request.
 
 %package mod_authz_groupfile
 Summary:	Apache module that allows group authorization using plaintext files
@@ -568,17 +579,22 @@ Provides:	apache(mod_authz_groupfile) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
 
 %description mod_authz_groupfile
-This module provides authorization capabilities so that authenticated users can be allowed or denied access to portions of the web site by group membership.
+This module provides authorization capabilities so that authenticated
+users can be allowed or denied access to portions of the web site by
+group membership.
 
 %package mod_authz_host
-Summary:	Apache module that allows group authorizations based on host (name or IP address)
-group authorization using plaintext files
+Summary:	Apache module that allows group authorizations based on host (name or IP address) group authorization using plaintext files
 Group:		Networking/Daemons
 Provides:	apache(mod_authz_host) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
 
 %description mod_authz_host
-The directives provided by mod_authz_host are used in <Directory>, <Files>, and <Location> sections as well as .htaccess files to control access to particular parts of the server. Access can be controlled based on the client hostname, IP address, or other characteristics of the client request, as captured in environment variables.
+The directives provided by mod_authz_host are used in <Directory>,
+<Files>, and <Location> sections as well as .htaccess files to control
+access to particular parts of the server. Access can be controlled
+based on the client hostname, IP address, or other characteristics of
+the client request, as captured in environment variables.
 
 %package mod_authz_owner
 Summary:	Apache module that allows authorization based on file ownership
@@ -587,7 +603,11 @@ Provides:	apache(mod_authz_owner) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
 
 %description mod_authz_owner
-This module authorizes access to files by comparing the userid used for HTTP authentication (the web userid) with the file-system owner or group of the requested file. The supplied username and password must be already properly verified by an authentication module, such as mod_auth_basic or mod_auth_digest.
+This module authorizes access to files by comparing the userid used
+for HTTP authentication (the web userid) with the file-system owner or
+group of the requested file. The supplied username and password must
+be already properly verified by an authentication module, such as
+mod_auth_basic or mod_auth_digest.
 
 %package mod_authz_user
 Summary:	Apache module that allows user authorization
@@ -596,7 +616,8 @@ Provides:	apache(mod_authz_user) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
 
 %description mod_authz_user
-This module provides authorization capabilities so that authenticated users can be allowed or denied access to portions of the web site.
+This module provides authorization capabilities so that authenticated
+users can be allowed or denied access to portions of the web site.
 
 %package mod_autoindex
 Summary:	Apache module - display index of files
@@ -679,6 +700,18 @@ rozproszonego autorstwa i wersjonowania). To rozszerzenie HTTP pozwala
 na tworzenie, przesuwanie, kopiowanie oraz kasowanie zasobów na
 zdalnym serwerze WWW.
 
+%package mod_dbd
+Summary:	Manages SQL database connections
+Group:		Networking/Daemons
+Provides:	apache(mod_dbd) = %{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
+
+%description mod_dbd
+mod_dbd manages SQL database connections using apr_dbd. It provides
+database connections on request to modules requiring SQL database
+functions, and takes care of managing databases with optimal
+efficiency and scalability for both threaded and non-threaded MPMs.
+
 %package mod_deflate
 Summary:	Apache module: Compress content before it is delivered to the client
 Summary(pl):	Modu³ Apache'a kompresuj±cy dane przed przes³aniem ich do klienta
@@ -708,6 +741,22 @@ redirects and serving directory index files.
 Modu³ oferuj±cy przekierowania i udostêpnianie informacji o zawarto¶ci
 katalogu.
 
+%package mod_dumpio
+Summary:	Dumps all I/O to error log as desired.
+Group:		Networking/Daemons
+Provides:	apache(mod_dumpio) = %{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
+
+%description mod_dumpio
+mod_dumpio allows for the logging of all input received by Apache
+and/or all output sent by Apache to be logged (dumped) to the
+error.log file.
+
+The data logging is done right after SSL decoding (for input) and
+right before SSL encoding (for output). As can be expected, this can
+produce extreme volumes of data, and should only be used when
+debugging problems.
+
 %package mod_headers
 Summary:	Apache module allows for the customization of HTTP response headers
 Summary(pl):	Modu³ Apache'a pozwalaj±cy na modyfikacjê nag³ówków HTTP
@@ -723,6 +772,29 @@ replaced or removed.
 %description mod_headers -l pl
 Modu³ pozwalaj±cy na ³±czenie, usuwanie oraz zamianê nag³ówków HTTP
 wysy³anych do przegl±darki.
+
+%package mod_ident
+Summary:	RFC 1413 ident lookups
+Group:		Networking/Daemons
+Provides:	apache(mod_ident) = %{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
+
+%description mod_ident
+This module queries an RFC 1413 compatible daemon on a remote host to
+look up the owner of a connection.
+
+%package mod_imagemap
+Summary:	Server-side imagemap processing
+Group:		Networking/Daemons
+Provides:	apache(mod_imagemap) = %{version}-%{release}
+Obsoletes:	%{name}-mod_imap
+Requires:	%{name} = %{version}-%{release}
+
+%description mod_imagemap
+This module processes .map files, thereby replacing the functionality
+of the imagemap CGI program. Any directory or document type configured
+to use the handler imap-file (using either AddHandler or SetHandler)
+will be processed by this module.
 
 %package mod_imap
 Summary:	Apache module with imap-file handler
@@ -767,6 +839,21 @@ Apache module to use LDAP connections.
 
 %description mod_ldap -l pl
 Modu³ Apache'a umo¿liwiaj±cy korzystanie z po³±czeñ LDAP.
+
+%package mod_logio
+Summary:	Logging of input and output bytes per request
+Group:		Networking/Daemons
+Provides:	apache(mod_logio) = %{version}-%{release}
+#Requires:	%{name}-mod_log_config = %{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
+
+%description mod_logio
+This module provides the logging of input and output number of bytes
+received/sent per request. The numbers reflect the actual bytes as
+received on the network, which then takes into account the headers and
+bodies of requests and responses. The counting is done before SSL/TLS
+on input and after SSL/TLS on output, so the numbers will correctly
+reflect any changes made by encryption.
 
 %package mod_proxy
 Summary:	Apache module with Web proxy
@@ -856,6 +943,19 @@ files.
 %description mod_usertrack -l pl
 Modu³ pozwalaj±cy na ¶ledzenie "ciasteczek".
 
+%package mod_version
+Summary:	Version dependent configuration
+Group:		Networking/Daemons
+Provides:	apache(mod_version) = %{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
+
+%description mod_version
+This module is designed for the use in test suites and large networks
+which have to deal with different httpd versions and different
+configurations. It provides a new container -- <IfVersion>, which
+allows a flexible version checking including numeric comparisons and
+regular expressions.
+
 %package mod_vhost_alias
 Summary:	Apache module for dynamically configured mass virtual hosting
 Summary(pl):	Modu³ Apache'a dodaj±cy obs³ugê hostów wirtualnych
@@ -924,6 +1024,18 @@ Caches a static list of files in memory.
 
 %description mod_file_cache -l pl
 Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
+
+%package mod_filter
+Summary:	Context-sensitive smart filter configuration module
+Group:		Networking/Daemons
+Provides:	apache(mod_filter) = %{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
+
+%description mod_filter
+This module enables smart, context-sensitive configuration of output
+content filters. For example, apache can be configured to process
+different content-types through different filters, even when the
+content-type is not known in advance (e.g. in a proxy).
 
 %package -n htpasswd-%{name}
 Summary:	Apache 2 htpasswd utility: manage user files for basic authentication
@@ -1190,8 +1302,8 @@ install %{SOURCE17} $CFG/57_mod_autoindex.conf
 echo "LoadModule ldap_module	%{_libexecdir}/mod_ldap.so" > $CFG/49_mod_ldap.conf
 echo "LoadModule actions_module	%{_libexecdir}/mod_actions.so" > $CFG/50_mod_actions.conf
 echo "LoadModule auth_module	%{_libexecdir}/mod_auth.so" > $CFG/51_mod_auth.conf
-echo "LoadModule auth_anon_module	%{_libexecdir}/mod_auth_anon.so" > $CFG/52_mod_auth_anon.conf
-echo "LoadModule auth_dbm_module	%{_libexecdir}/mod_auth_dbm.so" > $CFG/53_mod_auth_dbm.conf
+#echo "LoadModule auth_anon_module	%{_libexecdir}/mod_auth_anon.so" > $CFG/52_mod_auth_anon.conf
+#echo "LoadModule auth_dbm_module	%{_libexecdir}/mod_auth_dbm.so" > $CFG/53_mod_auth_dbm.conf
 echo "LoadModule auth_digest_module	%{_libexecdir}/mod_auth_digest.so" > $CFG/54_mod_auth_digest.conf
 echo "LoadModule cache_module	%{_libexecdir}/mod_cache.so
 LoadModule mem_cache_module	%{_libexecdir}/mod_mem_cache.so
@@ -1321,23 +1433,23 @@ fi
 %postun mod_actions
 %module_postun
 
-%post mod_auth
-%module_post
+#%post mod_auth
+#%module_post
+#
+#%postun mod_auth
+#%module_postun
 
-%postun mod_auth
-%module_postun
+#%post mod_auth_anon
+#%module_post
+#
+#%postun mod_auth_anon
+#%module_postun
 
-%post mod_auth_anon
-%module_post
-
-%postun mod_auth_anon
-%module_postun
-
-%post mod_auth_dbm
-%module_post
-
-%postun mod_auth_dbm
-%module_postun
+#%post mod_auth_dbm
+#%module_post
+#
+#%postun mod_auth_dbm
+#%module_postun
 
 %post mod_autoindex
 %module_post
@@ -1369,11 +1481,11 @@ fi
 %postun mod_dav
 %module_postun
 
-%post mod_auth_digest
-%module_post
-
-%postun mod_auth_digest
-%module_postun
+#%post mod_auth_digest
+#%module_post
+#
+#%postun mod_auth_digest
+#%module_postun
 
 %post mod_deflate
 %module_post
@@ -1750,48 +1862,116 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_actions.conf
 %attr(755,root,root) %{_libexecdir}/mod_actions.so
 
-%files mod_auth
-%defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth.conf
+#%files mod_auth
+#%defattr(644,root,root,755)
+#%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth.conf
 #%attr(755,root,root) %{_libexecdir}/mod_auth.so
 
-%files mod_auth_anon
-%defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth_anon.conf
+#%files mod_auth_anon
+#%defattr(644,root,root,755)
+#%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth_anon.conf
 #%attr(755,root,root) %{_libexecdir}/mod_auth_anon.so
 
-%if %{with ldap}
-%files mod_auth_ldap
+%files mod_auth_basic
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth_ldap.conf
-#%attr(755,root,root) %{_libexecdir}/mod_auth_ldap.so
-%endif
+#%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth.conf
+%attr(755,root,root) %{_libexecdir}/mod_auth_basic.so
 
-%if %{with ldap}
-%files mod_ldap
-%defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_ldap.conf
-%attr(755,root,root) %{_libexecdir}/mod_ldap.so
-%endif
-
-%files mod_auth_dbm
-%defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth_dbm.conf
+#%files mod_auth_dbm
+#%defattr(644,root,root,755)
+#%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth_dbm.conf
 #%attr(755,root,root) %{_libexecdir}/mod_auth_dbm.so
-%attr(755,root,root) %{_sbindir}/dbmmanage
-%attr(755,root,root) %{_sbindir}/htdbm
-%{_mandir}/man1/dbmmanage.1*
-%{_mandir}/man1/htdbm.1*
+#%attr(755,root,root) %{_sbindir}/dbmmanage
+#%attr(755,root,root) %{_sbindir}/htdbm
+#%{_mandir}/man1/dbmmanage.1*
+#%{_mandir}/man1/htdbm.1*
 
 %files mod_auth_digest
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth_digest.conf
 %attr(755,root,root) %{_libexecdir}/mod_auth_digest.so
 
+#%if %{with ldap}
+#%files mod_auth_ldap
+#%defattr(644,root,root,755)
+#%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth_ldap.conf
+#%attr(755,root,root) %{_libexecdir}/mod_auth_ldap.so
+#%endif
+
+%files mod_authn_alias
+%defattr(644,root,root,755)
+#%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth.conf
+%attr(755,root,root) %{_libexecdir}/mod_authn_alias.so
+
+%files mod_authn_anon
+%defattr(644,root,root,755)
+#%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth.conf
+%attr(755,root,root) %{_libexecdir}/mod_authn_anon.so
+
+%files mod_authn_dbd
+%defattr(644,root,root,755)
+#%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth.conf
+%attr(755,root,root) %{_libexecdir}/mod_authn_dbd.so
+
+%files mod_authn_dbm
+%defattr(644,root,root,755)
+#%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth.conf
+%attr(755,root,root) %{_libexecdir}/mod_authn_dbm.so
+
+%files mod_authn_default
+%defattr(644,root,root,755)
+#%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth.conf
+%attr(755,root,root) %{_libexecdir}/mod_authn_default.so
+
+%files mod_authn_file
+%defattr(644,root,root,755)
+#%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth.conf
+%attr(755,root,root) %{_libexecdir}/mod_authn_file.so
+
+%files mod_authnz_ldap
+%defattr(644,root,root,755)
+#%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth.conf
+%attr(755,root,root) %{_libexecdir}/mod_authnz_ldap.so
+
+%files mod_authz_dbm
+%defattr(644,root,root,755)
+#%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth.conf
+%attr(755,root,root) %{_libexecdir}/mod_authz_dbm.so
+
+%files mod_authz_default
+%defattr(644,root,root,755)
+#%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth.conf
+%attr(755,root,root) %{_libexecdir}/mod_authz_default.so
+
+%files mod_authz_groupfile
+%defattr(644,root,root,755)
+#%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth.conf
+%attr(755,root,root) %{_libexecdir}/mod_authz_groupfile.so
+
+%files mod_authz_host
+%defattr(644,root,root,755)
+#%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth.conf
+%attr(755,root,root) %{_libexecdir}/mod_authz_host.so
+
+%files mod_authz_owner
+%defattr(644,root,root,755)
+#%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth.conf
+%attr(755,root,root) %{_libexecdir}/mod_authz_owner.so
+
+%files mod_authz_user
+%defattr(644,root,root,755)
+#%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth.conf
+%attr(755,root,root) %{_libexecdir}/mod_authz_user.so
+
 %files mod_autoindex
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_autoindex.conf
 %attr(755,root,root) %{_libexecdir}/mod_autoindex.so
+
+#%files mod_bucketeer
+#%defattr(644,root,root,755)
+#%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth.conf
+#%attr(755,root,root) %{_libexecdir}/mod_bucketeer.so
 
 %files mod_cache
 %defattr(644,root,root,755)
@@ -1818,6 +1998,11 @@ fi
 %attr(755,root,root) %{_libexecdir}/mod_dav*.so
 %dir %attr(770,root,http) /var/lock/mod_dav
 
+%files mod_dbd
+%defattr(644,root,root,755)
+#%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth.conf
+%attr(755,root,root) %{_libexecdir}/mod_dbd.so
+
 %files mod_deflate
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_deflate.conf
@@ -1827,6 +2012,11 @@ fi
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_dir.conf
 %attr(755,root,root) %{_libexecdir}/mod_dir.so
+
+%files mod_dumpio
+%defattr(644,root,root,755)
+#%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth.conf
+%attr(755,root,root) %{_libexecdir}/mod_dumpio.so
 
 %files mod_expires
 %defattr(644,root,root,755)
@@ -1838,20 +2028,47 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_file_cache.conf
 %attr(755,root,root) %{_libexecdir}/mod_file_cache.so
 
+%files mod_filter
+%defattr(644,root,root,755)
+#%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth.conf
+%attr(755,root,root) %{_libexecdir}/mod_filter.so
+
 %files mod_headers
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_headers.conf
 %attr(755,root,root) %{_libexecdir}/mod_headers.so
 
-%files mod_imap
+%files mod_ident
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_imap.conf
+#%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth.conf
+%attr(755,root,root) %{_libexecdir}/mod_ident.so
+
+%files mod_imagemap
+%defattr(644,root,root,755)
+#%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth.conf
+%attr(755,root,root) %{_libexecdir}/mod_imagemap.so
+
+#%files mod_imap
+#%defattr(644,root,root,755)
+#%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_imap.conf
 #%attr(755,root,root) %{_libexecdir}/mod_imap.so
 
 %files mod_info
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_info.conf
 %attr(755,root,root) %{_libexecdir}/mod_info.so
+
+%if %{with ldap}
+%files mod_ldap
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_ldap.conf
+%attr(755,root,root) %{_libexecdir}/mod_ldap.so
+%endif
+
+%files mod_logio
+%defattr(644,root,root,755)
+#%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth.conf
+%attr(755,root,root) %{_libexecdir}/mod_logio.so
 
 %files mod_proxy
 %defattr(644,root,root,755)
@@ -1878,15 +2095,20 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_status.conf
 %attr(755,root,root) %{_libexecdir}/mod_status.so
 
+%files mod_unique_id
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_unique_id.conf
+%attr(755,root,root) %{_libexecdir}/mod_unique_id.so
+
 %files mod_usertrack
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_usertrack.conf
 %attr(755,root,root) %{_libexecdir}/mod_usertrack.so
 
-%files mod_unique_id
+%files mod_version
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_unique_id.conf
-%attr(755,root,root) %{_libexecdir}/mod_unique_id.so
+#%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_auth.conf
+%attr(755,root,root) %{_libexecdir}/mod_version.so
 
 %files mod_vhost_alias
 %defattr(644,root,root,755)
