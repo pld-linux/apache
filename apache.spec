@@ -39,7 +39,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.2.0
-Release:	0.7
+Release:	0.9
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -51,6 +51,7 @@ Source3:	%{name}-icons.tar.gz
 Source4:	%{name}.sysconfig
 Source5:	%{name}.monitrc
 Source6:	%{name}-httpd.conf
+Source7:	%{name}-common.conf
 Source8:	%{name}-mod_vhost_alias.conf
 Source9:	%{name}-mod_status.conf
 Source10:	%{name}-mod_proxy.conf
@@ -1130,7 +1131,6 @@ install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig,monit} \
 
 for mpm in %{?with_metuxmpm:metuxmpm} %{?with_peruser:peruser} worker %{?with_event:event}; do
 	install buildmpm-${mpm}/httpd.${mpm} $RPM_BUILD_ROOT%{_sbindir}/httpd.${mpm}
-	ln -s httpd.conf $RPM_BUILD_ROOT%{_sysconfdir}/httpd.${mpm}.conf
 done
 
 ln -s httpd.prefork $RPM_BUILD_ROOT%{_sbindir}/httpd
@@ -1156,9 +1156,12 @@ install %{SOURCE20} $RPM_BUILD_ROOT%{_sysconfdir}/ssl/server.crt
 install %{SOURCE21} $RPM_BUILD_ROOT%{_sysconfdir}/ssl/server.key
 %endif
 
-CFG="$RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf/"
+install %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/apache.conf
 
-install %{SOURCE6} $CFG/10_httpd.conf
+CFG="$RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf/"
+# TODO: split by modules
+install %{SOURCE7} $CFG/20_common.conf
+
 install %{SOURCE8} $CFG/20_mod_vhost_alias.conf
 install %{SOURCE9} $CFG/25_mod_status.conf
 install %{SOURCE10} $CFG/30_mod_proxy.conf
@@ -1600,7 +1603,8 @@ fi
 %attr(750,root,root) %dir %{_sysconfdir}/webapps.d
 %attr(750,root,root) %dir %{_sysconfdir}/modules
 %attr(750,root,root) %dir %{_sysconfdir}/run
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_httpd.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/apache.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_common.conf
 %attr(640,root,root) %{_sysconfdir}/magic
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/httpd
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/*
