@@ -471,92 +471,132 @@ much easier to execute scripts that process files.
 Ten modu³ pozwala na uruchamianie skryptów w momencie gdy nadchodzi
 ¿±danie pobrania pliku okre¶lonego typu.
 
-%package mod_auth
-Summary:	Apache module with user authentication using textual files
-Summary(pl):	Modu³ Apache'a identyfikuj±cy u¿ytkowników na podstawie plików tekstowych
+%package mod_auth_basic
+Summary:	Apache module that allows basic authentication
 Group:		Networking/Daemons
-Provides:	apache(mod_auth) = %{version}-%{release}
-Requires:	%{name} = %{version}-%{release}
-Requires:	htpasswd
-
-%description mod_auth
-This package contains mod_auth module. It provides for user
-authentication using textual files.
-
-%description mod_auth -l pl
-Ten pakiet zawiera modu³ mod_auth. S³u¿y on do sprawdzania to¿samo¶ci
-u¿ytkowników na podstawie plików tekstowych.
-
-%package mod_auth_anon
-Summary:	Apache module with "anonymous" user access authentication
-Summary(pl):	Modu³ Apache'a oferuj±cy autoryzacjê u¿ytkownika "anonimowego"
-Group:		Networking/Daemons
-Provides:	apache(mod_auth_anon) = %{version}-%{release}
+Provides:	apache(mod_auth_basic) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
 
-%description mod_auth_anon
-This package contains mod_auth_anon module. It allows "anonymous" user
-access to authenticated areas. It does access control in a manner
-similar to anonymous FTP sites; i.e. have a 'magic' user id
-'anonymous' and the email address as a password. These email addresses
-can be logged. Combined with other (database) access control methods,
-this allows for effective user tracking and customization according to
-a user profile while still keeping the site open for 'unregistered'
-users. One advantage of using Auth-based user tracking is that, unlike
-magic-cookies and funny URL pre/postfixes, it is completely browser
-independent and it allows users to share URLs.
+%description mod_auth_basic
+This module allows the use of HTTP Basic Authentication to restrict access by looking up users in the given providers.
 
-%description mod_auth_anon -l pl
-Ten modu³ oferuje autoryzacjê u¿ytkownika "anonimowego" podobnie do
-anonimowych serwerów FTP (u¿ytkownik "anonymous" oraz has³o w postaci
-adresu pocztowego u¿ytkownika).
-
-%package mod_auth_ldap
-Summary:	Apache module with LDAP user access authentication
-Summary(pl):	Modu³ Apache'a oferuj±cy autoryzacjê u¿ytkowników poprzez LDAP
+%package mod_authn_alias
+Summary:	Apache module that provides the ability to create extended authentication
 Group:		Networking/Daemons
-Provides:	apache(mod_auth_ldap) = %{version}-%{release}
-Requires:	%{name} = %{version}-%{release}
-Requires:	%{name}-mod_ldap = %{version}-%{release}
-
-%description mod_auth_ldap
-Apache module with LDAP user access authentication.
-
-%description mod_auth_ldap -l pl
-Modu³ Apache'a oferuj±cy autoryzacjê u¿ytkowników poprzez LDAP.
-
-%package mod_auth_dbm
-Summary:	Apache module with user authentication which uses DBM files
-Summary(pl):	Modu³ Apache'a z mechanizmem identyfikacji korzystaj±cym z plików DBM
-Group:		Networking/Daemons
-Obsoletes:	apache-mod_auth_db
-Provides:	apache(mod_auth_dbm) = %{version}-%{release}
+Provides:	apache(mod_authn_alias) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
 
-%description mod_auth_dbm
-This module provides for HTTP Basic Authentication, where the
-usernames and passwords are stored in DBM type database files. It is
-an alternative to the plain text password files provided by mod_auth.
+%description mod_authn_alias
+This module allows extended authentication providers to be created within the configuration file and assigned an alias name.
 
-%description mod_auth_dbm -l pl
-Ten modu³ udostêpnia Prost± Autoryzacjê HTTP, gdzie u¿ytkownicy oraz
-ich has³a s± trzymane w plikach bazy typu DBM.
-
-%package mod_auth_digest
-Summary:	Apache user authentication module using MD5 Digest Authentication
-Summary(pl):	Modu³ Apache'a do autoryzacji MD5
+%package mod_authn_anon
+Summary:	Apache module that allows "anonymous" user access to authenticated areas
 Group:		Networking/Daemons
-Obsoletes:	apache-mod_digest
-Provides:	apache(mod_auth_digest) = %{version}-%{release}
+Provides:	apache(mod_authn_anon) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
 
-%description mod_auth_digest
-This package contains mod_digest module. It provides user
-authentication using MD5 Digest Authentication.
+%description mod_authn_anon
+This module provides authentication front-ends such as mod_auth_basic to authenticate users similar to anonymous-ftp sites, i.e. have a 'magic' user id 'anonymous' and the email address as a password. These email addresses can be logged.
 
-%description mod_auth_digest -l pl
-Modu³ ten dostarcza metodê autoryzacji bazuj±c± na MD5 Digest
-Authentication.
+%package mod_authn_dbd
+Summary:	Apache module that allows user authentication using an SQL
+Group:		Networking/Daemons
+Provides:	apache(mod_authn_dbd) = %{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
+
+%description mod_authn_dbd
+This module provides authentication front-ends such as mod_auth_digest and mod_auth_basic to authenticate users by looking up users in SQL tables.
+
+%package mod_authn_dbm
+Summary:	Apache module that allows user authentication using DBM files
+Group:		Networking/Daemons
+Provides:	apache(mod_authn_dbm) = %{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
+
+%description mod_authn_dbm
+This module provides authentication front-ends such as mod_auth_digest and mod_auth_basic to authenticate users by looking up users in dbm password files.
+
+%package mod_authn_default
+Summary:	Apache module that rejects any credentials supplied by the user
+Group:		Networking/Daemons
+Provides:	apache(mod_authn_default) = %{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
+
+%description mod_authn_default
+This module is designed to be the fallback module, if you don't have configured an authentication module like mod_auth_basic. It simply rejects any credentials supplied by the user.
+
+%package mod_authn_file
+Summary:	Apache module that allows user authentication using text files
+Group:		Networking/Daemons
+Provides:	apache(mod_authn_file) = %{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
+
+%description mod_authn_file
+This module provides authentication front-ends such as mod_auth_digest and mod_auth_basic to authenticate users by looking up users in plain text password files.
+
+%package mod_authnz_ldap
+Summary:	Apache module that allows an LDAP directory to be used to store the database for HTTP Basic authentication
+Group:		Networking/Daemons
+Provides:	apache(mod_authnz_ldap) = %{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
+
+%description mod_authnz_ldap
+This module provides authentication front-ends such as mod_auth_basic to authenticate users through an ldap directory.
+
+%package mod_authz_dbm
+Summary:	Apache module that allows group authorization using DBM files
+Group:		Networking/Daemons
+Provides:	apache(mod_authz_dbm) = %{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
+
+%description mod_authz_dbm
+This module provides authorization capabilities so that authenticated users can be allowed or denied access to portions of the web site by group membership.
+
+%package mod_authz_default
+Summary:	Apache module that rejects any authorization request
+Group:		Networking/Daemons
+Provides:	apache(mod_authz_default) = %{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
+
+%description mod_authz_default
+This module is designed to be the fallback module, if you don't have configured an authorization module like mod_authz_user or mod_authz_groupfile. It simply rejects any authorization request.
+
+%package mod_authz_groupfile
+Summary:	Apache module that allows group authorization using plaintext files
+Group:		Networking/Daemons
+Provides:	apache(mod_authz_groupfile) = %{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
+
+%description mod_authz_groupfile
+This module provides authorization capabilities so that authenticated users can be allowed or denied access to portions of the web site by group membership.
+
+%package mod_authz_host
+Summary:	Apache module that allows group authorizations based on host (name or IP address)
+group authorization using plaintext files
+Group:		Networking/Daemons
+Provides:	apache(mod_authz_host) = %{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
+
+%description mod_authz_host
+The directives provided by mod_authz_host are used in <Directory>, <Files>, and <Location> sections as well as .htaccess files to control access to particular parts of the server. Access can be controlled based on the client hostname, IP address, or other characteristics of the client request, as captured in environment variables.
+
+%package mod_authz_owner
+Summary:	Apache module that allows authorization based on file ownership
+Group:		Networking/Daemons
+Provides:	apache(mod_authz_owner) = %{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
+
+%description mod_authz_owner
+This module authorizes access to files by comparing the userid used for HTTP authentication (the web userid) with the file-system owner or group of the requested file. The supplied username and password must be already properly verified by an authentication module, such as mod_auth_basic or mod_auth_digest.
+
+%package mod_authz_user
+Summary:	Apache module that allows user authorization
+Group:		Networking/Daemons
+Provides:	apache(mod_authz_user) = %{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
+
+%description mod_authz_user
+This module provides authorization capabilities so that authenticated users can be allowed or denied access to portions of the web site.
 
 %package mod_autoindex
 Summary:	Apache module - display index of files
