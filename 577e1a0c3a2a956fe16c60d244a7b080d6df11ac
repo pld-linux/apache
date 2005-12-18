@@ -1,0 +1,6 @@
+- use sed rather perl to do inline replaces (as perl ignores inexistent files)
+- removed no-longer-needed inline edits
+- fixed /etc/httpd ownership (main pkg no longer needs apxs)
+- fixed build dir ownerships (main vs apxs vs devel)
+- main requires mod_version, so you can always use that module (write
+  compatible configs for different versions, sadly 2.2.+ only (for now?))
