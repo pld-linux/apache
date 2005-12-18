@@ -37,7 +37,7 @@ Summary(ru):	óÁÍÙÊ ÐÏÐÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.2.0
-Release:	0.76
+Release:	0.77
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -601,6 +601,7 @@ Summary(pl):	Modu³ Apache'a umo¿liwiaj±cy przechowywanie danych dla uwierzytelni
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_authnz_ldap.html
 Requires:	%{name}-base = %{version}-%{release}
+Requires:	%{name}-mod_ldap  %{version}-%{release}
 Provides:	apache(mod_authnz_ldap) = %{version}-%{release}
 # compat
 Provides:	apache(mod_auth_ldap) = %{version}-%{release}
@@ -1658,7 +1659,7 @@ install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
 %{__make}
 ./httpd.${mpm} -l | grep -v "${mpm}" > modules-inside
 
-find include -name '*.h' | xargs sed -i -e 's#/httpd\..*\.conf#/etc/httpd/apache.conf#'
+find include -name '*.h' | xargs sed -i -e 's#/httpd\..*\.conf#%{_sysconfdir}/apache.conf#'
 
 cd ..
 done
