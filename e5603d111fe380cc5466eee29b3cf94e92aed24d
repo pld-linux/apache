@@ -1,0 +1,4 @@
+- multiple MPMs support
+- perchild is now default (to avoid PHP problems with external (and not always)
+  thread safe libraries when using worker)
+- more TODO items
