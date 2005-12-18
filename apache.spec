@@ -20,10 +20,10 @@
 # Conditional build:
 %bcond_without	ssl		# build without SSL support
 %bcond_without	ldap		# build without LDAP support
-%bcond_without	metuxmpm
-%bcond_without	peruser
-%bcond_without	event
-%bcond_with     distcache
+%bcond_without	metuxmpm	# metux MPM
+%bcond_without	peruser		# peruser MPM
+%bcond_without	event		# event MPM
+%bcond_with     distcache	# distcache support
 %bcond_with	bucketeer	# debug one
 #
 %include	/usr/lib/rpm/macros.perl
@@ -289,8 +289,8 @@ desenvolver módulos adicionais para o Apache.
 Summary:	Apache module for run CGI whenever a file of a certain type is requested
 Summary(pl):	Modu³ Apache'a do uruchamiania skryptów CGI
 Group:		Networking/Daemons
-Provides:	apache(mod_actions) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_actions) = %{version}-%{release}
 
 %description mod_actions
 This package contains mod_actions module. This module lets you run CGI
@@ -302,65 +302,92 @@ Ten modu³ pozwala na uruchamianie skryptów w momencie gdy nadchodzi
 ¿±danie pobrania pliku okre¶lonego typu.
 
 %package mod_auth
-Summary:	Virtual package which which provides backward compat with apache 2.0
+Summary:	Virtual package which which provides backward compatibility with apache 2.0
+Summary(pl):	Pakiet wirtualny zapewniaj±cy kompatybilno¶æ wsteczn± z apache 2.0
 Group:		Networking/Daemons
-Provides:	apache(mod_auth) = %{version}-%{release}
 Requires:	%{name}-mod_authn_file = %{version}-%{release}
 Requires:	%{name}-mod_authz_groupfile = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_auth) = %{version}-%{release}
 
 %description mod_auth
-Virtual package which which requires apache-mod_authn_file and
+Virtual package which requires apache-mod_authn_file and
 apache-mod_authz_groupfile for backward compatibility with apache 2.0.
 
+%description mod_auth -l pl
+Pakiet wirtualny wymagaj±cy apache-mod_authn_file i
+apache-mod_authz_groupfile dla kompatybilno¶ci wstecznej z apache 2.0.
+
 %package mod_auth_basic
-Summary:	Apache module that allows basic authentication
+Summary:	Apache module that allows Basic authentication
+Summary(pl):	Modu³ Apache'a umo¿liwiaj±cy korzystawnie z uwierzytelnienia Basic
 Group:		Networking/Daemons
-Provides:	apache(mod_auth_basic) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_auth_basic) = %{version}-%{release}
 
 %description mod_auth_basic
 This module allows the use of HTTP Basic Authentication to restrict
 access by looking up users in the given providers.
 
+%description mod_auth_basic -l pl
+Ten modu³ pozwala u¿ywaæ uwierzytelnienia HTTP Basic do ograniczania
+dostêpu poprzez wyszukiwanie u¿ytkowników we wskazanych miejscach
+
 %package mod_auth_dbm
-Summary:	Virtual package which which provides backward compat with apache 2.0
+Summary:	Virtual package which which provides backward compatibility with apache 2.0
+Summary(pl):	Pakiet wirtualny zapewniaj±cy kompatybilno¶æ wsteczn± z apache 2.0
 Group:		Networking/Daemons
-Provides:	apache(mod_auth_dbm) = %{version}-%{release}
 Requires:	%{name}-dbmtools = %{version}-%{release}
 Requires:	%{name}-mod_authn_dbm = %{version}-%{release}
 Requires:	%{name}-mod_authz_dbm = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_auth_dbm) = %{version}-%{release}
 
 %description mod_auth_dbm
-Virtual package which which requires apache-mod_authn_dbm and
+Virtual package which requires apache-mod_authn_dbm and
 apache-mod_authz_dbm for backward compatibility with apache 2.0.
+
+%description mod_auth_dbm -l pl
+Pakiet wirtualny wymagaj±cy apache-mod_authn_dbm i
+apache-mod_authz_dbm dla kompatybilno¶ci wstecznej z apache 2.0.
 
 %package mod_auth_digest
 Summary:	User authentication using MD5 Digest Authentication
+Summary(pl):	Uwierzytelnianie u¿ytkowników przy u¿yciu MD5 Digest
 Group:		Networking/Daemons
-Provides:	apache(mod_auth_digest) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_auth_digest) = %{version}-%{release}
 
 %description mod_auth_digest
 This module implements HTTP Digest Authentication. However, it has not
 been extensively tested and is therefore marked experimental.
 
+%description mod_auth_digest -l pl
+Ten modu³ implementuje uwierzytelnienie HTTP Digest. Nie zosta³ on
+jednak zbyt obszernie przetestowany, wiêc jest oznaczony jako
+eksperymentalny.
+
 %package mod_authn_alias
 Summary:	Apache module that provides the ability to create extended authentication
+Summary(pl):	Modu³ Apache'a umo¿liwiaj±cy tworzenie rozszerzonego uwierzytelniania
 Group:		Networking/Daemons
-Provides:	apache(mod_authn_alias) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_authn_alias) = %{version}-%{release}
 
 %description mod_authn_alias
 This module allows extended authentication providers to be created
 within the configuration file and assigned an alias name.
 
+%description mod_authn_alias -l pl
+Ten modu³ umo¿liwia tworzenie rozszerzonych sposobów uwierzytelniania
+w pliku konfiguracyjnym i nadawanie im aliasów.
+
 %package mod_authn_anon
 Summary:	Apache module that allows "anonymous" user access to authenticated areas
+Summary(pl):	Modu³ Apache'a umo¿liwiaj±cy dostêp anonimowych u¿ytkowników do stref uwierzytelnianych
 Group:		Networking/Daemons
-Provides:	apache(mod_authn_anon) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_authn_anon) = %{version}-%{release}
 # compat
 Provides:	apache-mod_auth_anon = %{version}-%{release}
 Provides:	apache(mod_auth_anon) = %{version}-%{release}
@@ -372,30 +399,50 @@ to authenticate users similar to anonymous-ftp sites, i.e. have a
 'magic' user id 'anonymous' and the email address as a password. These
 email addresses can be logged.
 
+%description mod_authn_anon -l pl
+Ten modu³ udmo¿liwia frontendom uwierzytelniaj±cym takim jak
+mod_auth_basic uwierzytelnianie u¿ytkowników podobnie do serwisów
+anonimowego ftp, tzn. przez udostêpnianie "magicznego" identyfikatora
+"anonymous" i adresu pocztowego jako has³a. Te adresy pocztowe mog±
+byæ logowane.
+
 %package mod_authn_dbd
 Summary:	Apache module that allows user authentication using an SQL
+Summary(pl):	Modu³ Apache'a umo¿liwiaj±cy uwierzytelnianie u¿ytkowników przy u¿yciu tabel SQL
 Group:		Networking/Daemons
-Provides:	apache(mod_authn_dbd) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_authn_dbd) = %{version}-%{release}
 
 %description mod_authn_dbd
 This module provides authentication front-ends such as mod_auth_digest
 and mod_auth_basic to authenticate users by looking up users in SQL
 tables.
 
+%description mod_authn_dbd -l pl
+Ten modu³ udostêpnia frontendom uwierzytelniaj±cym takim jak
+mod_auth_digest i mod_auth_basic uwierzytelnianie u¿ytkowników poprzez
+wyszukiwanie w tabelach SQL.
+
 %package mod_authn_dbm
 Summary:	Apache module that allows user authentication using DBM files
+Summary(pl):	Modu³ Apache'a umo¿liwiaj±cy uwierzytelnianie u¿ytkowników przy u¿yciu plików DBM
 Group:		Networking/Daemons
-Provides:	apache(mod_authn_dbm) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_authn_dbm) = %{version}-%{release}
 
 %description mod_authn_dbm
 This module provides authentication front-ends such as mod_auth_digest
-and mod_auth_basic to authenticate users by looking up users in dbm
+and mod_auth_basic to authenticate users by looking up users in DBM
 password files.
+
+%description mod_authn_dbm -l pl
+Ten modu³ udostêpnia frontendom uwierzytelniaj±cym takim jak
+mod_auth_digest i mod_auth_basic uwierzytelnianie u¿ytkowników poprzez
+wyszukiwanie w tabelach hase³ DBM.
 
 %package mod_authn_default
 Summary:	Apache module that rejects any credentials supplied by the user
+Summary(pl):	Modu³ Apache'a odrzucaj±cy wszystkie dane podane przez u¿ytkownika
 Group:		Networking/Daemons
 Provides:	apache(mod_authn_default) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
@@ -405,22 +452,35 @@ This module is designed to be the fallback module, if you don't have
 configured an authentication module like mod_auth_basic. It simply
 rejects any credentials supplied by the user.
 
+%description mod_authn_default -l pl
+Ten modu³ zosta³ pomy¶lany jako domy¶lny modu³ uwierzytelniaj±cy,
+je¶li nie skonfigurowano modu³u uwierzytelniaj±cego takiego jak
+mod_auth_basic. Modu³ ten po prostu odrzuca wszelkie dane przekazane
+przez u¿ytkownika.
+
 %package mod_authn_file
 Summary:	Apache module that allows user authentication using text files
+Summary(pl):	Modu³ Apache'a umo¿liwiaj±cy uwierzytelnianie u¿ytkowników poprzez pliki tekstowe
 Group:		Networking/Daemons
-Provides:	apache(mod_authn_file) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_authn_file) = %{version}-%{release}
 
 %description mod_authn_file
 This module provides authentication front-ends such as mod_auth_digest
 and mod_auth_basic to authenticate users by looking up users in plain
 text password files.
 
+%description mod_authn_file -l pl
+Ten modu³ udostêpnia frontendom uwierzytelniaj±cym takim jak
+mod_auth_digest i mod_auth_basic uwierzytelnianie u¿ytkowników poprzez
+wyszukiwanie w plikach tekstowych z has³ami.
+
 %package mod_authnz_ldap
 Summary:	Apache module that allows an LDAP directory to be used to store the database for HTTP Basic authentication
+Summary(pl):	Modu³ Apache'a umo¿liwiaj±cy przechowywanie danych dla uwierzytelnienia HTTP Basic w bazie LDAP
 Group:		Networking/Daemons
-Provides:	apache(mod_authnz_ldap) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_authnz_ldap) = %{version}-%{release}
 # compat
 Provides:	apache(mod_auth_ldap) = %{version}-%{release}
 Provides:	apache-mod_auth_ldap = %{version}-%{release}
@@ -428,46 +488,70 @@ Obsoletes:	apache-mod_auth_ldap < 2.2.0-0.5
 
 %description mod_authnz_ldap
 This module provides authentication front-ends such as mod_auth_basic
-to authenticate users through an ldap directory.
+to authenticate users through an LDAP directory.
+
+%description mod_authnz_ldap -l pl
+Ten modu³ udostêpnia frontendom uwierzytelniaj±cym takim jak
+mod_auth_basic uwierzytelnianie u¿ytkowników poprzez katalog LDAP.
 
 %package mod_authz_dbm
 Summary:	Apache module that allows group authorization using DBM files
+Summary(pl):	Modu³ Apache'a umo¿liwiaj±cy uwierzytelnianie grup z u¿yciem plików DBM
 Group:		Networking/Daemons
-Provides:	apache(mod_authz_dbm) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_authz_dbm) = %{version}-%{release}
 
 %description mod_authz_dbm
 This module provides authorization capabilities so that authenticated
 users can be allowed or denied access to portions of the web site by
-group membership.
+group membership stored in DBM file.
+
+%description mod_authz_dbm -l pl
+Ten modu³ daje mo¿liwo¶æ udostêpniania b±d¼ blokowania czê¶ci serwisu
+WWW dla uwierzytelnionych u¿ytkowników na podstawie ich przynale¿no¶ci
+do grupy zapisywanej w pliku DBM.
 
 %package mod_authz_default
 Summary:	Apache module that rejects any authorization request
+Summary(pl):	Modu³ Apache'a odrzucaj±cy wszystkie ¿±dania autoryzacji
 Group:		Networking/Daemons
-Provides:	apache(mod_authz_default) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_authz_default) = %{version}-%{release}
 
 %description mod_authz_default
 This module is designed to be the fallback module, if you don't have
 configured an authorization module like mod_authz_user or
 mod_authz_groupfile. It simply rejects any authorization request.
 
+%description mod_authz_default -l pl
+Ten modu³ zosta³ pomy¶lany jako domy¶lny modu³ autoryzuj±cy je¶li nie
+skonfigurowano modu³u autoryzuj±cego takiego jak mod_authz_user czy
+mod_authz_groupfile. Modu³ ten po prostu odrzuca wszelkie ¿±dania
+autoryzacji.
+
 %package mod_authz_groupfile
 Summary:	Apache module that allows group authorization using plaintext files
+Summary(pl):	Modu³ Apache'a umo¿liwiaj±cy autoryzacjê grup przy u¿yciu plików tekstowych
 Group:		Networking/Daemons
-Provides:	apache(mod_authz_groupfile) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_authz_groupfile) = %{version}-%{release}
 
 %description mod_authz_groupfile
 This module provides authorization capabilities so that authenticated
 users can be allowed or denied access to portions of the web site by
-group membership.
+group membership stored in plain text file.
+
+%description mod_authz_groupfile -l pl
+Ten modu³ daje mo¿liwo¶æ udostêpniania b±d¼ blokowania czê¶ci serwisu
+WWW dla uwierzytelnionych u¿ytkowników na podstawie ich przynale¿no¶ci
+do grupy zapisywanej w pliku tekstowym.
 
 %package mod_authz_host
-Summary:	Apache module that allows group authorizations based on host (name or IP address) group authorization using plaintext files
+Summary:	Apache module that allows group authorizations based on host (name or IP address)
+Summary(pl):	Modu³ Apache'a umo¿liwiaj±cy autoryzacjê grup w oparcu o host (nazwê lub IP)
 Group:		Networking/Daemons
-Provides:	apache(mod_authz_host) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_authz_host) = %{version}-%{release}
 
 %description mod_authz_host
 The directives provided by mod_authz_host are used in <Directory>,
@@ -476,11 +560,19 @@ access to particular parts of the server. Access can be controlled
 based on the client hostname, IP address, or other characteristics of
 the client request, as captured in environment variables.
 
+%description mod_authz_host -l pl
+Dyrektyw udostêpnianych przez mod_authz_host mo¿na u¿ywaæ w sekcjach
+<Directory>, <Files> i <Location>, a tak¿e plikach .htaccess w celu
+sterowania dostêpem do poszczególnych czê¶ci serwera. Dostêpem mo¿na
+sterowaæ na podstawie nazwy hosta klienta, adresu IP lub innej
+charakterystyki ¿±dania klienta dostêpnej w zmiennych ¶rodowiskowych.
+
 %package mod_authz_owner
 Summary:	Apache module that allows authorization based on file ownership
+Summary(pl):	Modu³ Apache'a umo¿liwiaj±cy autoryzacje w oparciu o w³asno¶æ plików
 Group:		Networking/Daemons
-Provides:	apache(mod_authz_owner) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_authz_owner) = %{version}-%{release}
 
 %description mod_authz_owner
 This module authorizes access to files by comparing the userid used
@@ -489,15 +581,28 @@ group of the requested file. The supplied username and password must
 be already properly verified by an authentication module, such as
 mod_auth_basic or mod_auth_digest.
 
+%description mod_authz_owner -l pl
+Ten modu³ autoryzuje dostêp do plików poprzez porównanie
+identyfikatora u¿ytkownika u¿ytego przy uwierzytelnianiu HTTP (web
+userid) z w³a¶cicielem lub grup± ¿±danego pliku w systemie plików.
+Podana nazwa u¿ytkownika i has³o musz± byæ wcze¶niej zweryfikowane
+przez modu³ uwierzytelniania, taki jak mod_auth_basic lub
+mod_auth_digest.
+
 %package mod_authz_user
 Summary:	Apache module that allows user authorization
+Summary(pl):	Modu³ Apache'a umo¿liwiaj±cy autoryzacjê u¿ytkowników
 Group:		Networking/Daemons
-Provides:	apache(mod_authz_user) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_authz_user) = %{version}-%{release}
 
 %description mod_authz_user
 This module provides authorization capabilities so that authenticated
 users can be allowed or denied access to portions of the web site.
+
+%description mod_authz_user -l pl
+Ten modu³ daje mo¿liwo¶æ udostêpniania b±d¼ blokowania czê¶ci serwisu
+WWW dla uwierzytelnionych u¿ytkowników.
 
 %package mod_autoindex
 Summary:	Apache module - display index of files
@@ -515,19 +620,23 @@ Ten pakiet dostarcza modu³ autoindex, który generuje indeks plików.
 
 %package mod_bucketeer
 Summary:	Split buckets whenever we find a control-char
+Summary(pl):	Dzielenie kube³ków po znalezieniu znaku steruj±cego
 Group:		Networking/Daemons
-Provides:	apache(mod_bucketeer) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_bucketeer) = %{version}-%{release}
 
 %description mod_bucketeer
 Split buckets whenever we find a control-char.
+
+%description mod_bucketeer -l pl
+Dzielenie kube³ków po znalezieniu znaku steruj±cego.
 
 %package mod_cache
 Summary:	Content cache keyed to URIs
 Summary(pl):	Pamiêæ podrêczna wg klucza URI
 Group:		Networking/Daemons
-Provides:	apache(mod_cache) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_cache) = %{version}-%{release}
 
 %description mod_cache
 mod_cache implements an RFC 2616 compliant HTTP content cache that can
@@ -548,8 +657,8 @@ dysku (u¿ywane do cache'owania proxy).
 Summary:	Execution of CGI scripts using an external CGI daemon
 Summary(pl):	Uruchamianie zewnêtrznych skryptów CGI za pomoc± daemona CGI
 Group:		Networking/Daemons
-Provides:	apache(mod_cgid) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_cgid) = %{version}-%{release}
 
 %description mod_cgid
 Execution of CGI scripts using an external CGI daemon.
@@ -561,8 +670,8 @@ Uruchamianie zewnêtrznych skryptów CGI za pomoc± demona CGI.
 Summary:	Specify character set translation or recoding
 Summary(pl):	Translacja lub przekodowywanie znaków
 Group:		Networking/Daemons
-Provides:	apache(mod_charset_lite) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_charset_lite) = %{version}-%{release}
 
 %description mod_charset_lite
 Specify character set translation or recoding.
@@ -574,8 +683,8 @@ Translacja lub przekodowywanie znaków.
 Summary:	Apache module - Distributed Authoring and Versioning
 Summary(pl):	Modu³ Apache'a - rozproszone autorstwo i wersjonowanie
 Group:		Networking/Daemons
-Provides:	apache(mod_dav) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_dav) = %{version}-%{release}
 
 %description mod_dav
 This module provides class 1 and class 2 WebDAV ('Web-based
@@ -591,9 +700,10 @@ zdalnym serwerze WWW.
 
 %package mod_dbd
 Summary:	Manages SQL database connections
+Summary(pl):	Zarz±dzanie po³±czeniami z baz± danych SQL
 Group:		Networking/Daemons
-Provides:	apache(mod_dbd) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_dbd) = %{version}-%{release}
 
 %description mod_dbd
 mod_dbd manages SQL database connections using apr_dbd. It provides
@@ -601,13 +711,20 @@ database connections on request to modules requiring SQL database
 functions, and takes care of managing databases with optimal
 efficiency and scalability for both threaded and non-threaded MPMs.
 
+%description mod_dbd -l pl
+mod_dbd zarz±dza po³±czeniami z baz± danych SQL przy u¿yciu apr_dbd.
+Udostêpnia po³±czenia z baz± danych na ¿±danie modu³ów wymagaj±cych
+funkcji bazy danych SQL, a nastêpnie dba o zarz±dzanie bazami danych z
+optymaln± wydajno¶ci± i skalowalno¶ci± zarówno dla w±tkowych jak i
+niew±tkowych MPM.
+
 %package mod_deflate
 Summary:	Apache module: Compress content before it is delivered to the client
 Summary(pl):	Modu³ Apache'a kompresuj±cy dane przed przes³aniem ich do klienta
 Group:		Networking/Daemons
-Provides:	apache(mod_deflate) = %{version}-%{release}
 Requires:	%{name}-mod_headers = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_deflate) = %{version}-%{release}
 
 %description mod_deflate
 Compress content before it is delivered to the client.
@@ -619,8 +736,8 @@ Modu³ kompresuj±cy dane przed przes³aniem ich do klienta.
 Summary:	Apache module for "trailing slash" redirects and serving directory index files
 Summary(pl):	Modu³ Apache'a oferuj±cy przekierowania i udostêpnianie informacji o zawarto¶ci katalogu
 Group:		Networking/Daemons
-Provides:	apache(mod_dir) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_dir) = %{version}-%{release}
 
 %description mod_dir
 This package contains mod_dir which provides "trailing slash"
@@ -632,9 +749,10 @@ katalogu.
 
 %package mod_dumpio
 Summary:	Dumps all I/O to error log as desired
+Summary(pl):	Zrzucanie ca³o¶ci wej¶cia/wyj¶cia do logu b³êdów
 Group:		Networking/Daemons
-Provides:	apache(mod_dumpio) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_dumpio) = %{version}-%{release}
 
 %description mod_dumpio
 mod_dumpio allows for the logging of all input received by Apache
@@ -646,12 +764,22 @@ right before SSL encoding (for output). As can be expected, this can
 produce extreme volumes of data, and should only be used when
 debugging problems.
 
+%description mod_dumpio -l pl
+mod_dumpio umo¿liwia logowanie ca³ego wej¶cia otrzymanego przez
+Apache'a i/lub ca³êgo wyj¶cia wysy³anego przez Apache'a do pliku
+error.log.
+
+Logowanie danych nastêpuja zaraz po zdekodowaniu SSL (dla wej¶cia) i
+zaraz przed kodowaniem SSL (dla wyj¶cia). Jak mo¿na siê spodziewaæ, ta
+opcja mo¿e tworzyæ ogromne ilo¶ci danych i powinna byæ u¿ywana tylko
+przy diagnostyce problemów.
+
 %package mod_expires
 Summary:	Apache module which generates Expires HTTP headers
 Summary(pl):	Modu³ Apache'a generuj±cy nag³ówki HTTP Expires
 Group:		Networking/Daemons
-Provides:	apache(mod_expires) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_expires) = %{version}-%{release}
 
 %description mod_expires
 This module controls the setting of the Expires HTTP header in server
@@ -668,9 +796,9 @@ wa¿no¶ci mo¿e byæ ustalana w zale¿no¶ci od czasu modyfikacji plików
 Summary:	Apache module: caches a static list of files in memory
 Summary(pl):	Modu³ Apache'a cache'uj±cy statyczn± listê plików w pamiêci
 Group:		Networking/Daemons
-Obsoletes:	apache-mmap_static
-Provides:	apache(mod_file_cache) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_file_cache) = %{version}-%{release}
+Obsoletes:	apache-mmap_static
 
 %description mod_file_cache
 Caches a static list of files in memory.
@@ -680,9 +808,10 @@ Modu³ cache'uj±cy statyczn± listê plików w pamiêci.
 
 %package mod_filter
 Summary:	Context-sensitive smart filter configuration module
+Summary(pl):	Modu³ inteligentnej, zale¿nej od kontekstu konfiguracji filtrów
 Group:		Networking/Daemons
-Provides:	apache(mod_filter) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_filter) = %{version}-%{release}
 
 %description mod_filter
 This module enables smart, context-sensitive configuration of output
@@ -690,12 +819,18 @@ content filters. For example, apache can be configured to process
 different content-types through different filters, even when the
 content-type is not known in advance (e.g. in a proxy).
 
+%description mod_filter -l pl
+Ten modu³ umo¿liwia inteligentne, zale¿ne od kontekstu konfigurowanie
+wyj¶ciowych filtrów tre¶ci. Na przyk³ad, Apache'a mo¿na skonfigurowaæ
+do przetwarzania ró¿nych content-type poprzez ró¿ne filtry, nawet
+je¶li content-type nie jest znany z góry (np. w wypadku proxy).
+
 %package mod_headers
 Summary:	Apache module allows for the customization of HTTP response headers
 Summary(pl):	Modu³ Apache'a pozwalaj±cy na modyfikacjê nag³ówków HTTP
 Group:		Networking/Daemons
-Provides:	apache(mod_headers) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_headers) = %{version}-%{release}
 
 %description mod_headers
 This package contains mod_headers module. The module allows for the
@@ -708,20 +843,26 @@ wysy³anych do przegl±darki.
 
 %package mod_ident
 Summary:	RFC 1413 ident lookups
+Summary(pl):	Sprawdzanie identyfikacji RFC 1413
 Group:		Networking/Daemons
-Provides:	apache(mod_ident) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_ident) = %{version}-%{release}
 
 %description mod_ident
 This module queries an RFC 1413 compatible daemon on a remote host to
 look up the owner of a connection.
 
+%description mod_ident -l pl
+Ten modu³ odpytuje demona zgodnego z RFC 1413 na zdalnym ho¶cie w celu
+sprawdzenia w³a¶ciciela po³±czenia.
+
 %package mod_imagemap
 Summary:	Server-side imagemap processing
+Summary(pl):	Przetwarzanie map obrazów po stronie serwera
 Group:		Networking/Daemons
-Provides:	apache(mod_imagemap) = %{version}-%{release}
-Obsoletes:	%{name}-mod_imap
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_imagemap) = %{version}-%{release}
+Obsoletes:	apache-mod_imap
 
 %description mod_imagemap
 This module processes .map files, thereby replacing the functionality
@@ -729,12 +870,18 @@ of the imagemap CGI program. Any directory or document type configured
 to use the handler imap-file (using either AddHandler or SetHandler)
 will be processed by this module.
 
+%description mod_imagemap -l pl
+Ten modu³ przetwarza pliki .map zastêpuj±c funkcjonalno¶æ programu CGI
+imagemap. Dowolny katalog lub rodzaj dokumentu skonfigurowany do
+u¿ywania procedury obs³ugi imap-file (poprzez AddHandler lub
+SetHandler) bêdzie przetwarzany przez ten modu³.
+
 %package mod_info
 Summary:	Apache module with comprehensive overview of the server configuration
 Summary(pl):	Modu³ Apache'a udostêpniaj±cy informacje o serwerze
 Group:		Networking/Daemons
-Provides:	apache(mod_info) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_info) = %{version}-%{release}
 
 %description mod_info
 This package contains mod_info module. It provides a comprehensive
@@ -749,8 +896,8 @@ zainstalowanych modu³ach itp.
 Summary:	Apache module to use LDAP connections
 Summary(pl):	Modu³ Apache'a umo¿liwiaj±cy korzystanie z po³±czeñ LDAP
 Group:		Networking/Daemons
-Provides:	apache(mod_ldap) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_ldap) = %{version}-%{release}
 
 %description mod_ldap
 Apache module to use LDAP connections.
@@ -760,10 +907,11 @@ Modu³ Apache'a umo¿liwiaj±cy korzystanie z po³±czeñ LDAP.
 
 %package mod_logio
 Summary:	Logging of input and output bytes per request
+Summary(pl):	Logowanie liczby bajtów wej¶cia i wyj¶cia dla zapytañ
 Group:		Networking/Daemons
-Provides:	apache(mod_logio) = %{version}-%{release}
-#Requires:	%{name}-mod_log_config = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+#Requires:	%{name}-mod_log_config = %{version}-%{release}
+Provides:	apache(mod_logio) = %{version}-%{release}
 
 %description mod_logio
 This module provides the logging of input and output number of bytes
@@ -773,12 +921,20 @@ bodies of requests and responses. The counting is done before SSL/TLS
 on input and after SSL/TLS on output, so the numbers will correctly
 reflect any changes made by encryption.
 
+%description mod_logio -l pl
+Ten modu³ zapewnia logowanie liczby bajtów wej¶cia i wyj¶cia
+odbieranych/wysy³anych przy ka¿dym zapytaniu. Liczby odzwierciedlaj±
+rzeczywiste bajty przesy³ane przez sieæ, z wliczonymi nag³ówkami i
+cia³ami ¿±dañ i odpowiedzi. Zliczanie jest wykonywane przed SSL/TLS na
+wej¶ciu i po SSL/TLS na wyj¶ciu, wiêc liczby bêd± w³a¶ciwie
+odzwierciedla³y wszystkie zmiany dokonywane przez szyfrowanie.
+
 %package mod_proxy
 Summary:	Apache module with Web proxy
 Summary(pl):	Modu³ Apache'a dodaj±cy obs³ugê serwera proxy
 Group:		Networking/Daemons
-Provides:	apache(mod_proxy) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_proxy) = %{version}-%{release}
 
 %description mod_proxy
 This package contains module with implementation a proxy/cache for
@@ -795,8 +951,8 @@ HTTP/1.0 i HTTP/1.1.
 Summary:	Apache module with rule-based engine for rewrite requested URLs on the fly
 Summary(pl):	Modu³ Apache'a do "przepisywania" adresów URL w locie
 Group:		Networking/Daemons
-Provides:	apache(mod_rewrite) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_rewrite) = %{version}-%{release}
 
 %description mod_rewrite
 This package contains It provides a rule-based rewriting engine to
@@ -811,8 +967,8 @@ Summary(pl):	Modu³ SSL/TSL dla serwera Apache
 Summary(ru):	íÏÄÕÌØ SSL/TLS ÄÌÑ ×ÅÂ-ÓÅÒ×ÅÒÁ Apache
 Group:		Networking/Daemons
 Epoch:		1
-Provides:	apache(mod_ssl) = 1:%{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_ssl) = 1:%{version}-%{release}
 
 %description mod_ssl
 The mod_ssl module provides strong cryptography for the Apache Web
@@ -832,8 +988,8 @@ Security).
 Summary:	Server status report module for Apache
 Summary(pl):	Modu³ udostêpniaj±cy informacje statystyczne z serwera Apache
 Group:		Networking/Daemons
-Provides:	apache(mod_status) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_status) = %{version}-%{release}
 
 %description mod_status
 The Status module allows a server administrator to find out how well
@@ -850,8 +1006,8 @@ pracy serwera Apache (w postaci strony HTML).
 Summary:	Apache module which provides a magic token for each request
 Summary(pl):	Modu³ Apache'a nadaj±cy ka¿demu zapytaniu unikalny token
 Group:		Networking/Daemons
-Provides:	apache(mod_unique_id) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_unique_id) = %{version}-%{release}
 
 %description mod_unique_id
 This package contains the mod_unique_id. This module provides a magic
@@ -872,8 +1028,8 @@ UNIQUE_ID.
 Summary:	Apache module for user tracking using cookies
 Summary(pl):	Modu³ Apache'a s³u¿±cy do ¶ledzenia "ciasteczek"
 Group:		Networking/Daemons
-Provides:	apache(mod_usertrack) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_usertrack) = %{version}-%{release}
 
 %description mod_usertrack
 This package contains the user tracking module which did its own
@@ -885,9 +1041,10 @@ Modu³ pozwalaj±cy na ¶ledzenie "ciasteczek".
 
 %package mod_version
 Summary:	Version dependent configuration
+Summary(pl):	Konfiguracja zale¿na od wersji
 Group:		Networking/Daemons
-Provides:	apache(mod_version) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_version) = %{version}-%{release}
 
 %description mod_version
 This module is designed for the use in test suites and large networks
@@ -896,12 +1053,19 @@ configurations. It provides a new container -- <IfVersion>, which
 allows a flexible version checking including numeric comparisons and
 regular expressions.
 
+%description mod_version -l pl
+Ten modu³ jest przeznaczony do u¿ywania w zestawach testów i du¿ych
+sieciach, gdzie trzeba inaczej obs³ugiwaæ ró¿ne wersje httpd i ró¿ne
+konfiguracje. Udostêpnia nowy kontener: <IfVersion>, umo¿liwiaj±cy
+elastyczne sprawdzanie wersji w³±cznie z porównaniami liczbowymi i
+wyra¿eniami regularnymi.
+
 %package mod_vhost_alias
 Summary:	Apache module for dynamically configured mass virtual hosting
 Summary(pl):	Modu³ Apache'a dodaj±cy obs³ugê hostów wirtualnych
 Group:		Networking/Daemons
-Provides:	apache(mod_vhost_alias) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_vhost_alias) = %{version}-%{release}
 
 %description mod_vhost_alias
 This package contains the mod_vhost_alias. It provides support for
@@ -933,11 +1097,15 @@ zakodowane algorytmami CRYPT (domy¶lnym), MD5 i SHA1.
 
 %package dbmtools
 Summary:	Apache 2 tools for manipulating DBM files
+Summary(pl):	Narzêdzia Apache'a 2 do obróbki plików DBM
 Group:		Networking/Utilities
 Requires:	%{name} = %{version}-%{release}
 
 %description dbmtools
 Apache 2 tools for manipulating DBM files.
+
+%description dbmtools -l pl
+Narzêdzia Apache'a 2 do obróbki plików DBM.
 
 %package cgi_test
 Summary:	cgi test/demo programs
