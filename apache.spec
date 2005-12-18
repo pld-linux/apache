@@ -1,6 +1,5 @@
 # TODO:
 # - config examples for mod_*
-# - add %%post/%%postun to suexec
 # - --with-suexec-gidmin=500 or =100 ?
 # - --with-suexec-uidmin=500 or =1000 ?
 # - subpackages for MPMs
@@ -14,6 +13,7 @@
 # - same for mod_authz
 # - mod_auth_digest and mod_auth_basic R: apache(authn) ?
 # - drop mod_case_filter* or find summary and description for them
+# - build modules only once (not with each mpm)
 
 # Conditional build:
 %bcond_without	ssl		# build without SSL support
@@ -37,7 +37,7 @@ Summary(ru):	óÁÍÙÊ ÐÏÐÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.2.0
-Release:	0.77
+Release:	0.81
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -226,6 +226,7 @@ bêdziesz móg³ prezentowaæ w³asne strony WWW w sieci Internet.
 Summary:	Apache suexec wrapper
 Summary(pl):	Wrapper suexec do serwera WWW Apache
 Group:		Networking/Daemons
+URL:		http://httpd.apache.org/docs/2.2/suexec.html
 Requires:	%{name}-base = %{version}-%{release}
 
 %description suexec
@@ -601,7 +602,7 @@ Summary(pl):	Modu³ Apache'a umo¿liwiaj±cy przechowywanie danych dla uwierzytelni
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_authnz_ldap.html
 Requires:	%{name}-base = %{version}-%{release}
-Requires:	%{name}-mod_ldap  %{version}-%{release}
+Requires:	%{name}-mod_ldap = %{version}-%{release}
 Provides:	apache(mod_authnz_ldap) = %{version}-%{release}
 # compat
 Provides:	apache(mod_auth_ldap) = %{version}-%{release}
@@ -1658,10 +1659,8 @@ install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
 
 %{__make}
 ./httpd.${mpm} -l | grep -v "${mpm}" > modules-inside
-
-find include -name '*.h' | xargs sed -i -e 's#/httpd\..*\.conf#%{_sysconfdir}/apache.conf#'
-
 cd ..
+
 done
 
 for mpm in %{?with_metuxmpm:metuxmpm} %{?with_peruser:peruser} worker %{?with_event:event}; do
@@ -1764,7 +1763,9 @@ echo "LoadModule authnz_ldap_module	modules/mod_authnz_ldap.so" > $CFG/00_mod_au
 echo "LoadModule authz_default_module	modules/mod_authz_default.so" > $CFG/00_mod_authz_default.conf
 echo "LoadModule auth_basic_module	modules/mod_auth_basic.so" > $CFG/00_mod_auth_basic.conf
 echo "LoadModule dbd_module	modules/mod_dbd.so" > $CFG/00_mod_dbd.conf
+%if %{with bucketeer}
 echo "LoadModule bucketeer_module	modules/mod_bucketeer.so" > $CFG/00_mod_bucketeer.conf
+%endif
 echo "LoadModule dumpio_module	modules/mod_dumpio.so" > $CFG/00_mod_dumpio.conf
 echo "LoadModule echo_module	modules/mod_echo.so" > $CFG/00_mod_echo.conf
 echo "LoadModule case_filter_module	modules/mod_case_filter.so" > $CFG/00_mod_case_filter.conf
@@ -2013,6 +2014,7 @@ fi
 %module_scripts mod_usertrack
 %module_scripts mod_version
 %module_scripts mod_vhost_alias
+%module_scripts suexec
 
 %post cgi_test
 if [ "$1" = "1" ]; then
