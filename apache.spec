@@ -14,6 +14,7 @@
 # - mod_auth_digest and mod_auth_basic R: apache(authn) ?
 # - drop mod_case_filter* or find summary and description for them
 # - build modules only once (not with each mpm)
+# - add to apache external packages apache_module_api dependency (like apache-mod_rpaf.spec)
 
 # Conditional build:
 %bcond_without	ssl		# build without SSL support
@@ -37,7 +38,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.2.0
-Release:	0.85
+Release:	0.86
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
