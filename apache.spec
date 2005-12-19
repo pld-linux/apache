@@ -37,7 +37,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.2.0
-Release:	0.82
+Release:	0.84
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -1910,11 +1910,16 @@ EOF
 	fi
 fi
 
+%triggerpostun base -- %{name}-base < 2.2.0-0.84
 # rename monitrc to be service name like other files
 if [ -f /etc/monit/apache.monitrc.rpmsave ]; then
 	mv -f /etc/monit/httpd.monitrc{,.rpmnew}
 	mv -f /etc/monit/{apache.monitrc.rpmsave,httpd.monitrc}
 fi
+
+# change HTTPD_CONF to point to new location. *only* if it's the
+# default config setting
+sed -i -e '/^HTTPD_CONF="\/etc\/httpd\/httpd.conf"/s,.*,HTTPD_CONF="/etc/httpd/apache.conf",' /etc/sysconfig/httpd
 
 %posttrans base
 # restore lock which we disabled in pretrans
