@@ -37,7 +37,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.2.0
-Release:	0.84
+Release:	0.85
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -2012,17 +2012,21 @@ rm -rf $RPM_BUILD_ROOT
 
 %pretrans base
 # change httpd.conf from dir to symlink
-if [ -d /etc/httpd/httpd.conf ] && [ ! -L /etc/httpd/httpd.conf ]; then
-	if [ -d /etc/httpd/conf.d ]; then
-		mv /etc/httpd/httpd.conf/* /etc/httpd/conf.d
-		rmdir /etc/httpd/httpd.conf 2>/dev/null || mv -v /etc/httpd/httpd.conf{,.rpmsave}
-	else
-		mv /etc/httpd/httpd.conf /etc/httpd/conf.d
+if [ ! -L /etc/httpd/httpd.conf ]; then
+	if [ -d /etc/httpd/httpd.conf ]; then
+		if [ -d /etc/httpd/conf.d ]; then
+			mv /etc/httpd/httpd.conf/* /etc/httpd/conf.d
+			rmdir /etc/httpd/httpd.conf 2>/dev/null || mv -v /etc/httpd/httpd.conf{,.rpmsave}
+		else
+			mv /etc/httpd/httpd.conf /etc/httpd/conf.d
+		fi
+
+		# new module packages issue error as first installed over 2.0 installation
+		mv -f /var/lock/subsys/httpd{,.disabled} 2>/dev/null
 	fi
-	# we make compat symlink in post otherwise rpm would nuke our configs
+
+	# always have httpd.conf symlink (until all packages from Ac use new dir)
 	ln -s conf.d /etc/httpd/httpd.conf
-	# new module packages issue error as first installed over 2.0 installation
-	mv -f /var/lock/subsys/httpd{,.disabled} 2>/dev/null
 fi
 exit 0
 
