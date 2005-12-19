@@ -184,6 +184,7 @@ sunucusudur.
 
 %package base
 Summary:	The Number One HTTP Server On The Internet
+Summary(pl):	Wiod±cy w Internecie serwer HTTP
 Group:		Networking/Daemons
 Requires(post):	fileutils
 Requires(post,preun):	/sbin/chkconfig
@@ -219,8 +220,9 @@ Web server. Apache is also the most popular Web server on the
 Internet.
 
 %description base -l pl
-Apache jest serwerem WWW (World Wide Web). Instaluj±c ten pakiet
-bêdziesz móg³ prezentowaæ w³asne strony WWW w sieci Internet.
+Apache jest potê¿nym, w pe³ni funkcjonalnym, wydajnym i wolnodostêpnym
+serwerem WWW (World Wide Web). Jest tak¿e najbardziej popularnym
+serwerem WWW w Internecie.
 
 %package suexec
 Summary:	Apache suexec wrapper
@@ -282,6 +284,7 @@ Podrêcznik Apache'a.
 
 %package errordocs
 Summary:	Multi-language error messages for Apache
+Summary(pl):	Wielojêzyczne komunikaty b³êdów dla Apache'a
 Group:		Applications/WWW
 URL:		http://httpd.apache.org/docs-project/
 Requires:	%{name}-base = %{version}-%{release}
@@ -294,7 +297,7 @@ Requires:	%{name}-mod_negotiation = %{version}-%{release}
 Multi-language error messages.
 
 %description errordocs -l pl
-Dokumenty opisuj±ce b³êdy HTTP dla Apache'a.
+Dokumenty opisuj±ce b³êdy HTTP dla Apache'a w wielu jêzykach.
 
 %package apxs
 Summary:	APache eXtenSion tool
@@ -348,12 +351,12 @@ utilitário apxs para a construção de objetos compartilhados dinâmicos
 desenvolver módulos adicionais para o Apache.
 
 %package mod_actions
-Summary:	This module provides for executing CGI scripts based on media type or request method
-Summary(pl):	Modu³ Apache'a do uruchamiania skryptów CGI
+Summary:	Apache module for executing CGI scripts based on media type or request method
+Summary(pl):	Modu³ Apache'a do uruchamiania skryptów CGI w oparciu o rodzaj danych lub ¿±dania
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_actions.html
-Provides:	apache(mod_actions) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_actions) = %{version}-%{release}
 
 %description mod_actions
 This module has two directives. The Action directive lets you run CGI
@@ -363,15 +366,19 @@ method is used in a request. This makes it much easier to execute
 scripts that process files.
 
 %description mod_actions -l pl
-Ten modu³ pozwala na uruchamianie skryptów w momencie gdy nadchodzi
-¿±danie pobrania pliku okre¶lonego typu.
+Ten modu³ ma dwie dyrektywy. Dyrektywa Action pozwala uruchamiaæ
+skrypty CGI przy ¿±daniu pliku o danym typie zawarto¶ci MIME.
+Dyrektywa Script pozwala uruchamiaæ skrypty CGI przy danej metodzie
+¿±dania. Znacznie u³atwia to wykonywanie skryptów przetwarzaj±cych
+pliki.
 
 %package mod_alias
-Summary:	Provides for mapping different parts of the host filesystem in the document tree and for URL redirection
+Summary:	Mapping different parts of the host filesystem in the document tree and for URL redirection
+Summary(pl):	Odwzorowywanie ró¿nych czê¶ci systemu plików w drzewie dokumentów i przekierowywanie URL-i
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_alias.html
-Provides:	apache(mod_alias) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_alias) = %{version}-%{release}
 
 %description mod_alias
 The directives contained in this module allow for manipulation and
@@ -390,12 +397,30 @@ mod_alias is designed to handle simple URL manipulation tasks. For
 more complicated tasks such as manipulating the query string, use the
 tools provided by mod_rewrite.
 
+%description mod_alias -l pl
+Dyrektywy zawarte w tym module umo¿liwiaj± manipulacje i sterowanie
+URL-ami kiedy ¿±dania s± dostarczane do serwera. Dyrektywy Alias i
+ScriptAlias s± u¿ywane do odwzorowywania miêdzy URL-ami i ¶cie¿kami w
+systemie plików. Umo¿liwia to serwowanie tre¶ci nie bêd±cej
+bezpo¶rednio wewn±trz DocumentRoota jako czê¶æ drzewa dokumentów WWW.
+Dyrektywa ScriptAlias ma dodatkowy efekt oznaczania katalogu
+docelowego jako zawieraj±cego wy³±cznie skrypty CGI.
+
+Dyrektywy Redirect s³u¿± do instruowania klientów, aby wykonali nowe
+¿±danie z innym URL-em. S± u¿ywane zwykle w przypadku, gdy zasoby
+zosta³y przeniesione w inne miejsce.
+
+mod_alias zosta³ zaprojektowany do obs³ugi prostych manipulacji na
+URL-ach. Bardziej skomplikowane zadania, takie jak modyfikowanie
+³añcucha zapytania mo¿na wykonaæ przy u¿yciu mod_rewrite.
+
 %package mod_asis
 Summary:	Sends files that contain their own HTTP headers
+Summary(pl):	Wysy³anie plików zawieraj±cych w³asne nag³ówki HTTP
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_asis.html
-Provides:	apache(mod_asis) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_asis) = %{version}-%{release}
 
 %description mod_asis
 This module provides the handler send-as-is which causes Apache to
@@ -408,14 +433,23 @@ cgi-script or an nph script.
 For historical reasons, this module will also process any file with
 the mime type httpd/send-as-is.
 
+%description mod_asis -l pl
+Ten modu³ udostêpnia procesurê obs³ugi send-as-is powoduj±c±, ¿e
+Apache wysy³a dokument bez dodawania wiêkszo¶ci zwykle u¿ywanych
+nag³ówków HTTP.
+
+Mo¿e to byæ u¿ywane do wysy³ania dowolnego rodzaju danych z serwera,
+w³±cznie z przekierowaniami i innymi specjalnymi odpowiedziami HTTP
+bez wymagania skryptu CGI lub nph.
+
 %package mod_auth
 Summary:	Virtual package which which provides backward compatibility with apache 2.0
 Summary(pl):	Pakiet wirtualny zapewniaj±cy kompatybilno¶æ wsteczn± z apache 2.0
 Group:		Networking/Daemons
-Provides:	apache(mod_auth) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
 Requires:	%{name}-mod_authn_file = %{version}-%{release}
 Requires:	%{name}-mod_authz_groupfile = %{version}-%{release}
+Provides:	apache(mod_auth) = %{version}-%{release}
 
 %description mod_auth
 Virtual package which requires apache-mod_authn_file and
@@ -430,8 +464,8 @@ Summary:	Apache module that allows Basic authentication
 Summary(pl):	Modu³ Apache'a umo¿liwiaj±cy korzystawnie z uwierzytelnienia Basic
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_auth_basic.html
-Provides:	apache(mod_auth_basic) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_auth_basic) = %{version}-%{release}
 
 %description mod_auth_basic
 This module allows the use of HTTP Basic Authentication to restrict
@@ -450,11 +484,11 @@ dostêpu poprzez wyszukiwanie u¿ytkowników we wskazanych miejscach
 Summary:	Virtual package which which provides backward compatibility with apache 2.0
 Summary(pl):	Pakiet wirtualny zapewniaj±cy kompatybilno¶æ wsteczn± z apache 2.0
 Group:		Networking/Daemons
-Provides:	apache(mod_auth_dbm) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
 Requires:	%{name}-dbmtools = %{version}-%{release}
 Requires:	%{name}-mod_authn_dbm = %{version}-%{release}
 Requires:	%{name}-mod_authz_dbm = %{version}-%{release}
+Provides:	apache(mod_auth_dbm) = %{version}-%{release}
 
 %description mod_auth_dbm
 Virtual package which requires apache-mod_authn_dbm and
@@ -469,8 +503,8 @@ Summary:	User authentication using MD5 Digest Authentication
 Summary(pl):	Uwierzytelnianie u¿ytkowników przy u¿yciu MD5 Digest
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_auth_digest.html
-Provides:	apache(mod_auth_digest) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_auth_digest) = %{version}-%{release}
 
 %description mod_auth_digest
 This module implements HTTP Digest Authentication. However, it has not
@@ -486,8 +520,8 @@ Summary:	Apache module that provides the ability to create extended authenticati
 Summary(pl):	Modu³ Apache'a umo¿liwiaj±cy tworzenie rozszerzonego uwierzytelniania
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_authn_alias.html
-Provides:	apache(mod_authn_alias) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_authn_alias) = %{version}-%{release}
 
 %description mod_authn_alias
 This module allows extended authentication providers to be created
@@ -502,8 +536,8 @@ Summary:	Apache module that allows "anonymous" user access to authenticated area
 Summary(pl):	Modu³ Apache'a umo¿liwiaj±cy dostêp anonimowych u¿ytkowników do stref uwierzytelnianych
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_authn_anon.html
-Provides:	apache(mod_authn_anon) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_authn_anon) = %{version}-%{release}
 # compat
 Provides:	apache-mod_auth_anon = %{version}-%{release}
 Provides:	apache(mod_auth_anon) = %{version}-%{release}
@@ -527,9 +561,9 @@ Summary:	Apache module that allows user authentication using an SQL
 Summary(pl):	Modu³ Apache'a umo¿liwiaj±cy uwierzytelnianie u¿ytkowników przy u¿yciu tabel SQL
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_authn_dbd.html
-Provides:	apache(mod_authn_dbd) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
 Requires:	%{name}-mod_dbd = %{version}-%{release}
+Provides:	apache(mod_authn_dbd) = %{version}-%{release}
 
 %description mod_authn_dbd
 This module provides authentication front-ends such as mod_auth_digest
@@ -546,8 +580,8 @@ Summary:	Apache module that allows user authentication using DBM files
 Summary(pl):	Modu³ Apache'a umo¿liwiaj±cy uwierzytelnianie u¿ytkowników przy u¿yciu plików DBM
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_authn_dbm.html
-Provides:	apache(mod_authn_dbm) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_authn_dbm) = %{version}-%{release}
 
 %description mod_authn_dbm
 This module provides authentication front-ends such as mod_auth_digest
@@ -564,8 +598,8 @@ Summary:	Apache module that rejects any credentials supplied by the user
 Summary(pl):	Modu³ Apache'a odrzucaj±cy wszystkie dane podane przez u¿ytkownika
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_authn_default.html
-Provides:	apache(mod_authn_default) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_authn_default) = %{version}-%{release}
 
 %description mod_authn_default
 This module is designed to be the fallback module, if you don't have
@@ -583,8 +617,8 @@ Summary:	Apache module that allows user authentication using text files
 Summary(pl):	Modu³ Apache'a umo¿liwiaj±cy uwierzytelnianie u¿ytkowników poprzez pliki tekstowe
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_authn_file.html
-Provides:	apache(mod_authn_file) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_authn_file) = %{version}-%{release}
 
 %description mod_authn_file
 This module provides authentication front-ends such as mod_auth_digest
@@ -622,8 +656,8 @@ Summary:	Apache module that allows group authorization using DBM files
 Summary(pl):	Modu³ Apache'a umo¿liwiaj±cy uwierzytelnianie grup z u¿yciem plików DBM
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_authz_dbm.html
-Provides:	apache(mod_authz_dbm) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_authz_dbm) = %{version}-%{release}
 
 %description mod_authz_dbm
 This module provides authorization capabilities so that authenticated
@@ -640,8 +674,8 @@ Summary:	Apache module that rejects any authorization request
 Summary(pl):	Modu³ Apache'a odrzucaj±cy wszystkie ¿±dania autoryzacji
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_authz_default.html
-Provides:	apache(mod_authz_default) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_authz_default) = %{version}-%{release}
 
 %description mod_authz_default
 This module is designed to be the fallback module, if you don't have
@@ -659,8 +693,8 @@ Summary:	Apache module that allows group authorization using plaintext files
 Summary(pl):	Modu³ Apache'a umo¿liwiaj±cy autoryzacjê grup przy u¿yciu plików tekstowych
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_authz_groupfile.html
-Provides:	apache(mod_authz_groupfile) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_authz_groupfile) = %{version}-%{release}
 
 %description mod_authz_groupfile
 This module provides authorization capabilities so that authenticated
@@ -677,8 +711,8 @@ Summary:	Apache module that allows group authorizations based on host (name or I
 Summary(pl):	Modu³ Apache'a umo¿liwiaj±cy autoryzacjê grup w oparcu o host (nazwê lub IP)
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_authz_host.html
-Provides:	apache(mod_authz_host) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_authz_host) = %{version}-%{release}
 
 %description mod_authz_host
 The directives provided by mod_authz_host are used in <Directory>,
@@ -699,9 +733,9 @@ Summary:	Apache module that allows authorization based on file ownership
 Summary(pl):	Modu³ Apache'a umo¿liwiaj±cy autoryzacje w oparciu o w³asno¶æ plików
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/en/mod/mod_authz_owner.html
-Provides:	apache(mod_authz_owner) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
 #Requires:	any-auth-module
+Provides:	apache(mod_authz_owner) = %{version}-%{release}
 
 %description mod_authz_owner
 This module authorizes access to files by comparing the userid used
@@ -723,8 +757,8 @@ Summary:	Apache module that allows user authorization
 Summary(pl):	Modu³ Apache'a umo¿liwiaj±cy autoryzacjê u¿ytkowników
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/en/mod/mod_authz_user.html
-Provides:	apache(mod_authz_user) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_authz_user) = %{version}-%{release}
 
 %description mod_authz_user
 This module provides authorization capabilities so that authenticated
@@ -739,9 +773,9 @@ Summary:	Apache module - display index of files
 Summary(pl):	Modu³ apache do wy¶wietlania indeksu plików
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/en/mod/mod_autoindex.html
-Provides:	apache(mod_autoindex) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
 Requires:	%{name}-mod_alias = %{version}-%{release}
+Provides:	apache(mod_autoindex) = %{version}-%{release}
 
 %description mod_autoindex
 This package contains mod_autoindex module. It provides generation
@@ -754,8 +788,8 @@ Ten pakiet dostarcza modu³ autoindex, który generuje indeks plików.
 Summary:	buckets manipulation filter
 Summary(pl):	Dzielenie kube³ków po znalezieniu znaku steruj±cego
 Group:		Networking/Daemons
-Provides:	apache(mod_bucketeer) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_bucketeer) = %{version}-%{release}
 
 %description mod_bucketeer
 Split buckets whenever we find a control-char.
@@ -768,8 +802,8 @@ Summary:	Content cache keyed to URIs
 Summary(pl):	Pamiêæ podrêczna wg klucza URI
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/en/mod/mod_cache.html
-Provides:	apache(mod_cache) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_cache) = %{version}-%{release}
 
 %description mod_cache
 mod_cache implements an RFC 2616 compliant HTTP content cache that can
@@ -789,25 +823,26 @@ dysku (u¿ywane do cache'owania proxy).
 %package mod_case_filter
 Summary:	TODO
 Group:		Networking/Daemons
-Provides:	apache(mod_case_filter) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_case_filter) = %{version}-%{release}
 
 %description mod_case_filter
 
 %package mod_case_filter_in
 Summary:	TODO
 Group:		Networking/Daemons
-Provides:	apache(mod_case_filter_in) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_case_filter_in) = %{version}-%{release}
 
 %description mod_case_filter_in
 
 %package mod_cern_meta
 Summary:	CERN httpd metafile semantics
+Summary(pl):	Obs³uga semantyki metaplików CERN httpd
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/en/mod/mod_cern_meta.html
-Provides:	apache(mod_cern_meta) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_cern_meta) = %{version}-%{release}
 
 %description mod_cern_meta
 Emulate the CERN HTTPD Meta file semantics. Meta files are HTTP
@@ -818,12 +853,22 @@ header, as well as providing other curiosities. There are many ways to
 manage meta information, this one was chosen because there is already
 a large number of CERN users who can exploit this module.
 
+%description mod_cern_meta -l pl
+Modu³ emuluj±cy semantykê metaplików CERN HTTPD. Metapliki to nag³ówki
+HTTP, które mog± byæ wysy³ane oprócz normalnego zestawu nag³ówków dla
+ka¿dego przetwarzanego pliku. Zachowuj± siê bardziej jak pliki .asis
+Apache'a i mog± dawaæ brutalny sposób wp³ywania na nag³ówek Expires:,
+a tak¿e dostarczaæ inne ciekawostki. Jest wiele sposobów zarz±dzania
+metainformacjami, ta zosta³a wybrana poniewa¿ istnieje ju¿ wielu
+u¿ytkowników CERN wykorzystuj±cych ten modu³.
+
 %package mod_cgi
 Summary:	Execution of CGI scripts
+Summary(pl):	Uruchamianie skryptów CGI
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/en/mod/mod_cgi.html
-Provides:	apache(mod_cgi) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_cgi) = %{version}-%{release}
 
 %description mod_cgi
 Any file that has the mime type application/x-httpd-cgi or handler
@@ -837,13 +882,25 @@ When using a multi-threaded MPM under unix, the module mod_cgid should
 be used in place of this module. At the user level, the two modules
 are essentially identical.
 
+%description mod_cgi -l pl
+Ten modu³ powoduje, ¿e dowolny plik o typie MIME
+application/x-httpd-cgi albo procedurze obs³ugi cgi-script (w Apache'u
+1.1 lub nowszym) bêdzie traktowany jako skrypt CGI i uruchamiany przez
+serwer, a jego wyj¶cie bêdzie zwracane klientowi. Pliki uzyskuj± ten
+typ przez posiadanie nazwy zawieraj±cej rozszerzenie okre¶lone
+dyrektyw± AddType lub bêd±c w katalogu ScriptAlias.
+
+Przy u¿ywaniu wielow±tkowych MPM pod unksem zamiast tego modu³u nale¿y
+u¿ywaæ modu³u mod_cgid. Z poziomu u¿ytkownika oba te modu³y zachowuj±
+siê identycznie.
+
 %package mod_cgid
 Summary:	Execution of CGI scripts using an external CGI daemon
 Summary(pl):	Uruchamianie zewnêtrznych skryptów CGI za pomoc± daemona CGI
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/en/mod/mod_cgid.html
-Provides:	apache(mod_cgid) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_cgid) = %{version}-%{release}
 
 %description mod_cgid
 Execution of CGI scripts using an external CGI daemon.
@@ -855,15 +912,21 @@ This module should be used instead of mod_cgi whenever a
 multi-threaded MPM is selected.
 
 %description mod_cgid -l pl
-Uruchamianie zewnêtrznych skryptów CGI za pomoc± demona CGI.
+Uruchamianie skryptów CGI za pomoc± zewnêtrznego demona CGI.
+
+Z wyj±tkiem optymalizacji i dodatkowej dyrektywy ScriptSock, mod_cgid
+zachowuje siê podobnie do mod_cgi.
+
+Tego modu³u nale¿y u¿ywaæ zamiast mod_cgi zawsze, je¶li wybrano
+wielow±tkowy MPM.
 
 %package mod_charset_lite
 Summary:	Specify character set translation or recoding
 Summary(pl):	Translacja lub przekodowywanie znaków
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/en/mod/mod_charset_lite.html
-Provides:	apache(mod_charset_lite) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_charset_lite) = %{version}-%{release}
 
 %description mod_charset_lite
 Specify character set translation or recoding.
@@ -876,13 +939,18 @@ This is an experimental module and should be used with care.
 %description mod_charset_lite -l pl
 Translacja lub przekodowywanie znaków.
 
+Ten modu³ udostêpnia niewielki podzbiór mechanizmów konfiguracyjnych
+zaimplementowanych przez Russian Apache i powi±zany z nim mod_charset.
+
+Jest to modu³ eksperymentalny i nale¿y u¿ywaæ go z uwag±.
+
 %package mod_dav
 Summary:	Apache module - Distributed Authoring and Versioning
 Summary(pl):	Modu³ Apache'a - rozproszone autorstwo i wersjonowanie
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/en/mod/mod_dav.html
-Provides:	apache(mod_dav) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_dav) = %{version}-%{release}
 
 %description mod_dav
 This module provides class 1 and class 2 WebDAV ('Web-based
@@ -901,8 +969,8 @@ Summary:	Manages SQL database connections
 Summary(pl):	Zarz±dzanie po³±czeniami z baz± danych SQL
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/en/mod/mod_dbd.html
-Provides:	apache(mod_dbd) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_dbd) = %{version}-%{release}
 
 %description mod_dbd
 mod_dbd manages SQL database connections using apr_dbd. It provides
@@ -922,9 +990,9 @@ Summary:	Apache module: Compress content before it is delivered to the client
 Summary(pl):	Modu³ Apache'a kompresuj±cy dane przed przes³aniem ich do klienta
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_deflate.html
-Provides:	apache(mod_deflate) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
 Requires:	%{name}-mod_headers = %{version}-%{release}
+Provides:	apache(mod_deflate) = %{version}-%{release}
 
 %description mod_deflate
 Compress content before it is delivered to the client.
@@ -937,8 +1005,8 @@ Summary:	Apache module for "trailing slash" redirects and serving directory inde
 Summary(pl):	Modu³ Apache'a oferuj±cy przekierowania i udostêpnianie informacji o zawarto¶ci katalogu
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_dir.html
-Provides:	apache(mod_dir) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_dir) = %{version}-%{release}
 
 %description mod_dir
 This package contains mod_dir which provides "trailing slash"
@@ -953,8 +1021,8 @@ Summary:	Dumps all I/O to error log as desired
 Summary(pl):	Zrzucanie ca³o¶ci wej¶cia/wyj¶cia do logu b³êdów
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_dumpio.html
-Provides:	apache(mod_dumpio) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_dumpio) = %{version}-%{release}
 
 %description mod_dumpio
 mod_dumpio allows for the logging of all input received by Apache
@@ -978,22 +1046,29 @@ przy diagnostyce problemów.
 
 %package mod_echo
 Summary:	A simple echo server to illustrate protocol modules
+Summary(pl):	Prosty serwer ocho ilustruj±cy modu³y protoko³ów
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_echo.html
-Provides:	apache(mod_echo) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_echo) = %{version}-%{release}
 
 %description mod_echo
 This module provides an example protocol module to illustrate the
 concept. It provides a simple echo server. Telnet to it and type
 stuff, and it will echo it.
 
+%description mod_echo -l pl
+Ten modu³ udostêpnia przyk³adowy modu³ protoko³u ilustruj±cy ideê.
+Udostêpnia prosty serwer echo. Mo¿na siê na niego zatelnetowaæ i
+napisaæ cokolwiek, a on odpowie tym samym.
+
 %package mod_env
 Summary:	Modifies the environment which is passed to CGI scripts and SSI pages
+Summary(pl):	Modyfikowanie ¶rodowiska przekazywanego skryptom CGI i stronom SSI
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_env.html
-Provides:	apache(mod_env) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_env) = %{version}-%{release}
 
 %description mod_env
 This module allows for control of the environment that will be
@@ -1002,13 +1077,19 @@ passed from the shell which invoked the httpd process. Alternatively,
 environment variables may be set or unset within the configuration
 process.
 
+%description mod_env -l pl
+Ten modu³ pozwala na kontrolê ¶rodowiska udostêpnianego skryptom CGI i
+stronom SSI. Zmienne ¶rodowiskowe mog± byæ przekazywane z pow³oki w
+czasie uruchamiania procesu httpd, albo - alternatywnie - ustawiane i
+usuwane w procesie konfiguracji.
+
 %package mod_expires
 Summary:	Apache module which generates Expires HTTP headers
 Summary(pl):	Modu³ Apache'a generuj±cy nag³ówki HTTP Expires
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_expires.html
-Provides:	apache(mod_expires) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_expires) = %{version}-%{release}
 
 %description mod_expires
 This module controls the setting of the Expires HTTP header in server
@@ -1023,10 +1104,11 @@ wa¿no¶ci mo¿e byæ ustalana w zale¿no¶ci od czasu modyfikacji plików
 
 %package mod_ext_filter
 Summary:	Pass the response body through an external program before delivery to the client
+Summary(pl):	Przekazywanie cia³a odpowiedzi do zewnêtrznego programu przed przekazaniem klientowi
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_ext_filter.html
-Provides:	apache(mod_ext_filter) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_ext_filter) = %{version}-%{release}
 
 %description mod_ext_filter
 mod_ext_filter presents a simple and familiar programming model for
@@ -1047,14 +1129,34 @@ Even when the performance characteristics are not suitable for
 production use, mod_ext_filter can be used as a prototype environment
 for filters.
 
+%description mod_ext_filter -l pl
+mod_ext_filter przedstawia prosty i przyjazny model programowania dla
+filtrów. Przy u¿yciu tego modu³u program czytaj±cy ze standardowego
+wej¶cia i pisz±cy na standardowe wyj¶cie (czyli uniksowe polecenie
+filtruj±ce) mo¿e byæ filtrem dla Apache'a.
+
+Ten mechanizm filtruj±cy jest znacznie wolniejszy ni¿ u¿ycie filtru
+napisanego specjalnie dla API Apache'a i dzia³aj±cego wewn±trz procesu
+Apache'a, ale ma nastêpuj±ce zalety:
+- znacznie prostszy model programowania
+- mo¿liwo¶æ u¿ycia dowolnego jêzyka programowania/skryptowego, je¶li
+  tylko umo¿liwia czytanie ze standardowego wej¶cia i pisanie na
+  standardowe wyj¶cie
+- mo¿liwo¶æ u¿ycia istniej±cych programów bez modyfikacji jako filtrów
+  Apache'a.
+
+Nawet kiedy charakterystyka wydajno¶ci nie jest odpowiednia dla u¿ytku
+produkcyjnego, mod_ext_filter mo¿na u¿ywaæ w ¶rodowisku prototypowym
+dla filtrów.
+
 %package mod_file_cache
 Summary:	Apache module: caches a static list of files in memory
 Summary(pl):	Modu³ Apache'a cache'uj±cy statyczn± listê plików w pamiêci
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_file_cache.html
-Obsoletes:	apache-mmap_static
-Provides:	apache(mod_file_cache) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_file_cache) = %{version}-%{release}
+Obsoletes:	apache-mmap_static
 
 %description mod_file_cache
 Caches a static list of files in memory.
@@ -1070,8 +1172,8 @@ Summary:	Context-sensitive smart filter configuration module
 Summary(pl):	Modu³ inteligentnej, zale¿nej od kontekstu konfiguracji filtrów
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_filter.html
-Provides:	apache(mod_filter) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_filter) = %{version}-%{release}
 
 %description mod_filter
 This module enables smart, context-sensitive configuration of output
@@ -1090,8 +1192,8 @@ Summary:	Apache module allows for the customization of HTTP response headers
 Summary(pl):	Modu³ Apache'a pozwalaj±cy na modyfikacjê nag³ówków HTTP
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_headers.html
-Provides:	apache(mod_headers) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_headers) = %{version}-%{release}
 
 %description mod_headers
 This package contains mod_headers module. The module allows for the
@@ -1107,8 +1209,8 @@ Summary:	RFC 1413 ident lookups
 Summary(pl):	Sprawdzanie identyfikacji RFC 1413
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_ident.html
-Provides:	apache(mod_ident) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_ident) = %{version}-%{release}
 
 %description mod_ident
 This module queries an RFC 1413 compatible daemon on a remote host to
@@ -1123,9 +1225,9 @@ Summary:	Server-side imagemap processing
 Summary(pl):	Przetwarzanie map obrazów po stronie serwera
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_imagemap.html
+Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_imagemap) = %{version}-%{release}
 Obsoletes:	%{name}-mod_imap
-Requires:	%{name}-base = %{version}-%{release}
 
 %description mod_imagemap
 This module processes .map files, thereby replacing the functionality
@@ -1141,10 +1243,11 @@ SetHandler) bêdzie przetwarzany przez ten modu³.
 
 %package mod_include
 Summary:	Server-parsed html documents (Server Side Includes)
+Summary(pl):	Dokumenty przetwarzane przez serwer (Server Side Includes)
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_include.html
-Provides:	apache(mod_include) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_include) = %{version}-%{release}
 
 %description mod_include
 This module provides a filter which will process files before they are
@@ -1153,14 +1256,21 @@ formatted SGML comments, referred to as elements. These elements allow
 conditional text, the inclusion of other files or programs, as well as
 the setting and printing of environment variables.
 
+%description mod_include -l pl
+Ten modu³ dostarcza procedurê obs³ugi przetwarzaj±c± pliki przed
+wys³aniem ich do klienta. Przetwarzanie jest sterowane specjalnie
+sformatowanymi komentarzami SGML, nazywanymi elementami. Elementy te
+pozwalaj± na tekst warunkowy, do³±czanie innych plików lub programów,
+a tak¿e ustawianie i wypisywanie zmiennych ¶rodowiskowych.
+
 %package mod_info
 Summary:	Apache module with comprehensive overview of the server configuration
 Summary(pl):	Modu³ Apache'a udostêpniaj±cy informacje o serwerze
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_info.html
-Provides:	apache(mod_info) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
 Requires:	%{name}-mod_authz_host = %{version}-%{release}
+Provides:	apache(mod_info) = %{version}-%{release}
 
 %description mod_info
 This package contains mod_info module. It provides a comprehensive
@@ -1176,8 +1286,8 @@ Summary:	Apache module to use LDAP connections
 Summary(pl):	Modu³ Apache'a umo¿liwiaj±cy korzystanie z po³±czeñ LDAP
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_ldap.html
-Provides:	apache(mod_ldap) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_ldap) = %{version}-%{release}
 
 %description mod_ldap
 Apache module to use LDAP connections.
@@ -1187,10 +1297,11 @@ Modu³ Apache'a umo¿liwiaj±cy korzystanie z po³±czeñ LDAP.
 
 %package mod_log_config
 Summary:	Logging of the requests made to the server
+Summary(pl):	Logowanie ¿±dañ zg³aszanych do serwera
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_log_config.html
-Provides:	apache(mod_log_config) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_log_config) = %{version}-%{release}
 
 %description mod_log_config
 This module provides for flexible logging of client requests. Logs are
@@ -1199,26 +1310,40 @@ file, or to an external program. Conditional logging is provided so
 that individual requests may be included or excluded from the logs
 based on characteristics of the request.
 
+%description mod_log_config -l pl
+Ten modu³ umo¿liwia elastyczne logowanie ¿±dañ klientów. Logi s±
+zapisywane w konfigurowalnym formacie i mog± byæ zapisywane
+bezpo¶rednio do pliku lub przekazywane do zewnêtrznego programu.
+Dostêpne jest logowanie warunkowe polegaj±ce na w³±czeniu lub
+wy³±czeniu poszczególnych ¿±dañ z logowania na podstawie
+charakterystyki ¿±dania.
+
 %package mod_log_forensic
 Summary:	Forensic Logging of the requests made to the server
+Summary(pl):	Logowanie ¿adañ zg³aszanych do serwera w celu pó¼niejszej analizy
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_log_forensic.html
-Provides:	apache(mod_log_forensic) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_log_forensic) = %{version}-%{release}
 
 %description mod_log_forensic
 This module provides for forensic logging of client requests. Logging
 is done before and after processing a request, so the forensic log
 contains two log lines for each request.
 
+%description mod_log_forensic -l pl
+Ten modu³ pozwala na logowanie ¿±dañ w celu pó¼niejszej analizy.
+Logowanie jest wykonywane przed i po przetworzeniu ¿±dania, wiêc log
+zawiera dwie linie dla ka¿dego ¿±dania.
+
 %package mod_logio
 Summary:	Logging of input and output bytes per request
 Summary(pl):	Logowanie liczby bajtów wej¶cia i wyj¶cia dla zapytañ
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_logio.html
-Provides:	apache(mod_logio) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
 Requires:	%{name}-mod_log_config = %{version}-%{release}
+Provides:	apache(mod_logio) = %{version}-%{release}
 
 %description mod_logio
 This module provides the logging of input and output number of bytes
@@ -1237,11 +1362,12 @@ wej¶ciu i po SSL/TLS na wyj¶ciu, wiêc liczby bêd± w³a¶ciwie
 odzwierciedla³y wszystkie zmiany dokonywane przez szyfrowanie.
 
 %package mod_mime
-Summary:	Associates the requested filename's extensions with the file's behavior (handlers and filters) and content (mime-type, language, character set and encoding)
+Summary:	Associates the requested filename's extensions with the file's behavior and content
+Summary(pl):	Wi±zanie okre¶lonych rozszerzeñ plików z zachowaniem i zawarto¶ci±
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_mime.html
-Provides:	apache(mod_mime) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_mime) = %{version}-%{release}
 
 %description mod_mime
 This module is used to associate various bits of "meta information"
@@ -1252,12 +1378,22 @@ participates in content negotiation, so the user's preferences are
 respected when choosing one of several possible files to serve. See
 mod_negotiation for more information about content negotiation.
 
+%description mod_mime -l pl
+Ten modu³ s³u¿y do wi±zania okre¶lonych czê¶ci "metainformacji" z
+plikami w zale¿no¶ci od rozszerzeñ nazw plików. Informacje te ³±cz±
+nazwy plików dokumentów z ich typem MIME, jêzykiem, zestawem znaków i
+kodowaniem. Informacje te s± wysy³ane przegl±darce i maj± wp³yw na
+negocjacjê tre¶ci, tak ¿e preferencje u¿ytkownika s± respektowane przy
+wybieraniu jednego z kilku dostêpnych do zaserwowania. Wiêcej
+informacji o negocjacji tre¶ci jest w dokumentacji do mod_negotiation.
+
 %package mod_mime_magic
 Summary:	Determines the MIME type of a file by looking at a few bytes of its contents
+Summary(pl):	Okre¶lanie typu MIME pliku poprzez sprawdzanie kilku bajtów jego zawarto¶ci
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_mime_magic.html
-Provides:	apache(mod_mime_magic) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_mime_magic) = %{version}-%{release}
 
 %description mod_mime_magic
 This module determines the MIME type of files in the same way the Unix
@@ -1265,27 +1401,39 @@ file(1) command works: it looks at the first few bytes of the file. It
 is intended as a "second line of defense" for cases that mod_mime
 can't resolve.
 
+%description mod_mime_magic -l pl
+Ten modu³ okre¶la typ MIME plików w ten sam sposób, co uniksowe
+polecenie file(1): patrzy na kilka pocz±tkowych bajtów pliku. Ma
+s³u¿yæ jako "druga linia obrony" dla przypadków, których nie mo¿e
+rozwi±zaæ mod_mime.
+
 %package mod_negotiation
 Summary:	Provides for content negotiation
+Summary(pl):	Modu³ do negocjacji tre¶ci
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_negotiation.html
-Provides:	apache(mod_negotiation) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
 Requires:	%{name}-mod_mime = %{version}-%{release}
+Provides:	apache(mod_negotiation) = %{version}-%{release}
 
 %description mod_negotiation
 Content negotiation, or more accurately content selection, is the
 selection of the document that best matches the clients capabilities,
 from one of several available documents.
 
+%description mod_negotiation -l pl
+Negocjacja tre¶ci, lub bardziej precyzyjnie - wybór tre¶ci, to wybór
+dokumentu najbardziej odpowiadaj±cego mo¿liwo¶ciom klientów spo¶ród
+kilku mo¿liwych dokumentów.
+
 %package mod_proxy
 Summary:	Apache module with Web proxy
 Summary(pl):	Modu³ Apache'a dodaj±cy obs³ugê serwera proxy
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_proxy.html
-Provides:	apache(mod_proxy) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
 Requires:	%{name}-mod_authz_host = %{version}-%{release}
+Provides:	apache(mod_proxy) = %{version}-%{release}
 
 %description mod_proxy
 This package contains module with implementation a proxy/cache for
@@ -1303,8 +1451,8 @@ Summary:	Apache module with rule-based engine for rewrite requested URLs on the 
 Summary(pl):	Modu³ Apache'a do "przepisywania" adresów URL w locie
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_rewrite.html
-Provides:	apache(mod_rewrite) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_rewrite) = %{version}-%{release}
 
 %description mod_rewrite
 This package contains It provides a rule-based rewriting engine to
@@ -1315,10 +1463,11 @@ Modu³ oferuj±cy mo¿liwo¶æ "przepisywania" adresów URL w locie.
 
 %package mod_setenvif
 Summary:	Allows the setting of environment variables based on characteristics of the request
+Summary(pl):	Ustawianie zmiennych ¶rodowiskowych w oparciu o charakterystykê ¿±dania
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_setenvif.html
-Provides:	apache(mod_setenvif) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_setenvif) = %{version}-%{release}
 
 %description mod_setenvif
 The mod_setenvif module allows you to set environment variables
@@ -1326,12 +1475,19 @@ according to whether different aspects of the request match regular
 expressions you specify. These environment variables can be used by
 other parts of the server to make decisions about actions to be taken.
 
+%description mod_setenvif
+Modu³ mod_setenvif pozwala na ustawianie zmiennych ¶rodowiskowych w
+zale¿no¶ci od ró¿nych aspektów ¿±dania pasuj±cych do podanych wyra¿eñ
+regularnych. Te zmienne ¶rodowiskowe mog± byæ u¿ywane przez inne
+czê¶ci serwera do podejmowania decyzji o podejmowanych akcjach.
+
 %package mod_speling
-Summary:	Attempts to correct mistaken URLs that users might have entered by ignoring capitalization and by allowing up to one misspelling
+Summary:	Attempts to correct mistaken URLs by ignoring capitalization and by allowing up to one misspelling
+Summary(pl):	Próba poprawiania b³êdnych URL-i poprzez ignorowanie wielko¶ci liter i zezwalanie na jedn± literówkê
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_speling.html
-Provides:	apache(mod_speling) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_speling) = %{version}-%{release}
 
 %description mod_speling
 Requests to documents sometimes cannot be served by the core apache
@@ -1344,6 +1500,17 @@ misspelling (character insertion / omission / transposition or wrong
 character). A list is built with all document names which were matched
 using this strategy.
 
+%description mod_speling -l pl
+Czasami ¿±dania dokumentów nie mog± byæ wykonane przez sam serwer
+Apache, poniewa¿ ¿±danie zosta³o napisane z b³êdem w znakach lub
+wielko¶ci liter. Ten modu³ próbuje rozwi±zaæ ten problem próbuj±c
+znale¼æ pasuj±cy dokument, nawet je¶li inne modu³y siê podda³y. Dzia³a
+on poprzez porównywanie nazwy ka¿dego dokumentu w ¿±danym katalogu z
+¿±dan± nazw± dokumentu bez zwracania uwagi na wielko¶æ liter i
+pozwalaj±c na jeden b³±d (dodany, pominiêty, przestawiony lub z³y
+znak). Tworzona jest lista dla wszystkich nazw dokumentów pasuj±cych
+dla tej strategii.
+
 %package mod_ssl
 Summary:	SSL/TLS module for the Apache HTTP server
 Summary(pl):	Modu³ SSL/TSL dla serwera Apache
@@ -1351,8 +1518,8 @@ Summary(ru):	íÏÄÕÌØ SSL/TLS ÄÌÑ ×ÅÂ-ÓÅÒ×ÅÒÁ Apache
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_ssl.html
 Epoch:		1
-Provides:	apache(mod_ssl) = 1:%{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_ssl) = 1:%{version}-%{release}
 
 %description mod_ssl
 The mod_ssl module provides strong cryptography for the Apache Web
@@ -1373,9 +1540,9 @@ Summary:	Server status report module for Apache
 Summary(pl):	Modu³ udostêpniaj±cy informacje statystyczne z serwera Apache
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_status.html
-Provides:	apache(mod_status) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
 Requires:	%{name}-mod_authz_host = %{version}-%{release}
+Provides:	apache(mod_status) = %{version}-%{release}
 
 %description mod_status
 The Status module allows a server administrator to find out how well
@@ -1393,8 +1560,8 @@ Summary:	Apache module which provides a magic token for each request
 Summary(pl):	Modu³ Apache'a nadaj±cy ka¿demu zapytaniu unikalny token
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_unique_id.html
-Provides:	apache(mod_unique_id) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_unique_id) = %{version}-%{release}
 
 %description mod_unique_id
 This package contains the mod_unique_id. This module provides a magic
@@ -1413,23 +1580,28 @@ UNIQUE_ID.
 
 %package mod_userdir
 Summary:	User-specific directories
+Summary(pl):	Katalogi specyficzne dla u¿ytkowników
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_userdir.html
-Provides:	apache(mod_userdir) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
 Requires:	%{name}-mod_authz_host = %{version}-%{release}
+Provides:	apache(mod_userdir) = %{version}-%{release}
 
 %description mod_userdir
 This module allows user-specific directories to be accessed using the
 http://example.com/~user/ syntax.
+
+%description mod_userdir -l pl
+Ten modu³ pozwala na dostêp do katalogów specyficznych dla
+u¿ytkowników przy u¿yciu sk³adni http://example.com/~user/ .
 
 %package mod_usertrack
 Summary:	Apache module for user tracking using cookies
 Summary(pl):	Modu³ Apache'a s³u¿±cy do ¶ledzenia "ciasteczek"
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_usertrack.html
-Provides:	apache(mod_usertrack) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_usertrack) = %{version}-%{release}
 
 %description mod_usertrack
 This package contains the user tracking module which did its own
@@ -1437,15 +1609,16 @@ logging using CookieLog directory. This module allow multiple log
 files.
 
 %description mod_usertrack -l pl
-Modu³ pozwalaj±cy na ¶ledzenie "ciasteczek".
+Ten pakiet zawiera modu³ ¶ledz±cy u¿ytkowników zapisuj±cy w³asny log
+przy u¿yciu katalogu CookieLog. Pozwala na u¿ycie wielu plików logów.
 
 %package mod_version
 Summary:	Version dependent configuration
 Summary(pl):	Konfiguracja zale¿na od wersji
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_version.html
-Provides:	apache(mod_version) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_version) = %{version}-%{release}
 
 %description mod_version
 This module is designed for the use in test suites and large networks
@@ -1466,8 +1639,8 @@ Summary:	Apache module for dynamically configured mass virtual hosting
 Summary(pl):	Modu³ Apache'a dodaj±cy obs³ugê hostów wirtualnych
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_vhost_alias.html
-Provides:	apache(mod_vhost_alias) = %{version}-%{release}
 Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_vhost_alias) = %{version}-%{release}
 
 %description mod_vhost_alias
 This package contains the mod_vhost_alias. It provides support for
