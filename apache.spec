@@ -37,7 +37,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.2.0
-Release:	0.81
+Release:	0.82
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -1851,6 +1851,7 @@ if [ -d /etc/httpd/httpd.conf ] && [ ! -L /etc/httpd/httpd.conf ]; then
 	# new module packages issue error as first installed over 2.0 installation
 	mv -f /var/lock/subsys/httpd{,.disabled} 2>/dev/null
 fi
+exit 0
 
 %post base
 /sbin/chkconfig --add httpd
@@ -1930,6 +1931,7 @@ mv -f /var/lock/subsys/httpd{.disabled,} 2>/dev/null
 
 # restart webserver at the end of transaction
 %service httpd restart
+exit 0
 
 # macro called at module post scriptlet
 %define	module_post \
