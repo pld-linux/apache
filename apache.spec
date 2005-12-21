@@ -4,8 +4,6 @@
 # - --with-suexec-uidmin=500 or =1000 ?
 # - subpackages for MPMs
 # - !!!check if all modules (*.so) are exactly the same for different MPMs
-# - /var/run/apache is also owned by apache1.spec, so rename it to /var/run/httpd spec here
-#   (NOTE: if you fix this also adjust apache-mod_fastcgi.spec)
 # - check those autn modules inner deps
 # - for external packages: don't use any apache module name in dep as they
 #   differ for apache 1.3/2.0/2.2!? any better ideas? rpm Suggests: tags?
@@ -38,7 +36,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.2.0
-Release:	0.86
+Release:	0.89
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -1751,7 +1749,7 @@ touch ssl_expr_scan.c
 cd ../..
 
 CPPFLAGS="-DMAX_SERVER_LIMIT=200000 -DBIG_SECURITY_HOLE=1"
-for mpm in %{?with_metuxmpm:metuxmpm} %{?with_peruser:peruser} prefork worker %{?with_event:event}; do
+for mpm in prefork worker %{?with_metuxmpm:metuxmpm} %{?with_peruser:peruser} %{?with_event:event}; do
 install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
 ../%configure \
 	--prefix=%{_sysconfdir} \
@@ -1848,7 +1846,7 @@ done
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig,monit} \
-	$RPM_BUILD_ROOT%{_var}/{log/{httpd,archiv/httpd},{run,cache}/apache,lock/mod_dav} \
+	$RPM_BUILD_ROOT%{_var}/{log/{httpd,archiv/httpd},{run,cache}/httpd,lock/mod_dav} \
 	$RPM_BUILD_ROOT%{_sysconfdir}/{webapps.d,conf.d} \
 	$RPM_BUILD_ROOT%{_datadir}/cgi-bin
 
@@ -1873,16 +1871,12 @@ done
 
 ln -s httpd.prefork $RPM_BUILD_ROOT%{_sbindir}/httpd
 ln -s %{_libdir}/apache $RPM_BUILD_ROOT%{_sysconfdir}/modules
-ln -s %{_localstatedir}/run/apache $RPM_BUILD_ROOT%{_sysconfdir}/run
+ln -s %{_localstatedir}/run/httpd $RPM_BUILD_ROOT%{_sysconfdir}/run
 ln -s %{_var}/log/httpd $RPM_BUILD_ROOT%{_sysconfdir}/logs
-#rm -f $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
 ln -s conf.d $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
 
-#mv $RPM_BUILD_ROOT{%{_sysconfdir},%{_libexecdir}}/build
-#ln -s %{_libdir}/apache/build $RPM_BUILD_ROOT%{_sysconfdir}/build
-
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
-install %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/apache
+install %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/httpd
 install %{SOURCE4} $RPM_BUILD_ROOT/etc/sysconfig/httpd
 install %{SOURCE5} $RPM_BUILD_ROOT/etc/monit/httpd.monitrc
 
@@ -2251,10 +2245,9 @@ fi
 %attr(755,root,root) %{_sbindir}/checkgid
 %attr(755,root,root) %{_sbindir}/httpd
 %attr(755,root,root) %{_sbindir}/httpd.*
-# TODO: move to -tools
 
-%dir %attr(770,root,http) /var/run/apache
-%dir %attr(770,root,http) /var/cache/apache
+%dir %attr(770,root,http) /var/run/httpd
+%dir %attr(770,root,http) /var/cache/httpd
 
 %{_mandir}/man8/httpd.8*
 
