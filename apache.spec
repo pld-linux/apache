@@ -36,7 +36,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.2.0
-Release:	1
+Release:	2
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -712,6 +712,8 @@ Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_authz_host.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_authz_host) = %{version}-%{release}
+# for apache < 2.2.0
+Provides:	apache(mod_access) = %{version}-%{release}
 
 %description mod_authz_host
 The directives provided by mod_authz_host are used in <Directory>,
@@ -1895,7 +1897,7 @@ CFG="$RPM_BUILD_ROOT%{_sysconfdir}/conf.d/"
 install %{SOURCE7} $CFG/10_common.conf
 
 install %{SOURCE25} $CFG/01_mod_mime.conf
-install %{SOURCE26} $CFG/01_mod_alias.conf
+install %{SOURCE26} $CFG/80_cgi-bin.conf
 install %{SOURCE27} $CFG/01_mod_authz_host.conf
 install %{SOURCE28} $CFG/01_mod_cgid.conf
 install %{SOURCE29} $CFG/01_mod_log_config.conf
@@ -1917,6 +1919,7 @@ install %{SOURCE22} $CFG/16_mod_userdir.conf
 install %{SOURCE23} $CFG/10_mpm.conf
 install %{SOURCE24} $CFG/20_languages.conf
 
+echo "LoadModule alias_module modules/mod_alias.so" > $CFG/00_mod_alias.conf
 echo "LoadModule authn_file_module	modules/mod_authn_file.so" > $CFG/00_mod_authn_file.conf
 echo "LoadModule authn_dbm_module	modules/mod_authn_dbm.so" > $CFG/00_mod_authn_dbm.conf
 echo "LoadModule authn_anon_module	modules/mod_authn_anon.so" > $CFG/00_mod_authn_anon.conf
