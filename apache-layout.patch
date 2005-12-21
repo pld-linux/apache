@@ -27,6 +27,6 @@ diff -urN httpd-2.0.45.org/config.layout httpd-2.0.45/config.layout
 +    localstatedir: /var/lib/httpd
 +    runtimedir:    /var/run
 +    logfiledir:    /var/log/httpd
-+    proxycachedir: /var/cache/apache
++    proxycachedir: /var/cache/httpd
 +    installbuilddir: ${exec_prefix}/lib/apache/build
 +</Layout>
