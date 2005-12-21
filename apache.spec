@@ -36,7 +36,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.2.0
-Release:	0.89
+Release:	1
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
