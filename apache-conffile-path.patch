@@ -6,7 +6,7 @@ diff -ur httpd-2.0.49-orig/configure.in httpd-2.0.49/configure.in
  AC_DEFINE_UNQUOTED(HTTPD_ROOT, "${ap_prefix}",
  	[Root directory of the Apache install area])
 -AC_DEFINE_UNQUOTED(SERVER_CONFIG_FILE, "${rel_sysconfdir}/${progname}.conf",
-+AC_DEFINE_UNQUOTED(SERVER_CONFIG_FILE, "${exp_sysconfdir}/httpd.conf",
++AC_DEFINE_UNQUOTED(SERVER_CONFIG_FILE, "${exp_sysconfdir}/apache.conf",
  	[Location of the config file, relative to the Apache root directory])
 -AC_DEFINE_UNQUOTED(AP_TYPES_CONFIG_FILE, "${rel_sysconfdir}/mime.types",
 +AC_DEFINE_UNQUOTED(AP_TYPES_CONFIG_FILE, "${exp_sysconfdir}/mime.types",
