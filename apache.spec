@@ -36,7 +36,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.2.0
-Release:	2
+Release:	3
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -73,6 +73,7 @@ Source28:	%{name}-mod_cgid.conf
 Source29:	%{name}-mod_log_config.conf
 Source30:	%{name}-mod_mime_magic.conf
 Source31:	%{name}-mod_cache.conf
+Patch100:	%{name}-branch.patch
 Patch0:		%{name}-configdir_skip_backups.patch
 Patch1:		%{name}-layout.patch
 Patch2:		%{name}-suexec.patch
@@ -1698,6 +1699,7 @@ Dwa programy testowe/przykЁadowe cgi: test-cgi and print-env.
 
 %prep
 %setup -q -n httpd-%{version}
+#%patch100 -p1
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
@@ -2085,7 +2087,7 @@ EOF
 	fi
 fi
 
-%triggerpostun base -- %{name}-base < 2.2.0-0.84
+%triggerpostun base -- %{name} < 2.2.0
 # rename monitrc to be service name like other files
 if [ -f /etc/monit/apache.monitrc.rpmsave ]; then
 	mv -f /etc/monit/httpd.monitrc{,.rpmnew}
@@ -2094,7 +2096,18 @@ fi
 
 # change HTTPD_CONF to point to new location. *only* if it's the
 # default config setting
+cp -f /etc/sysconfig/httpd{,.rpmsave}
 sed -i -e '/^HTTPD_CONF="\/etc\/httpd\/httpd.conf"/s,.*,HTTPD_CONF="/etc/httpd/apache.conf",' /etc/sysconfig/httpd
+
+# FIXME what other important things to notify about Apache 2.2
+%banner -e %{name} <<'EOF'
+NB! Apache main config has been changed to /etc/httpd/apache.conf
+
+There has been changed a lot, so many things could be broken.
+Please report bugs to http://bugs.pld-linux.org/ so these could be
+resolved before Apache 2.2 gets moved to Ac-main.
+
+EOF
 
 %posttrans base
 # restore lock which we disabled in pretrans
