@@ -25,3 +25,23 @@
  
  # Cross compile commands
  
+--- httpd-2.2.0/support/apxs.in~	2005-12-21 16:08:29.000000000 +0200
++++ httpd-2.2.0/support/apxs.in	2005-12-22 02:13:02.000000000 +0200
+@@ -408,7 +408,7 @@
+         $la =~ s|\.c$|.la|;
+         my $o = $s;
+         $o =~ s|\.c$|.o|;
+-        push(@cmds, "$libtool $ltflags --mode=compile $CFG_CC $cflags -I$CFG_INCLUDEDIR $apr_includedir $apu_includedir $opt -c -o $lo $s && touch $slo");
++        push(@cmds, "$libtool $ltflags --mode=compile --tag=CC $CFG_CC $cflags -I$CFG_INCLUDEDIR $apr_includedir $apu_includedir $opt -c -o $lo $s && touch $slo");
+         unshift(@objs, $lo);
+     }
+ 
+@@ -445,7 +445,7 @@
+         $opt .= " -rpath $CFG_LIBEXECDIR -module -avoid-version $apr_ldflags";
+     }
+ 
+-    push(@cmds, "$libtool $ltflags --mode=link $CFG_CC -o $dso_file $opt $lo");
++    push(@cmds, "$libtool $ltflags --mode=link --tag=CC $CFG_CC -o $dso_file $opt $lo");
+ 
+     #   execute the commands
+     &execute_cmds(@cmds);
