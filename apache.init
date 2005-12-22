@@ -7,10 +7,7 @@
 #		HTML files and CGI.
 # processname:	httpd
 # pidfile:	/var/run/httpd.pid
-# config:	/etc/httpd/conf/access.conf
-# config:	/etc/httpd/conf/httpd.conf
-# config:	/etc/httpd/conf/srm.conf
-
+# config:	/etc/httpd/apache.conf
 
 # Source function library
 . /etc/rc.d/init.d/functions
@@ -61,10 +58,7 @@ case "$1" in
 	if [ -f /var/lock/subsys/httpd ]; then
 		msg_stopping httpd.${HTTPD_MPM}
 		killproc --pidfile httpd.pid httpd.${HTTPD_MPM}
-		# Delete pidfile only when apache was called successfully
-		if [ $? -eq 0 ]; then
-			rm -f /var/lock/subsys/httpd /var/run/httpd.pid /var/run/httpd.loc* >/dev/null 2>&1
-		fi
+		rm -f /var/lock/subsys/httpd /var/run/httpd.pid /var/run/httpd.loc* >/dev/null 2>&1
 	else
 		msg_not_running httpd.${HTTPD_MPM}
 	fi
