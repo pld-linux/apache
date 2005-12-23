@@ -36,7 +36,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.2.0
-Release:	3
+Release:	4
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -2108,6 +2108,13 @@ Please report bugs to http://bugs.pld-linux.org/ so these could be
 resolved before Apache 2.2 gets moved to Ac-main.
 
 EOF
+
+%triggerpostun mod_ssl -- %{name}-mod_ssl < 2.2.0-3.1
+cp -f /etc/httpd/conf.d/40_mod_ssl.conf{,.rpmsave}
+sed -i -e '
+	s,/var/run/apache,/var/run/httpd,g
+	s,/var/cache/apache,/var/cache/httpd,g
+' /etc/httpd/conf.d/40_mod_ssl.conf
 
 %posttrans base
 # restore lock which we disabled in pretrans
