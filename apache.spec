@@ -2106,8 +2106,7 @@ sed -i -e '/^HTTPD_CONF="\/etc\/httpd\/httpd.conf"/s,.*,HTTPD_CONF="/etc/httpd/a
 NB! Apache main config has been changed to /etc/httpd/apache.conf
 
 There has been changed a lot, so many things could be broken.
-Please report bugs to http://bugs.pld-linux.org/ so these could be
-resolved before Apache 2.2 gets moved to Ac-main.
+Please report bugs to http://bugs.pld-linux.org/.
 
 EOF
 
