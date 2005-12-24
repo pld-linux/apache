@@ -36,7 +36,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.2.0
-Release:	5
+Release:	6
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -2110,7 +2110,7 @@ Please report bugs to http://bugs.pld-linux.org/.
 
 EOF
 
-%triggerpostun mod_ssl -- %{name}-mod_ssl < 2.2.0-3.1
+%triggerpostun mod_ssl -- %{name}-mod_ssl < 1:2.2.0-3.1
 cp -f /etc/httpd/conf.d/40_mod_ssl.conf{,.rpmsave}
 sed -i -e '
 	s,/var/run/apache,/var/run/httpd,g
