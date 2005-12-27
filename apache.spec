@@ -36,7 +36,7 @@ Summary(ru):	óÁÍÙÊ ÐÏÐÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.2.0
-Release:	6
+Release:	6.6
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -85,6 +85,7 @@ Patch5:		httpd-2.0.48-metuxmpm-r8.patch
 Patch6:		httpd-2.0.40-xfsz.patch
 Patch7:		%{name}-syslibs.patch
 Patch8:		httpd-2.0.45-encode.patch
+Patch9:		%{name}-paths.patch
 Patch10:	httpd-2.0.46-dav401dest.patch
 Patch12:	httpd-2.0.46-sslmutex.patch
 Patch14:	httpd-2.0.48-corelimit.patch
@@ -1709,6 +1710,7 @@ Dwa programy testowe/przyk³adowe cgi: test-cgi and print-env.
 %patch5 -p1
 %patch7 -p1
 %patch8 -p1
+%patch9 -p1
 %patch10 -p1
 %patch12 -p1
 %patch14 -p1
@@ -1721,14 +1723,6 @@ Dwa programy testowe/przyk³adowe cgi: test-cgi and print-env.
 
 # using system apr, apr-util and pcre
 rm -rf srclib/{apr,apr-util,pcre}
-
-# fixup perl path
-sed -i -e '1s@#!.*local/bin/perl@#!%{__perl}@' docs/cgi-examples/printenv
-
-# fix location of build dir in generated apxs
-sed -i -e '
-s:@exp_installbuilddir@:%{_libdir}/apache/build:g
-' support/apxs.in
 
 # sanity check
 MODULES_API=`awk '/#define MODULE_MAGIC_NUMBER_MAJOR/ {print $3}' include/ap_mmn.h`
@@ -1758,11 +1752,8 @@ CPPFLAGS="-DMAX_SERVER_LIMIT=200000 -DBIG_SECURITY_HOLE=1"
 for mpm in prefork worker %{?with_metuxmpm:metuxmpm} %{?with_peruser:peruser} %{?with_event:event}; do
 install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
 ../%configure \
-	--prefix=%{_sysconfdir} \
-	--exec-prefix=%{_libexecdir} \
-	--with-installbuilddir=%{_libdir}/apache/build \
-	--disable-v4-mapped \
 	--enable-layout=PLD \
+	--disable-v4-mapped \
 	--enable-modules=all \
 	--enable-mods-shared=all \
 	--enable-auth-anon \
@@ -1858,25 +1849,15 @@ install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig,monit} \
 
 # prefork is default one
 %{__make} -C buildmpm-prefork install \
-	DESTDIR=$RPM_BUILD_ROOT \
-	installbuilddir=%{_libdir}/apache/build \
-	prefix=%{_sysconfdir}/httpd \
-	libexecdir=%{_libdir}/%{name} \
-	iconsdir=%{_datadir}/icons \
-	errordir=%{_datadir}/error \
-	htdocsdir=%{_datadir}/html \
-	manualdir=%{_datadir}/manual \
-	cgidir=%{_cgibindir} \
-	runtimedir=%{_var}/run \
-	logdir=%{_var}/log/httpd \
-	proxycachedir=%{_var}/cache/httpd
+	DESTDIR=$RPM_BUILD_ROOT
 
+# install other mpm-s
 for mpm in %{?with_metuxmpm:metuxmpm} %{?with_peruser:peruser} worker %{?with_event:event}; do
 	install buildmpm-${mpm}/httpd.${mpm} $RPM_BUILD_ROOT%{_sbindir}/httpd.${mpm}
 done
 
 ln -s httpd.prefork $RPM_BUILD_ROOT%{_sbindir}/httpd
-ln -s %{_libdir}/apache $RPM_BUILD_ROOT%{_sysconfdir}/modules
+ln -s %{_libexecdir} $RPM_BUILD_ROOT%{_sysconfdir}/modules
 ln -s %{_localstatedir}/run/httpd $RPM_BUILD_ROOT%{_sysconfdir}/run
 ln -s %{_var}/log/httpd $RPM_BUILD_ROOT%{_sysconfdir}/logs
 ln -s conf.d $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
@@ -2333,9 +2314,8 @@ fi
 %files devel
 %defattr(644,root,root,755)
 %{_includedir}
+# FIXME: httpd.exp needed only on AIX
 %{_libexecdir}/*.exp
-# is this symlink needed?
-#%{_sysconfdir}/build
 %{_libexecdir}/build/[lprs]*.mk
 %attr(755,root,root) %{_libexecdir}/build/*.sh
 
