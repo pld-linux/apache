@@ -12,7 +12,6 @@
 # - mod_auth_digest and mod_auth_basic R: apache(authn) ?
 # - drop mod_case_filter* or find summary and description for them
 # - build modules only once (not with each mpm)
-# - add to apache external packages apache_module_api dependency (like apache-mod_rpaf.spec)
 
 # Conditional build:
 %bcond_without	ssl		# build without SSL support
@@ -36,7 +35,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.2.0
-Release:	6.6
+Release:	7
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -450,6 +449,7 @@ Group:		Networking/Daemons
 Requires:	%{name}-base = %{version}-%{release}
 Requires:	%{name}-mod_authn_file = %{version}-%{release}
 Requires:	%{name}-mod_authz_groupfile = %{version}-%{release}
+Requires:	%{name}-mod_auth_basic = %{version}-%{release}
 Provides:	apache(mod_auth) = %{version}-%{release}
 
 %description mod_auth
@@ -2079,7 +2079,7 @@ fi
 
 # change HTTPD_CONF to point to new location. *only* if it's the
 # default config setting
-cp -f /etc/sysconfig/httpd{,.rpmsave}
+cp -f /etc/sysconfig/httpd{,.rpmorig}
 sed -i -e '/^HTTPD_CONF="\/etc\/httpd\/httpd.conf"/s,.*,HTTPD_CONF="/etc/httpd/apache.conf",' /etc/sysconfig/httpd
 
 # FIXME what other important things to notify about Apache 2.2
