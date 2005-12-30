@@ -66,7 +66,6 @@ Source22:	%{name}-mod_userdir.conf
 Source23:	%{name}-mpm.conf
 Source24:	%{name}-languages.conf
 Source25:	%{name}-mod_mime.conf
-Source26:	%{name}-mod_alias.conf
 Source27:	%{name}-mod_authz_host.conf
 Source28:	%{name}-mod_cgid.conf
 Source29:	%{name}-mod_log_config.conf
