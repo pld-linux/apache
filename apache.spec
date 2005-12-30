@@ -35,7 +35,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.2.0
-Release:	7
+Release:	8
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -1882,7 +1882,6 @@ CFG="$RPM_BUILD_ROOT%{_sysconfdir}/conf.d/"
 install %{SOURCE7} $CFG/10_common.conf
 
 install %{SOURCE25} $CFG/01_mod_mime.conf
-install %{SOURCE26} $CFG/80_cgi-bin.conf
 install %{SOURCE27} $CFG/01_mod_authz_host.conf
 install %{SOURCE28} $CFG/01_mod_cgid.conf
 install %{SOURCE29} $CFG/01_mod_log_config.conf
@@ -2327,7 +2326,6 @@ fi
 %files mod_alias
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_alias.conf
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_cgi-bin.conf
 %attr(755,root,root) %{_libexecdir}/mod_alias.so
 
 %files mod_asis
