@@ -1,6 +1,23 @@
---- httpd-2.0.50/support/apxs.in.orig	2004-07-25 21:25:37.955097000 +0000
-+++ httpd-2.0.50/support/apxs.in	2004-07-25 22:25:01.093725664 +0000
-@@ -198,11 +198,10 @@
+--- httpd-2.2.0/support/apxs.in.save	2005-06-10 12:18:14.000000000 +0300
++++ httpd-2.2.0/support/apxs.in	2006-01-02 15:08:43.000000000 +0200
+@@ -44,6 +44,7 @@
+ my $CFG_CC         = get_vars("CC");
+ my $libexecdir     = get_vars("libexecdir");
+ my $CFG_LIBEXECDIR = eval qq("$libexecdir");
++my $CFG_DESTDIR    = '';
+ my $sbindir        = get_vars("sbindir");
+ my $CFG_SBINDIR    = eval qq("$sbindir");
+ my $ltflags        = $ENV{'LTFLAGS'};
+@@ -171,7 +172,7 @@
+ 	    my ($val) = $2;
+ 	    my $oldval = eval "\$CFG_$var";
+ 
+-	    unless ($var and $oldval) {
++	    unless ($var and defined $oldval) {
+ 		print STDERR "apxs:Error: no config variable $var\n";
+ 		&usage;
+ 	    }
+@@ -199,11 +200,10 @@
      ($httpd = $0) =~ s:support/apxs$::;
  }
  
@@ -15,7 +32,7 @@
  unless (grep /mod_so/, `. $envvars && $httpd -l`) {
      error("Sorry, no shared object support for Apache");
      error("available under your platform. Make sure");
-@@ -210,7 +209,7 @@
+@@ -211,7 +211,7 @@
      error("your server binary `$httpd'.");
      exit 1;
  }
@@ -24,24 +41,14 @@
  sub get_config_vars{
      my ($file, $rh_config) = @_;
  
---- httpd-2.2.0/support/apxs.in	2005-12-27 00:22:41.000000000 +0200
-+++ /usr/sbin/apxs	2005-12-28 16:06:45.000000000 +0200
-@@ -44,6 +44,7 @@
- my $CFG_CC         = get_vars("CC");
- my $libexecdir     = get_vars("libexecdir");
- my $CFG_LIBEXECDIR = eval qq("$libexecdir");
-+my $DESTDIR        = $ENV{'DESTDIR'};
- my $sbindir        = get_vars("sbindir");
- my $CFG_SBINDIR    = eval qq("$sbindir");
- my $ltflags        = $ENV{'LTFLAGS'};
-@@ -478,8 +479,8 @@
+@@ -479,8 +479,8 @@
          $t =~ s|\.[^./\\]+$|\.so|;
          if ($opt_i) {
  	    push(@cmds, "$installbuilddir/instdso.sh SH_LIBTOOL='" .
 -                 "$libtool' $f $CFG_LIBEXECDIR");
 -	    push(@cmds, "chmod 755 $CFG_LIBEXECDIR/$t");
-+                 "$libtool' $f $DESTDIR$CFG_LIBEXECDIR");
-+	    push(@cmds, "chmod 755 $DESTDIR$CFG_LIBEXECDIR/$t");
++                 "$libtool' $f $CFG_DESTDIR$CFG_LIBEXECDIR");
++	    push(@cmds, "chmod 755 $CFG_DESTDIR$CFG_LIBEXECDIR/$t");
          }
  
          #   determine module symbolname and filename
