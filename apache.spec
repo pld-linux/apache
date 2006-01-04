@@ -1479,7 +1479,7 @@ according to whether different aspects of the request match regular
 expressions you specify. These environment variables can be used by
 other parts of the server to make decisions about actions to be taken.
 
-%description mod_setenvif
+%description mod_setenvif -l pl
 Modu³ mod_setenvif pozwala na ustawianie zmiennych ¶rodowiskowych w
 zale¿no¶ci od ró¿nych aspektów ¿±dania pasuj±cych do podanych wyra¿eñ
 regularnych. Te zmienne ¶rodowiskowe mog± byæ u¿ywane przez inne
