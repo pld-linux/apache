@@ -35,7 +35,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.2.0
-Release:	8
+Release:	9
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -2007,6 +2007,7 @@ if [ ! -L /etc/httpd/httpd.conf ]; then
 	fi
 
 	# always have httpd.conf symlink (until all packages from Ac use new dir)
+	install -d /etc/httpd
 	ln -s conf.d /etc/httpd/httpd.conf
 fi
 exit 0
