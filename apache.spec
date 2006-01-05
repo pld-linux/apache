@@ -114,10 +114,12 @@ BuildRequires:	rpm-perlprov >= 4.1-13
 BuildRequires:	rpmbuild(macros) >= 1.228
 BuildRequires:	sed >= 4.0
 BuildRequires:	zlib-devel
+# packages that were in apache-2.0.rpm, for compatibility
 Requires:	%{name}-errordocs = %{version}-%{release}
 Requires:	%{name}-mod_alias = %{version}-%{release}
+Requires:	%{name}-mod_asis = %{version}-%{release}
 Requires:	%{name}-mod_authz_host = %{version}-%{release}
-Requires:	%{name}-mod_autoindex = %{version}-%{release}
+Requires:	%{name}-mod_cern_meta = %{version}-%{release}
 Requires:	%{name}-mod_cgi = %{version}-%{release}
 Requires:	%{name}-mod_env = %{version}-%{release}
 Requires:	%{name}-mod_include = %{version}-%{release}
