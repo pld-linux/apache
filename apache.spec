@@ -1942,9 +1942,6 @@ echo "LoadModule speling_module	modules/mod_speling.so" > $CFG/00_mod_speling.co
 echo "LoadModule ldap_module	modules/mod_ldap.so" > $CFG/00_mod_ldap.conf
 echo "LoadModule actions_module	modules/mod_actions.so" > $CFG/00_mod_actions.conf
 echo "LoadModule auth_digest_module	modules/mod_auth_digest.so" > $CFG/00_mod_auth_digest.conf
-echo "LoadModule cache_module	modules/mod_cache.so
-LoadModule mem_cache_module	modules/mod_mem_cache.so
-LoadModule disk_cache_module	modules/mod_disk_cache.so" > $CFG/00_mod_cache.conf
 echo "LoadModule charset_lite_module	modules/mod_charset_lite.so" > $CFG/00_mod_charset_lite.conf
 echo "LoadModule expires_module	modules/mod_expires.so" > $CFG/00_mod_expires.conf
 echo "LoadModule file_cache_module	modules/mod_file_cache.so" > $CFG/00_mod_file_cache.conf
