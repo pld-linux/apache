@@ -35,7 +35,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.2.0
-Release:	9
+Release:	9.3
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -2078,6 +2078,41 @@ fi
 # default config setting
 cp -f /etc/sysconfig/httpd{,.rpmorig}
 sed -i -e '/^HTTPD_CONF="\/etc\/httpd\/httpd.conf"/s,.*,HTTPD_CONF="/etc/httpd/apache.conf",' /etc/sysconfig/httpd
+
+if [ -f /etc/httpd/conf.d/10_httpd.conf.rpmsave ]; then
+	sed -e '
+	# as separate modules
+	/^LoadModule access_module/s,^,#,
+	/^LoadModule alias_module/s,^,#,
+	/^LoadModule asis_module/s,^,#,
+	/^LoadModule cern_meta_module/s,^,#,
+	/^LoadModule cgi_module/s,^,#,
+	/^LoadModule env_module/s,^,#,
+	/^LoadModule include_module/s,^,#,
+	/^LoadModule log_config_module/s,^,#,
+	/^LoadModule mime_magic_module/s,^,#,
+	/^LoadModule mime_module/s,^,#,
+	/^LoadModule negotiation_module/s,^,#,
+	/^LoadModule setenvif_module/s,^,#,
+	/^LoadModule speling_module/s,^,#,
+	/^LoadModule userdir_module/s,^,#,
+
+	# in 30_errordocs.conf
+	/<IfModule mod_include.c>/,/<\/IfModule>/s,^,#,
+
+	# in 57_mod_autoindex.conf
+	/^Alias \/icons\//s,^,#,
+
+	# in apache.conf
+	/^ScriptAlias \/cgi-bin\//s,^,#,
+	/^Listen 80/s,^,#,
+
+	# avoid loops
+	/Include conf.d\/\*.conf/s,^,#,
+	/Include webapps.d\/\*.conf/s,^,#,
+
+	' < /etc/httpd/conf.d/10_httpd.conf.rpmsave > /etc/httpd/conf.d/10_httpd.conf
+fi
 
 # FIXME what other important things to notify about Apache 2.2
 %banner -e %{name} <<'EOF'
