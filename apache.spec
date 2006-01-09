@@ -210,6 +210,7 @@ Obsoletes:	%{name}-mod_optional_fn_export
 Obsoletes:	%{name}-mod_optional_fn_import
 Obsoletes:	%{name}-mod_optional_fn_import
 Obsoletes:	%{name}-mod_optional_hook_import
+Conflicts:	apache < 2.2.0
 # for the posttrans scriptlet, conflicts because in vserver environment rpm package is not installed.
 Conflicts:	rpm < 4.4.2-0.2
 
