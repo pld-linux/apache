@@ -35,7 +35,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.2.0
-Release:	9.3
+Release:	10
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -2114,7 +2114,6 @@ if [ -f /etc/httpd/conf.d/10_httpd.conf.rpmsave ]; then
 	' < /etc/httpd/conf.d/10_httpd.conf.rpmsave > /etc/httpd/conf.d/10_httpd.conf
 fi
 
-# FIXME what other important things to notify about Apache 2.2
 %banner -e %{name} <<'EOF'
 NB! Apache main config has been changed to /etc/httpd/apache.conf
 
