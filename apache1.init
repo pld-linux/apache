@@ -95,7 +95,7 @@ case "$1" in
 	fi
 
 	;;
-  reload|force-reload)
+  force-reload)
   	if [ -f /var/lock/subsys/apache ]; then
 		msg_reloading apache
 
@@ -112,7 +112,7 @@ case "$1" in
 		RETVAL=7
 	fi
 	;;
-  graceful)
+  reload|graceful)
 	if [ -f /var/lock/subsys/apache ]; then
 		msg_reloading apache
 
