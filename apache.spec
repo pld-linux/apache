@@ -35,7 +35,7 @@ Summary(ru):	óÁÍÙÊ ÐÏÐÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.2.0
-Release:	11
+Release:	12
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -206,10 +206,10 @@ Provides:	webserver = apache
 Obsoletes:	apache-extra
 Obsoletes:	apache6
 # packaged by mistake. really sample code
-Obsoletes:	%{name}-mod_optional_fn_export
-Obsoletes:	%{name}-mod_optional_fn_import
-Obsoletes:	%{name}-mod_optional_fn_import
-Obsoletes:	%{name}-mod_optional_hook_import
+Obsoletes:	apache-mod_optional_fn_export
+Obsoletes:	apache-mod_optional_fn_import
+Obsoletes:	apache-mod_optional_fn_import
+Obsoletes:	apache-mod_optional_hook_import
 Conflicts:	apache < 2.2.0
 # for the posttrans scriptlet, conflicts because in vserver environment rpm package is not installed.
 Conflicts:	rpm < 4.4.2-0.2
@@ -447,18 +447,21 @@ Summary:	Virtual package which which provides backward compatibility with apache
 Summary(pl):	Pakiet wirtualny zapewniaj±cy kompatybilno¶æ wsteczn± z apache 2.0
 Group:		Networking/Daemons
 Requires:	%{name}-base = %{version}-%{release}
+Requires:	%{name}-mod_auth_basic = %{version}-%{release}
 Requires:	%{name}-mod_authn_file = %{version}-%{release}
 Requires:	%{name}-mod_authz_groupfile = %{version}-%{release}
-Requires:	%{name}-mod_auth_basic = %{version}-%{release}
+Requires:	%{name}-mod_authz_user = %{version}-%{release}
 Provides:	apache(mod_auth) = %{version}-%{release}
 
 %description mod_auth
-Virtual package which requires apache-mod_authn_file and
-apache-mod_authz_groupfile for backward compatibility with apache 2.0.
+Virtual package which requires apache-mod_authn_file,
+apache-mod_authz_user and apache-mod_authz_groupfile for backward
+compatibility with apache 2.0.
 
 %description mod_auth -l pl
-Pakiet wirtualny wymagaj±cy apache-mod_authn_file i
-apache-mod_authz_groupfile dla kompatybilno¶ci wstecznej z apache 2.0.
+Pakiet wirtualny wymagaj±cy apache-mod_authn_file,
+apache-mod_authz_user i apache-mod_authz_groupfile dla kompatybilno¶ci
+wstecznej z apache 2.0.
 
 %package mod_auth_basic
 Summary:	Apache module that allows Basic authentication
@@ -540,8 +543,8 @@ URL:		http://httpd.apache.org/docs/2.2/mod/mod_authn_anon.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_authn_anon) = %{version}-%{release}
 # compat
-Provides:	apache-mod_auth_anon = %{version}-%{release}
 Provides:	apache(mod_auth_anon) = %{version}-%{release}
+Provides:	apache-mod_auth_anon = %{version}-%{release}
 Obsoletes:	apache-mod_auth_anon < 2.2.0-0.5
 
 %description mod_authn_anon
@@ -1232,7 +1235,7 @@ Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_imagemap.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_imagemap) = %{version}-%{release}
-Obsoletes:	%{name}-mod_imap
+Obsoletes:	apache-mod_imap
 
 %description mod_imagemap
 This module processes .map files, thereby replacing the functionality
@@ -2169,7 +2172,6 @@ fi
 %module_scripts mod_actions
 %module_scripts mod_alias
 %module_scripts mod_asis
-%module_scripts mod_auth
 %module_scripts mod_auth_basic
 %module_scripts mod_auth_dbm
 %module_scripts mod_auth_digest
