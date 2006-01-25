@@ -34,7 +34,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.0.55
-Release:	3.2
+Release:	4
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -120,11 +120,11 @@ Requires:	/etc/mime.types
 Requires:	apr >= 1:1.0.0-2
 Requires:	mailcap
 Requires:	psmisc >= 20.1
+Provides:	apache-mod_mime = %{version}-%{release}
 Provides:	apache(modules-api) = %{_apache_modules_api}
 Provides:	apache(mod_access)
 Provides:	apache(mod_alias)
 Provides:	apache(mod_asis)
-Provides:	apache(mod_autoindex)
 Provides:	apache(mod_cern_meta)
 Provides:	apache(mod_cgi)
 Provides:	apache(mod_env)
