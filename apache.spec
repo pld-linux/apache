@@ -111,7 +111,7 @@ BuildRequires:	libtool >= 2:1.5
 BuildRequires:	pcre-devel
 BuildRequires:	rpm-build >= 4.4.0
 BuildRequires:	rpm-perlprov >= 4.1-13
-BuildRequires:	rpmbuild(macros) >= 1.228
+BuildRequires:	rpmbuild(macros) >= 1.268
 BuildRequires:	sed >= 4.0
 BuildRequires:	zlib-devel
 # packages that were in apache-2.0.rpm, for compatibility
@@ -2020,11 +2020,8 @@ touch /var/log/httpd/{access,error,agent,referer}_log
 
 %preun base
 if [ "$1" = "0" ]; then
-	if [ -f /var/lock/subsys/httpd ]; then
-		/etc/rc.d/init.d/httpd stop 1>&2
-	fi
-	# see http://thread.gmane.org/gmane.linux.pld.devel.english/712
-	[ ! -x /sbin/chkconfig ] || /sbin/chkconfig --del httpd
+	%service httpd stop
+	/sbin/chkconfig --del httpd
 fi
 
 %postun base
@@ -2147,7 +2144,6 @@ mv -f /var/lock/subsys/httpd{.disabled,} 2>/dev/null
 
 # restart webserver at the end of transaction
 %service httpd restart
-exit 0
 
 # macro called at module post scriptlet
 %define	module_post \
