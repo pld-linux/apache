@@ -35,7 +35,7 @@ Summary(ru):	óÁÍÙÊ ĞÏĞÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.2.0
-Release:	12
+Release:	13
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -303,6 +303,7 @@ Dokumenty opisuj±ce b³êdy HTTP dla Apache'a w wielu jêzykach.
 Summary:	APache eXtenSion tool
 Summary(pl):	Narzêdzie do rozszerzania Apache'a
 Group:		Development/Tools
+Requires:	apr-devel
 
 %description apxs
 APache eXtenSion tool.
