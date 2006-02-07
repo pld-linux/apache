@@ -91,9 +91,9 @@ Patch24:	%{name}2-pcre-patch.diff
 Patch25:	%{name}-CVE-2005-3352.patch
 Patch26:	%{name}-CVE-2005-3357.patch
 URL:		http://httpd.apache.org/
-BuildRequires:	automake
 BuildRequires:	apr-devel >= 1:1.0.0
 BuildRequires:	apr-util-devel >= 1:1.0.0
+BuildRequires:	automake
 BuildRequires:	db-devel
 BuildRequires:	expat-devel
 BuildRequires:	gdbm-devel >= 1.8.3
@@ -107,23 +107,21 @@ BuildRequires:	rpm-build >= 4.4.0
 BuildRequires:	rpm-perlprov >= 4.1-13
 BuildRequires:	rpmbuild(macros) >= 1.228
 BuildRequires:	zlib-devel
-PreReq:		perl-base
-PreReq:		rc-scripts >= 0.4.0.15
+Requires(post):	fileutils
+Requires(post,preun):	/sbin/chkconfig
+Requires(postun):	/usr/sbin/groupdel
+Requires(postun):	/usr/sbin/userdel
 Requires(pre):	/bin/id
 Requires(pre):	/usr/bin/getgid
 Requires(pre):	/usr/sbin/groupadd
 Requires(pre):	/usr/sbin/useradd
-Requires(postun):	/usr/sbin/userdel
-Requires(postun):	/usr/sbin/groupdel
-Requires(post,preun):	/sbin/chkconfig
-Requires(post):	fileutils
-Requires:	/sbin/chkconfig
 Requires:	/etc/mime.types
+Requires:	/sbin/chkconfig
 Requires:	apr >= 1:1.0.0-2
 Requires:	mailcap
+Requires:	perl-base
 Requires:	psmisc >= 20.1
-Provides:	apache-mod_mime = %{version}-%{release}
-Provides:	apache(modules-api) = %{_apache_modules_api}
+Requires:	rc-scripts >= 0.4.0.15
 Provides:	apache(mod_access)
 Provides:	apache(mod_alias)
 Provides:	apache(mod_asis)
@@ -138,6 +136,8 @@ Provides:	apache(mod_negotiation)
 Provides:	apache(mod_setenvif)
 Provides:	apache(mod_speling)
 Provides:	apache(mod_userdir)
+Provides:	apache(modules-api) = %{_apache_modules_api}
+Provides:	apache-mod_mime = %{version}-%{release}
 Provides:	group(http)
 Provides:	httpd = %{version}
 Provides:	user(http)
@@ -292,8 +292,8 @@ desenvolver módulos adicionais para o Apache.
 Summary:	Apache module for run CGI whenever a file of a certain type is requested
 Summary(pl):	Modu³ Apache'a do uruchamiania skryptów CGI
 Group:		Networking/Daemons
-Provides:	apache(mod_actions) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_actions) = %{version}-%{release}
 
 %description mod_actions
 This package contains mod_actions module. This module lets you run CGI
@@ -308,9 +308,9 @@ Ten modu³ pozwala na uruchamianie skryptów w momencie gdy nadchodzi
 Summary:	Apache module with user authentication using textual files
 Summary(pl):	Modu³ Apache'a identyfikuj±cy u¿ytkowników na podstawie plików tekstowych
 Group:		Networking/Daemons
-Provides:	apache(mod_auth) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
 Requires:	htpasswd
+Provides:	apache(mod_auth) = %{version}-%{release}
 
 %description mod_auth
 This package contains mod_auth module. It provides for user
@@ -324,8 +324,8 @@ u¿ytkowników na podstawie plików tekstowych.
 Summary:	Apache module with "anonymous" user access authentication
 Summary(pl):	Modu³ Apache'a oferuj±cy autoryzacjê u¿ytkownika "anonimowego"
 Group:		Networking/Daemons
-Provides:	apache(mod_auth_anon) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_auth_anon) = %{version}-%{release}
 
 %description mod_auth_anon
 This package contains mod_auth_anon module. It allows "anonymous" user
@@ -348,9 +348,9 @@ adresu pocztowego u¿ytkownika).
 Summary:	Apache module with LDAP user access authentication
 Summary(pl):	Modu³ Apache'a oferuj±cy autoryzacjê u¿ytkowników poprzez LDAP
 Group:		Networking/Daemons
-Provides:	apache(mod_auth_ldap) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
 Requires:	%{name}-mod_ldap = %{version}-%{release}
+Provides:	apache(mod_auth_ldap) = %{version}-%{release}
 
 %description mod_auth_ldap
 Apache module with LDAP user access authentication.
@@ -362,9 +362,9 @@ Modu³ Apache'a oferuj±cy autoryzacjê u¿ytkowników poprzez LDAP.
 Summary:	Apache module with user authentication which uses DBM files
 Summary(pl):	Modu³ Apache'a z mechanizmem identyfikacji korzystaj±cym z plików DBM
 Group:		Networking/Daemons
-Obsoletes:	apache-mod_auth_db
-Provides:	apache(mod_auth_dbm) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_auth_dbm) = %{version}-%{release}
+Obsoletes:	apache-mod_auth_db
 
 %description mod_auth_dbm
 This module provides for HTTP Basic Authentication, where the
@@ -379,9 +379,9 @@ ich has³a s± trzymane w plikach bazy typu DBM.
 Summary:	Apache user authentication module using MD5 Digest Authentication
 Summary(pl):	Modu³ Apache'a do autoryzacji MD5
 Group:		Networking/Daemons
-Obsoletes:	apache-mod_digest
-Provides:	apache(mod_auth_digest) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_auth_digest) = %{version}-%{release}
+Obsoletes:	apache-mod_digest
 
 %description mod_auth_digest
 This package contains mod_digest module. It provides user
@@ -395,12 +395,12 @@ Authentication.
 Summary:	Apache module - display index of files
 Summary(pl):	Modu³ apache do wy¶wietlania indeksu plików
 Group:		Networking/Daemons
-Provides:	apache(mod_autoindex) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_autoindex) = %{version}-%{release}
 
 %description mod_autoindex
-This package contains mod_autoindex module. It provides
-generation index of files.
+This package contains mod_autoindex module. It provides generation
+index of files.
 
 %description mod_autoindex -l pl
 Ten pakiet dostarcza modu³ autoindex, który generuje indeks plików.
@@ -409,8 +409,8 @@ Ten pakiet dostarcza modu³ autoindex, który generuje indeks plików.
 Summary:	Content cache keyed to URIs
 Summary(pl):	Pamiêæ podrêczna wg klucza URI
 Group:		Networking/Daemons
-Provides:	apache(mod_cache) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_cache) = %{version}-%{release}
 
 %description mod_cache
 mod_cache implements an RFC 2616 compliant HTTP content cache that can
@@ -431,8 +431,8 @@ dysku (u¿ywane do cache'owania proxy).
 Summary:	Execution of CGI scripts using an external CGI daemon
 Summary(pl):	Uruchamianie zewnêtrznych skryptów CGI za pomoc± daemona CGI
 Group:		Networking/Daemons
-Provides:	apache(mod_cgid) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_cgid) = %{version}-%{release}
 
 %description mod_cgid
 Execution of CGI scripts using an external CGI daemon.
@@ -444,8 +444,8 @@ Uruchamianie zewnêtrznych skryptów CGI za pomoc± demona CGI.
 Summary:	Specify character set translation or recoding
 Summary(pl):	Translacja lub przekodowywanie znaków
 Group:		Networking/Daemons
-Provides:	apache(mod_charset_lite) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_charset_lite) = %{version}-%{release}
 
 %description mod_charset_lite
 Specify character set translation or recoding.
@@ -457,8 +457,8 @@ Translacja lub przekodowywanie znaków.
 Summary:	Apache module - Distributed Authoring and Versioning
 Summary(pl):	Modu³ Apache'a - rozproszone autorstwo i wersjonowanie
 Group:		Networking/Daemons
-Provides:	apache(mod_dav) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_dav) = %{version}-%{release}
 
 %description mod_dav
 This module provides class 1 and class 2 WebDAV ('Web-based
@@ -476,9 +476,9 @@ zdalnym serwerze WWW.
 Summary:	Apache module: Compress content before it is delivered to the client
 Summary(pl):	Modu³ Apache'a kompresuj±cy dane przed przes³aniem ich do klienta
 Group:		Networking/Daemons
-Provides:	apache(mod_deflate) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
 Requires:	%{name}-mod_headers = %{version}-%{release}
+Provides:	apache(mod_deflate) = %{version}-%{release}
 
 %description mod_deflate
 Compress content before it is delivered to the client.
@@ -490,8 +490,8 @@ Modu³ kompresuj±cy dane przed przes³aniem ich do klienta.
 Summary:	Apache module for "trailing slash" redirects and serving directory index files
 Summary(pl):	Modu³ Apache'a oferuj±cy przekierowania i udostêpnianie informacji o zawarto¶ci katalogu
 Group:		Networking/Daemons
-Provides:	apache(mod_dir) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_dir) = %{version}-%{release}
 
 %description mod_dir
 This package contains mod_dir which provides "trailing slash"
@@ -505,8 +505,8 @@ katalogu.
 Summary:	Apache module allows for the customization of HTTP response headers
 Summary(pl):	Modu³ Apache'a pozwalaj±cy na modyfikacjê nag³ówków HTTP
 Group:		Networking/Daemons
-Provides:	apache(mod_headers) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_headers) = %{version}-%{release}
 
 %description mod_headers
 This package contains mod_headers module. The module allows for the
@@ -521,8 +521,8 @@ wysy³anych do przegl±darki.
 Summary:	Apache module with imap-file handler
 Summary(pl):	Modu³ Apache'a z obs³ug± imap-file
 Group:		Networking/Daemons
-Provides:	apache(mod_imap) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_imap) = %{version}-%{release}
 
 %description mod_imap
 This package contains mod_imap module. It provides for .map files,
@@ -536,8 +536,8 @@ Modu³ umo¿liwiaj±cy obs³ugê plików .map (imap-file handler).
 Summary:	Apache module with comprehensive overview of the server configuration
 Summary(pl):	Modu³ Apache'a udostêpniaj±cy informacje o serwerze
 Group:		Networking/Daemons
-Provides:	apache(mod_info) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_info) = %{version}-%{release}
 
 %description mod_info
 This package contains mod_info module. It provides a comprehensive
@@ -552,8 +552,8 @@ zainstalowanych modu³ach itp.
 Summary:	Apache module to use LDAP connections
 Summary(pl):	Modu³ Apache'a umo¿liwiaj±cy korzystanie z po³±czeñ LDAP
 Group:		Networking/Daemons
-Provides:	apache(mod_ldap) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_ldap) = %{version}-%{release}
 
 %description mod_ldap
 Apache module to use LDAP connections.
@@ -565,8 +565,8 @@ Modu³ Apache'a umo¿liwiaj±cy korzystanie z po³±czeñ LDAP.
 Summary:	Apache module with Web proxy
 Summary(pl):	Modu³ Apache'a dodaj±cy obs³ugê serwera proxy
 Group:		Networking/Daemons
-Provides:	apache(mod_proxy) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_proxy) = %{version}-%{release}
 
 %description mod_proxy
 This package contains module with implementation a proxy/cache for
@@ -583,8 +583,8 @@ HTTP/1.0 i HTTP/1.1.
 Summary:	Apache module with rule-based engine for rewrite requested URLs on the fly
 Summary(pl):	Modu³ Apache'a do "przepisywania" adresów URL w locie
 Group:		Networking/Daemons
-Provides:	apache(mod_rewrite) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_rewrite) = %{version}-%{release}
 
 %description mod_rewrite
 This package contains It provides a rule-based rewriting engine to
@@ -599,8 +599,8 @@ Summary(pl):	Modu³ SSL/TSL dla serwera Apache
 Summary(ru):	íÏÄÕÌØ SSL/TLS ÄÌÑ ×ÅÂ-ÓÅÒ×ÅÒÁ Apache
 Group:		Networking/Daemons
 Epoch:		1
-Provides:	apache(mod_ssl) = 1:%{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_ssl) = 1:%{version}-%{release}
 
 %description mod_ssl
 The mod_ssl module provides strong cryptography for the Apache Web
@@ -620,8 +620,8 @@ Security).
 Summary:	Server status report module for Apache
 Summary(pl):	Modu³ udostêpniaj±cy informacje statystyczne z serwera Apache
 Group:		Networking/Daemons
-Provides:	apache(mod_status) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_status) = %{version}-%{release}
 
 %description mod_status
 The Status module allows a server administrator to find out how well
@@ -638,8 +638,8 @@ pracy serwera Apache (w postaci strony HTML).
 Summary:	Apache module for user tracking using cookies
 Summary(pl):	Modu³ Apache'a s³u¿±cy do ¶ledzenia "ciasteczek"
 Group:		Networking/Daemons
-Provides:	apache(mod_usertrack) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_usertrack) = %{version}-%{release}
 
 %description mod_usertrack
 This package contains the user tracking module which did its own
@@ -653,8 +653,8 @@ Modu³ pozwalaj±cy na ¶ledzenie "ciasteczek".
 Summary:	Apache module for dynamically configured mass virtual hosting
 Summary(pl):	Modu³ Apache'a dodaj±cy obs³ugê hostów wirtualnych
 Group:		Networking/Daemons
-Provides:	apache(mod_vhost_alias) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_vhost_alias) = %{version}-%{release}
 
 %description mod_vhost_alias
 This package contains the mod_vhost_alias. It provides support for
@@ -668,8 +668,8 @@ wirtualnych.
 Summary:	Apache module which provides a magic token for each request
 Summary(pl):	Modu³ Apache'a nadaj±cy ka¿demu zapytaniu unikalny token
 Group:		Networking/Daemons
-Provides:	apache(mod_unique_id) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_unique_id) = %{version}-%{release}
 
 %description mod_unique_id
 This package contains the mod_unique_id. This module provides a magic
@@ -690,8 +690,8 @@ UNIQUE_ID.
 Summary:	Apache module which generates Expires HTTP headers
 Summary(pl):	Modu³ Apache'a generuj±cy nag³ówki HTTP Expires
 Group:		Networking/Daemons
-Provides:	apache(mod_expires) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_expires) = %{version}-%{release}
 
 %description mod_expires
 This module controls the setting of the Expires HTTP header in server
@@ -708,9 +708,9 @@ wa¿no¶ci mo¿e byæ ustalana w zale¿no¶ci od czasu modyfikacji plików
 Summary:	Apache module: caches a static list of files in memory
 Summary(pl):	Modu³ Apache'a cache'uj±cy statyczn± listê plików w pamiêci
 Group:		Networking/Daemons
-Obsoletes:	apache-mmap_static
-Provides:	apache(mod_file_cache) = %{version}-%{release}
 Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_file_cache) = %{version}-%{release}
+Obsoletes:	apache-mmap_static
 
 %description mod_file_cache
 Caches a static list of files in memory.
