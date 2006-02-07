@@ -35,7 +35,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.2.0
-Release:	13
+Release:	14
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -1758,6 +1758,7 @@ install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
 ../%configure \
 	--enable-layout=PLD \
 	--disable-v4-mapped \
+	$( [ "${mpm}" = "prefork" -o "${mpm}" = "worker" -o "${mpm}" = "event" ] && echo "--enable-exception-hook" ) \
 	--enable-modules=all \
 	--enable-mods-shared=all \
 	--enable-auth-anon \
