@@ -35,7 +35,7 @@ Summary(ru):	óÁÍÙÊ ÐÏÐÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.2.0
-Release:	14
+Release:	15
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -94,6 +94,8 @@ Patch20:	%{name}-apxs.patch
 # http://www.telana.com/peruser.php
 Patch21:	httpd-2.0.52-peruser-0.1.6.patch
 Patch22:	%{name}-libtool.patch
+Patch23:	%{name}-CVE-2005-3352.patch
+Patch24:	%{name}-CVE-2005-3357.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	apr-devel >= 1:1.2
 BuildRequires:	apr-util-devel >= 1:1.2
@@ -1724,6 +1726,8 @@ Dwa programy testowe/przyk³adowe cgi: test-cgi and print-env.
 %patch20 -p1
 %patch21 -p1
 %patch22 -p1
+%patch23 -p1
+%patch24 -p1
 
 # using system apr, apr-util and pcre
 rm -rf srclib/{apr,apr-util,pcre}
