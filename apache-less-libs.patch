@@ -1,0 +1,29 @@
+--- apache_1.3.29/src/support/Makefile.tmpl.orig	2003-12-15 22:19:55.000000000 +0200
++++ apache_1.3.29/src/support/Makefile.tmpl	2003-12-15 22:20:19.000000000 +0200
+@@ -8,7 +8,7 @@
+ # INCLUDES=-I$(SSLLOC)/include $(INCLUDES1) $(INCLUDES0) $(EXTRA_INCLUDES)
+ 
+ CFLAGS=$(OPTIM) $(CFLAGS1) $(EXTRA_CFLAGS)
+-LIBS=-lm -lap -los $(EXTRA_LIBS) $(LIBS1)
++LIBS=-lap -los
+ INCLUDES=$(INCLUDES1) $(INCLUDES0) $(EXTRA_INCLUDES)
+ LDFLAGS=$(LDFLAGS1) $(EXTRA_LDFLAGS) -L$(OSDIR) -L$(SRCDIR)/ap
+ 
+@@ -22,7 +22,7 @@
+ all: $(TARGETS)
+ 
+ htpasswd: htpasswd.o
+-	$(CC) $(CFLAGS) -o htpasswd $(LDFLAGS) htpasswd.o $(LIBS)
++	$(CC) $(CFLAGS) -o htpasswd $(LDFLAGS) htpasswd.o $(LIBS) -lcrypt
+ 
+ htdigest: htdigest.o
+ 	$(CC) $(CFLAGS) -o htdigest $(LDFLAGS) htdigest.o $(LIBS)
+@@ -34,7 +34,7 @@
+ 	$(CC) $(CFLAGS) -o logresolve $(LDFLAGS) logresolve.o $(LIBS)
+ 
+ ab: ab.o
+-	$(CC) $(CFLAGS) -o ab $(LDFLAGS) ab.o $(LIBS)
++	$(CC) $(CFLAGS) -o ab $(LDFLAGS) ab.o $(LIBS) -lm
+ 
+ checkgid: checkgid.o
+ 	$(CC) $(CFLAGS) -o checkgid $(LDFLAGS) checkgid.o $(LIBS)
