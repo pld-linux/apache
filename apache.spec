@@ -27,7 +27,7 @@ Summary(uk):	îÁÊÐÏÐÕÌÑÒÎ¦ÛÉÊ Web-Server
 Summary(zh_CN):	Internet ÉÏÓ¦ÓÃ×î¹ã·ºµÄ Web ·þÎñ³ÌÐò¡£
 Name:		apache
 Version:	1.3.34
-Release:	1
+Release:	2
 License:	Apache Group
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/%{name}_%{version}.tar.gz
@@ -66,6 +66,8 @@ Patch18:	%{name}-EAPI-missing_files.patch
 Patch19:	%{name}-PLD-nov6.patch
 Patch20:	%{name}-configdir_skip_backups.patch
 Patch21:	%{name}-apxs-quiet.patch
+Patch22:	%{name}-less-libs.patch
+Patch23:	%{name}-CVE-2005-3352.patch
 URL:		http://www.apache.org/
 BuildRequires:	db3-devel
 BuildRequires:	mm-devel >= 1.1.3
@@ -692,6 +694,8 @@ Logowanie jest wykonywane przed i po przetworzeniu ¿±dania.
 %{?_without_ipv6:%patch19 -p1}
 %patch20 -p1
 %patch21 -p1
+%patch22 -p1
+%patch23 -p0
 
 %build
 OPTIM="%{rpmcflags} -DHARD_SERVER_LIMIT=2048 -DBIG_SECURITY_HOLE=1" \
