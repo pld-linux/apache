@@ -29,3 +29,11 @@
 	/etc/rc.d/init.d/httpd graceful > /dev/null 2>&1 || /bin/true
     endscript
 }
+
+/var/log/httpd/*rewrite_log {
+    olddir /var/log/archiv/httpd
+    sharedscripts
+    postrotate
+	/etc/rc.d/init.d/httpd graceful > /dev/null 2>&1 || /bin/true
+    endscript
+}
