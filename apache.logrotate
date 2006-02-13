@@ -1,39 +1,12 @@
-/var/log/httpd/*access_log {
+/var/log/httpd/*access_log
+/var/log/httpd/*agent_log
+/var/log/httpd/*error_log
+/var/log/httpd/*referer_log
+/var/log/httpd/*rewrite_log
+{
     olddir /var/log/archiv/httpd
     sharedscripts
     postrotate
-	/etc/rc.d/init.d/httpd graceful > /dev/null 2>&1 || /bin/true
-    endscript
-}
-
-/var/log/httpd/*agent_log {
-    olddir /var/log/archiv/httpd
-    sharedscripts
-    postrotate
-	/etc/rc.d/init.d/httpd graceful > /dev/null 2>&1 || /bin/true
-    endscript
-}
-
-/var/log/httpd/*error_log {
-    olddir /var/log/archiv/httpd
-    sharedscripts
-    postrotate
-	/etc/rc.d/init.d/httpd graceful > /dev/null 2>&1 || /bin/true
-    endscript
-}
-
-/var/log/httpd/*referer_log {
-    olddir /var/log/archiv/httpd
-    sharedscripts
-    postrotate
-	/etc/rc.d/init.d/httpd graceful > /dev/null 2>&1 || /bin/true
-    endscript
-}
-
-/var/log/httpd/*rewrite_log {
-    olddir /var/log/archiv/httpd
-    sharedscripts
-    postrotate
-	/etc/rc.d/init.d/httpd graceful > /dev/null 2>&1 || /bin/true
+		/etc/rc.d/init.d/httpd graceful > /dev/null 2>&1 || /bin/true
     endscript
 }
