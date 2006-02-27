@@ -35,7 +35,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.2.0
-Release:	15
+Release:	16
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -1404,6 +1404,7 @@ Summary(pl):	Okre╤lanie typu MIME pliku poprzez sprawdzanie kilku bajtСw jego za
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_mime_magic.html
 Requires:	%{name}-base = %{version}-%{release}
+Requires:	file
 Provides:	apache(mod_mime_magic) = %{version}-%{release}
 
 %description mod_mime_magic
