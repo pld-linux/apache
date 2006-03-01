@@ -1238,6 +1238,7 @@ Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_imagemap.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_imagemap) = %{version}-%{release}
+Provides:	apache-mod_imap
 Obsoletes:	apache-mod_imap
 
 %description mod_imagemap
