@@ -900,7 +900,7 @@ serwer, a jego wyj¶cie bêdzie zwracane klientowi. Pliki uzyskuj± ten
 typ przez posiadanie nazwy zawieraj±cej rozszerzenie okre¶lone
 dyrektyw± AddType lub bêd±c w katalogu ScriptAlias.
 
-Przy u¿ywaniu wielow±tkowych MPM pod unksem zamiast tego modu³u nale¿y
+Przy u¿ywaniu wielow±tkowych MPM pod uniksem zamiast tego modu³u nale¿y
 u¿ywaæ modu³u mod_cgid. Z poziomu u¿ytkownika oba te modu³y zachowuj±
 siê identycznie.
 
