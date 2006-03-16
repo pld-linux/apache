@@ -122,11 +122,26 @@ case "$1" in
 			killproc apache -USR1
 		else
 			fail
-			echo "Configuration file syntax test failed."
+			echo >&2 "Configuration file syntax test failed."
 		fi
 	else
 		msg_not_running apache >&2
 		RETVAL=7
+	fi
+	;;
+  flush-logs)
+	if [ -f /var/lock/subsys/apache ]; then
+		msg_reloading apache
+
+		apache -t > /dev/null 2>&1
+		RETVAL=$?
+		if [ $RETVAL -eq 0 ]; then
+			killproc apache -USR1
+			RETVAL=$?
+		else
+			fail
+			echo >&2 "Configuration file syntax test failed."
+		fi
 	fi
 	;;
   configtest)
