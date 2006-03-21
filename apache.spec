@@ -120,7 +120,7 @@ BuildRequires:	zlib-devel
 Requires:	%{name}-errordocs = %{version}-%{release}
 Requires:	%{name}-mod_alias = %{version}-%{release}
 Requires:	%{name}-mod_asis = %{version}-%{release}
-Requires:	%{name}-mod_authz_host = %{version}-%{release}
+Requires:	%{name}-mod_auth = %{version}-%{release}
 Requires:	%{name}-mod_cern_meta = %{version}-%{release}
 Requires:	%{name}-mod_cgi = %{version}-%{release}
 Requires:	%{name}-mod_env = %{version}-%{release}
