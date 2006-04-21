@@ -2,6 +2,7 @@
 /var/log/httpd/*agent_log
 /var/log/httpd/*error_log
 /var/log/httpd/*referer_log
+/var/log/httpd/*request_log
 /var/log/httpd/*rewrite_log
 {
     olddir /var/log/archiv/httpd
