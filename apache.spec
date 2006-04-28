@@ -561,6 +561,21 @@ Apache module to use LDAP connections.
 %description mod_ldap -l pl
 Modu³ Apache'a umo¿liwiaj±cy korzystanie z po³±czeñ LDAP.
 
+%package mod_logio
+Summary:	Apache module for logging of input and output bytes per request
+Summary(pl):	Modu³ Apache'a umo¿liwiaj±cy logowanie ilo¶ci bajtów odebranych oraz wys³anych
+Group:		Networking/Daemons
+Requires:	%{name} = %{version}-%{release}
+Provides:	apache(mod_logio) = %{version}-%{release}
+
+%description mod_logio
+This package contains mod_logio module. It allows to log number of
+input and output bytes per request.
+
+%description mod_logio -l pl
+Modu³ pozwalaj±cy logowaæ ile bajtów zosta³o wys³anych lub odebranych
+w danym zapytaniu.
+
 %package mod_proxy
 Summary:	Apache module with Web proxy
 Summary(pl):	Modu³ Apache'a dodaj±cy obs³ugê serwera proxy
@@ -834,6 +849,7 @@ install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
 	--enable-proxy-ftp \
 	--enable-proxy-http \
 	%{?with_ssl:--enable-ssl} \
+	--enable-logio \
 	--enable-optional-hook-export \
 	--enable-optional-hook-import \
 	--enable-optional-fn-import \
@@ -976,6 +992,7 @@ echo "LoadModule imap_module	%{_libexecdir}/mod_imap.so" > $CFG/63_mod_imap.conf
 echo "LoadModule rewrite_module	%{_libexecdir}/mod_rewrite.so" > $CFG/64_mod_rewrite.conf
 echo "LoadModule usertrack_module	%{_libexecdir}/mod_usertrack.so" > $CFG/65_mod_usertrack.conf
 echo "LoadModule unique_id_module	%{_libexecdir}/mod_unique_id.so" > $CFG/66_mod_unique_id.conf
+echo "LoadModule logio_module	%{_libexecdir}/mod_logio.so" > $CFG/67_mod_logio.conf
 
 ln -sf index.html.en $RPM_BUILD_ROOT%{_datadir}/html/index.html
 # let's remove trash (yes, *.html without lang suffix also contain trash)
@@ -1185,6 +1202,12 @@ fi
 %module_post
 
 %postun mod_info
+%module_postun
+
+%post mod_logio
+%module_post
+
+%postun mod_logio
 %module_postun
 
 %post mod_proxy
@@ -1620,6 +1643,11 @@ fi
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_info.conf
 %attr(755,root,root) %{_libexecdir}/mod_info.so
+
+%files mod_logio
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_logio.conf
+%attr(755,root,root) %{_libexecdir}/mod_logio.so
 
 %files mod_proxy
 %defattr(644,root,root,755)
