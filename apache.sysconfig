@@ -4,8 +4,8 @@
 # Nice level for apache
 SERVICE_RUN_NICE_LEVEL="+5"
 
-# config dir/file path
-HTTPD_CONF="/etc/httpd/apache.conf"
+# config dir/file path. default is compiled in path
+#HTTPD_CONF="/etc/httpd/apache.conf"
 
 # other command-line options
 HTTPD_OPTS=""
@@ -19,7 +19,4 @@ HTTPD_MPM="prefork"
 #SERVICE_LIMITS="$DEFAULT_SERVICE_LIMITS -m 128000"
 
 # Skip apache restarts invoked from rpm installs.
-# Enable this if you run a production server and don't want rpm upgrade restart
-# your webserver like 20 times.
-# NOTE: You should be aware of that you need then restart the webserver manually.
 #RPM_SKIP_AUTO_RESTART=yes
