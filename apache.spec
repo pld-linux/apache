@@ -71,7 +71,6 @@ Source28:	%{name}-mod_cgid.conf
 Source29:	%{name}-mod_log_config.conf
 Source30:	%{name}-mod_mime_magic.conf
 Source31:	%{name}-mod_cache.conf
-Patch100:	%{name}-branch.patch
 Patch0:		%{name}-configdir_skip_backups.patch
 Patch1:		%{name}-layout.patch
 Patch2:		%{name}-suexec.patch
@@ -1708,7 +1707,6 @@ Dwa programy testowe/przyk³adowe cgi: test-cgi and print-env.
 
 %prep
 %setup -q -n httpd-%{version}
-#%patch100 -p1
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
