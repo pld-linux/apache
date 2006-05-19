@@ -563,7 +563,7 @@ Modu³ Apache'a umo¿liwiaj±cy korzystanie z po³±czeñ LDAP.
 
 %package mod_logio
 Summary:	Apache module for logging of input and output bytes per request
-Summary(pl):	Modu³ Apache'a umo¿liwiaj±cy logowanie ilo¶ci bajtów odebranych oraz wys³anych
+Summary(pl):	Modu³ Apache'a umo¿liwiaj±cy logowanie liczby bajtów odebranych oraz wys³anych
 Group:		Networking/Daemons
 Requires:	%{name} = %{version}-%{release}
 Provides:	apache(mod_logio) = %{version}-%{release}
