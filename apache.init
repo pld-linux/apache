@@ -82,7 +82,7 @@ case "$1" in
 			RETVAL=$?
 		fi
 	else
-		msg_not_running httpd.${HTTPD_MPM} >&2
+		msg_not_running httpd.${HTTPD_MPM}
 		RETVAL=7
 	fi
 	;;
@@ -97,7 +97,7 @@ case "$1" in
 			RETVAL=$?
 		fi
 	else
-		msg_not_running httpd.${HTTPD_MPM} >&2
+		msg_not_running httpd.${HTTPD_MPM}
 		RETVAL=7
 	fi
 	;;

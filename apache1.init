@@ -108,7 +108,7 @@ case "$1" in
 			echo "Configuration file syntax test failed."
 		fi
 	else
-		msg_not_running apache >&2
+		msg_not_running apache
 		RETVAL=7
 	fi
 	;;
@@ -125,7 +125,7 @@ case "$1" in
 			echo >&2 "Configuration file syntax test failed."
 		fi
 	else
-		msg_not_running apache >&2
+		msg_not_running apache
 		RETVAL=7
 	fi
 	;;
