@@ -35,7 +35,7 @@ Summary(ru):	óÁÍÙÊ ÐÏÐÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.2.2
-Release:	1
+Release:	2
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -101,7 +101,6 @@ BuildRequires:	automake
 BuildRequires:	db-devel
 %{?with_distcache:BuildRequires:	distcache-devel}
 BuildRequires:	expat-devel
-BuildRequires:	findutils
 BuildRequires:	gdbm-devel >= 1.8.3
 BuildRequires:	libtool >= 2:1.5
 %{?with_ldap:BuildRequires:	openldap-devel >= 2.3.0}
@@ -897,9 +896,9 @@ serwer, a jego wyj¶cie bêdzie zwracane klientowi. Pliki uzyskuj± ten
 typ przez posiadanie nazwy zawieraj±cej rozszerzenie okre¶lone
 dyrektyw± AddType lub bêd±c w katalogu ScriptAlias.
 
-Przy u¿ywaniu wielow±tkowych MPM pod uniksem zamiast tego modu³u nale¿y
-u¿ywaæ modu³u mod_cgid. Z poziomu u¿ytkownika oba te modu³y zachowuj±
-siê identycznie.
+Przy u¿ywaniu wielow±tkowych MPM pod uniksem zamiast tego modu³u
+nale¿y u¿ywaæ modu³u mod_cgid. Z poziomu u¿ytkownika oba te modu³y
+zachowuj± siê identycznie.
 
 %package mod_cgid
 Summary:	Execution of CGI scripts using an external CGI daemon
@@ -1525,9 +1524,9 @@ dla tej strategii.
 Summary:	SSL/TLS module for the Apache HTTP server
 Summary(pl):	Modu³ SSL/TSL dla serwera Apache
 Summary(ru):	íÏÄÕÌØ SSL/TLS ÄÌÑ ×ÅÂ-ÓÅÒ×ÅÒÁ Apache
+Epoch:		1
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_ssl.html
-Epoch:		1
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_ssl) = 1:%{version}-%{release}
 
