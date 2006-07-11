@@ -378,6 +378,7 @@ Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_alias.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_alias) = %{version}-%{release}
+Provides:	webserver(url_alias)
 
 %description mod_alias
 The directives contained in this module allow for manipulation and
@@ -451,6 +452,7 @@ Requires:	%{name}-mod_authn_file = %{version}-%{release}
 Requires:	%{name}-mod_authz_groupfile = %{version}-%{release}
 Requires:	%{name}-mod_authz_user = %{version}-%{release}
 Provides:	apache(mod_auth) = %{version}-%{release}
+Provides:	webserver(authentication)
 
 %description mod_auth
 Virtual package which requires apache-mod_authn_file,
@@ -718,6 +720,7 @@ Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_authz_host) = %{version}-%{release}
 # for apache < 2.2.0
 Provides:	apache(mod_access) = %{version}-%{release}
+Provides:	webserver(url_access)
 
 %description mod_authz_host
 The directives provided by mod_authz_host are used in <Directory>,
@@ -1014,6 +1017,7 @@ Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_dir.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_dir) = %{version}-%{release}
+Provides:	webserver(indexfile)
 
 %description mod_dir
 This package contains mod_dir which provides "trailing slash"
