@@ -878,6 +878,7 @@ URL:		http://httpd.apache.org/docs/2.2/en/mod/mod_cgi.html
 Requires:	%{name}-base = %{version}-%{release}
 Requires:	%{name}-mod_alias = %{version}-%{release}
 Provides:	apache(mod_cgi) = %{version}-%{release}
+Provides:	webserver(cgi)
 
 %description mod_cgi
 Any file that has the mime type application/x-httpd-cgi or handler
@@ -911,6 +912,7 @@ URL:		http://httpd.apache.org/docs/2.2/en/mod/mod_cgid.html
 Requires:	%{name}-base = %{version}-%{release}
 Requires:	%{name}-mod_alias = %{version}-%{release}
 Provides:	apache(mod_cgid) = %{version}-%{release}
+Provides:	webserver(cgi)
 
 %description mod_cgid
 Execution of CGI scripts using an external CGI daemon.
