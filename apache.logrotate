@@ -1,4 +1,5 @@
 /var/log/httpd/*access_log
+/var/log/httpd/*combined_log
 /var/log/httpd/*agent_log
 /var/log/httpd/*error_log
 /var/log/httpd/*referer_log
