@@ -34,12 +34,12 @@ Summary(pt_BR):	Servidor HTTPD para prover serviГos WWW
 Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
-Version:	2.2.2
-Release:	3
+Version:	2.2.3
+Release:	1
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
-# Source0-md5:	a0d9f7f6f70110a5965340eb7f3a3e66
+# Source0-md5:	f72ffb176e2dc7b322be16508c09f63c
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}-icons.tar.gz
