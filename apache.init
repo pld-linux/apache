@@ -86,6 +86,21 @@ case "$1" in
 		RETVAL=7
 	fi
 	;;
+  flush-logs)
+	if [ -f /var/lock/subsys/httpd ]; then
+		msg_reloading httpd.${HTTPD_MPM}
+
+		httpd.${HTTPD_MPM} -t >/dev/null 2>&1
+		RETVAL=$?
+		if [ $RETVAL -eq 0 ]; then
+			daemon httpd.${HTTPD_MPM} $CFG -k graceful
+			RETVAL=$?
+		else
+			fail
+			echo >&2 "Configuration file syntax test failed."
+		fi
+	fi
+	;;
   force-reload)
 	if [ -f /var/lock/subsys/httpd ]; then
 		run_cmd "Checking httpd.${HTTPD_MPM} configuration" httpd.${HTTPD_MPM} $CFG -t
