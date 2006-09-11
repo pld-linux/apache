@@ -93,6 +93,7 @@ Patch20:	%{name}-apxs.patch
 # http://www.telana.com/peruser.php
 Patch21:	httpd-2.0.52-peruser-0.1.6.patch
 Patch22:	%{name}-libtool.patch
+Patch23:	%{name}-revert-bug-40463.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	apr-devel >= 1:1.2
 BuildRequires:	apr-util-devel >= 1:1.2
@@ -1729,6 +1730,7 @@ Dwa programy testowe/przyk³adowe cgi: test-cgi and print-env.
 %patch20 -p1
 %patch21 -p1
 %patch22 -p1
+%patch23 -p1
 
 # using system apr, apr-util and pcre
 rm -rf srclib/{apr,apr-util,pcre}
