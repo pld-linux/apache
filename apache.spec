@@ -2294,7 +2294,7 @@ fi
 
 %{_mandir}/man8/httpd.8*
 
-%attr(2750,root,logs) %dir /var/log/httpd
+%attr(2751,root,logs) %dir /var/log/httpd
 %attr(2750,root,logs) %dir /var/log/archiv/httpd
 %attr(640,root,logs) %ghost /var/log/httpd/*
 
