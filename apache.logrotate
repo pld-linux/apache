@@ -9,6 +9,6 @@
     olddir /var/log/archiv/httpd
     sharedscripts
     postrotate
-		/etc/rc.d/init.d/httpd flush-logs > /dev/null
+		/sbin/service httpd flush-logs > /dev/null
     endscript
 }
