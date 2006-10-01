@@ -39,10 +39,7 @@ if [ -n "${HTTPD_CONF}" ]; then
 	fi
 fi
 
-RETVAL=0
-# See how we were called.
-case "$1" in
-  start)
+start() {
 	# Check if the service is already running?
 	if [ ! -f /var/lock/subsys/httpd ]; then
 		msg_starting httpd.${HTTPD_MPM}
@@ -52,8 +49,9 @@ case "$1" in
 	else
 		msg_already_running httpd.${HTTPD_MPM}
 	fi
-	;;
-  stop)
+}
+
+stop() {
 	# Stop daemons.
 	if [ -f /var/lock/subsys/httpd ]; then
 		msg_stopping httpd.${HTTPD_MPM}
@@ -62,6 +60,16 @@ case "$1" in
 	else
 		msg_not_running httpd.${HTTPD_MPM}
 	fi
+}
+
+RETVAL=0
+# See how we were called.
+case "$1" in
+  start)
+  	start
+	;;
+  stop)
+  	stop
 	;;
   status)
 	status httpd.${HTTPD_MPM}
@@ -69,8 +77,8 @@ case "$1" in
 	/usr/sbin/httpd.${HTTPD_MPM} $CFG -S
 	;;
   restart)
-	$0 stop
-	$0 start
+	stop
+	start
 	;;
   reload|force-reload|graceful)
 	if [ -f /var/lock/subsys/httpd ]; then
