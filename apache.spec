@@ -35,7 +35,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.2.3
-Release:	4
+Release:	5
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -1980,7 +1980,7 @@ cd $cur
 
 # htpasswd goes to %{_bindir}
 mv $RPM_BUILD_ROOT%{_sbindir}/htpasswd $RPM_BUILD_ROOT%{_bindir}
-ln -sf %{_bindir}/htpasswd $RPM_BUILD_ROOT%{_sbindir}/
+ln -sf %{_bindir}/htpasswd $RPM_BUILD_ROOT%{_sbindir}
 
 # cgi_test: create config file with ScriptAlias
 cat << EOF > $CFG/09_cgi_test.conf
