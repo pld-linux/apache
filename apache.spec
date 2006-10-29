@@ -963,6 +963,8 @@ Summary(pl):	Modu³ Apache'a - rozproszone autorstwo i wersjonowanie
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/en/mod/mod_dav.html
 Requires:	%{name}-base = %{version}-%{release}
+Requires:	apache-mod_authn_file
+Requires:	apache-mod_setenvif
 Provides:	apache(mod_dav) = %{version}-%{release}
 
 %description mod_dav
