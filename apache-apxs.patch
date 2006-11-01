@@ -1,6 +1,14 @@
---- httpd-2.2.0/support/apxs.in.save	2005-06-10 12:18:14.000000000 +0300
-+++ httpd-2.2.0/support/apxs.in	2006-01-02 15:08:43.000000000 +0200
-@@ -44,6 +44,7 @@
+--- httpd-2.2.3/support/apxs.in-orig	2006-11-01 00:59:27.000000000 +0100
++++ httpd-2.2.3/support/apxs.in	2006-11-01 00:59:54.000000000 +0100
+@@ -35,6 +35,7 @@
+ my $exec_prefix    = get_vars("exec_prefix");
+ my $datadir        = get_vars("datadir");
+ my $localstatedir  = get_vars("localstatedir");
++my $libdir	   = get_vars("libdir");
+ my $CFG_TARGET     = get_vars("progname");
+ my $CFG_SYSCONFDIR = get_vars("sysconfdir");
+ my $CFG_CFLAGS     = join ' ', map { get_vars($_) }
+@@ -44,6 +45,7 @@
  my $CFG_CC         = get_vars("CC");
  my $libexecdir     = get_vars("libexecdir");
  my $CFG_LIBEXECDIR = eval qq("$libexecdir");
@@ -8,7 +16,7 @@
  my $sbindir        = get_vars("sbindir");
  my $CFG_SBINDIR    = eval qq("$sbindir");
  my $ltflags        = $ENV{'LTFLAGS'};
-@@ -171,7 +172,7 @@
+@@ -171,7 +173,7 @@
  	    my ($val) = $2;
  	    my $oldval = eval "\$CFG_$var";
  
@@ -17,7 +25,7 @@
  		print STDERR "apxs:Error: no config variable $var\n";
  		&usage;
  	    }
-@@ -199,11 +200,10 @@
+@@ -199,11 +201,10 @@
      ($httpd = $0) =~ s:support/apxs$::;
  }
  
@@ -32,7 +40,7 @@
  unless (grep /mod_so/, `. $envvars && $httpd -l`) {
      error("Sorry, no shared object support for Apache");
      error("available under your platform. Make sure");
-@@ -211,7 +211,7 @@
+@@ -211,7 +212,7 @@
      error("your server binary `$httpd'.");
      exit 1;
  }
@@ -41,7 +49,7 @@
  sub get_config_vars{
      my ($file, $rh_config) = @_;
  
-@@ -479,8 +479,8 @@
+@@ -479,8 +480,8 @@
          $t =~ s|\.[^./\\]+$|\.so|;
          if ($opt_i) {
  	    push(@cmds, "$installbuilddir/instdso.sh SH_LIBTOOL='" .
