@@ -1705,7 +1705,7 @@ Summary:	cgi test/demo programs
 Summary(pl):	Programy testowe/przyk³adowe cgi
 Group:		Networking/Utilities
 Requires:	%{name}-base = %{version}-%{release}
-Requires:	filesystem >= 3.0-11
+Requires:	filesystem >= 2.0-1
 
 %description cgi_test
 Two cgi test/demo programs: test-cgi and print-env.
