@@ -1744,6 +1744,9 @@ if [ "$MODULES_API" != "%_apache_modules_api" ]; then
 	exit 1
 fi
 
+# fix libdir (at least in PLD layout; no need to care about other ones)
+sed -i -e 's,/lib$,/%{_lib},' config.layout
+
 %build
 cp /usr/share/apr/build/apr_common.m4 build
 cp /usr/share/libtool/ltmain.sh build
