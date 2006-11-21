@@ -35,7 +35,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.2.3
-Release:	7
+Release:	8
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -45,7 +45,6 @@ Source2:	%{name}.logrotate
 Source3:	%{name}-icons.tar.gz
 # Source3-md5:	2b085cbc19fd28536dc883f0b864cd83
 Source4:	%{name}.sysconfig
-Source5:	%{name}.monitrc
 Source6:	%{name}-httpd.conf
 Source7:	%{name}-common.conf
 Source8:	%{name}-mod_vhost_alias.conf
@@ -1859,7 +1858,7 @@ done
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig,monit} \
+install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig} \
 	$RPM_BUILD_ROOT%{_var}/{log/{httpd,archiv/httpd},{run,cache}/httpd,lock/mod_dav} \
 	$RPM_BUILD_ROOT%{_sysconfdir}/{webapps.d,conf.d} \
 	$RPM_BUILD_ROOT%{_datadir}/cgi-bin
@@ -1882,7 +1881,6 @@ ln -s conf.d $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/httpd
 install %{SOURCE4} $RPM_BUILD_ROOT/etc/sysconfig/httpd
-install %{SOURCE5} $RPM_BUILD_ROOT/etc/monit/httpd.monitrc
 
 touch $RPM_BUILD_ROOT/var/log/httpd/{access,error,agent,referer,suexec}_log
 
@@ -2082,12 +2080,6 @@ EOF
 fi
 
 %triggerpostun base -- %{name} < 2.2.0
-# rename monitrc to be service name like other files
-if [ -f /etc/monit/apache.monitrc.rpmsave ]; then
-	mv -f /etc/monit/httpd.monitrc{,.rpmnew}
-	mv -f /etc/monit/{apache.monitrc.rpmsave,httpd.monitrc}
-fi
-
 # change HTTPD_CONF to point to new location. *only* if it's the
 # default config setting
 cp -f /etc/sysconfig/httpd{,.rpmorig}
@@ -2286,7 +2278,6 @@ fi
 %attr(640,root,root) %{_sysconfdir}/magic
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/httpd
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/*
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/monit/*.monitrc
 
 %dir %{_libexecdir}
 
