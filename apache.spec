@@ -34,7 +34,7 @@ Summary(ru):	óÁÍÙÊ ÐÏÐÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.0.59
-Release:	1
+Release:	2
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -88,6 +88,7 @@ Patch22:	%{name}-apr1.patch
 Patch23:	%{name}-normalize-path.patch
 # http://issues.apache.org/bugzilla/attachment.cgi?id=13377 external pcre
 Patch24:	%{name}2-pcre-patch.diff
+Patch25:	%{name}-bug-40970.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	apr-devel >= 1:1.0.0
 BuildRequires:	apr-util-devel >= 1:1.0.0
@@ -790,6 +791,7 @@ Dwa programy testowe/przyk³adowe cgi: test-cgi and print-env.
 %patch22 -p1
 %patch23 -p1
 %{?with_external_pcre:%patch24 -p2}
+%patch25 -p0
 
 %{__perl} -pi -e "s@/usr/local/bin/perl@%{__perl}@" $(grep -rl "/usr/local/bin/perl" *)
 %{__perl} -pi -e "s@BUILD_SUBDIRS.*@BUILD_SUBDIRS =@g" srclib/Makefile.in
