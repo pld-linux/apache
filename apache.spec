@@ -35,7 +35,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.2.3
-Release:	8
+Release:	9
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -197,6 +197,7 @@ Requires:	apr >= 1:1.2
 Requires:	mailcap
 Requires:	psmisc >= 20.1
 Requires:	rc-scripts >= 0.4.0.15
+Requires:	webapps
 Provides:	apache(modules-api) = %{_apache_modules_api}
 Provides:	group(http)
 Provides:	user(http)
