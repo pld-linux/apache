@@ -1,8 +1,0 @@
---- httpd-2.2.0/docs/cgi-examples/printenv.save	2005-12-26 23:09:55.000000000 +0200
-+++ httpd-2.2.0/docs/cgi-examples/printenv	2005-12-26 23:09:55.000000000 +0200
-@@ -1,4 +1,4 @@
--#!/usr/local/bin/perl
-+#!/usr/bin/perl
- ##
- ##  printenv -- demo CGI program which just prints its environment
- ##
