@@ -35,7 +35,7 @@ Summary(ru):	óÁÍÙÊ ÐÏÐÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
 Version:	2.2.3
-Release:	9
+Release:	10
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -1705,7 +1705,7 @@ Summary:	cgi test/demo programs
 Summary(pl):	Programy testowe/przyk³adowe cgi
 Group:		Networking/Utilities
 Requires:	%{name}-base = %{version}-%{release}
-Requires:	filesystem >= 3.0-11
+Requires:	filesystem >= 2.0-1
 
 %description cgi_test
 Two cgi test/demo programs: test-cgi and print-env.
