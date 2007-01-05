@@ -1,5 +1,5 @@
+# Customized settings for Apache
 # $Id$
-# Customized settings for apache
 
 # Nice level for apache
 SERVICE_RUN_NICE_LEVEL="+5"
