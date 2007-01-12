@@ -25,7 +25,7 @@ diff -ur httpd-2.2.0.org/server/util_script.c httpd-2.2.0/server/util_script.c
 @@ -224,8 +224,7 @@
  
      apr_table_addn(e, "SERVER_SIGNATURE", ap_psignature("", r));
-     apr_table_addn(e, "SERVER_SOFTWARE", ap_get_server_version());
+     apr_table_addn(e, "SERVER_SOFTWARE", ap_get_server_banner());
 -    apr_table_addn(e, "SERVER_NAME",
 -                   ap_escape_html(r->pool, ap_get_server_name(r)));
 +    apr_table_addn(e, "SERVER_NAME", ap_get_server_name(r));
