@@ -33,10 +33,11 @@ if is_no "${IPV6_NETWORKING}"; then
 	HTTPD_OPTS="$HTTPD_OPTS -4"
 fi
 
-RETVAL=0
-# See how we were called.
-case "$1" in
-  start)
+configtest() {
+	apache -t > /dev/null 2>&1
+}
+
+start() {
 	# Check if the service is already running?
 	if [ -x /usr/lib/apache1/lingerd ]; then
 		if [ ! -f /var/lock/subsys/lingerd ]; then
@@ -56,8 +57,9 @@ case "$1" in
 	else
 		msg_already_running apache
 	fi
-	;;
-  stop)
+}
+
+stop() {
 	# Stop daemons.
 	if [ -f /var/lock/subsys/apache ]; then
 		msg_stopping apache
@@ -75,6 +77,16 @@ case "$1" in
 			msg_not_running lingerd
 		fi
 	fi
+}
+
+RETVAL=0
+# See how we were called.
+case "$1" in
+  start)
+  	start
+	;;
+  stop)
+  	stop
 	;;
   status)
 	status apache
@@ -85,10 +97,8 @@ case "$1" in
 	apache -t > /dev/null 2>&1
 	RETVAL=$?
 	if [ $RETVAL -eq 0 ]; then
-		$0 stop
-		RETVAL=$((RETVAL + $?))
-		$0 start
-		RETVAL=$((RETVAL + $?))
+		stop
+		start
 	else
 		fail
 		echo "Configuration file syntax test failed."
@@ -99,7 +109,7 @@ case "$1" in
   	if [ -f /var/lock/subsys/apache ]; then
 		msg_reloading apache
 
-		apache -t > /dev/null 2>&1
+		configtest
 		RETVAL=$?
 		if [ $RETVAL -eq 0 ]; then
 			killproc apache -HUP
@@ -116,7 +126,7 @@ case "$1" in
 	if [ -f /var/lock/subsys/apache ]; then
 		msg_reloading apache
 
-		apache -t > /dev/null 2>&1
+		configtest
 		RETVAL=$?
 		if [ $RETVAL -eq 0 ]; then
 			killproc apache -USR1
@@ -133,7 +143,7 @@ case "$1" in
 	if [ -f /var/lock/subsys/apache ]; then
 		msg_reloading apache
 
-		apache -t > /dev/null 2>&1
+		configtest
 		RETVAL=$?
 		if [ $RETVAL -eq 0 ]; then
 			killproc apache -USR1
