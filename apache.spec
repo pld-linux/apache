@@ -26,13 +26,13 @@
 # this is internal macro, don't change to %%apache_modules_api
 %define		_apache_modules_api 20051115
 Summary:	The most widely used Web server on the Internet
-Summary(de.UTF-8):   Leading World Wide Web-Server
-Summary(es.UTF-8):   Servidor HTTPD para proveer servicios WWW
-Summary(fr.UTF-8):   Le serveur web le plus utilise sur Internet
-Summary(pl.UTF-8):   Serwer WWW (World Wide Web)
-Summary(pt_BR.UTF-8):   Servidor HTTPD para prover serviços WWW
-Summary(ru.UTF-8):   Самый популярный веб-сервер
-Summary(tr.UTF-8):   Lider WWW tarayıcı
+Summary(de.UTF-8):	Leading World Wide Web-Server
+Summary(es.UTF-8):	Servidor HTTPD para proveer servicios WWW
+Summary(fr.UTF-8):	Le serveur web le plus utilise sur Internet
+Summary(pl.UTF-8):	Serwer WWW (World Wide Web)
+Summary(pt_BR.UTF-8):	Servidor HTTPD para prover serviços WWW
+Summary(ru.UTF-8):	Самый популярный веб-сервер
+Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.2.4
 Release:	1
@@ -181,7 +181,7 @@ sunucusudur.
 
 %package base
 Summary:	The Number One HTTP Server On The Internet
-Summary(pl.UTF-8):   Wiodący w Internecie serwer HTTP
+Summary(pl.UTF-8):	Wiodący w Internecie serwer HTTP
 Group:		Networking/Daemons
 Requires(post):	fileutils
 Requires(post,preun):	/sbin/chkconfig
@@ -225,7 +225,7 @@ serwerem WWW w Internecie.
 
 %package suexec
 Summary:	Apache suexec wrapper
-Summary(pl.UTF-8):   Wrapper suexec do serwera WWW Apache
+Summary(pl.UTF-8):	Wrapper suexec do serwera WWW Apache
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/suexec.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -243,7 +243,7 @@ wykonywane jako taki sam użytkownik jak serwer WWW.
 
 %package tools
 Summary:	Apache tools
-Summary(pl.UTF-8):   Narzędzia Apache'a
+Summary(pl.UTF-8):	Narzędzia Apache'a
 Group:		Development/Tools
 
 %description tools
@@ -254,7 +254,7 @@ Narzędzia Apache'a.
 
 %package index
 Summary:	Apache index.html* files
-Summary(pl.UTF-8):   Pliki Apache index.html*
+Summary(pl.UTF-8):	Pliki Apache index.html*
 Group:		Documentation
 Requires:	%{name}-base = %{version}-%{release}
 Obsoletes:	indexhtml
@@ -267,7 +267,7 @@ Pliki index.html* Apache'a.
 
 %package doc
 Summary:	Apache manual
-Summary(pl.UTF-8):   Podręcznik Apache'a
+Summary(pl.UTF-8):	Podręcznik Apache'a
 Group:		Documentation
 Requires:	%{name}-base = %{version}-%{release}
 Requires:	%{name}-mod_alias = %{version}-%{release}
@@ -283,7 +283,7 @@ Podręcznik Apache'a.
 
 %package errordocs
 Summary:	Multi-language error messages for Apache
-Summary(pl.UTF-8):   Wielojęzyczne komunikaty błędów dla Apache'a
+Summary(pl.UTF-8):	Wielojęzyczne komunikaty błędów dla Apache'a
 Group:		Applications/WWW
 URL:		http://httpd.apache.org/docs-project/
 Requires:	%{name}-base = %{version}-%{release}
@@ -300,7 +300,7 @@ Dokumenty opisujące błędy HTTP dla Apache'a w wielu językach.
 
 %package apxs
 Summary:	APache eXtenSion tool
-Summary(pl.UTF-8):   Narzędzie do rozszerzania Apache'a
+Summary(pl.UTF-8):	Narzędzie do rozszerzania Apache'a
 Group:		Development/Tools
 Requires:	apr-devel
 
@@ -312,11 +312,11 @@ Narzędzie do rozszerzania Apache'a.
 
 %package devel
 Summary:	Module development tools for the Apache web server
-Summary(es.UTF-8):   Archivos de inclusión del Apache para desarrollo de módulos
-Summary(fr.UTF-8):   Les outils de developpement de modules pour le serveur web Apache
-Summary(pl.UTF-8):   Pliki nagłówkowe do tworzenia modułów rozszerzeń do serwera WWW Apache
-Summary(pt_BR.UTF-8):   Arquivos de inclusão do Apache para desenvolvimento de módulos
-Summary(ru.UTF-8):   Средства разработки модулей для веб-сервера Apache
+Summary(es.UTF-8):	Archivos de inclusión del Apache para desarrollo de módulos
+Summary(fr.UTF-8):	Les outils de developpement de modules pour le serveur web Apache
+Summary(pl.UTF-8):	Pliki nagłówkowe do tworzenia modułów rozszerzeń do serwera WWW Apache
+Summary(pt_BR.UTF-8):	Arquivos de inclusão do Apache para desenvolvimento de módulos
+Summary(ru.UTF-8):	Средства разработки модулей для веб-сервера Apache
 Group:		Networking/Utilities
 Requires:	%{name}-apxs = %{version}-%{release}
 Requires:	apr-util-devel >= 1:1.2
@@ -352,7 +352,7 @@ desenvolver módulos adicionais para o Apache.
 
 %package mod_actions
 Summary:	Apache module for executing CGI scripts based on media type or request method
-Summary(pl.UTF-8):   Moduł Apache'a do uruchamiania skryptów CGI w oparciu o rodzaj danych lub żądania
+Summary(pl.UTF-8):	Moduł Apache'a do uruchamiania skryptów CGI w oparciu o rodzaj danych lub żądania
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_actions.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -374,7 +374,7 @@ pliki.
 
 %package mod_alias
 Summary:	Mapping different parts of the host filesystem in the document tree and for URL redirection
-Summary(pl.UTF-8):   Odwzorowywanie różnych części systemu plików w drzewie dokumentów i przekierowywanie URL-i
+Summary(pl.UTF-8):	Odwzorowywanie różnych części systemu plików w drzewie dokumentów i przekierowywanie URL-i
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_alias.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -417,7 +417,7 @@ URL-ach. Bardziej skomplikowane zadania, takie jak modyfikowanie
 
 %package mod_asis
 Summary:	Sends files that contain their own HTTP headers
-Summary(pl.UTF-8):   Wysyłanie plików zawierających własne nagłówki HTTP
+Summary(pl.UTF-8):	Wysyłanie plików zawierających własne nagłówki HTTP
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_asis.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -445,7 +445,7 @@ bez wymagania skryptu CGI lub nph.
 
 %package mod_auth
 Summary:	Virtual package which which provides backward compatibility with apache 2.0
-Summary(pl.UTF-8):   Pakiet wirtualny zapewniający kompatybilność wsteczną z apache 2.0
+Summary(pl.UTF-8):	Pakiet wirtualny zapewniający kompatybilność wsteczną z apache 2.0
 Group:		Networking/Daemons
 Requires:	%{name}-base = %{version}-%{release}
 Requires:	%{name}-mod_auth_basic = %{version}-%{release}
@@ -467,7 +467,7 @@ wstecznej z apache 2.0.
 
 %package mod_auth_basic
 Summary:	Apache module that allows Basic authentication
-Summary(pl.UTF-8):   Moduł Apache'a umożliwiający korzystawnie z uwierzytelnienia Basic
+Summary(pl.UTF-8):	Moduł Apache'a umożliwiający korzystawnie z uwierzytelnienia Basic
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_auth_basic.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -488,7 +488,7 @@ dostępu poprzez wyszukiwanie użytkowników we wskazanych miejscach
 
 %package mod_auth_dbm
 Summary:	Virtual package which which provides backward compatibility with apache 2.0
-Summary(pl.UTF-8):   Pakiet wirtualny zapewniający kompatybilność wsteczną z apache 2.0
+Summary(pl.UTF-8):	Pakiet wirtualny zapewniający kompatybilność wsteczną z apache 2.0
 Group:		Networking/Daemons
 Requires:	%{name}-base = %{version}-%{release}
 Requires:	%{name}-dbmtools = %{version}-%{release}
@@ -506,7 +506,7 @@ apache-mod_authz_dbm dla kompatybilności wstecznej z apache 2.0.
 
 %package mod_auth_digest
 Summary:	User authentication using MD5 Digest Authentication
-Summary(pl.UTF-8):   Uwierzytelnianie użytkowników przy użyciu MD5 Digest
+Summary(pl.UTF-8):	Uwierzytelnianie użytkowników przy użyciu MD5 Digest
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_auth_digest.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -523,7 +523,7 @@ eksperymentalny.
 
 %package mod_authn_alias
 Summary:	Apache module that provides the ability to create extended authentication
-Summary(pl.UTF-8):   Moduł Apache'a umożliwiający tworzenie rozszerzonego uwierzytelniania
+Summary(pl.UTF-8):	Moduł Apache'a umożliwiający tworzenie rozszerzonego uwierzytelniania
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_authn_alias.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -539,7 +539,7 @@ w pliku konfiguracyjnym i nadawanie im aliasów.
 
 %package mod_authn_anon
 Summary:	Apache module that allows "anonymous" user access to authenticated areas
-Summary(pl.UTF-8):   Moduł Apache'a umożliwiający dostęp anonimowych użytkowników do stref uwierzytelnianych
+Summary(pl.UTF-8):	Moduł Apache'a umożliwiający dostęp anonimowych użytkowników do stref uwierzytelnianych
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_authn_anon.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -564,7 +564,7 @@ być logowane.
 
 %package mod_authn_dbd
 Summary:	Apache module that allows user authentication using an SQL
-Summary(pl.UTF-8):   Moduł Apache'a umożliwiający uwierzytelnianie użytkowników przy użyciu tabel SQL
+Summary(pl.UTF-8):	Moduł Apache'a umożliwiający uwierzytelnianie użytkowników przy użyciu tabel SQL
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_authn_dbd.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -583,7 +583,7 @@ wyszukiwanie w tabelach SQL.
 
 %package mod_authn_dbm
 Summary:	Apache module that allows user authentication using DBM files
-Summary(pl.UTF-8):   Moduł Apache'a umożliwiający uwierzytelnianie użytkowników przy użyciu plików DBM
+Summary(pl.UTF-8):	Moduł Apache'a umożliwiający uwierzytelnianie użytkowników przy użyciu plików DBM
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_authn_dbm.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -601,7 +601,7 @@ wyszukiwanie w tabelach haseł DBM.
 
 %package mod_authn_default
 Summary:	Apache module that rejects any credentials supplied by the user
-Summary(pl.UTF-8):   Moduł Apache'a odrzucający wszystkie dane podane przez użytkownika
+Summary(pl.UTF-8):	Moduł Apache'a odrzucający wszystkie dane podane przez użytkownika
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_authn_default.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -620,7 +620,7 @@ przez użytkownika.
 
 %package mod_authn_file
 Summary:	Apache module that allows user authentication using text files
-Summary(pl.UTF-8):   Moduł Apache'a umożliwiający uwierzytelnianie użytkowników poprzez pliki tekstowe
+Summary(pl.UTF-8):	Moduł Apache'a umożliwiający uwierzytelnianie użytkowników poprzez pliki tekstowe
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_authn_file.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -638,7 +638,7 @@ wyszukiwanie w plikach tekstowych z hasłami.
 
 %package mod_authnz_ldap
 Summary:	Apache module that allows an LDAP directory to be used to store the database for HTTP Basic authentication
-Summary(pl.UTF-8):   Moduł Apache'a umożliwiający przechowywanie danych dla uwierzytelnienia HTTP Basic w bazie LDAP
+Summary(pl.UTF-8):	Moduł Apache'a umożliwiający przechowywanie danych dla uwierzytelnienia HTTP Basic w bazie LDAP
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_authnz_ldap.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -659,7 +659,7 @@ mod_auth_basic uwierzytelnianie użytkowników poprzez katalog LDAP.
 
 %package mod_authz_dbm
 Summary:	Apache module that allows group authorization using DBM files
-Summary(pl.UTF-8):   Moduł Apache'a umożliwiający uwierzytelnianie grup z użyciem plików DBM
+Summary(pl.UTF-8):	Moduł Apache'a umożliwiający uwierzytelnianie grup z użyciem plików DBM
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_authz_dbm.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -677,7 +677,7 @@ do grupy zapisywanej w pliku DBM.
 
 %package mod_authz_default
 Summary:	Apache module that rejects any authorization request
-Summary(pl.UTF-8):   Moduł Apache'a odrzucający wszystkie żądania autoryzacji
+Summary(pl.UTF-8):	Moduł Apache'a odrzucający wszystkie żądania autoryzacji
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_authz_default.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -696,7 +696,7 @@ autoryzacji.
 
 %package mod_authz_groupfile
 Summary:	Apache module that allows group authorization using plaintext files
-Summary(pl.UTF-8):   Moduł Apache'a umożliwiający autoryzację grup przy użyciu plików tekstowych
+Summary(pl.UTF-8):	Moduł Apache'a umożliwiający autoryzację grup przy użyciu plików tekstowych
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_authz_groupfile.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -714,7 +714,7 @@ do grupy zapisywanej w pliku tekstowym.
 
 %package mod_authz_host
 Summary:	Apache module that allows group authorizations based on host (name or IP address)
-Summary(pl.UTF-8):   Moduł Apache'a umożliwiający autoryzację grup w oparcu o host (nazwę lub IP)
+Summary(pl.UTF-8):	Moduł Apache'a umożliwiający autoryzację grup w oparcu o host (nazwę lub IP)
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_authz_host.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -739,7 +739,7 @@ charakterystyki żądania klienta dostępnej w zmiennych środowiskowych.
 
 %package mod_authz_owner
 Summary:	Apache module that allows authorization based on file ownership
-Summary(pl.UTF-8):   Moduł Apache'a umożliwiający autoryzacje w oparciu o własność plików
+Summary(pl.UTF-8):	Moduł Apache'a umożliwiający autoryzacje w oparciu o własność plików
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/en/mod/mod_authz_owner.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -763,7 +763,7 @@ mod_auth_digest.
 
 %package mod_authz_user
 Summary:	Apache module that allows user authorization
-Summary(pl.UTF-8):   Moduł Apache'a umożliwiający autoryzację użytkowników
+Summary(pl.UTF-8):	Moduł Apache'a umożliwiający autoryzację użytkowników
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/en/mod/mod_authz_user.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -779,7 +779,7 @@ WWW dla uwierzytelnionych użytkowników.
 
 %package mod_autoindex
 Summary:	Apache module - display index of files
-Summary(pl.UTF-8):   Moduł apache do wyświetlania indeksu plików
+Summary(pl.UTF-8):	Moduł apache do wyświetlania indeksu plików
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/en/mod/mod_autoindex.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -795,7 +795,7 @@ Ten pakiet dostarcza moduł autoindex, który generuje indeks plików.
 
 %package mod_bucketeer
 Summary:	buckets manipulation filter
-Summary(pl.UTF-8):   Dzielenie kubełków po znalezieniu znaku sterującego
+Summary(pl.UTF-8):	Dzielenie kubełków po znalezieniu znaku sterującego
 Group:		Networking/Daemons
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_bucketeer) = %{version}-%{release}
@@ -808,7 +808,7 @@ Dzielenie kubełków po znalezieniu znaku sterującego.
 
 %package mod_cache
 Summary:	Content cache keyed to URIs
-Summary(pl.UTF-8):   Pamięć podręczna wg klucza URI
+Summary(pl.UTF-8):	Pamięć podręczna wg klucza URI
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/en/mod/mod_cache.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -847,7 +847,7 @@ Provides:	apache(mod_case_filter_in) = %{version}-%{release}
 
 %package mod_cern_meta
 Summary:	CERN httpd metafile semantics
-Summary(pl.UTF-8):   Obsługa semantyki metaplików CERN httpd
+Summary(pl.UTF-8):	Obsługa semantyki metaplików CERN httpd
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/en/mod/mod_cern_meta.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -873,7 +873,7 @@ użytkowników CERN wykorzystujących ten moduł.
 
 %package mod_cgi
 Summary:	Execution of CGI scripts
-Summary(pl.UTF-8):   Uruchamianie skryptów CGI
+Summary(pl.UTF-8):	Uruchamianie skryptów CGI
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/en/mod/mod_cgi.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -907,7 +907,7 @@ zachowują się identycznie.
 
 %package mod_cgid
 Summary:	Execution of CGI scripts using an external CGI daemon
-Summary(pl.UTF-8):   Uruchamianie zewnętrznych skryptów CGI za pomocą daemona CGI
+Summary(pl.UTF-8):	Uruchamianie zewnętrznych skryptów CGI za pomocą daemona CGI
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/en/mod/mod_cgid.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -935,7 +935,7 @@ wielowątkowy MPM.
 
 %package mod_charset_lite
 Summary:	Specify character set translation or recoding
-Summary(pl.UTF-8):   Translacja lub przekodowywanie znaków
+Summary(pl.UTF-8):	Translacja lub przekodowywanie znaków
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/en/mod/mod_charset_lite.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -959,7 +959,7 @@ Jest to moduł eksperymentalny i należy używać go z uwagą.
 
 %package mod_dav
 Summary:	Apache module - Distributed Authoring and Versioning
-Summary(pl.UTF-8):   Moduł Apache'a - rozproszone autorstwo i wersjonowanie
+Summary(pl.UTF-8):	Moduł Apache'a - rozproszone autorstwo i wersjonowanie
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/en/mod/mod_dav.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -981,7 +981,7 @@ zdalnym serwerze WWW.
 
 %package mod_dbd
 Summary:	Manages SQL database connections
-Summary(pl.UTF-8):   Zarządzanie połączeniami z bazą danych SQL
+Summary(pl.UTF-8):	Zarządzanie połączeniami z bazą danych SQL
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/en/mod/mod_dbd.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1002,7 +1002,7 @@ niewątkowych MPM.
 
 %package mod_deflate
 Summary:	Apache module: Compress content before it is delivered to the client
-Summary(pl.UTF-8):   Moduł Apache'a kompresujący dane przed przesłaniem ich do klienta
+Summary(pl.UTF-8):	Moduł Apache'a kompresujący dane przed przesłaniem ich do klienta
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_deflate.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1017,7 +1017,7 @@ Moduł kompresujący dane przed przesłaniem ich do klienta.
 
 %package mod_dir
 Summary:	Apache module for "trailing slash" redirects and serving directory index files
-Summary(pl.UTF-8):   Moduł Apache'a oferujący przekierowania i udostępnianie informacji o zawartości katalogu
+Summary(pl.UTF-8):	Moduł Apache'a oferujący przekierowania i udostępnianie informacji o zawartości katalogu
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_dir.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1034,7 +1034,7 @@ katalogu.
 
 %package mod_dumpio
 Summary:	Dumps all I/O to error log as desired
-Summary(pl.UTF-8):   Zrzucanie całości wejścia/wyjścia do logu błędów
+Summary(pl.UTF-8):	Zrzucanie całości wejścia/wyjścia do logu błędów
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_dumpio.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1062,7 +1062,7 @@ przy diagnostyce problemów.
 
 %package mod_echo
 Summary:	A simple echo server to illustrate protocol modules
-Summary(pl.UTF-8):   Prosty serwer ocho ilustrujący moduły protokołów
+Summary(pl.UTF-8):	Prosty serwer ocho ilustrujący moduły protokołów
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_echo.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1080,7 +1080,7 @@ napisać cokolwiek, a on odpowie tym samym.
 
 %package mod_env
 Summary:	Modifies the environment which is passed to CGI scripts and SSI pages
-Summary(pl.UTF-8):   Modyfikowanie środowiska przekazywanego skryptom CGI i stronom SSI
+Summary(pl.UTF-8):	Modyfikowanie środowiska przekazywanego skryptom CGI i stronom SSI
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_env.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1101,7 +1101,7 @@ usuwane w procesie konfiguracji.
 
 %package mod_expires
 Summary:	Apache module which generates Expires HTTP headers
-Summary(pl.UTF-8):   Moduł Apache'a generujący nagłówki HTTP Expires
+Summary(pl.UTF-8):	Moduł Apache'a generujący nagłówki HTTP Expires
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_expires.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1120,7 +1120,7 @@ ważności może być ustalana w zależności od czasu modyfikacji plików
 
 %package mod_ext_filter
 Summary:	Pass the response body through an external program before delivery to the client
-Summary(pl.UTF-8):   Przekazywanie ciała odpowiedzi do zewnętrznego programu przed przekazaniem klientowi
+Summary(pl.UTF-8):	Przekazywanie ciała odpowiedzi do zewnętrznego programu przed przekazaniem klientowi
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_ext_filter.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1167,7 +1167,7 @@ dla filtrów.
 
 %package mod_file_cache
 Summary:	Apache module: caches a static list of files in memory
-Summary(pl.UTF-8):   Moduł Apache'a cache'ujący statyczną listę plików w pamięci
+Summary(pl.UTF-8):	Moduł Apache'a cache'ujący statyczną listę plików w pamięci
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_file_cache.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1185,7 +1185,7 @@ Moduł cache'ujący statyczną listę plików w pamięci.
 
 %package mod_filter
 Summary:	Context-sensitive smart filter configuration module
-Summary(pl.UTF-8):   Moduł inteligentnej, zależnej od kontekstu konfiguracji filtrów
+Summary(pl.UTF-8):	Moduł inteligentnej, zależnej od kontekstu konfiguracji filtrów
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_filter.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1205,7 +1205,7 @@ jeśli content-type nie jest znany z góry (np. w wypadku proxy).
 
 %package mod_headers
 Summary:	Apache module allows for the customization of HTTP response headers
-Summary(pl.UTF-8):   Moduł Apache'a pozwalający na modyfikację nagłówków HTTP
+Summary(pl.UTF-8):	Moduł Apache'a pozwalający na modyfikację nagłówków HTTP
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_headers.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1222,7 +1222,7 @@ wysyłanych do przeglądarki.
 
 %package mod_ident
 Summary:	RFC 1413 ident lookups
-Summary(pl.UTF-8):   Sprawdzanie identyfikacji RFC 1413
+Summary(pl.UTF-8):	Sprawdzanie identyfikacji RFC 1413
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_ident.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1238,7 +1238,7 @@ sprawdzenia właściciela połączenia.
 
 %package mod_imagemap
 Summary:	Server-side imagemap processing
-Summary(pl.UTF-8):   Przetwarzanie map obrazów po stronie serwera
+Summary(pl.UTF-8):	Przetwarzanie map obrazów po stronie serwera
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_imagemap.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1260,7 +1260,7 @@ SetHandler) będzie przetwarzany przez ten moduł.
 
 %package mod_include
 Summary:	Server-parsed html documents (Server Side Includes)
-Summary(pl.UTF-8):   Dokumenty przetwarzane przez serwer (Server Side Includes)
+Summary(pl.UTF-8):	Dokumenty przetwarzane przez serwer (Server Side Includes)
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_include.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1282,7 +1282,7 @@ a także ustawianie i wypisywanie zmiennych środowiskowych.
 
 %package mod_info
 Summary:	Apache module with comprehensive overview of the server configuration
-Summary(pl.UTF-8):   Moduł Apache'a udostępniający informacje o serwerze
+Summary(pl.UTF-8):	Moduł Apache'a udostępniający informacje o serwerze
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_info.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1300,7 +1300,7 @@ zainstalowanych modułach itp.
 
 %package mod_ldap
 Summary:	Apache module to use LDAP connections
-Summary(pl.UTF-8):   Moduł Apache'a umożliwiający korzystanie z połączeń LDAP
+Summary(pl.UTF-8):	Moduł Apache'a umożliwiający korzystanie z połączeń LDAP
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_ldap.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1314,7 +1314,7 @@ Moduł Apache'a umożliwiający korzystanie z połączeń LDAP.
 
 %package mod_log_config
 Summary:	Logging of the requests made to the server
-Summary(pl.UTF-8):   Logowanie żądań zgłaszanych do serwera
+Summary(pl.UTF-8):	Logowanie żądań zgłaszanych do serwera
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_log_config.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1337,7 +1337,7 @@ charakterystyki żądania.
 
 %package mod_log_forensic
 Summary:	Forensic Logging of the requests made to the server
-Summary(pl.UTF-8):   Logowanie żadań zgłaszanych do serwera w celu późniejszej analizy
+Summary(pl.UTF-8):	Logowanie żadań zgłaszanych do serwera w celu późniejszej analizy
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_log_forensic.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1355,7 +1355,7 @@ zawiera dwie linie dla każdego żądania.
 
 %package mod_logio
 Summary:	Logging of input and output bytes per request
-Summary(pl.UTF-8):   Logowanie liczby bajtów wejścia i wyjścia dla zapytań
+Summary(pl.UTF-8):	Logowanie liczby bajtów wejścia i wyjścia dla zapytań
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_logio.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1380,7 +1380,7 @@ odzwierciedlały wszystkie zmiany dokonywane przez szyfrowanie.
 
 %package mod_mime
 Summary:	Associates the requested filename's extensions with the file's behavior and content
-Summary(pl.UTF-8):   Wiązanie określonych rozszerzeń plików z zachowaniem i zawartością
+Summary(pl.UTF-8):	Wiązanie określonych rozszerzeń plików z zachowaniem i zawartością
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_mime.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1406,7 +1406,7 @@ informacji o negocjacji treści jest w dokumentacji do mod_negotiation.
 
 %package mod_mime_magic
 Summary:	Determines the MIME type of a file by looking at a few bytes of its contents
-Summary(pl.UTF-8):   Określanie typu MIME pliku poprzez sprawdzanie kilku bajtów jego zawartości
+Summary(pl.UTF-8):	Określanie typu MIME pliku poprzez sprawdzanie kilku bajtów jego zawartości
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_mime_magic.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1427,7 +1427,7 @@ rozwiązać mod_mime.
 
 %package mod_negotiation
 Summary:	Provides for content negotiation
-Summary(pl.UTF-8):   Moduł do negocjacji treści
+Summary(pl.UTF-8):	Moduł do negocjacji treści
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_negotiation.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1446,7 +1446,7 @@ kilku możliwych dokumentów.
 
 %package mod_proxy
 Summary:	Apache module with Web proxy
-Summary(pl.UTF-8):   Moduł Apache'a dodający obsługę serwera proxy
+Summary(pl.UTF-8):	Moduł Apache'a dodający obsługę serwera proxy
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_proxy.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1466,7 +1466,7 @@ HTTP/1.0 i HTTP/1.1.
 
 %package mod_rewrite
 Summary:	Apache module with rule-based engine for rewrite requested URLs on the fly
-Summary(pl.UTF-8):   Moduł Apache'a do "przepisywania" adresów URL w locie
+Summary(pl.UTF-8):	Moduł Apache'a do "przepisywania" adresów URL w locie
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_rewrite.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1481,7 +1481,7 @@ Moduł oferujący możliwość "przepisywania" adresów URL w locie.
 
 %package mod_setenvif
 Summary:	Allows the setting of environment variables based on characteristics of the request
-Summary(pl.UTF-8):   Ustawianie zmiennych środowiskowych w oparciu o charakterystykę żądania
+Summary(pl.UTF-8):	Ustawianie zmiennych środowiskowych w oparciu o charakterystykę żądania
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_setenvif.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1501,7 +1501,7 @@ części serwera do podejmowania decyzji o podejmowanych akcjach.
 
 %package mod_speling
 Summary:	Attempts to correct mistaken URLs by ignoring capitalization and by allowing up to one misspelling
-Summary(pl.UTF-8):   Próba poprawiania błędnych URL-i poprzez ignorowanie wielkości liter i zezwalanie na jedną literówkę
+Summary(pl.UTF-8):	Próba poprawiania błędnych URL-i poprzez ignorowanie wielkości liter i zezwalanie na jedną literówkę
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_speling.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1531,8 +1531,8 @@ dla tej strategii.
 
 %package mod_ssl
 Summary:	SSL/TLS module for the Apache HTTP server
-Summary(pl.UTF-8):   Moduł SSL/TSL dla serwera Apache
-Summary(ru.UTF-8):   Модуль SSL/TLS для веб-сервера Apache
+Summary(pl.UTF-8):	Moduł SSL/TSL dla serwera Apache
+Summary(ru.UTF-8):	Модуль SSL/TLS для веб-сервера Apache
 Epoch:		1
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_ssl.html
@@ -1555,7 +1555,7 @@ Security).
 
 %package mod_status
 Summary:	Server status report module for Apache
-Summary(pl.UTF-8):   Moduł udostępniający informacje statystyczne z serwera Apache
+Summary(pl.UTF-8):	Moduł udostępniający informacje statystyczne z serwera Apache
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_status.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1575,7 +1575,7 @@ pracy serwera Apache (w postaci strony HTML).
 
 %package mod_unique_id
 Summary:	Apache module which provides a magic token for each request
-Summary(pl.UTF-8):   Moduł Apache'a nadający każdemu zapytaniu unikalny token
+Summary(pl.UTF-8):	Moduł Apache'a nadający każdemu zapytaniu unikalny token
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_unique_id.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1598,7 +1598,7 @@ UNIQUE_ID.
 
 %package mod_userdir
 Summary:	User-specific directories
-Summary(pl.UTF-8):   Katalogi specyficzne dla użytkowników
+Summary(pl.UTF-8):	Katalogi specyficzne dla użytkowników
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_userdir.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1615,7 +1615,7 @@ użytkowników przy użyciu składni http://example.com/~user/ .
 
 %package mod_usertrack
 Summary:	Apache module for user tracking using cookies
-Summary(pl.UTF-8):   Moduł Apache'a służący do śledzenia "ciasteczek"
+Summary(pl.UTF-8):	Moduł Apache'a służący do śledzenia "ciasteczek"
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_usertrack.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1632,7 +1632,7 @@ przy użyciu katalogu CookieLog. Pozwala na użycie wielu plików logów.
 
 %package mod_version
 Summary:	Version dependent configuration
-Summary(pl.UTF-8):   Konfiguracja zależna od wersji
+Summary(pl.UTF-8):	Konfiguracja zależna od wersji
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_version.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1654,7 +1654,7 @@ wyrażeniami regularnymi.
 
 %package mod_vhost_alias
 Summary:	Apache module for dynamically configured mass virtual hosting
-Summary(pl.UTF-8):   Moduł Apache'a dodający obsługę hostów wirtualnych
+Summary(pl.UTF-8):	Moduł Apache'a dodający obsługę hostów wirtualnych
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_vhost_alias.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1670,7 +1670,7 @@ wirtualnych.
 
 %package -n htpasswd-%{name}
 Summary:	Apache 2 htpasswd utility: manage user files for basic authentication
-Summary(pl.UTF-8):   Narzędzie htpasswd z Apache'a 2 do zarządzania plikami uwierzytelnienia basic
+Summary(pl.UTF-8):	Narzędzie htpasswd z Apache'a 2 do zarządzania plikami uwierzytelnienia basic
 Group:		Networking/Utilities
 Provides:	htpasswd
 Obsoletes:	htpasswd
@@ -1690,7 +1690,7 @@ zakodowane algorytmami CRYPT (domyślnym), MD5 i SHA1.
 
 %package dbmtools
 Summary:	Apache 2 tools for manipulating DBM files
-Summary(pl.UTF-8):   Narzędzia Apache'a 2 do obróbki plików DBM
+Summary(pl.UTF-8):	Narzędzia Apache'a 2 do obróbki plików DBM
 Group:		Networking/Utilities
 Requires:	%{name}-base = %{version}-%{release}
 
@@ -1702,7 +1702,7 @@ Narzędzia Apache'a 2 do obróbki plików DBM.
 
 %package cgi_test
 Summary:	cgi test/demo programs
-Summary(pl.UTF-8):   Programy testowe/przykładowe cgi
+Summary(pl.UTF-8):	Programy testowe/przykładowe cgi
 Group:		Networking/Utilities
 Requires:	%{name}-base = %{version}-%{release}
 Requires:	filesystem >= 3.0-11
