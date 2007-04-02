@@ -35,7 +35,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.2.4
-Release:	1
+Release:	2
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -1860,7 +1860,7 @@ done
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig} \
-	$RPM_BUILD_ROOT%{_var}/{log/{httpd,archiv/httpd},{run,cache}/httpd,lock/mod_dav} \
+	$RPM_BUILD_ROOT%{_var}/{log/{httpd,archive/httpd},{run,cache}/httpd,lock/mod_dav} \
 	$RPM_BUILD_ROOT%{_sysconfdir}/{webapps.d,conf.d} \
 	$RPM_BUILD_ROOT%{_datadir}/cgi-bin
 
