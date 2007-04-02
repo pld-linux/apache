@@ -6,7 +6,7 @@
 /var/log/httpd/*request_log
 /var/log/httpd/*rewrite_log
 {
-    olddir /var/log/archiv/httpd
+    olddir /var/log/archive/httpd
     sharedscripts
     postrotate
 		/sbin/service httpd flush-logs > /dev/null
