@@ -35,7 +35,7 @@ Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
 Version:	2.2.4
-Release:	1
+Release:	3
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -73,6 +73,7 @@ Source31:	%{name}-mod_cache.conf
 Patch0:		%{name}-configdir_skip_backups.patch
 Patch1:		%{name}-layout.patch
 Patch2:		%{name}-suexec.patch
+Patch3:		%{name}-branding.patch
 Patch4:		%{name}-apr.patch
 # project homepage http://www.metux.de/mpm/en/?patpage=index
 # http://www.sannes.org/metuxmpm/
@@ -1718,6 +1719,7 @@ Dwa programy testowe/przykЁadowe cgi: test-cgi and print-env.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 %patch4 -p1
 %patch5 -p1
 %patch7 -p1
