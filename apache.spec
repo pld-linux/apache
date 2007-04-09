@@ -34,12 +34,12 @@ Summary(pt_BR):	Servidor HTTPD para prover serviços WWW
 Summary(ru):	óÁÍÙÊ ÐÏÐÕÌÑÒÎÙÊ ×ÅÂ-ÓÅÒ×ÅÒ
 Summary(tr):	Lider WWW tarayýcý
 Name:		apache
-Version:	2.2.3
-Release:	9
+Version:	2.2.4
+Release:	3
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
-# Source0-md5:	f72ffb176e2dc7b322be16508c09f63c
+# Source0-md5:	3add41e0b924d4bb53c2dee55a38c09e
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}-icons.tar.gz
@@ -73,6 +73,7 @@ Source31:	%{name}-mod_cache.conf
 Patch0:		%{name}-configdir_skip_backups.patch
 Patch1:		%{name}-layout.patch
 Patch2:		%{name}-suexec.patch
+Patch3:		%{name}-branding.patch
 Patch4:		%{name}-apr.patch
 # project homepage http://www.metux.de/mpm/en/?patpage=index
 # http://www.sannes.org/metuxmpm/
@@ -1705,7 +1706,7 @@ Summary:	cgi test/demo programs
 Summary(pl):	Programy testowe/przyk³adowe cgi
 Group:		Networking/Utilities
 Requires:	%{name}-base = %{version}-%{release}
-Requires:	filesystem >= 3.0-11
+Requires:	filesystem >= 2.0-1
 
 %description cgi_test
 Two cgi test/demo programs: test-cgi and print-env.
@@ -1718,6 +1719,7 @@ Dwa programy testowe/przyk³adowe cgi: test-cgi and print-env.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 %patch4 -p1
 %patch5 -p1
 %patch7 -p1
