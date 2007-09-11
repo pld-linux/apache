@@ -211,7 +211,7 @@ Obsoletes:	apache-mod_optional_fn_import
 Obsoletes:	apache-mod_optional_fn_import
 Obsoletes:	apache-mod_optional_hook_import
 Conflicts:	apache < 2.2.0
-Conflicts:	logrotate < 3.7.4
+Conflicts:	logrotate < 3.7-4
 # for the posttrans scriptlet, conflicts because in vserver environment rpm package is not installed.
 Conflicts:	rpm < 4.4.2-0.2
 
