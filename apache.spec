@@ -33,12 +33,12 @@ Summary(pt_BR):	Servidor HTTPD para prover serviГos WWW
 Summary(ru):	Самый популярный веб-сервер
 Summary(tr):	Lider WWW tarayЩcЩ
 Name:		apache
-Version:	2.0.59
-Release:	2
+Version:	2.0.61
+Release:	1
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
-# Source0-md5:	35a4cebaa6b4548f9a48375ea9629c8f
+# Source0-md5:	ef5bee4bad359cea02146efd88d04be0
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}-icons.tar.gz
@@ -1293,6 +1293,7 @@ fi
 %attr(755,root,root) %{_libexecdir}/mod_setenvif.so
 %attr(755,root,root) %{_libexecdir}/mod_speling.so
 %attr(755,root,root) %{_libexecdir}/mod_userdir.so
+%attr(755,root,root) %{_libexecdir}/mod_version.so
 
 # look at TODO on top
 %attr(755,root,root) %{_libexecdir}/mod_case_filter.so
@@ -1654,6 +1655,7 @@ fi
 
 %files mod_rewrite
 %defattr(644,root,root,755)
+%attr(755,root,root) %{_sbindir}/httxt2dbm
 %attr(755,root,root) %{_libexecdir}/mod_rewrite.so
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_rewrite.conf
 
