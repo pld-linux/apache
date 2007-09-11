@@ -1127,18 +1127,6 @@ diff -ur httpd-2.0.52.org/server/listen.c httpd-2.0.52/server/listen.c
          != APR_SUCCESS) {
          ap_log_perror(APLOG_MARK, APLOG_CRIT, status, process->pool,
                        "alloc_listener: failed to get a socket for %s", addr);
-diff -ur httpd-2.0.52.org/server/main.c httpd-2.0.52/server/main.c
---- httpd-2.0.52.org/server/main.c	2004-10-02 18:25:57.292941087 +0200
-+++ httpd-2.0.52/server/main.c	2004-10-02 18:26:13.673431951 +0200
-@@ -238,7 +238,7 @@
-     apr_pool_tag(process->pconf, "pconf");
-     process->argc = argc;
-     process->argv = argv;
--    process->short_name = apr_filename_of_pathname(argv[0]);
-+    process->short_name = apr_filepath_name_get(argv[0]);
-     return process;
- }
- 
 diff -ur httpd-2.0.52.org/server/mpm/experimental/metuxmpm/metuxmpm.c httpd-2.0.52/server/mpm/experimental/metuxmpm/metuxmpm.c
 --- httpd-2.0.52.org/server/mpm/experimental/metuxmpm/metuxmpm.c	2004-10-02 18:25:57.241952010 +0200
 +++ httpd-2.0.52/server/mpm/experimental/metuxmpm/metuxmpm.c	2004-10-02 18:26:13.678430880 +0200
