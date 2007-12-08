@@ -1321,6 +1321,7 @@ Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_log_config.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_log_config) = %{version}-%{release}
+Provides:	webserver(log)
 
 %description mod_log_config
 This module provides for flexible logging of client requests. Logs are
