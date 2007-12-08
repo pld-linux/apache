@@ -43,7 +43,7 @@ Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}-icons.tar.gz
-# Source3-md5: 2b085cbc19fd28536dc883f0b864cd83
+# Source3-md5:	2b085cbc19fd28536dc883f0b864cd83
 Source4:	%{name}.sysconfig
 Source6:	%{name}-httpd.conf
 Source7:	%{name}-common.conf
@@ -211,6 +211,7 @@ Obsoletes:	apache-mod_optional_fn_import
 Obsoletes:	apache-mod_optional_fn_import
 Obsoletes:	apache-mod_optional_hook_import
 Conflicts:	apache < 2.2.0
+Conflicts:	logrotate < 3.7-4
 # for the posttrans scriptlet, conflicts because in vserver environment rpm package is not installed.
 Conflicts:	rpm < 4.4.2-0.2
 
@@ -1863,7 +1864,7 @@ done
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig} \
-	$RPM_BUILD_ROOT%{_var}/{log/{httpd,archiv/httpd},{run,cache}/httpd,lock/mod_dav} \
+	$RPM_BUILD_ROOT%{_var}/{log/{httpd,archive/httpd},{run,cache}/httpd,lock/mod_dav} \
 	$RPM_BUILD_ROOT%{_sysconfdir}/{webapps.d,conf.d} \
 	$RPM_BUILD_ROOT%{_datadir}/cgi-bin
 
@@ -2295,7 +2296,7 @@ fi
 %{_mandir}/man8/httpd.8*
 
 %attr(2751,root,logs) %dir /var/log/httpd
-%attr(2750,root,logs) %dir /var/log/archiv/httpd
+%attr(2750,root,logs) %dir /var/log/archive/httpd
 %attr(640,root,logs) %ghost /var/log/httpd/*
 
 %dir %{_datadir}
