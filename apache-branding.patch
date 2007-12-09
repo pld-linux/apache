@@ -1,0 +1,11 @@
+--- httpd-2.2.4/server/core.c~	2007-04-09 12:44:44.498312561 +0300
++++ httpd-2.2.4/server/core.c	2007-04-09 13:51:55.259792868 +0300
+@@ -2733,7 +2733,7 @@
+ AP_DECLARE(const char *) ap_get_server_description(void)
+ {
+     return server_description ? server_description :
+-        AP_SERVER_BASEVERSION " (" PLATFORM ")";
++        AP_SERVER_BASEVERSION " (PLD/Linux)";
+ }
+ 
+ AP_DECLARE(const char *) ap_get_server_banner(void)
