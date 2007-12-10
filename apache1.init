@@ -146,7 +146,7 @@ case "$1" in
 		configtest
 		RETVAL=$?
 		if [ $RETVAL -eq 0 ]; then
-			killproc apache -USR1
+			killproc apache -HUP
 			RETVAL=$?
 		else
 			fail
