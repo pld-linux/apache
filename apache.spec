@@ -308,9 +308,9 @@ Summary(pl.UTF-8):	Pliki nagłówkowe do tworzenia modułów rozszerzeń do serw
 Summary(pt_BR.UTF-8):	Arquivos de inclusão do Apache para desenvolvimento de módulos
 Summary(ru.UTF-8):	Средства разработки модулей для веб-сервера Apache
 Group:		Networking/Utilities
-Obsoletes:	%{name}-apxs
 Requires:	apr-util-devel >= 1:1.2
 Requires:	libtool
+Obsoletes:	apache-apxs
 Obsoletes:	apache-static
 
 %description devel
