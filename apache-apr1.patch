@@ -1782,3 +1782,14 @@ diff -ur httpd-2.0.52.org/modules/experimental/util_ldap.c httpd-2.0.52/modules/
      if (rv != APR_SUCCESS) {
          int log_level = APLOG_WARNING;
  
+--- httpd-2.0.63/support/Makefile.in~	2007-12-28 16:11:51.000000000 +0100
++++ httpd-2.0.63/support/Makefile.in	2008-01-22 13:43:36.488001322 +0100
+@@ -52,7 +52,7 @@
+ ab_OBJECTS = ab.lo
+ ab_LDADD = $(PROGRAM_LDADD) $(SSL_LIBS)
+ ab: $(ab_OBJECTS)
+-	$(LINK) $(ab_LTFLAGS) $(ab_OBJECTS) $(ab_LDADD)
++	$(LINK) $(ab_LTFLAGS) $(ab_OBJECTS) $(ab_LDADD) -lm
+ 
+ checkgid_OBJECTS = checkgid.lo
+ checkgid: $(checkgid_OBJECTS)
