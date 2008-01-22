@@ -1729,18 +1729,6 @@ diff -ur httpd-2.0.52.org/support/ab.c httpd-2.0.52/support/ab.c
                          }
                          c->state = STATE_UNCONNECTED;
                          start_connect(c);
-diff -ur httpd-2.0.52.org/support/Makefile.in httpd-2.0.52/support/Makefile.in
---- httpd-2.0.52.org/support/Makefile.in	2004-10-02 18:25:58.494683641 +0200
-+++ httpd-2.0.52/support/Makefile.in	2004-10-02 18:26:13.890385473 +0200
-@@ -51,7 +51,7 @@
- 
- ab_OBJECTS = ab.lo
- ab: $(ab_OBJECTS)
--	$(LINK) $(ab_LTFLAGS) $(ab_OBJECTS) $(PROGRAM_LDADD)
-+	$(LINK) $(ab_LTFLAGS) $(ab_OBJECTS) $(PROGRAM_LDADD) -lm
- 
- checkgid_OBJECTS = checkgid.lo
- checkgid: $(checkgid_OBJECTS)
 diff -ur httpd-2.0.52.org/modules/experimental/util_ldap.c httpd-2.0.52/modules/experimental/util_ldap.c
 --- httpd-2.0.52.org/modules/experimental/util_ldap.c	2004-10-02 22:10:30.732572635 +0200
 +++ httpd-2.0.52/modules/experimental/util_ldap.c	2004-10-03 00:59:18.141012892 +0200
