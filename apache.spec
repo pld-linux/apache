@@ -34,12 +34,12 @@ Summary(pt_BR.UTF-8):	Servidor HTTPD para prover serviços WWW
 Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
-Version:	2.2.6
-Release:	4
+Version:	2.2.8
+Release:	1
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
-# Source0-md5:	d050a49bd7532ec21c6bb593b3473a5d
+# Source0-md5:	39a755eb0f584c279336387b321e3dfc
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}-icons.tar.gz
@@ -1564,6 +1564,22 @@ browser).
 Moduł pozwala administratorowi na przeglądanie statystyk dotyczących
 pracy serwera Apache (w postaci strony HTML).
 
+%package mod_substitute
+Summary:	Substitute module for Apache
+Summary(pl.UTF-8):	Moduł pozwalający na znajdywanie i zastępowanie wyjścia dla serwera Apache
+Group:		Networking/Daemons
+URL:		http://httpd.apache.org/docs/2.2/mod/mod_substitute.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_substitute) = %{version}-%{release}
+
+%description mod_substitute
+The Substitute module provides a mechanism to perform both regular
+expression and fixed string substitutions on response bodies.
+
+%description mod_substitute -l pl.UTF-8
+Moduł pozwala na zastępowanie ciągów znaków w wyjściu również na
+podstawie wyrażenia regularnego.
+
 %package mod_unique_id
 Summary:	Apache module which provides a magic token for each request
 Summary(pl.UTF-8):	Moduł Apache'a nadający każdemu zapytaniu unikalny token
@@ -1958,6 +1974,7 @@ echo "LoadModule headers_module	modules/mod_headers.so" > $CFG/00_mod_headers.co
 echo "LoadModule rewrite_module	modules/mod_rewrite.so" > $CFG/00_mod_rewrite.conf
 echo "LoadModule usertrack_module	modules/mod_usertrack.so" > $CFG/00_mod_usertrack.conf
 echo "LoadModule unique_id_module	modules/mod_unique_id.so" > $CFG/00_mod_unique_id.conf
+echo "LoadModule substitute_module      modules/mod_subsitute.so" > $CFG/00_mod_substitute.conf
 
 # anything in style dir not ending with .css is trash
 rm -rf $RPM_BUILD_ROOT%{_datadir}/manual/style/{lang,latex,xsl}
@@ -2222,6 +2239,7 @@ fi
 %module_scripts mod_speling
 %module_scripts mod_ssl
 %module_scripts mod_status
+%module_scripts mod_substitute
 %module_scripts mod_unique_id
 %module_scripts mod_userdir
 %module_scripts mod_usertrack
@@ -2640,6 +2658,11 @@ fi
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_status.conf
 %attr(755,root,root) %{_libexecdir}/mod_status.so
+
+%files mod_substitute
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_substitute.conf
+%attr(755,root,root) %{_libexecdir}/mod_substitute.so
 
 %files mod_unique_id
 %defattr(644,root,root,755)
