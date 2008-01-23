@@ -34,12 +34,12 @@ Summary(pt_BR.UTF-8):	Servidor HTTPD para prover serviços WWW
 Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
-Version:	2.2.4
-Release:	2
+Version:	2.2.8
+Release:	1
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
-# Source0-md5:	3add41e0b924d4bb53c2dee55a38c09e
+# Source0-md5:	39a755eb0f584c279336387b321e3dfc
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}-icons.tar.gz
@@ -73,6 +73,7 @@ Source31:	%{name}-mod_cache.conf
 Patch0:		%{name}-configdir_skip_backups.patch
 Patch1:		%{name}-layout.patch
 Patch2:		%{name}-suexec.patch
+Patch3:		%{name}-branding.patch
 Patch4:		%{name}-apr.patch
 # project homepage http://www.metux.de/mpm/en/?patpage=index
 # http://www.sannes.org/metuxmpm/
@@ -210,6 +211,7 @@ Obsoletes:	apache-mod_optional_fn_import
 Obsoletes:	apache-mod_optional_fn_import
 Obsoletes:	apache-mod_optional_hook_import
 Conflicts:	apache < 2.2.0
+Conflicts:	logrotate < 3.7-4
 # for the posttrans scriptlet, conflicts because in vserver environment rpm package is not installed.
 Conflicts:	rpm < 4.4.2-0.2
 
@@ -298,18 +300,6 @@ Multi-language error messages.
 %description errordocs -l pl.UTF-8
 Dokumenty opisujące błędy HTTP dla Apache'a w wielu językach.
 
-%package apxs
-Summary:	APache eXtenSion tool
-Summary(pl.UTF-8):	Narzędzie do rozszerzania Apache'a
-Group:		Development/Tools
-Requires:	apr-devel
-
-%description apxs
-APache eXtenSion tool.
-
-%description apxs -l pl.UTF-8
-Narzędzie do rozszerzania Apache'a.
-
 %package devel
 Summary:	Module development tools for the Apache web server
 Summary(es.UTF-8):	Archivos de inclusión del Apache para desarrollo de módulos
@@ -318,9 +308,9 @@ Summary(pl.UTF-8):	Pliki nagłówkowe do tworzenia modułów rozszerzeń do serw
 Summary(pt_BR.UTF-8):	Arquivos de inclusão do Apache para desenvolvimento de módulos
 Summary(ru.UTF-8):	Средства разработки модулей для веб-сервера Apache
 Group:		Networking/Utilities
-Requires:	%{name}-apxs = %{version}-%{release}
 Requires:	apr-util-devel >= 1:1.2
 Requires:	libtool
+Obsoletes:	apache-apxs
 Obsoletes:	apache-static
 
 %description devel
@@ -1319,6 +1309,7 @@ Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_log_config.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_log_config) = %{version}-%{release}
+Provides:	webserver(log)
 
 %description mod_log_config
 This module provides for flexible logging of client requests. Logs are
@@ -1573,6 +1564,22 @@ browser).
 Moduł pozwala administratorowi na przeglądanie statystyk dotyczących
 pracy serwera Apache (w postaci strony HTML).
 
+%package mod_substitute
+Summary:	Substitute module for Apache
+Summary(pl.UTF-8):	Moduł pozwalający na znajdywanie i zastępowanie wyjścia dla serwera Apache
+Group:		Networking/Daemons
+URL:		http://httpd.apache.org/docs/2.2/mod/mod_substitute.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_substitute) = %{version}-%{release}
+
+%description mod_substitute
+The Substitute module provides a mechanism to perform both regular
+expression and fixed string substitutions on response bodies.
+
+%description mod_substitute -l pl.UTF-8
+Moduł pozwala na zastępowanie ciągów znaków w wyjściu również na
+podstawie wyrażenia regularnego.
+
 %package mod_unique_id
 Summary:	Apache module which provides a magic token for each request
 Summary(pl.UTF-8):	Moduł Apache'a nadający każdemu zapytaniu unikalny token
@@ -1705,7 +1712,7 @@ Summary:	cgi test/demo programs
 Summary(pl.UTF-8):	Programy testowe/przykładowe cgi
 Group:		Networking/Utilities
 Requires:	%{name}-base = %{version}-%{release}
-Requires:	filesystem >= 3.0-11
+Requires:	filesystem >= 2.0-1
 
 %description cgi_test
 Two cgi test/demo programs: test-cgi and print-env.
@@ -1718,6 +1725,7 @@ Dwa programy testowe/przykładowe cgi: test-cgi and print-env.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 %patch4 -p1
 %patch5 -p1
 %patch7 -p1
@@ -1966,6 +1974,7 @@ echo "LoadModule headers_module	modules/mod_headers.so" > $CFG/00_mod_headers.co
 echo "LoadModule rewrite_module	modules/mod_rewrite.so" > $CFG/00_mod_rewrite.conf
 echo "LoadModule usertrack_module	modules/mod_usertrack.so" > $CFG/00_mod_usertrack.conf
 echo "LoadModule unique_id_module	modules/mod_unique_id.so" > $CFG/00_mod_unique_id.conf
+echo "LoadModule substitute_module      modules/mod_subsitute.so" > $CFG/00_mod_substitute.conf
 
 # anything in style dir not ending with .css is trash
 rm -rf $RPM_BUILD_ROOT%{_datadir}/manual/style/{lang,latex,xsl}
@@ -1987,13 +1996,14 @@ mv $RPM_BUILD_ROOT%{_sbindir}/htpasswd $RPM_BUILD_ROOT%{_bindir}
 ln -sf %{_bindir}/htpasswd $RPM_BUILD_ROOT%{_sbindir}
 
 # cgi_test: create config file with ScriptAlias
-cat << EOF > $CFG/09_cgi_test.conf
+cat << 'EOF' > $CFG/09_cgi_test.conf
 ScriptAlias /cgi-bin/printenv %{_cgibindir}/printenv
 ScriptAlias /cgi-bin/test-cgi %{_cgibindir}/test-cgi
 EOF
 
 # no value
 rm $RPM_BUILD_ROOT%{_libexecdir}/build/config.nice
+rm $RPM_BUILD_ROOT%{_libexecdir}/*.exp
 rm $RPM_BUILD_ROOT%{_sysconfdir}/mime.types
 rm $RPM_BUILD_ROOT%{_sysconfdir}/httpd.prefork.conf
 rm -rf $RPM_BUILD_ROOT%{_sysconfdir}/{extra,original}
@@ -2125,7 +2135,7 @@ fi
 NB! Apache main config has been changed to /etc/httpd/apache.conf
 
 There has been changed a lot, so many things could be broken.
-Please report bugs to http://bugs.pld-linux.org/.
+Please report bugs to <http://bugs.pld-linux.org/>.
 
 EOF
 
@@ -2229,6 +2239,7 @@ fi
 %module_scripts mod_speling
 %module_scripts mod_ssl
 %module_scripts mod_status
+%module_scripts mod_substitute
 %module_scripts mod_unique_id
 %module_scripts mod_userdir
 %module_scripts mod_usertrack
@@ -2263,9 +2274,7 @@ fi
 %defattr(644,root,root,755)
 %doc ABOUT_APACHE CHANGES README
 %doc docs/conf/mime.types
-
 %attr(754,root,root) /etc/rc.d/init.d/httpd
-
 %attr(751,root,root) %dir %{_sysconfdir}
 %{_sysconfdir}/modules
 %{_sysconfdir}/run
@@ -2323,16 +2332,6 @@ fi
 %{_datadir}/html/*.gif
 %{_datadir}/html/*.png
 
-%files apxs
-%defattr(644,root,root,755)
-%attr(755,root,root) %{_sbindir}/apxs
-%attr(755,root,root) %{_sbindir}/envvars*
-# package libexecdir also to -apxs, as -apxs and -devel don't require -base package
-%dir %{_libexecdir}
-%dir %{_libexecdir}/build
-%{_libexecdir}/build/config_vars.mk
-%{_mandir}/man8/apxs.8*
-
 %files tools
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_sbindir}/ab
@@ -2348,11 +2347,14 @@ fi
 
 %files devel
 %defattr(644,root,root,755)
-%{_includedir}
-# FIXME: httpd.exp needed only on AIX
-%{_libexecdir}/*.exp
+%attr(755,root,root) %{_sbindir}/apxs
+%attr(755,root,root) %{_sbindir}/envvars*
+%dir %{_libexecdir}/build
 %{_libexecdir}/build/[lprs]*.mk
+%{_libexecdir}/build/config_vars.mk
 %attr(755,root,root) %{_libexecdir}/build/*.sh
+%{_includedir}
+%{_mandir}/man8/apxs.8*
 
 %files mod_actions
 %defattr(644,root,root,755)
@@ -2656,6 +2658,11 @@ fi
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_status.conf
 %attr(755,root,root) %{_libexecdir}/mod_status.so
+
+%files mod_substitute
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_substitute.conf
+%attr(755,root,root) %{_libexecdir}/mod_substitute.so
 
 %files mod_unique_id
 %defattr(644,root,root,755)
