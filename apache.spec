@@ -1,6 +1,5 @@
 # TODO:
 # - config examples for mod_*
-# - --with-suexec-gidmin=500 or =100 ?
 # - --with-suexec-uidmin=500 or =1000 ?
 # - subpackages for MPMs
 # - !!!check if all modules (*.so) are exactly the same for different MPMs
@@ -19,7 +18,7 @@
 %bcond_without	metuxmpm	# metux MPM
 %bcond_without	peruser		# peruser MPM
 %bcond_without	event		# event MPM
-%bcond_with     distcache	# distcache support
+%bcond_with	distcache	# distcache support
 %bcond_with	bucketeer	# debug one
 #
 %include	/usr/lib/rpm/macros.perl
@@ -1974,7 +1973,7 @@ echo "LoadModule headers_module	modules/mod_headers.so" > $CFG/00_mod_headers.co
 echo "LoadModule rewrite_module	modules/mod_rewrite.so" > $CFG/00_mod_rewrite.conf
 echo "LoadModule usertrack_module	modules/mod_usertrack.so" > $CFG/00_mod_usertrack.conf
 echo "LoadModule unique_id_module	modules/mod_unique_id.so" > $CFG/00_mod_unique_id.conf
-echo "LoadModule substitute_module      modules/mod_subsitute.so" > $CFG/00_mod_substitute.conf
+echo "LoadModule substitute_module	modules/mod_subsitute.so" > $CFG/00_mod_substitute.conf
 
 # anything in style dir not ending with .css is trash
 rm -rf $RPM_BUILD_ROOT%{_datadir}/manual/style/{lang,latex,xsl}
