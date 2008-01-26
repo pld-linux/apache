@@ -35,6 +35,7 @@ fi
 
 configtest() {
 	apache -t > /dev/null 2>&1
+	RETVAL=$?
 }
 
 start() {
@@ -79,6 +80,37 @@ stop() {
 	fi
 }
 
+restart() {
+	configtest
+	if [ $RETVAL -eq 0 ]; then
+		stop
+		start
+	else
+		fail
+		echo >&2 "Configuration file syntax test failed."
+	fi
+}
+
+reload() {
+	sig=${1:-HUP}
+	retnr=${2:-7}
+	if [ -f /var/lock/subsys/apache ]; then
+		msg_reloading apache
+
+		configtest
+		if [ $RETVAL -eq 0 ]; then
+			killproc apache -$sig
+			RETVAL=$?
+		else
+			fail
+			echo >&2 "Configuration file syntax test failed."
+		fi
+	else
+		msg_not_running apache
+		RETVAL=$retnr
+	fi
+}
+
 RETVAL=0
 # See how we were called.
 case "$1" in
@@ -94,71 +126,29 @@ case "$1" in
 	/usr/sbin/apache -S
 	;;
   restart)
-	apache -t > /dev/null 2>&1
-	RETVAL=$?
-	if [ $RETVAL -eq 0 ]; then
-		stop
-		start
+	restart
+	;;
+  try-restart)
+  	if [ -f /var/lock/subsys/apache ]; then
+		restart
 	else
-		fail
-		echo "Configuration file syntax test failed."
+		msg_not_running apache
 	fi
-
 	;;
   force-reload)
-  	if [ -f /var/lock/subsys/apache ]; then
-		msg_reloading apache
-
-		configtest
-		RETVAL=$?
-		if [ $RETVAL -eq 0 ]; then
-			killproc apache -HUP
-		else
-			fail
-			echo "Configuration file syntax test failed."
-		fi
-	else
-		msg_not_running apache
-		RETVAL=7
-	fi
+	reload HUP 7
 	;;
   reload|graceful)
-	if [ -f /var/lock/subsys/apache ]; then
-		msg_reloading apache
-
-		configtest
-		RETVAL=$?
-		if [ $RETVAL -eq 0 ]; then
-			killproc apache -USR1
-		else
-			fail
-			echo >&2 "Configuration file syntax test failed."
-		fi
-	else
-		msg_not_running apache
-		RETVAL=7
-	fi
+	reload USR1 7
 	;;
   flush-logs)
-	if [ -f /var/lock/subsys/apache ]; then
-		msg_reloading apache
-
-		configtest
-		RETVAL=$?
-		if [ $RETVAL -eq 0 ]; then
-			killproc apache -HUP
-			RETVAL=$?
-		else
-			fail
-			echo >&2 "Configuration file syntax test failed."
-		fi
-	fi
+	reload HUP 0
 	;;
   configtest)
 	apache -t
 	;;
   *)
-	msg_usage "$0 {start|stop|restart|reload|force-reload|graceful|configtest|status}"
+	msg_usage "$0 {start|stop|restart|try-restart|reload|force-reload|graceful|configtest|status}"
 	exit 3
 	;;
 esac
