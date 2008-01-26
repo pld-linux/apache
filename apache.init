@@ -62,6 +62,16 @@ stop() {
 	fi
 }
 
+condrestart() {
+	if [ -f /var/lock/subsys/httpd ]; then
+		stop
+		start
+	else
+		msg_not_running httpd.${HTTPD_MPM}
+		RETVAL=$1
+	fi
+}
+
 RETVAL=0
 # See how we were called.
 case "$1" in
@@ -79,6 +89,9 @@ case "$1" in
   restart)
 	stop
 	start
+	;;
+  try-restart)
+	condrestart 0
 	;;
   reload|force-reload|graceful)
 	if [ -f /var/lock/subsys/httpd ]; then
@@ -109,24 +122,8 @@ case "$1" in
 		fi
 	fi
 	;;
-  force-reload)
-	if [ -f /var/lock/subsys/httpd ]; then
-		run_cmd "Checking httpd.${HTTPD_MPM} configuration" httpd.${HTTPD_MPM} $CFG -t
-		RETVAL=$?
-		if [ $RETVAL -eq 0 ]; then
-			msg_reloading httpd.${HTTPD_MPM}
-			# forced reload
-			daemon httpd.${HTTPD_MPM} $CFG -k restart
-			RETVAL=$?
-		fi
-	else
-		msg_not_running httpd.${HTTPD_MPM}
-		RETVAL=7
-	fi
-	;;
-
   *)
-	msg_usage "$0 {start|stop|restart|reload|force-reload|graceful|status}"
+	msg_usage "$0 {start|stop|restart|try-restart|reload|force-reload|graceful|status}"
 	exit 3
 	;;
 esac
