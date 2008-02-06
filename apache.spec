@@ -34,7 +34,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.2.8
-Release:	1
+Release:	2
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -2050,7 +2050,7 @@ if [ "$1" = "0" ]; then
 	%groupremove http
 fi
 
-%triggerpostun base -- %{name} <= 2.0.50-6
+%triggerpostun base -- %{name} < 2.0.50-6.9
 %banner %{name}-2.0.50-6 << EOF
 WARNING!!!
 Since apache-2.0.50-6 autoindex module has been separated to package
