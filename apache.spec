@@ -34,16 +34,16 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.2.8
-Release:	1
+Release:	2
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 # Source0-md5:	39a755eb0f584c279336387b321e3dfc
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
-Source3:	%{name}-icons.tar.gz
-# Source3-md5:	2b085cbc19fd28536dc883f0b864cd83
-Source4:	%{name}.sysconfig
+Source3:	%{name}.sysconfig
+Source4:	%{name}-server.crt
+Source5:	%{name}-server.key
 Source6:	%{name}-httpd.conf
 Source7:	%{name}-common.conf
 Source8:	%{name}-mod_vhost_alias.conf
@@ -58,17 +58,15 @@ Source16:	%{name}-mod_deflate.conf
 Source17:	%{name}-mod_autoindex.conf
 Source18:	%{name}-multilang-errordoc.conf
 Source19:	%{name}-manual.conf
-Source20:	%{name}-server.crt
-Source21:	%{name}-server.key
-Source22:	%{name}-mod_userdir.conf
-Source23:	%{name}-mpm.conf
-Source24:	%{name}-languages.conf
-Source25:	%{name}-mod_mime.conf
-Source27:	%{name}-mod_authz_host.conf
-Source28:	%{name}-mod_cgid.conf
-Source29:	%{name}-mod_log_config.conf
-Source30:	%{name}-mod_mime_magic.conf
-Source31:	%{name}-mod_cache.conf
+Source20:	%{name}-mod_userdir.conf
+Source21:	%{name}-mpm.conf
+Source22:	%{name}-languages.conf
+Source23:	%{name}-mod_mime.conf
+Source24:	%{name}-mod_authz_host.conf
+Source25:	%{name}-mod_cgid.conf
+Source26:	%{name}-mod_log_config.conf
+Source27:	%{name}-mod_mime_magic.conf
+Source28:	%{name}-mod_cache.conf
 Patch0:		%{name}-configdir_skip_backups.patch
 Patch1:		%{name}-layout.patch
 Patch2:		%{name}-suexec.patch
@@ -103,7 +101,7 @@ BuildRequires:	db-devel
 BuildRequires:	expat-devel
 BuildRequires:	gdbm-devel >= 1.8.3
 BuildRequires:	libtool >= 2:1.5
-%{?with_ldap:BuildRequires:	openldap-devel >= 2.4.6}
+%{?with_ldap:BuildRequires:	openldap-devel >= 2.3.0}
 %{?with_ssl:BuildRequires:	openssl-devel >= 0.9.7d}
 %{?with_ssl:BuildRequires:	openssl-tools >= 0.9.7d}
 BuildRequires:	pcre-devel
@@ -1711,7 +1709,7 @@ Summary:	cgi test/demo programs
 Summary(pl.UTF-8):	Programy testowe/przykładowe cgi
 Group:		Networking/Utilities
 Requires:	%{name}-base = %{version}-%{release}
-Requires:	filesystem >= 3.0-11
+Requires:	filesystem >= 2.0-1
 
 %description cgi_test
 Two cgi test/demo programs: test-cgi and print-env.
@@ -1888,14 +1886,14 @@ ln -s conf.d $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
 
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/httpd
-install %{SOURCE4} $RPM_BUILD_ROOT/etc/sysconfig/httpd
+install %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/httpd
 
 touch $RPM_BUILD_ROOT/var/log/httpd/{access,error,agent,referer,suexec}_log
 
 %if %{with ssl}
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/ssl
-install %{SOURCE20} $RPM_BUILD_ROOT%{_sysconfdir}/ssl/server.crt
-install %{SOURCE21} $RPM_BUILD_ROOT%{_sysconfdir}/ssl/server.key
+install %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/ssl/server.crt
+install %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/ssl/server.key
 %endif
 
 install %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/apache.conf
@@ -1904,12 +1902,12 @@ CFG="$RPM_BUILD_ROOT%{_sysconfdir}/conf.d/"
 
 install %{SOURCE7} $CFG/10_common.conf
 
-install %{SOURCE25} $CFG/01_mod_mime.conf
-install %{SOURCE27} $CFG/01_mod_authz_host.conf
-install %{SOURCE28} $CFG/01_mod_cgid.conf
-install %{SOURCE29} $CFG/01_mod_log_config.conf
-install %{SOURCE30} $CFG/01_mod_mime_magic.conf
-install %{SOURCE31} $CFG/01_mod_cache.conf
+install %{SOURCE23} $CFG/01_mod_mime.conf
+install %{SOURCE24} $CFG/01_mod_authz_host.conf
+install %{SOURCE25} $CFG/01_mod_cgid.conf
+install %{SOURCE26} $CFG/01_mod_log_config.conf
+install %{SOURCE27} $CFG/01_mod_mime_magic.conf
+install %{SOURCE28} $CFG/01_mod_cache.conf
 install %{SOURCE8} $CFG/20_mod_vhost_alias.conf
 install %{SOURCE9} $CFG/25_mod_status.conf
 install %{SOURCE10} $CFG/30_mod_proxy.conf
@@ -1922,9 +1920,9 @@ install %{SOURCE16} $CFG/58_mod_deflate.conf
 install %{SOURCE17} $CFG/57_mod_autoindex.conf
 install %{SOURCE18} $CFG/30_errordocs.conf
 install %{SOURCE19} $CFG/30_manual.conf
-install %{SOURCE22} $CFG/16_mod_userdir.conf
-install %{SOURCE23} $CFG/10_mpm.conf
-install %{SOURCE24} $CFG/20_languages.conf
+install %{SOURCE20} $CFG/16_mod_userdir.conf
+install %{SOURCE21} $CFG/10_mpm.conf
+install %{SOURCE22} $CFG/20_languages.conf
 
 echo "LoadModule alias_module modules/mod_alias.so" > $CFG/00_mod_alias.conf
 echo "LoadModule authn_file_module	modules/mod_authn_file.so" > $CFG/00_mod_authn_file.conf
@@ -2052,7 +2050,7 @@ if [ "$1" = "0" ]; then
 	%groupremove http
 fi
 
-%triggerpostun base -- %{name} <= 2.0.50-6
+%triggerpostun base -- %{name} < 2.0.50-6.9
 %banner %{name}-2.0.50-6 << EOF
 WARNING!!!
 Since apache-2.0.50-6 autoindex module has been separated to package
