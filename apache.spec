@@ -35,7 +35,7 @@ Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.2.8
 Release:	3
-License:	Apache Group License
+License:	Apache
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 # Source0-md5:	39a755eb0f584c279336387b321e3dfc
