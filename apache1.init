@@ -142,7 +142,7 @@ case "$1" in
 	reload USR1 7
 	;;
   flush-logs)
-	reload HUP 0
+	reload USR1 0
 	;;
   configtest)
 	apache -t
