@@ -34,7 +34,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.2.8
-Release:	3
+Release:	4
 License:	Apache
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -2346,6 +2346,7 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_sbindir}/apxs
 %attr(755,root,root) %{_sbindir}/envvars*
+%dir %{_libexecdir}
 %dir %{_libexecdir}/build
 %{_libexecdir}/build/[lprs]*.mk
 %{_libexecdir}/build/config_vars.mk
