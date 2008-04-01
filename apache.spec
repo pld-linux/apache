@@ -1287,7 +1287,7 @@ zainstalowanych modułach itp.
 
 %package mod_ldap
 Summary:	Apache module for LDAP connection pooling and result caching services for other LDAP modules
-Summary(pl.UTF-8):	Moduł Apache'a umożliwiający korzystanie z połączeń LDAP
+Summary(pl.UTF-8):	Moduł Apache'a zarządzający połączeniami z serwerami LDAP
 Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_ldap.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1300,7 +1300,10 @@ provided by the standard LDAP libraries, this module adds an LDAP
 connection pool and an LDAP shared memory cache.
 
 %description mod_ldap -l pl.UTF-8
-Moduł Apache'a umożliwiający korzystanie z połączeń LDAP.
+Moduł Apache'a poprawiający wydajność serwisów polegających na
+połączeniach z serwerami LDAP. Oprócz funkcjo udostępnianych przez
+standardowe biblioteki LDAP ten moduł dodaje zarządzanie pulą połączeń
+i współdzieloną pamięć podręczną zapytań.
 
 %package mod_log_config
 Summary:	Logging of the requests made to the server
