@@ -87,8 +87,8 @@ Patch15:	httpd-2.0.48-debuglog.patch
 Patch18:	%{name}-v6only-ENOPROTOOPT.patch
 Patch19:	%{name}-conffile-path.patch
 Patch20:	%{name}-apxs.patch
-# http://www.telana.com/peruser.php
-Patch21:	httpd-2.0.52-peruser-0.1.6.patch
+# http://www.telana.com/peruser.php (2.2.3-0.3.0)
+Patch21:	httpd-peruser.patch
 Patch22:	%{name}-libtool.patch
 Patch23:	%{name}-revert-bug-40463.patch
 URL:		http://httpd.apache.org/
