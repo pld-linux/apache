@@ -1,6 +1,15 @@
-diff -urN httpd-2.2.0.org/server/mpm/config.m4 httpd-2.2.0/server/mpm/config.m4
---- httpd-2.2.0.org/server/mpm/config.m4	2005-12-02 22:41:02.471004000 +0100
-+++ httpd-2.2.0/server/mpm/config.m4	2005-12-02 22:42:26.900280500 +0100
+diff -Nur httpd-2.2.3/server/mpm/config.m4 httpd-2.2.3-peruser/server/mpm/config.m4
+--- httpd-2.2.3/server/mpm/config.m4	2005-10-30 10:05:26.000000000 -0700
++++ httpd-2.2.3-peruser/server/mpm/config.m4	2007-09-24 22:52:22.000000000 -0600
+@@ -1,7 +1,7 @@
+ AC_MSG_CHECKING(which MPM to use)
+ AC_ARG_WITH(mpm,
+ APACHE_HELP_STRING(--with-mpm=MPM,Choose the process model for Apache to use.
+-                          MPM={beos|event|worker|prefork|mpmt_os2|metuxmpm}),[
++                          MPM={beos|event|worker|prefork|mpmt_os2|metuxmpm|peruser}),[
+   APACHE_MPM=$withval
+ ],[
+   if test "x$APACHE_MPM" = "x"; then
 @@ -23,7 +23,7 @@
  
  ap_mpm_is_experimental ()
@@ -10,25 +19,145 @@ diff -urN httpd-2.2.0.org/server/mpm/config.m4 httpd-2.2.0/server/mpm/config.m4
          return 0
      else
          return 1
-diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/config.m4 httpd-2.2.0/server/mpm/experimental/peruser/config.m4
---- httpd-2.2.0.org/server/mpm/experimental/peruser/config.m4	1970-01-01 01:00:00.000000000 +0100
-+++ httpd-2.2.0/server/mpm/experimental/peruser/config.m4	2005-12-02 22:41:54.314244000 +0100
-@@ -0,0 +1,3 @@
-+if test "$MPM_NAME" = "peruser" ; then
-+    APACHE_FAST_OUTPUT(server/mpm/experimental/$MPM_NAME/Makefile)
-+fi
-diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/Makefile.in httpd-2.2.0/server/mpm/experimental/peruser/Makefile.in
---- httpd-2.2.0.org/server/mpm/experimental/peruser/Makefile.in	1970-01-01 01:00:00.000000000 +0100
-+++ httpd-2.2.0/server/mpm/experimental/peruser/Makefile.in	2005-12-02 22:41:54.314244000 +0100
+diff -Nur httpd-2.2.3/server/mpm/experimental/peruser/AUTHORS httpd-2.2.3-peruser/server/mpm/experimental/peruser/AUTHORS
+--- httpd-2.2.3/server/mpm/experimental/peruser/AUTHORS	1969-12-31 17:00:00.000000000 -0700
++++ httpd-2.2.3-peruser/server/mpm/experimental/peruser/AUTHORS	2007-09-28 17:29:01.000000000 -0600
+@@ -0,0 +1,9 @@
++Enrico Weigelt <weigelt [at] metux.de> (MetuxMPM maintainer)
++Sean Gabriel Heacock <gabriel [at] telana.com> (Peruser maintainer)
++Stefan Seufert <stefan [at] seuf.de>
++Janno Sannik <janno [at] kood.ee>
++Taavi Sannik <taavi [at] kood.ee>
++Rommer <rommer [at] active.by>
++Bert <bert [at] ev6.net>
++Leen Besselink <leen [at] consolejunkie.net>
++Steve Amerige <mpm [at] fatbear.com>
+diff -Nur httpd-2.2.3/server/mpm/experimental/peruser/Makefile.in httpd-2.2.3-peruser/server/mpm/experimental/peruser/Makefile.in
+--- httpd-2.2.3/server/mpm/experimental/peruser/Makefile.in	1969-12-31 17:00:00.000000000 -0700
++++ httpd-2.2.3-peruser/server/mpm/experimental/peruser/Makefile.in	2007-09-28 17:29:01.000000000 -0600
 @@ -0,0 +1,5 @@
 +
 +LTLIBRARY_NAME    = libperuser.la
 +LTLIBRARY_SOURCES = peruser.c
 +
 +include $(top_srcdir)/build/ltlib.mk
-diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/mpm_default.h httpd-2.2.0/server/mpm/experimental/peruser/mpm_default.h
---- httpd-2.2.0.org/server/mpm/experimental/peruser/mpm_default.h	1970-01-01 01:00:00.000000000 +0100
-+++ httpd-2.2.0/server/mpm/experimental/peruser/mpm_default.h	2005-12-02 22:41:54.314244000 +0100
+diff -Nur httpd-2.2.3/server/mpm/experimental/peruser/config.m4 httpd-2.2.3-peruser/server/mpm/experimental/peruser/config.m4
+--- httpd-2.2.3/server/mpm/experimental/peruser/config.m4	1969-12-31 17:00:00.000000000 -0700
++++ httpd-2.2.3-peruser/server/mpm/experimental/peruser/config.m4	2007-09-28 17:29:01.000000000 -0600
+@@ -0,0 +1,3 @@
++if test "$MPM_NAME" = "peruser" ; then
++    APACHE_FAST_OUTPUT(server/mpm/experimental/$MPM_NAME/Makefile)
++fi
+diff -Nur httpd-2.2.3/server/mpm/experimental/peruser/mpm.h httpd-2.2.3-peruser/server/mpm/experimental/peruser/mpm.h
+--- httpd-2.2.3/server/mpm/experimental/peruser/mpm.h	1969-12-31 17:00:00.000000000 -0700
++++ httpd-2.2.3-peruser/server/mpm/experimental/peruser/mpm.h	2007-09-28 17:29:01.000000000 -0600
+@@ -0,0 +1,103 @@
++/* ====================================================================
++ * The Apache Software License, Version 1.1
++ *
++ * Copyright (c) 2000-2003 The Apache Software Foundation.  All rights
++ * reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ *
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in
++ *    the documentation and/or other materials provided with the
++ *    distribution.
++ *
++ * 3. The end-user documentation included with the redistribution,
++ *    if any, must include the following acknowledgment:
++ *       "This product includes software developed by the
++ *        Apache Software Foundation (http://www.apache.org/)."
++ *    Alternately, this acknowledgment may appear in the software itself,
++ *    if and wherever such third-party acknowledgments normally appear.
++ *
++ * 4. The names "Apache" and "Apache Software Foundation" must
++ *    not be used to endorse or promote products derived from this
++ *    software without prior written permission. For written
++ *    permission, please contact apache@apache.org.
++ *
++ * 5. Products derived from this software may not be called "Apache",
++ *    nor may "Apache" appear in their name, without prior written
++ *    permission of the Apache Software Foundation.
++ *
++ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
++ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
++ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
++ * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
++ * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
++ * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
++ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
++ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
++ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++ * SUCH DAMAGE.
++ * ====================================================================
++ *
++ * This software consists of voluntary contributions made by many
++ * individuals on behalf of the Apache Software Foundation.  For more
++ * information on the Apache Software Foundation, please see
++ * <http://www.apache.org/>.
++ *
++ * Portions of this software are based upon public domain software
++ * originally written at the National Center for Supercomputing Applications,
++ * University of Illinois, Urbana-Champaign.
++ */
++
++#include "httpd.h"
++#include "mpm_default.h"
++#include "scoreboard.h"
++#include "unixd.h"
++
++#ifndef APACHE_MPM_PERUSER_H
++#define APACHE_MPM_PERUSER_H
++
++#define PERUSER_MPM
++
++#define MPM_NAME "Peruser"
++
++#define AP_MPM_WANT_RECLAIM_CHILD_PROCESSES
++#define AP_MPM_WANT_WAIT_OR_TIMEOUT
++#define AP_MPM_WANT_PROCESS_CHILD_STATUS
++#define AP_MPM_WANT_SET_PIDFILE
++#define AP_MPM_WANT_SET_SCOREBOARD
++#define AP_MPM_WANT_SET_LOCKFILE
++#define AP_MPM_WANT_SET_MAX_REQUESTS
++#define AP_MPM_WANT_SET_COREDUMPDIR
++#define AP_MPM_WANT_SET_ACCEPT_LOCK_MECH
++#define AP_MPM_WANT_SIGNAL_SERVER
++#define AP_MPM_WANT_SET_MAX_MEM_FREE
++#define AP_MPM_DISABLE_NAGLE_ACCEPTED_SOCK
++
++#define AP_MPM_USES_POD 1
++#define MPM_CHILD_PID(i) (ap_scoreboard_image->parent[i].pid)
++#define MPM_NOTE_CHILD_KILLED(i) (MPM_CHILD_PID(i) = 0)
++#define MPM_ACCEPT_FUNC unixd_accept
++
++extern int ap_threads_per_child;
++extern int ap_max_daemons_limit;
++extern server_rec *ap_server_conf;
++
++/* Table of child status */
++#define SERVER_DEAD 0
++#define SERVER_DYING 1
++#define SERVER_ALIVE 2
++
++typedef struct ap_ctable {
++    pid_t pid;
++    unsigned char status;
++} ap_ctable;
++
++#endif /* APACHE_MPM_PERUSER_H */
+diff -Nur httpd-2.2.3/server/mpm/experimental/peruser/mpm_default.h httpd-2.2.3-peruser/server/mpm/experimental/peruser/mpm_default.h
+--- httpd-2.2.3/server/mpm/experimental/peruser/mpm_default.h	1969-12-31 17:00:00.000000000 -0700
++++ httpd-2.2.3-peruser/server/mpm/experimental/peruser/mpm_default.h	2007-09-28 17:29:01.000000000 -0600
 @@ -0,0 +1,110 @@
 +/* ====================================================================
 + * The Apache Software License, Version 1.1
@@ -140,10 +269,10 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/mpm_default.h httpd-2.
 +#endif
 +
 +#endif /* AP_MPM_DEFAULT_H */
-diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/mpm.h httpd-2.2.0/server/mpm/experimental/peruser/mpm.h
---- httpd-2.2.0.org/server/mpm/experimental/peruser/mpm.h	1970-01-01 01:00:00.000000000 +0100
-+++ httpd-2.2.0/server/mpm/experimental/peruser/mpm.h	2005-12-02 22:41:54.314244000 +0100
-@@ -0,0 +1,103 @@
+diff -Nur httpd-2.2.3/server/mpm/experimental/peruser/peruser.c httpd-2.2.3-peruser/server/mpm/experimental/peruser/peruser.c
+--- httpd-2.2.3/server/mpm/experimental/peruser/peruser.c	1969-12-31 17:00:00.000000000 -0700
++++ httpd-2.2.3-peruser/server/mpm/experimental/peruser/peruser.c	2007-10-03 11:28:06.000000000 -0600
+@@ -0,0 +1,3223 @@
 +/* ====================================================================
 + * The Apache Software License, Version 1.1
 + *
@@ -202,112 +331,7 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/mpm.h httpd-2.2.0/serv
 + * University of Illinois, Urbana-Champaign.
 + */
 +
-+#include "httpd.h"
-+#include "mpm_default.h"
-+#include "scoreboard.h"
-+#include "unixd.h"
-+
-+#ifndef APACHE_MPM_PERUSER_H
-+#define APACHE_MPM_PERUSER_H
-+
-+#define PERUSER_MPM
-+
-+#define MPM_NAME "Peruser"
-+
-+#define AP_MPM_WANT_RECLAIM_CHILD_PROCESSES
-+#define AP_MPM_WANT_WAIT_OR_TIMEOUT
-+#define AP_MPM_WANT_PROCESS_CHILD_STATUS
-+#define AP_MPM_WANT_SET_PIDFILE
-+#define AP_MPM_WANT_SET_SCOREBOARD
-+#define AP_MPM_WANT_SET_LOCKFILE
-+#define AP_MPM_WANT_SET_MAX_REQUESTS
-+#define AP_MPM_WANT_SET_COREDUMPDIR
-+#define AP_MPM_WANT_SET_ACCEPT_LOCK_MECH
-+#define AP_MPM_WANT_SIGNAL_SERVER
-+#define AP_MPM_WANT_SET_MAX_MEM_FREE
-+#define AP_MPM_DISABLE_NAGLE_ACCEPTED_SOCK
-+
-+#define AP_MPM_USES_POD 1
-+#define MPM_CHILD_PID(i) (ap_scoreboard_image->parent[i].pid)
-+#define MPM_NOTE_CHILD_KILLED(i) (MPM_CHILD_PID(i) = 0)
-+#define MPM_ACCEPT_FUNC unixd_accept
-+
-+extern int ap_threads_per_child;
-+extern int ap_max_daemons_limit;
-+extern server_rec *ap_server_conf;
-+
-+/* Table of child status */
-+#define SERVER_DEAD 0
-+#define SERVER_DYING 1
-+#define SERVER_ALIVE 2
-+
-+typedef struct ap_ctable {
-+    pid_t pid;
-+    unsigned char status;
-+} ap_ctable;
-+
-+#endif /* APACHE_MPM_PERUSER_H */
-diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/server/mpm/experimental/peruser/peruser.c
---- httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c	1970-01-01 01:00:00.000000000 +0100
-+++ httpd-2.2.0/server/mpm/experimental/peruser/peruser.c	2005-12-02 22:46:31.963596000 +0100
-@@ -0,0 +1,2796 @@
-+/* ====================================================================
-+ * The Apache Software License, Version 1.1
-+ *
-+ * Copyright (c) 2000-2003 The Apache Software Foundation.  All rights
-+ * reserved.
-+ *
-+ * Redistribution and use in source and binary forms, with or without
-+ * modification, are permitted provided that the following conditions
-+ * are met:
-+ *
-+ * 1. Redistributions of source code must retain the above copyright
-+ *    notice, this list of conditions and the following disclaimer.
-+ *
-+ * 2. Redistributions in binary form must reproduce the above copyright
-+ *    notice, this list of conditions and the following disclaimer in
-+ *    the documentation and/or other materials provided with the
-+ *    distribution.
-+ *
-+ * 3. The end-user documentation included with the redistribution,
-+ *    if any, must include the following acknowledgment:
-+ *       "This product includes software developed by the
-+ *        Apache Software Foundation (http://www.apache.org/)."
-+ *    Alternately, this acknowledgment may appear in the software itself,
-+ *    if and wherever such third-party acknowledgments normally appear.
-+ *
-+ * 4. The names "Apache" and "Apache Software Foundation" must
-+ *    not be used to endorse or promote products derived from this
-+ *    software without prior written permission. For written
-+ *    permission, please contact apache@apache.org.
-+ *
-+ * 5. Products derived from this software may not be called "Apache",
-+ *    nor may "Apache" appear in their name, without prior written
-+ *    permission of the Apache Software Foundation.
-+ *
-+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
-+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-+ * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
-+ * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
-+ * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
-+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-+ * SUCH DAMAGE.
-+ * ====================================================================
-+ *
-+ * This software consists of voluntary contributions made by many
-+ * individuals on behalf of the Apache Software Foundation.  For more
-+ * information on the Apache Software Foundation, please see
-+ * <http://www.apache.org/>.
-+ *
-+ * Portions of this software are based upon public domain software
-+ * originally written at the National Center for Supercomputing Applications,
-+ * University of Illinois, Urbana-Champaign.
-+ */
++/* Peruser version 0.3.0 */
 +
 +/* #define MPM_PERUSER_DEBUG */
 +
@@ -319,7 +343,6 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +#include "apr_strings.h"
 +#include "apr_thread_proc.h"
 +#include "apr_signal.h"
-+
 +#define APR_WANT_STDIO
 +#define APR_WANT_STRFUNC
 +#define APR_WANT_IOVEC
@@ -342,7 +365,8 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +#include "http_config.h"
 +#include "http_core.h"		/* for get_remote_host */
 +#include "http_connection.h"
-+#include "http_protocol.h"  /* for ap_hook_post_read_request */
++#include "http_protocol.h"	/* for ap_hook_post_read_request */
++#include "http_vhost.h"		/* for ap_update_vhost_given_ip */
 +#include "scoreboard.h"
 +#include "ap_mpm.h"
 +#include "unixd.h"
@@ -351,6 +375,7 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +#include "ap_mmn.h"
 +#include "apr_poll.h"
 +#include "util_ebcdic.h"
++#include "mod_status.h"
 +
 +#ifdef HAVE_BSTRING_H
 +#include <bstring.h>		/* for IRIX, FD_SET calls bzero() */
@@ -458,6 +483,7 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +static int ap_max_processors=DEFAULT_MAX_PROCESSORS;
 +static int ap_daemons_limit=0;      /* MaxClients */
 +static int expire_timeout=1800;
++static int idle_timeout=900;
 +static int server_limit = DEFAULT_SERVER_LIMIT;
 +static int first_server_limit;
 +static int changed_limit_at_restart;
@@ -516,6 +542,16 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +
 +typedef struct
 +{
++    /* identification */
++    int id;            /* index in child_info_table */
++    pid_t pid;         /* process id */
++    int status;                /* status of child */
++    int type;           /* multiplexer or processor */
++    apr_time_t last_used;
++} child_grace_info_t;
++
++typedef struct
++{
 +    apr_size_t num;
 +} child_info_control;
 +
@@ -524,7 +560,6 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +    child_info_control *control;
 +    child_info_t *table;
 +} child_info;
-+
 +
 +typedef struct
 +{
@@ -545,13 +580,14 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 + */
 +static apr_size_t child_info_size;
 +static child_info *child_info_image;
++static child_grace_info_t *child_grace_info_table;
 +struct ap_ctable *ap_child_table;
 +
 +#define NUM_CHILDS (child_info_image != NULL ? child_info_image->control->num : 0)
 +#define CHILD_INFO_TABLE (child_info_image != NULL ? child_info_image->table : NULL)
 +
 +static apr_size_t server_env_size;
-+static server_env *server_env_image;
++static server_env *server_env_image = NULL;
 +
 +#define NUM_SENV (server_env_image != NULL ? server_env_image->control->num : 0)
 +#define SENV (server_env_image != NULL ? server_env_image->table : NULL)
@@ -606,6 +642,10 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +#endif /* TPF */
 +
 +static int die_now = 0;
++
++int grace_children = 0;
++int grace_children_alive = 0;
++int server_env_cleanup = 1;
 +
 +#ifdef GPROF
 +/* 
@@ -674,6 +714,7 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +
 +void dump_child_table()
 +{
++#ifdef MPM_PERUSER_DEBUG
 +  int x;
 +  server_env_t *senv;
 +
@@ -695,7 +736,21 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +      senv == NULL ? -1 : CHILD_INFO_TABLE[x].senv->output,
 +      CHILD_INFO_TABLE[x].sock_fd);
 +  }
++#endif
 +}
++
++void dump_server_env_image()
++{
++#ifdef MPM_PERUSER_DEBUG
++  int x;
++  _DBG("%-3s %-7s %-7s", "N", "INPUT", "OUTPUT");
++  for(x = 0; x < NUM_SENV; x++)
++  {
++    _DBG("%-3d %-7d %-7d", x, SENV[x].input, SENV[x].output);
++  }
++#endif
++}
++
 +
 +/* XXX - I don't know if TPF will ever use this module or not, so leave
 + * the ap_check_signals calls in but disable them - manoj */
@@ -855,7 +910,8 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +/* handle all varieties of core dumping signals */
 +static void sig_coredump(int sig)
 +{
-+    chdir(ap_coredump_dir);
++    int retval;
++    retval = chdir(ap_coredump_dir);
 +    apr_signal(sig, SIG_DFL);
 +    if (ap_my_pid == parent_pid) {
 +            ap_log_error(APLOG_MARK, APLOG_NOTICE,
@@ -1073,13 +1129,150 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +    return 0;
 +}
 +
++/*
++ * This function sends a raw socket over to a processor. It uses the same
++ * on-wire format as pass_request. The recipient can determine if he got
++ * a socket or a whole request by inspecting the header_length of the
++ * message. If it is zero then only a socket was sent.
++ */
++static int pass_socket(apr_socket_t *thesock, child_info_t *processor, apr_pool_t *pool)
++{
++    int rv;
++    struct msghdr msg;
++    struct cmsghdr *cmsg;
++    apr_sockaddr_t *remote_addr;
++    int sock_fd;
++    char *body = "";
++    struct iovec iov[5];
++    apr_size_t header_len = 0;
++    apr_size_t body_len = 0;
++    peruser_header h;
++
++    if (!processor)
++    {
++        _DBG("server %s in child %d has no child_info associated",
++                "(unkonwn)", my_child_num);
++        return -1;
++    }
++
++    _DBG("passing request to another child.", 0);
++
++    apr_os_sock_get(&sock_fd, thesock);
++    /* passing remote_addr too, see comments below */
++    apr_socket_addr_get(&remote_addr, APR_REMOTE, thesock);
++    
++    header_len = 0;
++    body_len = 0;
++
++    iov[0].iov_base = &header_len;
++    iov[0].iov_len  = sizeof(header_len);
++    iov[1].iov_base = &body_len;
++    iov[1].iov_len  = sizeof(body_len);
++    iov[2].iov_base = remote_addr;
++    iov[2].iov_len  = sizeof(*remote_addr);
++    iov[3].iov_base = h.headers;
++    iov[3].iov_len  = 0;
++    iov[4].iov_base = body;
++    iov[4].iov_len  = body_len;
++
++    msg.msg_name    = NULL;
++    msg.msg_namelen = 0;
++    msg.msg_iov     = iov;
++    msg.msg_iovlen  = 5;
++
++    cmsg = apr_palloc(pool, sizeof(*cmsg) + sizeof(sock_fd));
++    cmsg->cmsg_len   = sizeof(*cmsg) + sizeof(sock_fd);
++    cmsg->cmsg_level = SOL_SOCKET;
++    cmsg->cmsg_type  = SCM_RIGHTS;
++
++    memcpy(CMSG_DATA(cmsg), &sock_fd, sizeof(sock_fd));
++
++    msg.msg_control    = cmsg;
++    msg.msg_controllen = cmsg->cmsg_len;
++
++    if (processor->status == CHILD_STATUS_STANDBY)
++    {
++        _DBG("Activating child #%d", processor->id);
++        processor->status = CHILD_STATUS_STARTING;
++    }
++
++    _DBG("Writing message to %d, passing sock_fd:  %d", processor->senv->output, sock_fd);
++    _DBG("header_len=%d headers=\"%s\"", header_len, h.headers);
++    _DBG("body_len=%d body=\"%s\"", body_len, body);
++
++    if ((rv = sendmsg(processor->senv->output, &msg, 0)) == -1)
++    {
++        apr_pool_destroy(pool);
++        ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, ap_server_conf,
++                     "Writing message failed %d %d", rv, errno);
++        return -1;
++    }
++
++    _DBG("Writing message succeeded %d", rv);
++
++    /* -- close the socket on our side -- */
++    _DBG("closing socket %d on our side", sock_fd);
++    apr_socket_close(thesock);
++
++    apr_pool_destroy(pool);
++    return 1;
++}
++
 +static void process_socket(apr_pool_t *p, apr_socket_t *sock, long conn_id,
-+                           apr_bucket_alloc_t *bucket_alloc)
++                           apr_bucket_alloc_t *bucket_alloc, apr_pool_t *pool)
 +{
 +    conn_rec *current_conn;
 +    int sock_fd;
 +    apr_status_t rv;
 +    ap_sb_handle_t *sbh;
++    child_info_t *processor;
++    apr_pool_t *ptrans;
++    peruser_server_conf *sconf;
++
++    _DBG("Creating dummy connection to use the vhost lookup api", 0);
++
++    ap_create_sb_handle(&sbh, p, conn_id, 0);
++    current_conn = ap_run_create_connection(p, ap_server_conf, sock, conn_id,
++                                            sbh, bucket_alloc);
++    _DBG("Looking up the right vhost");
++    if (current_conn) {
++	    ap_update_vhost_given_ip(current_conn);
++	    _DBG("Base server is %s, name based vhosts %s", current_conn->base_server->server_hostname,
++		    current_conn->vhost_lookup_data ? "on" : "off");
++    }
++
++    if (current_conn && !current_conn->vhost_lookup_data && CHILD_INFO_TABLE[my_child_num].type == CHILD_TYPE_MULTIPLEXER) {
++    	_DBG("We are not using name based vhosts, we'll directly pass the socket.");
++	
++	sconf = PERUSER_SERVER_CONF(current_conn->base_server->module_config);
++	processor = &CHILD_INFO_TABLE[sconf->senv->processor_id];
++
++	_DBG("Forwarding without further inspection, processor %d", processor->id);
++        if (processor->status == CHILD_STATUS_STANDBY)
++        {
++             _DBG("Activating child #%d", processor->id);
++             processor->status = CHILD_STATUS_STARTING;
++        }
++
++        _DBG("Creating new pool",0);
++	apr_pool_create(&ptrans, pool);
++        _DBG("Passing request.",0);
++        if (pass_socket(sock, processor, ptrans) == -1)
++        {
++            ap_log_error(APLOG_MARK, APLOG_ERR, 0,
++                  ap_server_conf, "Could not pass request to proper "                             
++                  "child, request will not be honoured.");
++             return;
++        }
++        if (current_conn)
++        {
++            _DBG("freeing connection",0);
++            ap_lingering_close(current_conn);
++        }
++        _DBG("doing longjmp",0);
++        longjmp(CHILD_INFO_TABLE[my_child_num].jmpbuffer, 1);
++	return;
++    }
 +
 +    if ((rv = apr_os_sock_get(&sock_fd, sock)) != APR_SUCCESS)
 +    {
@@ -1106,9 +1299,11 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +        ap_sock_disable_nagle(sock);
 +    }
 +
-+    ap_create_sb_handle(&sbh, p, conn_id, 0);
-+    current_conn = ap_run_create_connection(p, ap_server_conf, sock, conn_id,
-+                                            sbh, bucket_alloc);
++    if (!current_conn) {
++        ap_create_sb_handle(&sbh, p, conn_id, 0);
++        current_conn = ap_run_create_connection(p, ap_server_conf, sock, conn_id,
++                                                sbh, bucket_alloc);
++    }
 +
 +    if (current_conn)
 +    {
@@ -1139,10 +1334,8 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +            net = filter->ctx;
 +            net->in_ctx = apr_palloc(conn->pool, sizeof(*net->in_ctx));
 +            net->in_ctx->b = bb;
-+
 +            net->in_ctx->tmpbb = apr_brigade_create(net->in_ctx->b->p, 
 +                net->in_ctx->b->bucket_alloc);
-+
 +        }
 +    }
 +    _DBG("leaving (DECLINED)", 0);
@@ -1184,9 +1377,10 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +    int rv;
 +    struct msghdr msg;
 +    struct cmsghdr *cmsg;
++    apr_sockaddr_t *remote_addr;
 +    int sock_fd;
 +    char *body = "";
-+    struct iovec iov[4];
++    struct iovec iov[5];
 +    conn_rec *c = r->connection;
 +    apr_bucket_brigade *bb = apr_brigade_create(r->pool, c->bucket_alloc);
 +    apr_bucket_brigade *body_bb = NULL;
@@ -1248,6 +1442,9 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +    _DBG("Scanning is finished",0);
 +
 +    apr_os_sock_get(&sock_fd, thesock);
++    /* looks like a bug while sending/receiving SCM_RIGHTS related to ipv6
++       workaround: send remote_addr structure too */
++    apr_socket_addr_get(&remote_addr, APR_REMOTE, thesock);
 +
 +    h.p = r->pool;
 +
@@ -1273,15 +1470,17 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +    iov[0].iov_len  = sizeof(header_len);
 +    iov[1].iov_base = &body_len;
 +    iov[1].iov_len  = sizeof(body_len);
-+    iov[2].iov_base = h.headers;
-+    iov[2].iov_len  = strlen(h.headers) + 1;
-+    iov[3].iov_base = body;
-+    iov[3].iov_len  = body_len;
++    iov[2].iov_base = remote_addr;
++    iov[2].iov_len  = sizeof(*remote_addr);
++    iov[3].iov_base = h.headers;
++    iov[3].iov_len  = strlen(h.headers) + 1;
++    iov[4].iov_base = body;
++    iov[4].iov_len  = body_len;
 +
 +    msg.msg_name    = NULL;
 +    msg.msg_namelen = 0;
 +    msg.msg_iov     = iov;
-+    msg.msg_iovlen  = 4;
++    msg.msg_iovlen  = 5;
 +
 +    cmsg = apr_palloc(r->pool, sizeof(*cmsg) + sizeof(sock_fd));
 +    cmsg->cmsg_len   = sizeof(*cmsg) + sizeof(sock_fd);
@@ -1298,12 +1497,6 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +    {
 +        _DBG("Activating child #%d", processor->id);
 +        processor->status = CHILD_STATUS_STARTING;
-+    }
-+
-+    while (processor->status != CHILD_STATUS_ACTIVE)
-+    {
-+        _DBG("Waiting for child #%d...", processor->id);
-+        sleep(1);
 +    }
 +
 +    _DBG("Writing message to %d, passing sock_fd:  %d", processor->senv->output, sock_fd);
@@ -1341,10 +1534,12 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +    char headers[HUGE_STRING_LEN] = "";
 +    char *body = "";
 +    apr_size_t header_len, body_len;
-+    struct iovec iov[3];
++    struct iovec iov[4];
 +    int ret, fd_tmp;
 +    apr_os_sock_t ctrl_sock_fd;
 +    apr_os_sock_t trans_sock_fd;
++    apr_sockaddr_t remote_addr;
++    apr_os_sock_info_t sockinfo;
 +
 +    /* -- bucket's, brigades and their allocators */
 +    apr_bucket_alloc_t *alloc = apr_bucket_alloc_create(ptrans);
@@ -1356,8 +1551,10 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +    iov[0].iov_len  = sizeof(header_len);
 +    iov[1].iov_base = &body_len;
 +    iov[1].iov_len  = sizeof(body_len);
-+    iov[2].iov_base = (char*)&buff;
-+    iov[2].iov_len  = HUGE_STRING_LEN;
++    iov[2].iov_base = &remote_addr;
++    iov[2].iov_len  = sizeof(remote_addr);
++    iov[3].iov_base = (char*)&buff;
++    iov[3].iov_len  = HUGE_STRING_LEN;
 +
 +    cmsg = apr_palloc(ptrans, sizeof(*cmsg) + sizeof(trans_sock_fd));
 +    cmsg->cmsg_len = sizeof(*cmsg) + sizeof(trans_sock_fd);
@@ -1365,7 +1562,7 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +    msg.msg_name       = NULL;
 +    msg.msg_namelen    = 0;
 +    msg.msg_iov        = iov;
-+    msg.msg_iovlen     = 3;
++    msg.msg_iovlen     = 4;
 +    msg.msg_control    = cmsg;
 +    msg.msg_controllen = cmsg->cmsg_len;
 +
@@ -1381,7 +1578,17 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +
 +    /* -- extract socket from the cmsg -- */
 +    memcpy(&trans_sock_fd, CMSG_DATA(cmsg), sizeof(trans_sock_fd));
-+    apr_os_sock_put((apr_socket_t **)trans_sock, &trans_sock_fd, ptrans);
++    /* here *trans_sock always == NULL (socket reset at got_fd), so
++       we can use apr_os_sock_make() instead of apr_os_sock_put() */
++    sockinfo.os_sock  = &trans_sock_fd;
++    sockinfo.local    = NULL;
++    sockinfo.remote   = (struct sockaddr *)&remote_addr.sa.sin;
++    sockinfo.family   = remote_addr.family;
++    sockinfo.type     = SOCK_STREAM;
++#ifdef APR_ENABLE_FOR_1_0
++    sockinfo.protocol = 0;
++#endif
++    apr_os_sock_make((apr_socket_t **)trans_sock, &sockinfo, ptrans);
 +    apr_os_sock_get(&fd_tmp, *trans_sock);
 +
 +    _DBG("trans_sock=%ld fdx=%d sock_fd=%d",
@@ -1390,6 +1597,8 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +    apr_cpystrn(headers, buff, header_len + 1);
 +    _DBG("header_len=%d headers=\"%s\"", header_len, headers);
 +
++if (header_len) {    
++    _DBG("header_len > 0, we got a request", 0);
 +    /* -- store received data into an brigade and add
 +          it to the current transaction's pool -- */
 +    bucket = apr_bucket_eos_create(alloc);
@@ -1411,7 +1620,9 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +
 +    APR_BRIGADE_INSERT_HEAD(bb, bucket);
 +    apr_pool_userdata_set(bb, "PERUSER_SOCKETS", NULL, ptrans);
-+
++} else {
++    _DBG("header_len == 0, we got a socket only", 0);
++}
 +    _DBG("returning 0", 0);
 +    return 0;
 +}
@@ -1468,10 +1679,20 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +    server_env_t *senv = CHILD_INFO_TABLE[childnum].senv;
 +
 +    if(senv->chroot) {
++      _DBG("chdir to %s", senv->chroot);
++      if(chdir(senv->chroot)) {
++        ap_log_error(APLOG_MARK, APLOG_ALERT, errno, NULL,
++                     "chdir: unable to change to directory: %s",
++                     senv->chroot);
++        return -1;
++      }
++
 +      _DBG("chroot to %s", senv->chroot);
 +      if(chroot(senv->chroot)) {
-+        _DBG("chroot failure %s", senv->chroot);
-+        return;
++        ap_log_error(APLOG_MARK, APLOG_ALERT, errno, NULL,
++                     "chroot: unable to change root to: %s",
++                     senv->chroot);
++        return -1;
 +      }
 +    }
 +
@@ -1608,8 +1829,8 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +    apr_status_t rv;
 +    apr_bucket_alloc_t *bucket_alloc;
 +    int fd;
-+    void* sock;
-+    void* pod_sock;
++    apr_socket_t *sock = NULL;
++    apr_socket_t *pod_sock = NULL;
 +
 +    mpm_state = AP_MPMQ_STARTING; /* for benefit of any hooks that run as this
 +                                  * child initializes
@@ -1664,7 +1885,7 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +            _DBG("%s %d", child_type_string(CHILD_INFO_TABLE[my_child_num].type), my_child_num);
 +
 +            /* -- create new listener to receive from multiplexer -- */
-+            apr_os_sock_put((void*)&sock, &CHILD_INFO_TABLE[my_child_num].senv->input, pconf);
++            apr_os_sock_put(&sock, &CHILD_INFO_TABLE[my_child_num].senv->input, pconf);
 +            listen_clear();
 +            listen_add(pconf, sock, receive_from_multiplexer);
 +
@@ -1677,10 +1898,12 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +    }
 +
 +    apr_os_file_get(&fd, pipe_of_death_in);
-+    apr_os_sock_put((void*)&pod_sock, &fd, pconf);
++    apr_os_sock_put(&pod_sock, &fd, pconf);
 +    listen_add(pconf, pod_sock, check_pipe_of_death);
 +
-+    (peruser_setup_child(my_child_num) && clean_child_exit(APEXIT_CHILDFATAL));
++    if(peruser_setup_child(my_child_num) != 0)
++        clean_child_exit(APEXIT_CHILDFATAL);
++
 +    ap_run_child_init(pchild, ap_server_conf);
 +
 +    ap_create_sb_handle(&sbh, pchild, my_child_num, 0);
@@ -1777,10 +2000,10 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +        _DBG("input available ... resetting socket.",0);
 +        sock = NULL;    /* important! */
 +
-+	/* if we accept() something we don't want to die, so we have to
-+	 * defer the exit
-+	 */
-+        status = listensocks[offset].accept_func(&sock, &listensocks[offset], ptrans);
++        /* if we accept() something we don't want to die, so we have to
++         * defer the exit
++         */
++        status = listensocks[offset].accept_func((void *)&sock, &listensocks[offset], ptrans);
 +        SAFE_ACCEPT(accept_mutex_off()); 	/* unlock after "accept" */
 +
 +        if (status == APR_EGENERAL) {
@@ -1806,7 +2029,7 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +
 +          if(total_processors(my_child_num) <
 +              CHILD_INFO_TABLE[my_child_num].senv->max_processors &&
-+            idle_processors(my_child_num) <
++            idle_processors(my_child_num) <=
 +              CHILD_INFO_TABLE[my_child_num].senv->min_free_processors)
 +          {
 +              _DBG("CLONING CHILD");
@@ -1818,7 +2041,7 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +        {
 +            _DBG("marked jmpbuffer",0);
 +            _TRACE_CALL("process_socket()",0);
-+            process_socket(ptrans, sock, my_child_num, bucket_alloc);
++            process_socket(ptrans, sock, my_child_num, bucket_alloc, pchild);
 +            _TRACE_RET("process_socket()",0);
 +        }
 +        else
@@ -1902,18 +2125,18 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +    child_info_t *this;
 +    child_info_t *new;
 +
-+    if(NUM_CHILDS >= server_limit)
-+    {
-+        _DBG("Trying to use more child ID's than NumServers.  "
-+               "Increase NumServers in your config file.");
-+        return NULL;
-+    }
-+
 +    for(i = 0; i < NUM_CHILDS; i++)
 +    {
 +      if(CHILD_INFO_TABLE[i].pid == 0 &&
 +         CHILD_INFO_TABLE[i].type == CHILD_TYPE_UNKNOWN) break;
 +    }
++    
++    if(i == NUM_CHILDS && NUM_CHILDS >= server_limit)
++    {
++        _DBG("Trying to use more child ID's than NumServers.  "
++               "Increase NumServers in your config file.");
++        return NULL;
++    }    
 +
 +    _DBG("cloning child #%d from #%d", i, my_child_num);
 +
@@ -1930,7 +2153,7 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +}
 +
 +static const char* child_add(int type, int status,
-+                             uid_t uid, gid_t gid, const char* chroot)
++                             apr_pool_t *pool, uid_t uid, gid_t gid, const char* chroot)
 +{
 +    _DBG("adding child #%d", NUM_CHILDS);
 +
@@ -1939,6 +2162,9 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +        return "Trying to use more child ID's than NumServers.  "
 +               "Increase NumServers in your config file.";
 +    }
++
++       if (chroot && !ap_is_directory(pool, chroot))
++               return apr_psprintf(pool, "Error: chroot directory [%s] does not exist", chroot);
 +
 +    CHILD_INFO_TABLE[NUM_CHILDS].senv = senv_add(uid, gid, chroot);
 +
@@ -1964,7 +2190,6 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +        _DBG("Assigning root user/group to a child.", 0);
 +    }
 +
-+    server_env_image->control->num++;
 +    child_info_image->control->num++;
 +
 +    return NULL;
@@ -1973,10 +2198,9 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +static int make_child(server_rec *s, int slot)
 +{
 +    int pid;
-+    int socks[2];
-+    child_info_t *multiplexer;
 +
 +    _DBG("function entered", 0);
++    dump_server_env_image();
 +
 +    switch (CHILD_INFO_TABLE[slot].type)
 +    {
@@ -2082,7 +2306,20 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +#ifndef MAX_SPAWN_RATE
 +#define MAX_SPAWN_RATE	(32)
 +#endif
-+static int hold_off_on_exponential_spawning;
++static int total_processes(int child_num)
++{
++    int i, total;
++    for(i = 0, total = 0; i < NUM_CHILDS; ++i)
++    {
++        if(CHILD_INFO_TABLE[i].senv == CHILD_INFO_TABLE[child_num].senv &&
++           (!(CHILD_INFO_TABLE[i].type == CHILD_TYPE_PROCESSOR &&
++           CHILD_INFO_TABLE[i].status == CHILD_STATUS_STANDBY)))
++        {
++           total++;
++        }
++    }
++    return total;
++}
 +
 +static void perform_idle_server_maintenance(apr_pool_t *p)
 +{
@@ -2100,12 +2337,14 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +        if(CHILD_INFO_TABLE[i].status == CHILD_STATUS_STARTING)
 +          make_child(ap_server_conf, i);
 +      }
-+      else if(expire_timeout > 0 &&
-+        (CHILD_INFO_TABLE[i].type == CHILD_TYPE_PROCESSOR ||
-+          CHILD_INFO_TABLE[i].type == CHILD_TYPE_WORKER) &&
-+        ap_scoreboard_image->parent[i].pid > 1 &&
-+        ap_scoreboard_image->servers[i][0].status != SERVER_DEAD &&
-+        apr_time_sec(now - ap_scoreboard_image->servers[i][0].last_used) > expire_timeout)
++      else if(((CHILD_INFO_TABLE[i].type == CHILD_TYPE_PROCESSOR || 
++               CHILD_INFO_TABLE[i].type == CHILD_TYPE_WORKER)  &&
++               ap_scoreboard_image->parent[i].pid > 1) &&
++               (idle_processors (i) > 1 || total_processes (i) == 1) && (
++                   (expire_timeout > 0 &&  ap_scoreboard_image->servers[i][0].status != SERVER_DEAD && 
++                   apr_time_sec(now - ap_scoreboard_image->servers[i][0].last_used) > expire_timeout) ||
++                   (idle_timeout >   0 &&  ap_scoreboard_image->servers[i][0].status == SERVER_READY &&  
++                   apr_time_sec(now - ap_scoreboard_image->servers[i][0].last_used) > idle_timeout)))
 +      {
 +        CHILD_INFO_TABLE[i].pid = 0;
 +        CHILD_INFO_TABLE[i].status = CHILD_STATUS_STANDBY;
@@ -2118,18 +2357,58 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +          CHILD_INFO_TABLE[i].type    = CHILD_TYPE_UNKNOWN;
 +          CHILD_INFO_TABLE[i].sock_fd = -3; /* -1 and -2 are taken */
 +        }
-+
 +        if(kill(ap_scoreboard_image->parent[i].pid, SIGTERM) == -1)
 +        {
 +          ap_log_error(APLOG_MARK, APLOG_WARNING, errno,
 +            ap_server_conf, "kill SIGTERM");
 +        }
++       
 +
 +        ap_update_child_status_from_indexes(i, 0, SERVER_DEAD, NULL);
 +      }
 +    }
++    
++    for(i=0;i<grace_children;i++) {
++       if (child_grace_info_table[i].pid > 0 && expire_timeout > 0 &&
++                       apr_time_sec(now - child_grace_info_table[i].last_used) > expire_timeout) {
++               
++               _DBG("Killing a child from last graceful (pid=%d,childno=%d,last_used=%d)", 
++                               child_grace_info_table[i].pid, child_grace_info_table[i].id,
++                               child_grace_info_table[i].last_used);
++            
++               if(kill(child_grace_info_table[i].pid, SIGTERM) == -1)
++            {
++              ap_log_error(APLOG_MARK, APLOG_WARNING, errno,
++                ap_server_conf, "kill SIGTERM");
++            }
++               
++               /*      We don't need to do remove_grace_child() here,
++                *  because it will be automatically done once 
++                *  the child dies by ap_mpm_run() */
++       }
++    }
 +}
 +
++int remove_grace_child(int slot) {
++       if (slot < grace_children) {
++               child_grace_info_table[slot].id = 0;
++               child_grace_info_table[slot].pid = 0;
++               child_grace_info_table[slot].status = CHILD_STATUS_STANDBY;
++               child_grace_info_table[slot].type = CHILD_TYPE_UNKNOWN;
++               child_grace_info_table[slot].last_used = 0;
++               grace_children_alive--;
++               
++               if (grace_children_alive <= 0) { /*     All children have returned from graceful        */
++                       _DBG("Every child has returned from graceful restart - freeing child_grace_info_table");
++                       grace_children_alive = 0;
++                       is_graceful = 0;
++                       grace_children = 0;
++                       free(child_grace_info_table);
++               }
++               return 0;
++       }
++       return 1;
++}
 +
 +/*****************************************************************
 + * Executive routines.
@@ -2263,6 +2542,19 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +                mpm_state = AP_MPMQ_STOPPING;
 +                return 1;
 +            }
++            
++            if (grace_children > 0) {
++               for(i=0;i<grace_children;i++) {
++                       if (child_grace_info_table[i].pid == pid.pid) {
++                               break;
++                       }
++               }
++               if (i != grace_children) {
++                       _DBG("Child returned from graceful (%d)", i);
++                       remove_grace_child(i);
++                       continue;
++               }
++            }
 +
 +            /* non-fatal death... note that it's gone in the scoreboard. */
 +            child_slot = find_child_by_pid(&pid);
@@ -2305,8 +2597,8 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +		}
 +#if APR_HAS_OTHER_CHILD
 +	    }
-+	    else if (apr_proc_other_child_alert(&pid, APR_OC_REASON_DEATH, status) == 0) {
-+                _DBG("APR_HAS_OTHER_CHILD, apparently", 0);
++	    else if (apr_proc_other_child_alert(&pid, APR_OC_REASON_DEATH, status) == APR_SUCCESS) {
++                _DBG("Already handled", 0);
 +		/* handled */
 +#endif
 +	    }
@@ -2408,9 +2700,40 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +         * gracefully dealing with existing request.
 +         */
 +
++        int alivechildren = 0;
++        child_grace_info_t* old_grace_info;
++
 +        for (i = 0; i < NUM_CHILDS; ++i)
 +        {
 +            ((ap_child_table[i].pid) && (ap_child_table[i].status = SERVER_DYING));
++            
++            if (CHILD_INFO_TABLE[i].pid) {
++               alivechildren++;
++            }
++        }
++        
++        _DBG("Initializing child_grace_info_table", 0);
++        
++        if (alivechildren > 0) {
++               if (grace_children > 0) {
++                       old_grace_info = child_grace_info_table;
++                       _DBG("%d children still living from last graceful "
++                                       "- adding to new child_grace_info_table", 
++                                       grace_children);
++               }
++               
++               child_grace_info_table = (child_grace_info_t*)calloc(alivechildren+grace_children,
++                               sizeof(child_grace_info_t));
++               
++               if (grace_children > 0) {
++                       for(i=0;i<grace_children;i++) {
++                               child_grace_info_table[i] = old_grace_info[i];
++                       }
++                       grace_children = i;
++                       free(old_grace_info);
++               }
++               else grace_children = 0;
++               
 +        }
 +
 +        /* give the children the signal to die */
@@ -2422,14 +2745,27 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +                ap_log_error(APLOG_MARK, APLOG_WARNING, rv, ap_server_conf,
 +                             "write pipe_of_death");
 +            }
++            if (CHILD_INFO_TABLE[i].pid) {
++               child_grace_info_table[grace_children].id               = CHILD_INFO_TABLE[i].id;
++               child_grace_info_table[grace_children].pid              = CHILD_INFO_TABLE[i].pid;
++               child_grace_info_table[grace_children].status   = CHILD_INFO_TABLE[i].status;
++               child_grace_info_table[grace_children].type     = CHILD_INFO_TABLE[i].type;
++               child_grace_info_table[grace_children].last_used= ap_scoreboard_image->servers[i][0].last_used;
++               grace_children++;
++               grace_children_alive++;
++            }
 +            i++;
 +        }
++        _DBG("Total children of %d leaving behind for graceful restart (%d living)", 
++                       grace_children, grace_children_alive);
 +
++       /* destroy server_env_image */
 +        for (i = 0; i < NUM_SENV; i++)
 +        {
 +            close(SENV[i].input);
 +            close(SENV[i].output);
 +        }
++       cleanup_server_environments(NULL);
 +    }
 +    else {
 +	/* Kill 'em off */
@@ -2493,9 +2829,9 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +    return OK;
 +}
 +
++static int restart_num = 0;
 +static int peruser_pre_config(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp)
 +{
-+    static int restart_num = 0;
 +    int no_detach, debug, foreground, i;
 +    int tmp_server_limit = DEFAULT_SERVER_LIMIT;
 +    ap_directive_t *pdir;
@@ -2520,8 +2856,6 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +
 +    /* sigh, want this only the second time around */
 +    if (restart_num++ == 1) {
-+	is_graceful = 0;
-+
 +        if (!one_process && !foreground) {
 +            rv = apr_proc_detach(no_detach ? APR_PROC_DETACH_FOREGROUND
 +                                           : APR_PROC_DETACH_DAEMONIZE);
@@ -2532,7 +2866,7 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +            }
 +        }
 +
-+	parent_pid = ap_my_pid = getpid();
++        parent_pid = ap_my_pid = getpid();
 +    }
 +
 +    unixd_pre_config(ptemp);
@@ -2621,44 +2955,47 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +        CHILD_INFO_TABLE[i].id      = i;
 +    }
 +
-+    _DBG("Initializing server_environments_table", 0);
-+    server_env_size = tmp_server_limit * sizeof(server_env_t) + sizeof(apr_size_t);
-+
-+    rv = apr_shm_create(&server_env_shm, server_env_size, NULL, global_pool);
-+
-+    if (rv != APR_SUCCESS) {
-+        _DBG("shared memory creation failed", 0);
-+
-+        ap_log_error(APLOG_MARK, APLOG_CRIT, rv, NULL,
-+                     "Unable to create shared memory segment "
-+                     "(anonymous shared memory failure)");
-+    }
-+    else if (rv == APR_ENOTIMPL) {
-+        _DBG("anonymous shared memory not available", 0);
-+        /* TODO: make up a filename and do name-based shmem */
-+    }
-+
-+    if (rv || !(shmem = apr_shm_baseaddr_get(server_env_shm))) {
-+        _DBG("apr_shm_baseaddr_get() failed", 0);
-+        return HTTP_INTERNAL_SERVER_ERROR;
-+    }
-+
-+    memset(shmem, 0, sizeof(server_env_size));
-+    server_env_image = (server_env*)calloc(1, sizeof(server_env_size));
-+    server_env_image->control = (server_env_control*)shmem;
-+    shmem += sizeof(server_env_control*);
-+    server_env_image->table = (server_env_t*)shmem;
-+
-+    server_env_image->control->num = 0;
-+
-+    for (i = 0; i < tmp_server_limit; i++)
++    if (!server_env_image)
 +    {
-+        SENV[i].processor_id = -1;
-+        SENV[i].uid          = -1;
-+        SENV[i].gid          = -1;
-+        SENV[i].chroot       = NULL;
-+        SENV[i].input        = -1;
-+        SENV[i].output       = -1;
++       _DBG("Initializing server_environments_table", 0);
++       server_env_size = tmp_server_limit * sizeof(server_env_t) + sizeof(apr_size_t);
++
++       rv = apr_shm_create(&server_env_shm, server_env_size, NULL, global_pool);
++
++       if (rv != APR_SUCCESS) {
++           _DBG("shared memory creation failed", 0);
++
++           ap_log_error(APLOG_MARK, APLOG_CRIT, rv, NULL,
++                        "Unable to create shared memory segment "
++                        "(anonymous shared memory failure)");
++        }
++        else if (rv == APR_ENOTIMPL) {
++            _DBG("anonymous shared memory not available", 0);
++            /* TODO: make up a filename and do name-based shmem */
++        }
++
++        if (rv || !(shmem = apr_shm_baseaddr_get(server_env_shm))) {
++            _DBG("apr_shm_baseaddr_get() failed", 0);
++            return HTTP_INTERNAL_SERVER_ERROR;
++        }
++
++        memset(shmem, 0, sizeof(server_env_size));
++        server_env_image = (server_env*)calloc(1, sizeof(server_env_size));
++        server_env_image->control = (server_env_control*)shmem;
++        shmem += sizeof(server_env_control*);
++        server_env_image->table = (server_env_t*)shmem;
++
++        server_env_image->control->num = 0;
++
++        for (i = 0; i < tmp_server_limit; i++)
++        {
++            SENV[i].processor_id = -1;
++            SENV[i].uid          = -1;
++            SENV[i].gid          = -1;
++            SENV[i].chroot       = NULL;
++            SENV[i].input        = -1;
++            SENV[i].output       = -1;
++        }
 +    }
 +
 +    return OK;
@@ -2734,8 +3071,43 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +        case CHILD_TYPE_PROCESSOR:
 +        case CHILD_TYPE_WORKER:
 +        {
++               if (sconf->senv != CHILD_INFO_TABLE[my_child_num].senv) {
++                       ap_log_error(APLOG_MARK, APLOG_WARNING, 
++                                    0, ap_server_conf,
++                                   "invalid virtualhost for this child! (%s)", r->hostname);
++                       ap_lingering_close(r->connection);
++                       return HTTP_REQUEST_TIME_OUT;
++               }
++               
 +            _DBG("%s %d", child_type_string(CHILD_INFO_TABLE[my_child_num].type), my_child_num);
 +            _DBG("request for %s / (server %s) seems to be for us", r->hostname, r->server->server_hostname);
++
++            if (server_env_cleanup)
++            {
++                int i;
++                int input = sconf->senv->input;
++                int output = sconf->senv->output;
++
++                _DBG("performing handle cleanup");
++                for (i = 0; i < NUM_SENV; i++)
++                {
++                    if (SENV[i].input > 0 && SENV[i].input != input) {
++                        int retval = close(SENV[i].input);
++                        if (retval < 0) {
++                            ap_log_error(APLOG_MARK, APLOG_WARNING, errno, ap_server_conf,
++                                         "close(%d) failed", SENV[i].input);
++                        }
++                    }
++                    if (SENV[i].output > 0 && SENV[i].output != output) {
++                        int retval = close(SENV[i].output);
++                        if (retval < 0) {
++                            ap_log_error(APLOG_MARK, APLOG_WARNING, errno, ap_server_conf,
++                                         "close(%d) failed", SENV[i].output);
++                        }
++                    }
++                }
++                server_env_cleanup = 0;
++            }
 +
 +            return OK;
 +        }
@@ -2748,6 +3120,65 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +    }
 +
 +    _DBG("THIS POINT SHOULD NOT BE REACHED!",0);
++    return OK;
++}
++
++static int peruser_status_hook(request_rec *r, int flags)
++{
++    int x;
++    server_env_t *senv;
++
++    if (flags & AP_STATUS_SHORT)
++           return OK;
++    
++    ap_rputs("<hr>\n", r);
++    ap_rputs("<h2>peruser status</h2>\n", r);
++    ap_rputs("<table border=\"0\">\n", r);
++    ap_rputs("<tr><td>ID</td><td>PID</td><td>STATUS</td><td>TYPE</td><td>UID</td>"
++                   "<td>GID</td><td>CHROOT</td><td>INPUT</td>"
++                   "<td>OUTPUT</td><td>SOCK_FD</td>"
++                   "<td>TOTAL PROCESSORS</td><td>MAX PROCESSORS</td>"
++                   "<td>IDLE PROCESSORS</td><td>MIN FREE PROCESSORS</td></tr>\n", r);
++    for (x = 0; x < NUM_CHILDS; x++)
++        {
++        senv = CHILD_INFO_TABLE[x].senv;
++        ap_rprintf(r, "<tr><td>%3d</td><td>%5d</td><td>%8s</td><td>%12s</td>"
++                       "<td>%4d</td><td>%4d</td><td>%25s</td><td>%5d</td>"
++                       "<td>%6d</td><td>%7d</td><td>%d</td><td>%d</td>"
++                       "<td>%d</td><td>%d</td></tr>\n", 
++                       CHILD_INFO_TABLE[x].id, 
++                       CHILD_INFO_TABLE[x].pid, 
++                       child_status_string(CHILD_INFO_TABLE[x].status), 
++                       child_type_string(CHILD_INFO_TABLE[x].type), 
++                       senv == NULL ? -1 : senv->uid, 
++                       senv == NULL ? -1 : senv->gid, 
++                       senv == NULL ? NULL : senv->chroot, 
++                       senv == NULL ? -1 : CHILD_INFO_TABLE[x].senv->input, 
++                       senv == NULL ? -1 : CHILD_INFO_TABLE[x].senv->output, 
++                       CHILD_INFO_TABLE[x].sock_fd,
++                       total_processors(x), 
++                       senv == NULL ? -1 : CHILD_INFO_TABLE[x].senv->max_processors,
++                       idle_processors(x),
++                       senv == NULL ? -1 : CHILD_INFO_TABLE[x].senv->min_free_processors
++                       );
++       }
++    ap_rputs("</table>\n", r);
++    
++    if (grace_children > 0) {
++       ap_rputs("<h2>peruser graceful children status</h2>\n", r);
++       ap_rprintf(r, "%d of total %d still living<br />\n", grace_children_alive, grace_children);
++        ap_rputs("<table border=\"0\">\n", r);
++        ap_rputs("<tr><td>ID</td><td>PID</td><td>STATUS</td><td>TYPE</td></tr>\n", r);
++        for (x = 0; x < grace_children; x++) {
++            ap_rprintf(r, "<tr><td>%3d</td><td>%5d</td><td>%8s</td><td>%12s</td></tr>\n", 
++                           child_grace_info_table[x].id, 
++                           child_grace_info_table[x].pid, 
++                           child_status_string(child_grace_info_table[x].status), 
++                           child_type_string(child_grace_info_table[x].type)
++                           );
++        }
++        ap_rputs("</table>\n", r);
++    }
 +    return OK;
 +}
 +
@@ -2778,6 +3209,8 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +                              APR_HOOK_REALLY_FIRST);
 +    ap_hook_process_connection(peruser_process_connection, NULL, NULL,
 +                               APR_HOOK_REALLY_FIRST);
++
++    APR_OPTIONAL_HOOK(ap, status_hook, peruser_status_hook, NULL, NULL, APR_HOOK_MIDDLE);
 +}
 +
 +/* we define an Processor w/ specific uid/gid */
@@ -2791,7 +3224,7 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +        user_name, uid, group_name, gid, chroot);
 +
 +    return child_add(CHILD_TYPE_PROCESSOR, CHILD_STATUS_STANDBY,
-+                     uid, gid, chroot);
++                     cmd->pool, uid, gid, chroot);
 +}
 +
 +/* we define an Multiplexer child w/ specific uid/gid */
@@ -2805,7 +3238,7 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +        user_name, uid, group_name, gid, chroot, NUM_CHILDS);
 +
 +    return child_add(CHILD_TYPE_MULTIPLEXER, CHILD_STATUS_STARTING,
-+                     uid, gid, chroot);
++                     cmd->pool, uid, gid, chroot);
 +}
 +
 +static const char* cf_ServerEnvironment(cmd_parms *cmd, void *dummy,
@@ -2816,6 +3249,9 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +    peruser_server_conf *sconf = PERUSER_SERVER_CONF(cmd->server->module_config);
 +
 +    _DBG("function entered", 0);
++
++       if (chroot && !ap_is_directory(cmd->pool, chroot))
++               return apr_psprintf(cmd->pool, "Error: chroot directory [%s] does not exist", chroot);
 +
 +    sconf->senv = senv_add(uid, gid, chroot);
 +
@@ -3011,6 +3447,17 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +    return NULL;
 +}
 +
++static const char *set_idle_timeout (cmd_parms *cmd, void *dummy, const char *arg) {
++    const char *err = ap_check_cmd_context(cmd, GLOBAL_ONLY);
++    if (err != NULL) {
++        return err;
++    }
++
++    idle_timeout = atoi(arg);
++
++    return NULL;
++}
++
 +static const command_rec peruser_cmds[] = {
 +UNIX_DAEMON_COMMANDS,
 +LISTEN_COMMANDS,
@@ -3028,6 +3475,8 @@ diff -urN httpd-2.2.0.org/server/mpm/experimental/peruser/peruser.c httpd-2.2.0/
 +              "Maximum value of MaxClients for this run of Apache"),
 +AP_INIT_TAKE1("ExpireTimeout", set_expire_timeout, NULL, RSRC_CONF,
 +              "Maximum idle time before a child is killed, 0 to disable"),
++AP_INIT_TAKE1("IdleTimeout", set_idle_timeout, NULL, RSRC_CONF,
++              "Maximum time before a child is killed after being idle, 0 to disable"),
 +AP_INIT_TAKE23("Multiplexer", cf_Multiplexer, NULL, RSRC_CONF,
 +              "Specify an Multiplexer Child configuration."),
 +AP_INIT_TAKE23("Processor", cf_Processor, NULL, RSRC_CONF,
