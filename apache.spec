@@ -34,7 +34,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.2.8
-Release:	2
+Release:	2.1
 License:	Apache Group License
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -87,8 +87,8 @@ Patch15:	httpd-2.0.48-debuglog.patch
 Patch18:	%{name}-v6only-ENOPROTOOPT.patch
 Patch19:	%{name}-conffile-path.patch
 Patch20:	%{name}-apxs.patch
-# http://www.telana.com/peruser.php
-Patch21:	httpd-2.0.52-peruser-0.1.6.patch
+# http://www.telana.com/peruser.php (2.2.3-peruser-0.3.0)
+Patch21:	httpd-peruser.patch
 Patch22:	%{name}-libtool.patch
 Patch23:	%{name}-revert-bug-40463.patch
 URL:		http://httpd.apache.org/
