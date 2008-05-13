@@ -34,7 +34,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.2.8
-Release:	5
+Release:	6
 License:	Apache
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -90,7 +90,8 @@ Patch20:	%{name}-apxs.patch
 # http://www.telana.com/peruser.php (2.2.3-0.3.0)
 Patch21:	httpd-peruser.patch
 Patch22:	%{name}-libtool.patch
-Patch23:	%{name}-revert-bug-40463.patch
+Patch23:	%{name}-suexec_fcgi.patch
+Patch24:	%{name}-revert-bug-40463.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	apr-devel >= 1:1.2
 BuildRequires:	apr-util-devel >= 1:1.2
@@ -1744,6 +1745,7 @@ Dwa programy testowe/przykładowe cgi: test-cgi and print-env.
 %patch21 -p1
 %patch22 -p1
 %patch23 -p1
+%patch24 -p1
 
 # using system apr, apr-util and pcre
 rm -rf srclib/{apr,apr-util,pcre}
@@ -2003,6 +2005,10 @@ cat << 'EOF' > $CFG/09_cgi_test.conf
 ScriptAlias /cgi-bin/printenv %{_cgibindir}/printenv
 ScriptAlias /cgi-bin/test-cgi %{_cgibindir}/test-cgi
 EOF
+
+# our suexec is patched to support php + fcgi + suexec with
+# virtual users when called as suexec.fcgi
+ln -sf suexec $RPM_BUILD_ROOT%{_sbindir}/suexec.fcgi
 
 # no value
 rm $RPM_BUILD_ROOT%{_libexecdir}/build/config.nice
@@ -2325,6 +2331,7 @@ fi
 %files suexec
 %defattr(644,root,root,755)
 %attr(4755,root,root) %{_sbindir}/suexec
+%attr(755,root,root) %{_sbindir}/suexec.fcgi
 %attr(755,root,root) %{_libexecdir}/mod_suexec.so
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_suexec.conf
 %{_mandir}/man8/suexec.8*
