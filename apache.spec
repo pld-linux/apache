@@ -34,7 +34,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.2.8
-Release:	6
+Release:	7
 License:	Apache
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -81,6 +81,7 @@ Patch7:		%{name}-syslibs.patch
 Patch8:		httpd-2.0.45-encode.patch
 Patch9:		%{name}-paths.patch
 Patch10:	httpd-2.0.46-dav401dest.patch
+Patch11:	%{name}-bug-40970.patch
 Patch12:	httpd-2.0.46-sslmutex.patch
 Patch14:	httpd-2.0.48-corelimit.patch
 Patch15:	httpd-2.0.48-debuglog.patch
@@ -1736,6 +1737,7 @@ Dwa programy testowe/przykładowe cgi: test-cgi and print-env.
 %patch8 -p1
 %patch9 -p1
 %patch10 -p1
+%patch11 -p1
 %patch12 -p1
 %patch14 -p1
 %patch15 -p1
@@ -1762,7 +1764,8 @@ sed -i -e 's,/lib$,/%{_lib},' config.layout
 
 %build
 cp /usr/share/apr/build/apr_common.m4 build
-cp /usr/share/libtool/ltmain.sh build
+%{__libtoolize}
+%{__aclocal} -I build
 cp /usr/share/automake/config.* build
 %{__autoheader}
 %{__autoconf}
