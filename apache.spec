@@ -34,7 +34,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.2.9
-Release:	6
+Release:	7
 License:	Apache
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -95,7 +95,7 @@ Patch23:	%{name}-suexec_fcgi.patch
 Patch24:	%{name}-revert-bug-40463.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	apr-devel >= 1:1.2
-BuildRequires:	apr-util-devel >= 1:1.2
+BuildRequires:	apr-util-devel >= 1:1.3
 BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	db-devel
@@ -107,7 +107,6 @@ BuildRequires:	libtool >= 2:1.5
 %{?with_ssl:BuildRequires:	openssl-devel >= 0.9.7d}
 %{?with_ssl:BuildRequires:	openssl-tools >= 0.9.7d}
 BuildRequires:	pcre-devel
-BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpm-build >= 4.4.0
 BuildRequires:	rpm-perlprov >= 4.1-13
 BuildRequires:	rpmbuild(macros) >= 1.268
@@ -633,9 +632,7 @@ Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_authnz_ldap.html
 Requires:	%{name}-base = %{version}-%{release}
 Requires:	%{name}-mod_ldap = %{version}-%{release}
-%if "%{pld_release}" != "ac"
 Requires:	apr-util-ldap
-%endif
 Provides:	apache(mod_authnz_ldap) = %{version}-%{release}
 # compat
 Provides:	apache(mod_auth_ldap) = %{version}-%{release}
