@@ -34,7 +34,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.2.9
-Release:	7
+Release:	8
 License:	Apache
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -1985,7 +1985,7 @@ echo "LoadModule headers_module	modules/mod_headers.so" > $CFG/00_mod_headers.co
 echo "LoadModule rewrite_module	modules/mod_rewrite.so" > $CFG/00_mod_rewrite.conf
 echo "LoadModule usertrack_module	modules/mod_usertrack.so" > $CFG/00_mod_usertrack.conf
 echo "LoadModule unique_id_module	modules/mod_unique_id.so" > $CFG/00_mod_unique_id.conf
-echo "LoadModule substitute_module	modules/mod_subsitute.so" > $CFG/00_mod_substitute.conf
+echo "LoadModule substitute_module	modules/mod_substitute.so" > $CFG/00_mod_substitute.conf
 
 # anything in style dir not ending with .css is trash
 rm -rf $RPM_BUILD_ROOT%{_datadir}/manual/style/{lang,latex,xsl}
