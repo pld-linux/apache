@@ -99,8 +99,10 @@ case "$1" in
 		RETVAL=$?
 		if [ $RETVAL -eq 0 ]; then
 			msg_reloading httpd.${HTTPD_MPM}
-			daemon httpd.${HTTPD_MPM} $CFG -k graceful
+			busy
+			httpd.${HTTPD_MPM} $CFG -k graceful
 			RETVAL=$?
+			[ $RETVAL -eq 0 ] && ok || fail
 		fi
 	else
 		msg_not_running httpd.${HTTPD_MPM}
