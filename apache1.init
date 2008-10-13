@@ -34,7 +34,7 @@ if is_no "${IPV6_NETWORKING}"; then
 fi
 
 configtest() {
-	apache -t > /dev/null 2>&1
+	/usr/sbin/apache -t > /dev/null 2>&1
 	RETVAL=$?
 }
 
@@ -52,7 +52,7 @@ start() {
 	fi
 	if [ ! -f /var/lock/subsys/apache ]; then
 		msg_starting apache
-		daemon apache $HTTPD_OPTS
+		daemon /usr/sbin/apache $HTTPD_OPTS
 		RETVAL=$?
   		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/apache
 	else
@@ -64,7 +64,7 @@ stop() {
 	# Stop daemons.
 	if [ -f /var/lock/subsys/apache ]; then
 		msg_stopping apache
-		killproc apache
+		killproc --pidfile /var/run/apache.pid apache
 		rm -f /var/lock/subsys/apache /var/run/apache.pid /var/run/apache.loc* >/dev/null 2>&1
 	else
 		msg_not_running apache
@@ -99,7 +99,7 @@ reload() {
 
 		configtest
 		if [ $RETVAL -eq 0 ]; then
-			killproc apache -$sig
+			killproc --pidfile /var/run/apache.pid apache -$sig
 			RETVAL=$?
 		else
 			fail
@@ -145,7 +145,7 @@ case "$1" in
 	reload USR1 0
 	;;
   configtest)
-	apache -t
+	/usr/sbin/apache -t
 	;;
   *)
 	msg_usage "$0 {start|stop|restart|try-restart|reload|force-reload|graceful|configtest|status}"
