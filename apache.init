@@ -43,7 +43,7 @@ start() {
 	# Check if the service is already running?
 	if [ ! -f /var/lock/subsys/httpd ]; then
 		msg_starting httpd.${HTTPD_MPM}
-		daemon httpd.${HTTPD_MPM} $CFG $HTTPD_OPTS
+		daemon /usr/sbin/httpd.${HTTPD_MPM} $CFG $HTTPD_OPTS
 		RETVAL=$?
 		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/httpd
 	else
@@ -95,12 +95,12 @@ case "$1" in
 	;;
   reload|force-reload|graceful)
 	if [ -f /var/lock/subsys/httpd ]; then
-		run_cmd "Checking httpd.${HTTPD_MPM} configuration" httpd.${HTTPD_MPM} $CFG -t
+		run_cmd "Checking httpd.${HTTPD_MPM} configuration" /usr/sbin/httpd.${HTTPD_MPM} $CFG -t
 		RETVAL=$?
 		if [ $RETVAL -eq 0 ]; then
 			msg_reloading httpd.${HTTPD_MPM}
 			busy
-			httpd.${HTTPD_MPM} $CFG -k graceful
+			/usr/sbin/httpd.${HTTPD_MPM} $CFG -k graceful
 			RETVAL=$?
 			[ $RETVAL -eq 0 ] && ok || fail
 		fi
@@ -113,11 +113,12 @@ case "$1" in
 	if [ -f /var/lock/subsys/httpd ]; then
 		msg_reloading httpd.${HTTPD_MPM}
 
-		httpd.${HTTPD_MPM} -t >/dev/null 2>&1
+		/usr/sbin/httpd.${HTTPD_MPM} -t >/dev/null 2>&1
 		RETVAL=$?
 		if [ $RETVAL -eq 0 ]; then
-			daemon httpd.${HTTPD_MPM} $CFG -k graceful
+			/usr/sbin/httpd.${HTTPD_MPM} $CFG -k graceful
 			RETVAL=$?
+			[ $RETVAL -eq 0 ] && ok || fail
 		else
 			fail
 			echo >&2 "Configuration file syntax test failed."
