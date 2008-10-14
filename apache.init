@@ -39,6 +39,10 @@ if [ -n "${HTTPD_CONF}" ]; then
 	fi
 fi
 
+configtest() {
+	/usr/sbin/httpd.${HTTPD_MPM} -t $CFG $HTTPD_OPTS >/dev/null 2>&1
+}
+
 start() {
 	# Check if the service is already running?
 	if [ ! -f /var/lock/subsys/httpd ]; then
@@ -84,7 +88,7 @@ case "$1" in
   status)
 	status httpd.${HTTPD_MPM}
 	RETVAL=$?
-	/usr/sbin/httpd.${HTTPD_MPM} $CFG -S
+	/usr/sbin/httpd.${HTTPD_MPM} $CFG $HTTPD_OPTS -S
 	;;
   restart)
 	stop
@@ -95,12 +99,12 @@ case "$1" in
 	;;
   reload|force-reload|graceful)
 	if [ -f /var/lock/subsys/httpd ]; then
-		run_cmd "Checking httpd.${HTTPD_MPM} configuration" /usr/sbin/httpd.${HTTPD_MPM} $CFG -t
+		configtest
 		RETVAL=$?
 		if [ $RETVAL -eq 0 ]; then
 			msg_reloading httpd.${HTTPD_MPM}
 			busy
-			/usr/sbin/httpd.${HTTPD_MPM} $CFG -k graceful
+			/usr/sbin/httpd.${HTTPD_MPM} $CFG $HTTPD_OPTS -k graceful
 			RETVAL=$?
 			[ $RETVAL -eq 0 ] && ok || fail
 		fi
@@ -113,7 +117,7 @@ case "$1" in
 	if [ -f /var/lock/subsys/httpd ]; then
 		msg_reloading httpd.${HTTPD_MPM}
 
-		/usr/sbin/httpd.${HTTPD_MPM} -t >/dev/null 2>&1
+		configtest
 		RETVAL=$?
 		if [ $RETVAL -eq 0 ]; then
 			/usr/sbin/httpd.${HTTPD_MPM} $CFG -k graceful
@@ -125,8 +129,11 @@ case "$1" in
 		fi
 	fi
 	;;
+  configtest)
+	/usr/sbin/httpd.${HTTPD_MPM} -t $CFG $HTTPD_OPTS
+	;;
   *)
-	msg_usage "$0 {start|stop|restart|try-restart|reload|force-reload|graceful|status}"
+	msg_usage "$0 {start|stop|restart|try-restart|reload|force-reload|graceful|configtest|status}"
 	exit 3
 	;;
 esac
