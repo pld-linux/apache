@@ -87,13 +87,13 @@ restart() {
 		start
 	else
 		fail
-		echo >&2 "Configuration file syntax test failed."
+		echo >&2 "Configuration file syntax test failed. Run $0 configtest to see errors."
 	fi
 }
 
 reload() {
-	sig=${1:-HUP}
-	retnr=${2:-7}
+	local sig=${1:-HUP}
+	local retnr=${2:-7}
 	if [ -f /var/lock/subsys/apache ]; then
 		msg_reloading apache
 
@@ -103,7 +103,7 @@ reload() {
 			RETVAL=$?
 		else
 			fail
-			echo >&2 "Configuration file syntax test failed."
+			echo >&2 "Configuration file syntax test failed. Run $0 configtest to see errors."
 		fi
 	else
 		msg_not_running apache
@@ -119,11 +119,6 @@ case "$1" in
 	;;
   stop)
   	stop
-	;;
-  status)
-	status apache
-	RETVAL=$?
-	/usr/sbin/apache -S
 	;;
   restart)
 	restart
@@ -146,6 +141,11 @@ case "$1" in
 	;;
   configtest)
 	/usr/sbin/apache -t
+	;;
+  status)
+	status apache
+	RETVAL=$?
+	/usr/sbin/apache -S
 	;;
   *)
 	msg_usage "$0 {start|stop|restart|try-restart|reload|force-reload|graceful|configtest|status}"

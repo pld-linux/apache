@@ -41,6 +41,7 @@ fi
 
 configtest() {
 	/usr/sbin/httpd.${HTTPD_MPM} -t $CFG $HTTPD_OPTS >/dev/null 2>&1
+	RETVAL=$?
 }
 
 start() {
@@ -100,7 +101,6 @@ case "$1" in
   reload|force-reload|graceful)
 	if [ -f /var/lock/subsys/httpd ]; then
 		configtest
-		RETVAL=$?
 		if [ $RETVAL -eq 0 ]; then
 			msg_reloading httpd.${HTTPD_MPM}
 			busy
@@ -118,14 +118,13 @@ case "$1" in
 		msg_reloading httpd.${HTTPD_MPM}
 
 		configtest
-		RETVAL=$?
 		if [ $RETVAL -eq 0 ]; then
 			/usr/sbin/httpd.${HTTPD_MPM} $CFG -k graceful
 			RETVAL=$?
 			[ $RETVAL -eq 0 ] && ok || fail
 		else
 			fail
-			echo >&2 "Configuration file syntax test failed."
+			echo >&2 "Configuration file syntax test failed. Run $0 configtest to see errors."
 		fi
 	fi
 	;;
