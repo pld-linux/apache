@@ -34,7 +34,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.2.9
-Release:	9
+Release:	10
 License:	Apache
 Group:		Networking/Daemons
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -868,6 +868,7 @@ Group:		Networking/Daemons
 URL:		http://httpd.apache.org/docs/2.2/en/mod/mod_cgi.html
 Requires:	%{name}-base = %{version}-%{release}
 Requires:	%{name}-mod_alias = %{version}-%{release}
+Suggests:	%{name}-suexec = %{version}-%{release}
 Provides:	apache(mod_cgi) = %{version}-%{release}
 Provides:	webserver(cgi)
 
