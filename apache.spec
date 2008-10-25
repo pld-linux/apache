@@ -433,7 +433,7 @@ włącznie z przekierowaniami i innymi specjalnymi odpowiedziami HTTP
 bez wymagania skryptu CGI lub nph.
 
 %package mod_auth
-Summary:	Virtual package which which provides backward compatibility with apache 2.0
+Summary:	Virtual package which provides backward compatibility with apache 2.0
 Summary(pl.UTF-8):	Pakiet wirtualny zapewniający kompatybilność wsteczną z apache 2.0
 Group:		Networking/Daemons/HTTP
 Requires:	%{name}-base = %{version}-%{release}
@@ -476,7 +476,7 @@ Ten moduł pozwala używać uwierzytelnienia HTTP Basic do ograniczania
 dostępu poprzez wyszukiwanie użytkowników we wskazanych miejscach
 
 %package mod_auth_dbm
-Summary:	Virtual package which which provides backward compatibility with apache 2.0
+Summary:	Virtual package which provides backward compatibility with apache 2.0
 Summary(pl.UTF-8):	Pakiet wirtualny zapewniający kompatybilność wsteczną z apache 2.0
 Group:		Networking/Daemons/HTTP
 Requires:	%{name}-base = %{version}-%{release}
