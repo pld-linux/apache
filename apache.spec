@@ -35,7 +35,7 @@ Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.2.9
 Release:	10
-License:	Apache
+License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 # Source0-md5:	80d3754fc278338033296f0d41ef2c04
