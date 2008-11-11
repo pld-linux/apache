@@ -34,7 +34,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.2.10
-Release:	2
+Release:	3
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -191,10 +191,8 @@ Requires(pre):	/bin/id
 Requires(pre):	/usr/bin/getgid
 Requires(pre):	/usr/sbin/groupadd
 Requires(pre):	/usr/sbin/useradd
-Requires:	/etc/mime.types
 Requires:	/sbin/chkconfig
 Requires:	apr >= 1:1.2
-Requires:	mailcap
 Requires:	psmisc >= 20.1
 Requires:	rc-scripts >= 0.4.0.15
 Requires:	webapps
@@ -1384,6 +1382,7 @@ Summary(pl.UTF-8):	Wiązanie określonych rozszerzeń plików z zachowaniem i za
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_mime.html
 Requires:	%{name}-base = %{version}-%{release}
+Requires:	mailcap
 Provides:	apache(mod_mime) = %{version}-%{release}
 
 %description mod_mime
