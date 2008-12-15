@@ -33,12 +33,12 @@ Summary(pt_BR.UTF-8):	Servidor HTTPD para prover serviços WWW
 Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
-Version:	2.2.10
-Release:	4
+Version:	2.2.11
+Release:	1
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
-# Source0-md5:	f611aff3ddba114499e623a5259faa5c
+# Source0-md5:	03e0a99a5de0f3f568a0087fb9993af9
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}.sysconfig
@@ -90,7 +90,6 @@ Patch19:	%{name}-conffile-path.patch
 Patch20:	%{name}-apxs.patch
 # http://www.telana.com/peruser.php (2.2.3-0.3.0)
 Patch21:	httpd-peruser.patch
-Patch22:	%{name}-libtool.patch
 Patch23:	%{name}-suexec_fcgi.patch
 Patch24:	%{name}-revert-bug-40463.patch
 URL:		http://httpd.apache.org/
@@ -1748,7 +1747,6 @@ Dwa programy testowe/przykładowe cgi: test-cgi and print-env.
 %patch19 -p1
 %patch20 -p1
 %patch21 -p1
-%patch22 -p1
 %patch23 -p1
 %patch24 -p1
 
@@ -2345,8 +2343,6 @@ fi
 %files index
 %defattr(644,root,root,755)
 %config(noreplace,missingok) %{_datadir}/html/index.html*
-%{_datadir}/html/*.gif
-%{_datadir}/html/*.png
 
 %files tools
 %defattr(644,root,root,755)
