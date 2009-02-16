@@ -49,7 +49,7 @@ start() {
 	# Check if the service is already running?
 	if [ ! -f /var/lock/subsys/httpd ]; then
 		msg_starting "$SVC_NAME"
-		daemon /usr/sbin/httpd.${HTTPD_MPM} $CFG $HTTPD_OPTS
+		daemon --pidfile /var/run/httpd.pid /usr/sbin/httpd.${HTTPD_MPM} $CFG $HTTPD_OPTS
 		RETVAL=$?
 		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/httpd
 	else
@@ -61,7 +61,7 @@ stop() {
 	# Stop daemons.
 	if [ -f /var/lock/subsys/httpd ]; then
 		msg_stopping "$SVC_NAME"
-		killproc --pidfile httpd.pid httpd.${HTTPD_MPM}
+		killproc --pidfile /var/run/httpd.pid httpd.${HTTPD_MPM}
 		rm -f /var/lock/subsys/httpd /var/run/httpd.pid /var/run/httpd.loc* >/dev/null 2>&1
 	else
 		msg_not_running "$SVC_NAME"
@@ -82,10 +82,10 @@ RETVAL=0
 # See how we were called.
 case "$1" in
   start)
-  	start
+	start
 	;;
   stop)
-  	stop
+	stop
 	;;
   status)
 	status httpd.${HTTPD_MPM}
