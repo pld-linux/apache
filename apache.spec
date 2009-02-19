@@ -34,7 +34,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.2.11
-Release:	4
+Release:	5
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -196,7 +196,6 @@ Requires:	/sbin/chkconfig
 Requires:	apr >= 1:1.2
 Requires:	psmisc >= 20.1
 Requires:	rc-scripts >= 0.4.0.15
-Requires:	webapps
 Provides:	apache(modules-api) = %{_apache_modules_api}
 Provides:	group(http)
 Provides:	user(http)
