@@ -11,6 +11,7 @@
 # - mod_auth_digest and mod_auth_basic R: apache(authn) ?
 # - drop mod_case_filter* or find summary and description for them
 # - build modules only once (not with each mpm)
+# - FYI: http://wiki.apache.org/httpd/InternalDummyConnection
 
 # Conditional build:
 %bcond_without	ssl		# build without SSL support
