@@ -35,7 +35,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.2.11
-Release:	6
+Release:	7
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -1468,6 +1468,7 @@ Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_rewrite.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_rewrite) = %{version}-%{release}
+Provides:	webserver(rewrite)
 
 %description mod_rewrite
 This package contains It provides a rule-based rewriting engine to
