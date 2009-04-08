@@ -193,7 +193,7 @@ Requires(pre):	/usr/sbin/useradd
 Requires:	/sbin/chkconfig
 Requires:	apr >= 1:1.2
 Requires:	psmisc >= 20.1
-Requires:	rc-scripts >= 0.4.0.15
+Requires:	rc-scripts >= 0.4.1.23
 Provides:	apache(modules-api) = %{_apache_modules_api}
 Provides:	group(http)
 Provides:	user(http)
