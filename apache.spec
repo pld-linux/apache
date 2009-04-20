@@ -16,7 +16,6 @@
 # Conditional build:
 %bcond_without	ssl		# build without SSL support
 %bcond_without	ldap		# build without LDAP support
-%bcond_without	metuxmpm	# metux MPM
 %bcond_without	peruser		# peruser MPM
 %bcond_without	event		# event MPM
 %bcond_with	distcache	# distcache support
@@ -35,7 +34,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.2.11
-Release:	8
+Release:	9
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -73,9 +72,6 @@ Patch1:		%{name}-layout.patch
 Patch2:		%{name}-suexec.patch
 Patch3:		%{name}-branding.patch
 Patch4:		%{name}-apr.patch
-# project homepage http://www.metux.de/mpm/en/?patpage=index
-# http://www.sannes.org/metuxmpm/
-Patch5:		httpd-2.0.48-metuxmpm-r8.patch
 # what about this? it isn't applied...
 Patch6:		httpd-2.0.40-xfsz.patch
 Patch7:		%{name}-syslibs.patch
@@ -1734,7 +1730,6 @@ Dwa programy testowe/przykładowe cgi: test-cgi and print-env.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
-%patch5 -p1
 %patch7 -p1
 %patch8 -p1
 %patch9 -p1
@@ -1784,7 +1779,7 @@ touch ssl_expr_scan.c
 cd ../..
 
 CPPFLAGS="-DMAX_SERVER_LIMIT=200000 -DBIG_SECURITY_HOLE=1"
-for mpm in prefork worker %{?with_metuxmpm:metuxmpm} %{?with_peruser:peruser} %{?with_event:event}; do
+for mpm in prefork worker %{?with_peruser:peruser} %{?with_event:event}; do
 install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
 ../%configure \
 	--enable-layout=PLD \
@@ -1868,7 +1863,7 @@ cd ..
 
 done
 
-for mpm in %{?with_metuxmpm:metuxmpm} %{?with_peruser:peruser} worker %{?with_event:event}; do
+for mpm in %{?with_peruser:peruser} worker %{?with_event:event}; do
 	if ! cmp -s buildmpm-prefork/modules-inside buildmpm-${mpm}/modules-inside; then
 		echo "List of compiled modules is different between prefork-MPM and ${mpm}-MPM!"
 		echo "Build failed."
@@ -1888,7 +1883,7 @@ install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig} \
 	DESTDIR=$RPM_BUILD_ROOT
 
 # install other mpm-s
-for mpm in %{?with_metuxmpm:metuxmpm} %{?with_peruser:peruser} worker %{?with_event:event}; do
+for mpm in %{?with_peruser:peruser} worker %{?with_event:event}; do
 	install buildmpm-${mpm}/httpd.${mpm} $RPM_BUILD_ROOT%{_sbindir}/httpd.${mpm}
 done
 
