@@ -34,7 +34,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.2.11
-Release:	9
+Release:	10
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -85,8 +85,6 @@ Patch15:	httpd-2.0.48-debuglog.patch
 Patch18:	%{name}-v6only-ENOPROTOOPT.patch
 Patch19:	%{name}-conffile-path.patch
 Patch20:	%{name}-apxs.patch
-# http://www.telana.com/peruser.php (2.2.3-0.3.0)
-Patch21:	httpd-peruser.patch
 Patch23:	%{name}-suexec_fcgi.patch
 Patch24:	%{name}-revert-bug-40463.patch
 Patch25:	%{name}-prefork-graceful-fix.patch
@@ -1741,7 +1739,6 @@ Dwa programy testowe/przykładowe cgi: test-cgi and print-env.
 %patch18 -p1
 %patch19 -p1
 %patch20 -p1
-%patch21 -p1
 %patch23 -p1
 %patch24 -p1
 %patch25 -p0
@@ -1779,7 +1776,7 @@ touch ssl_expr_scan.c
 cd ../..
 
 CPPFLAGS="-DMAX_SERVER_LIMIT=200000 -DBIG_SECURITY_HOLE=1"
-for mpm in prefork worker %{?with_peruser:peruser} %{?with_event:event}; do
+for mpm in prefork worker %{?with_event:event}; do
 install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
 ../%configure \
 	--enable-layout=PLD \
@@ -1863,7 +1860,7 @@ cd ..
 
 done
 
-for mpm in %{?with_peruser:peruser} worker %{?with_event:event}; do
+for mpm in worker %{?with_event:event}; do
 	if ! cmp -s buildmpm-prefork/modules-inside buildmpm-${mpm}/modules-inside; then
 		echo "List of compiled modules is different between prefork-MPM and ${mpm}-MPM!"
 		echo "Build failed."
@@ -1883,7 +1880,7 @@ install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig} \
 	DESTDIR=$RPM_BUILD_ROOT
 
 # install other mpm-s
-for mpm in %{?with_peruser:peruser} worker %{?with_event:event}; do
+for mpm in worker %{?with_event:event}; do
 	install buildmpm-${mpm}/httpd.${mpm} $RPM_BUILD_ROOT%{_sbindir}/httpd.${mpm}
 done
 
