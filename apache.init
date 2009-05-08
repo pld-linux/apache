@@ -99,34 +99,22 @@ case "$1" in
   try-restart)
 	condrestart 0
 	;;
-  reload|force-reload|graceful)
+  reload|force-reload|graceful|flush-logs)
 	if [ -f /var/lock/subsys/httpd ]; then
 		configtest
 		if [ $RETVAL -eq 0 ]; then
-			msg_reloading "$SVC_NAME"
-			busy
+			msg_reloading "$SVC_NAME"; busy
 			/usr/sbin/httpd.${HTTPD_MPM} $CFG $HTTPD_OPTS -k graceful
 			RETVAL=$?
 			[ $RETVAL -eq 0 ] && ok || fail
+		else
+			show "Checking configuration"; busy
+			fail
+			echo >&2 "Configuration file syntax test failed. Run $0 configtest to see errors."
 		fi
 	else
 		msg_not_running "$SVC_NAME"
 		RETVAL=7
-	fi
-	;;
-  flush-logs)
-	if [ -f /var/lock/subsys/httpd ]; then
-		msg_reloading "$SVC_NAME"
-
-		configtest
-		if [ $RETVAL -eq 0 ]; then
-			/usr/sbin/httpd.${HTTPD_MPM} $CFG -k graceful
-			RETVAL=$?
-			[ $RETVAL -eq 0 ] && ok || fail
-		else
-			fail
-			echo >&2 "Configuration file syntax test failed. Run $0 configtest to see errors."
-		fi
 	fi
 	;;
   configtest)
