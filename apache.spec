@@ -78,6 +78,8 @@ Patch26:	%{name}-pollset-segv.patch
 # http://www.apache.org/dist/httpd/patches/apply_to_2.2.11/
 Patch27:	PR46949.diff
 URL:		http://httpd.apache.org/
+# http://svn.apache.org/viewvc?view=rev&revision=772997
+BuildRequires:	security(CVE-2009-1195)
 BuildRequires:	apr-devel >= 1:1.2
 BuildRequires:	apr-util-devel >= 1:1.3
 BuildRequires:	autoconf
