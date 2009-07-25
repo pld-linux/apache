@@ -40,42 +40,93 @@ if [ -n "${HTTPD_CONF}" ]; then
 	fi
 fi
 
+# configtest itself
 configtest() {
-	/usr/sbin/httpd.${HTTPD_MPM} -t $CFG $HTTPD_OPTS >/dev/null 2>&1
-	RETVAL=$?
+	/usr/sbin/httpd.${HTTPD_MPM} -t $CFG $HTTPD_OPTS 2>&1
+	return $?
+}
+
+# wrapper for configtest:
+checkconfig() {
+	local details=${1:-0}
+
+	if [ $details = 1 ]; then
+		# run config test and display report (status action)
+		show "Checking %s configuration" "$SVC_NAME"; busy
+		local out
+		out=`configtest 2>&1`
+		RETVAL=$?
+		if [ $RETVAL = 0 ]; then
+			ok
+		else
+			fail
+		fi
+		[ "$out" ] && echo >&2 "$out"
+	else
+		# run config test and abort with nice message if failed
+		# (for actions checking status before action).
+		configtest >/dev/null 2>&1
+		RETVAL=$?
+		if [ $RETVAL != 0 ]; then
+			show "Checking %s configuration" "$SVC_NAME"; fail
+			nls 'Configuration test failed. See details with %s "checkconfig"' $0
+			exit $RETVAL
+		fi
+	fi
 }
 
 start() {
 	# Check if the service is already running?
-	if [ ! -f /var/lock/subsys/httpd ]; then
-		msg_starting "$SVC_NAME"
-		daemon --pidfile /var/run/httpd.pid /usr/sbin/httpd.${HTTPD_MPM} $CFG $HTTPD_OPTS
-		RETVAL=$?
-		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/httpd
-	else
+	if [ -f /var/lock/subsys/httpd ]; then
 		msg_already_running "$SVC_NAME"
+		return
 	fi
+
+	checkconfig
+	msg_starting "$SVC_NAME"
+	daemon --pidfile /var/run/httpd.pid /usr/sbin/httpd.${HTTPD_MPM} $CFG $HTTPD_OPTS
+	RETVAL=$?
+	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/httpd
 }
 
 stop() {
 	# Stop daemons.
-	if [ -f /var/lock/subsys/httpd ]; then
-		msg_stopping "$SVC_NAME"
-		killproc --pidfile /var/run/httpd.pid httpd.${HTTPD_MPM}
-		rm -f /var/lock/subsys/httpd /var/run/httpd.pid /var/run/httpd.loc* >/dev/null 2>&1
-	else
+	if [ ! -f /var/lock/subsys/httpd ]; then
 		msg_not_running "$SVC_NAME"
+		return
 	fi
+
+	msg_stopping "$SVC_NAME"
+	killproc --pidfile /var/run/httpd.pid httpd.${HTTPD_MPM}
+	rm -f /var/lock/subsys/httpd /var/run/httpd.pid /var/run/httpd.loc* >/dev/null 2>&1
+}
+
+
+reload() {
+	if [ ! -f /var/lock/subsys/httpd ]; then
+		msg_not_running "$SVC_NAME"
+		RETVAL=7
+		return
+	fi
+
+	checkconfig
+	msg_reloading "$SVC_NAME"
+	busy
+	/usr/sbin/httpd.${HTTPD_MPM} $CFG $HTTPD_OPTS -k graceful
+	RETVAL=$?
+	[ $RETVAL -eq 0 ] && ok || fail
 }
 
 condrestart() {
-	if [ -f /var/lock/subsys/httpd ]; then
-		stop
-		start
-	else
+	if [ ! -f /var/lock/subsys/httpd ]; then
 		msg_not_running "$SVC_NAME"
 		RETVAL=$1
+		return
 	fi
+
+	checkconfig
+	stop
+	start
 }
 
 RETVAL=0
@@ -87,11 +138,6 @@ case "$1" in
   stop)
 	stop
 	;;
-  status)
-	status httpd.${HTTPD_MPM}
-	RETVAL=$?
-	/usr/sbin/httpd.${HTTPD_MPM} $CFG $HTTPD_OPTS -S
-	;;
   restart)
 	stop
 	start
@@ -100,25 +146,15 @@ case "$1" in
 	condrestart 0
 	;;
   reload|force-reload|graceful|flush-logs)
-	if [ -f /var/lock/subsys/httpd ]; then
-		configtest
-		if [ $RETVAL -eq 0 ]; then
-			msg_reloading "$SVC_NAME"; busy
-			/usr/sbin/httpd.${HTTPD_MPM} $CFG $HTTPD_OPTS -k graceful
-			RETVAL=$?
-			[ $RETVAL -eq 0 ] && ok || fail
-		else
-			show "Checking configuration"; busy
-			fail
-			echo >&2 "Configuration file syntax test failed. Run $0 configtest to see errors."
-		fi
-	else
-		msg_not_running "$SVC_NAME"
-		RETVAL=7
-	fi
+  	reload
 	;;
-  configtest)
-	/usr/sbin/httpd.${HTTPD_MPM} -t $CFG $HTTPD_OPTS
+  checkconfig|configtest)
+	checkconfig 1
+	;;
+  status)
+	status httpd.${HTTPD_MPM}
+	RETVAL=$?
+	/usr/sbin/httpd.${HTTPD_MPM} $CFG $HTTPD_OPTS -S
 	;;
   *)
 	msg_usage "$0 {start|stop|restart|try-restart|reload|force-reload|graceful|configtest|status}"
