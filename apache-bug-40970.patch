@@ -1,0 +1,12 @@
+--- apache/server/core.c~	2008-06-06 11:05:04.956063837 +0200
++++ apache/server/core.c	2008-06-06 11:11:35.201986198 +0200
+@@ -1176,8 +1176,7 @@
+ 
+     /* TODO: ap_configtestonly && ap_docrootcheck && */
+     if (apr_filepath_merge((char**)&conf->ap_document_root, NULL, arg,
+-                           APR_FILEPATH_TRUENAME, cmd->pool) != APR_SUCCESS
+-        || !ap_is_directory(cmd->pool, arg)) {
++                           APR_FILEPATH_TRUENAME, cmd->pool) != APR_SUCCESS) {
+         if (cmd->server->is_virtual) {
+             ap_log_perror(APLOG_MARK, APLOG_STARTUP, 0,
+                           cmd->pool,
