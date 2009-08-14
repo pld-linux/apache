@@ -1511,6 +1511,7 @@ Epoch:		1
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_ssl.html
 Requires:	%{name}-base = %{version}-%{release}
+Requires:	apr-util-dbm-db
 Provides:	apache(mod_ssl) = 1:%{version}-%{release}
 
 %description mod_ssl
