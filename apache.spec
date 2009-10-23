@@ -19,7 +19,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.2.14
-Release:	3
+Release:	4
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -82,8 +82,8 @@ BuildRequires:	expat-devel
 BuildRequires:	gdbm-devel >= 1.8.3
 BuildRequires:	libtool >= 2:1.5
 %{?with_ldap:BuildRequires:	openldap-devel >= 2.3.0}
-%{?with_ssl:BuildRequires:	openssl-devel >= 0.9.7d}
-%{?with_ssl:BuildRequires:	openssl-tools >= 0.9.7d}
+%{?with_ssl:BuildRequires:	openssl-devel >= 0.9.8i}
+%{?with_ssl:BuildRequires:	openssl-tools >= 0.9.8i}
 BuildRequires:	pcre-devel
 BuildRequires:	rpm-build >= 4.4.0
 BuildRequires:	rpm-perlprov >= 4.1-13
@@ -1511,6 +1511,7 @@ Epoch:		1
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_ssl.html
 Requires:	%{name}-base = %{version}-%{release}
+Requires:	openssl >= 0.9.8i
 %if "%{pld_release}" != "ac"
 Requires:	apr-util-dbm-db
 %endif
