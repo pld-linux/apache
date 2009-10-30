@@ -100,9 +100,7 @@ BuildRequires:	zlib-devel
 Requires:	%{name}-errordocs = %{version}-%{release}
 Requires:	%{name}-mod_alias = %{version}-%{release}
 Requires:	%{name}-mod_auth = %{version}-%{release}
-Requires:	%{name}-mod_cgi = %{version}-%{release}
 Requires:	%{name}-mod_env = %{version}-%{release}
-Requires:	%{name}-mod_include = %{version}-%{release}
 Requires:	%{name}-mod_log_config = %{version}-%{release}
 Requires:	%{name}-mod_mime = %{version}-%{release}
 Requires:	%{name}-mod_mime_magic = %{version}-%{release}
