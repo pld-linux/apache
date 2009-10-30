@@ -19,7 +19,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.2.14
-Release:	4
+Release:	5
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -1358,6 +1358,7 @@ URL:		http://httpd.apache.org/docs/2.2/mod/mod_mime.html
 Requires:	%{name}-base = %{version}-%{release}
 Requires:	mailcap
 Provides:	apache(mod_mime) = %{version}-%{release}
+Provides:	webserver(mime)
 
 %description mod_mime
 This module is used to associate various bits of "meta information"
