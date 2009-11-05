@@ -25,7 +25,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.2.14
-Release:	7
+Release:	8
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -77,6 +77,9 @@ Patch18:	%{name}-v6only-ENOPROTOOPT.patch
 Patch19:	%{name}-conffile-path.patch
 Patch20:	%{name}-apxs.patch
 Patch23:	%{name}-suexec_fcgi.patch
+Patch24:	%{name}-bug-48094.patch
+# http://marc.info/?l=apache-httpd-dev&m=125712658610440&w=2
+Patch25:	%{name}-shutdown-sockets.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	apr-devel >= 1:1.2
 BuildRequires:	apr-util-devel >= 1:1.3
@@ -1732,6 +1735,8 @@ Dwa programy testowe/przykładowe cgi: test-cgi and print-env.
 %patch19 -p1
 %patch20 -p1
 %patch23 -p1
+%patch24 -p1
+%patch25 -p1
 
 # using system apr, apr-util and pcre
 rm -rf srclib/{apr,apr-util,pcre}
