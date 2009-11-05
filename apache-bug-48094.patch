@@ -1,0 +1,122 @@
+--- httpd-2.2.14-v/server/mpm/worker/worker.c	2007-07-18 00:48:25.000000000 +1000
++++ httpd-2.2.14/server/mpm/worker/worker.c	2009-11-02 09:40:23.129750043 +1100
+@@ -32,6 +32,7 @@
+ #include "apr_poll.h"
+ #define APR_WANT_STRFUNC
+ #include "apr_want.h"
++#include "apr_atomic.h"
+ 
+ #if APR_HAVE_UNISTD_H
+ #include <unistd.h>
+@@ -226,10 +227,73 @@
+  */
+ #define WORKER_SIGNAL       AP_SIG_GRACEFUL
+ 
++#ifdef HAVE_PTHREAD_KILL
++/* Variables for suspending the worker threads. */
++static volatile sig_atomic_t suspend_workers = 0;
++static apr_uint32_t suspended_workers;
++static apr_os_thread_t **worker_os_threads;
++#endif
++
+ /* An array of socket descriptors in use by each thread used to
+  * perform a non-graceful (forced) shutdown of the server. */
+ static apr_socket_t **worker_sockets;
+ 
++#ifdef HAVE_PTHREAD_KILL
++static void worker_signal_handler(int sig)
++{
++    /* wait here if we are being suspended, otherwise just exit */
++    if (suspend_workers) {
++        sigset_t sigset;
++
++        apr_atomic_inc32(&suspended_workers);
++
++        sigfillset(&sigset);
++        sigdelset(&sigset, WORKER_SIGNAL);
++        sigsuspend(&sigset);
++    }
++}
++
++static void close_worker_sockets(void)
++{
++    int i, csd;
++
++    suspend_workers = 1;
++    apr_atomic_set32(&suspended_workers, 0);
++
++    /* suspend worker threads */
++    for (i = 0; i < ap_threads_per_child; i++) {
++        if (worker_os_threads[i]) {
++            pthread_kill(*worker_os_threads[i], WORKER_SIGNAL);
++        }
++    }
++
++    /* wait for threads to suspend, but press ahead after a while anyway */
++    for (i = 0;
++         apr_atomic_read32(&suspended_workers) < ap_threads_per_child && i < 25;
++         i++) {
++        apr_sleep(apr_time_from_sec(1) / 5);
++    }
++
++    /* shut down all client sockets */
++    for (i = 0; i < ap_threads_per_child; i++) {
++        if (worker_sockets[i]) {
++            apr_os_sock_get(&csd, worker_sockets[i]);
++            if (csd != -1) {
++                shutdown(csd, SHUT_RDWR);
++            }
++        }
++    }
++
++    suspend_workers = 0;
++
++    /* resume worker threads */
++    for (i = 0; i < ap_threads_per_child; i++) {
++        if (worker_os_threads[i]) {
++            pthread_kill(*worker_os_threads[i], WORKER_SIGNAL);
++        }
++    }
++}
++#else
+ static void close_worker_sockets(void)
+ {
+     int i;
+@@ -240,6 +304,7 @@
+         }
+     }
+ }
++#endif
+ 
+ static void wakeup_listener(void)
+ {
+@@ -836,7 +901,7 @@
+ 
+ #ifdef HAVE_PTHREAD_KILL
+     unblock_signal(WORKER_SIGNAL);
+-    apr_signal(WORKER_SIGNAL, dummy_signal_handler);
++    apr_signal(WORKER_SIGNAL, worker_signal_handler);
+ #endif
+ 
+     while (!workers_may_exit) {
+@@ -977,6 +1042,10 @@
+ 
+     worker_sockets = apr_pcalloc(pchild, ap_threads_per_child
+                                         * sizeof(apr_socket_t *));
++#ifdef HAVE_PTHREAD_KILL
++    worker_os_threads = apr_pcalloc(pchild, ap_threads_per_child
++                                           * sizeof(*worker_os_threads));
++#endif
+ 
+     loops = prev_threads_created = 0;
+     while (1) {
+@@ -1012,6 +1081,9 @@
+                 /* let the parent decide how bad this really is */
+                 clean_child_exit(APEXIT_CHILDSICK);
+             }
++#ifdef HAVE_PTHREAD_KILL
++            apr_os_thread_get(&worker_os_threads[i], threads[i]);
++#endif
+             threads_created++;
+         }
+         /* Start the listener only when there are workers available */
