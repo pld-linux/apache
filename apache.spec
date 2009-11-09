@@ -1,3 +1,19 @@
+# # TODO:
+# - config examples for mod_*
+# - --with-suexec-uidmin=500 or =1000 ?
+# - subpackages for MPMs
+# - !!!check if all modules (*.so) are exactly the same for different MPMs
+# - check those autn modules inner deps
+# - for external packages: don't use any apache module name in dep as they
+#  differ for apache 1.3/2.0/2.2!? any better ideas? rpm Suggests: tags?
+# - for mod_auth_* modules require each auth module to require virtual authn so at least *_default
+#  is chosen?
+# - same for mod_authz
+# - mod_auth_digest and mod_auth_basic R: apache(authn) ?
+# - drop mod_case_filter* or find summary and description for them
+# - build modules only once (not with each mpm)
+# - FYI: http://wiki.apache.org/httpd/InternalDummyConnection
+
 # Conditional build:
 %bcond_without	ssl		# build without SSL support
 %bcond_without	ldap		# build without LDAP support
