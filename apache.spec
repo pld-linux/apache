@@ -41,7 +41,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.2.14
-Release:	8
+Release:	9
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -1882,7 +1882,7 @@ done
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig} \
 	$RPM_BUILD_ROOT%{_var}/{log/{httpd,archive/httpd},{run,cache}/httpd,lock/mod_dav} \
-	$RPM_BUILD_ROOT%{_sysconfdir}/{webapps.d,conf.d} \
+	$RPM_BUILD_ROOT%{_sysconfdir}/{webapps.d,conf.d,vhosts.d} \
 	$RPM_BUILD_ROOT%{_datadir}/cgi-bin
 
 # prefork is default one
@@ -2298,6 +2298,7 @@ fi
 %{_sysconfdir}/logs
 %ghost %{_sysconfdir}/httpd.conf
 %attr(750,root,root) %dir %{_sysconfdir}/conf.d
+%attr(750,root,root) %dir %{_sysconfdir}/vhosts.d
 %attr(750,root,root) %dir %{_sysconfdir}/webapps.d
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/apache.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_common.conf
