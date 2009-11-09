@@ -1900,45 +1900,44 @@ ln -s %{_localstatedir}/run/httpd $RPM_BUILD_ROOT%{_sysconfdir}/run
 ln -s %{_var}/log/httpd $RPM_BUILD_ROOT%{_sysconfdir}/logs
 ln -s conf.d $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
 
-install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
-install %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/httpd
-install %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/httpd
+install -p %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
+cp -a %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/httpd
+cp -a %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/httpd
 
 touch $RPM_BUILD_ROOT/var/log/httpd/{access,error,agent,referer,suexec}_log
 
 %if %{with ssl}
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/ssl
-install %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/ssl/server.crt
-install %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/ssl/server.key
+cp -a %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/ssl/server.crt
+cp -a %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/ssl/server.key
 %endif
 
-install %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/apache.conf
+cp -a %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/apache.conf
 
-CFG="$RPM_BUILD_ROOT%{_sysconfdir}/conf.d/"
+CFG="$RPM_BUILD_ROOT%{_sysconfdir}/conf.d"
 
-install %{SOURCE7} $CFG/10_common.conf
-
-install %{SOURCE23} $CFG/01_mod_mime.conf
-install %{SOURCE24} $CFG/01_mod_authz_host.conf
-install %{SOURCE25} $CFG/01_mod_cgid.conf
-install %{SOURCE26} $CFG/01_mod_log_config.conf
-install %{SOURCE27} $CFG/01_mod_mime_magic.conf
-install %{SOURCE28} $CFG/01_mod_cache.conf
-install %{SOURCE8} $CFG/20_mod_vhost_alias.conf
-install %{SOURCE9} $CFG/25_mod_status.conf
-install %{SOURCE10} $CFG/30_mod_proxy.conf
-install %{SOURCE11} $CFG/35_mod_info.conf
-install %{SOURCE12} $CFG/40_mod_ssl.conf
-install %{SOURCE13} $CFG/45_mod_dav.conf
-install %{SOURCE14} $CFG/59_mod_dir.conf
-install %{SOURCE15} $CFG/13_mod_suexec.conf
-install %{SOURCE16} $CFG/58_mod_deflate.conf
-install %{SOURCE17} $CFG/57_mod_autoindex.conf
-install %{SOURCE18} $CFG/30_errordocs.conf
-install %{SOURCE19} $CFG/30_manual.conf
-install %{SOURCE20} $CFG/16_mod_userdir.conf
-install %{SOURCE21} $CFG/10_mpm.conf
-install %{SOURCE22} $CFG/20_languages.conf
+cp -a %{SOURCE7} $CFG/10_common.conf
+cp -a %{SOURCE23} $CFG/01_mod_mime.conf
+cp -a %{SOURCE24} $CFG/01_mod_authz_host.conf
+cp -a %{SOURCE25} $CFG/01_mod_cgid.conf
+cp -a %{SOURCE26} $CFG/01_mod_log_config.conf
+cp -a %{SOURCE27} $CFG/01_mod_mime_magic.conf
+cp -a %{SOURCE28} $CFG/01_mod_cache.conf
+cp -a %{SOURCE8} $CFG/20_mod_vhost_alias.conf
+cp -a %{SOURCE9} $CFG/25_mod_status.conf
+cp -a %{SOURCE10} $CFG/30_mod_proxy.conf
+cp -a %{SOURCE11} $CFG/35_mod_info.conf
+cp -a %{SOURCE12} $CFG/40_mod_ssl.conf
+cp -a %{SOURCE13} $CFG/45_mod_dav.conf
+cp -a %{SOURCE14} $CFG/59_mod_dir.conf
+cp -a %{SOURCE15} $CFG/13_mod_suexec.conf
+cp -a %{SOURCE16} $CFG/58_mod_deflate.conf
+cp -a %{SOURCE17} $CFG/57_mod_autoindex.conf
+cp -a %{SOURCE18} $CFG/30_errordocs.conf
+cp -a %{SOURCE19} $CFG/30_manual.conf
+cp -a %{SOURCE20} $CFG/16_mod_userdir.conf
+cp -a %{SOURCE21} $CFG/10_mpm.conf
+cp -a %{SOURCE22} $CFG/20_languages.conf
 
 echo "LoadModule alias_module modules/mod_alias.so" > $CFG/00_mod_alias.conf
 echo "LoadModule authn_file_module	modules/mod_authn_file.so" > $CFG/00_mod_authn_file.conf
