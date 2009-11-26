@@ -41,7 +41,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.2.14
-Release:	10
+Release:	11
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -74,6 +74,7 @@ Source25:	%{name}-mod_cgid.conf
 Source26:	%{name}-mod_log_config.conf
 Source27:	%{name}-mod_mime_magic.conf
 Source28:	%{name}-mod_cache.conf
+Source29:	%{name}-example.net.conf
 Patch0:		%{name}-configdir_skip_backups.patch
 Patch1:		%{name}-layout.patch
 Patch2:		%{name}-suexec.patch
@@ -1883,7 +1884,7 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig} \
 	$RPM_BUILD_ROOT%{_var}/{log/{httpd,archive/httpd},{run,cache}/httpd,lock/mod_dav} \
 	$RPM_BUILD_ROOT%{_sysconfdir}/{webapps.d,conf.d,vhosts.d} \
-	$RPM_BUILD_ROOT%{_datadir}/cgi-bin
+	$RPM_BUILD_ROOT%{_datadir}/{cgi-bin,vhosts}
 
 # prefork is default one
 %{__make} -C buildmpm-prefork install \
@@ -1938,6 +1939,7 @@ cp -a %{SOURCE19} $CFG/30_manual.conf
 cp -a %{SOURCE20} $CFG/16_mod_userdir.conf
 cp -a %{SOURCE21} $CFG/10_mpm.conf
 cp -a %{SOURCE22} $CFG/20_languages.conf
+cp -a %{SOURCE29} $RPM_BUILD_ROOT%{_sysconfdir}/vhosts.d/example.net.conf
 
 echo "LoadModule alias_module modules/mod_alias.so" > $CFG/00_mod_alias.conf
 echo "LoadModule authn_file_module	modules/mod_authn_file.so" > $CFG/00_mod_authn_file.conf
@@ -2302,6 +2304,7 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/apache.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_common.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mpm.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/vhosts.d/example.net.conf
 %attr(640,root,root) %{_sysconfdir}/magic
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/httpd
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/*
@@ -2325,6 +2328,7 @@ fi
 
 %dir %{_datadir}/cgi-bin
 %dir %{_datadir}/html
+%dir %{_datadir}/vhosts
 %{_datadir}/icons
 
 %files doc -f manual.files
