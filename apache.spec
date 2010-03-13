@@ -111,6 +111,7 @@ BuildRequires:	libtool >= 2:1.5
 %{?with_ssl:BuildRequires:	openssl-devel >= %{openssl_version}}
 %{?with_ssl:BuildRequires:	openssl-tools >= %{openssl_version}}
 BuildRequires:	pcre-devel
+BuildRequires:	pkgconfig
 BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpm-build >= 4.4.0
 BuildRequires:	rpm-perlprov >= 4.1-13
@@ -1473,10 +1474,12 @@ Provides:	apache(mod_reqtimeout) = %{version}-%{release}
 Provides:	webserver(reqtimeout)
 
 %description mod_reqtimeout
-Apache module to set timeout and minimum data rate for receiving requests.
+Apache module to set timeout and minimum data rate for receiving
+requests.
 
 %description mod_reqtimeout -l pl.UTF-8
-Moduł Apache'a pozwalający na ustawianie timeout oraz minimalnego transferu danych.
+Moduł Apache'a pozwalający na ustawianie timeout oraz minimalnego
+transferu danych.
 
 %package mod_rewrite
 Summary:	Apache module with rule-based engine for rewrite requested URLs on the fly
@@ -2346,7 +2349,7 @@ fi
 %dir %{_datadir}/cgi-bin
 %dir %{_datadir}/html
 %dir %{_datadir}/vhosts
-%{_datadir}/icons
+%{_iconsdir}
 
 %files doc -f manual.files
 %defattr(644,root,root,755)
