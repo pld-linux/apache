@@ -2349,7 +2349,8 @@ fi
 %dir %{_datadir}/cgi-bin
 %dir %{_datadir}/html
 %dir %{_datadir}/vhosts
-%{_iconsdir}
+# do not adapter here, %{_datadir} != /usr/share here
+%{_datadir}/icons
 
 %files doc -f manual.files
 %defattr(644,root,root,755)
