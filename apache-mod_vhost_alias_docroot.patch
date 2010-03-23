@@ -1,0 +1,100 @@
+--- old/modules/mappers/mod_vhost_alias.c	2006-07-24 13:07:15.000000000 +0100
++++ new/modules/mappers/mod_vhost_alias.c	2006-07-24 13:09:21.000000000 +0100
+@@ -33,6 +33,8 @@
+  * both written by James Grinter <jrg@blodwen.demon.co.uk>.
+  */
+ 
++#define CORE_PRIVATE
++
+ #include "apr.h"
+ #include "apr_strings.h"
+ #include "apr_hooks.h"
+@@ -67,6 +69,7 @@
+     const char *cgi_root;
+     mva_mode_e doc_root_mode;
+     mva_mode_e cgi_root_mode;
++    int set_doc_root;
+ } mva_sconf_t;
+ 
+ static void *mva_create_server_config(apr_pool_t *p, server_rec *s)
+@@ -78,6 +81,7 @@
+     conf->cgi_root = NULL;
+     conf->doc_root_mode = VHOST_ALIAS_UNSET;
+     conf->cgi_root_mode = VHOST_ALIAS_UNSET;
++    conf->set_doc_root = 0;
+     return conf;
+ }
+ 
+@@ -104,6 +108,8 @@
+         conf->cgi_root_mode = child->cgi_root_mode;
+         conf->cgi_root = child->cgi_root;
+     }
++
++    conf->set_doc_root = child->set_doc_root;
+     return conf;
+ }
+ 
+@@ -212,6 +218,18 @@
+     return NULL;
+ }
+ 
++
++static const char *vhost_set_docroot(cmd_parms *cmd, void *dummy,
++				     const char *str)
++{
++    mva_sconf_t *conf;
++    conf = (mva_sconf_t *) ap_get_module_config(cmd->server->module_config,
++						&vhost_alias_module);
++    conf->set_doc_root = (strcasecmp(str, "yes") == 0 ||
++			  strcasecmp(str, "on") == 0) ? 1 : 0;
++    return NULL;
++}
++
+ static const command_rec mva_commands[] =
+ {
+     AP_INIT_TAKE1("VirtualScriptAlias", vhost_alias_set,
+@@ -226,6 +244,9 @@
+     AP_INIT_TAKE1("VirtualDocumentRootIP", vhost_alias_set,
+                   &vhost_alias_set_doc_root_ip, RSRC_CONF,
+                   "how to create the DocumentRoot based on the host"),
++    AP_INIT_TAKE1("SetVirtualDocumentRoot", vhost_set_docroot,
++		  NULL, RSRC_CONF,
++	 	  "set DOCUMENT_ROOT to parsed document root"),
+     { NULL }
+ };
+ 
+@@ -250,8 +271,9 @@
+     }
+ }
+ 
+-static void vhost_alias_interpolate(request_rec *r, const char *name,
+-                                    const char *map, const char *uri)
++static void vhost_alias_interpolate(request_rec *r, mva_sconf_t *conf,
++				    const char *name, const char *map,
++				    const char *uri)
+ {
+     /* 0..9 9..0 */
+     enum { MAXDOTS = 19 };
+@@ -378,6 +400,13 @@
+     else {
+         r->filename = apr_pstrcat(r->pool, buf, uri, NULL);
+     }
++
++    if (conf->set_doc_root) {
++	request_rec *top = (r->main)?r->main:r;
++	core_server_config *core = (core_server_config *) ap_get_module_config(r->server->module_config, &core_module);
++
++	core->ap_document_root = apr_pstrdup(top->pool, buf);
++    }
+ }
+ 
+ static int mva_translate(request_rec *r)
+@@ -426,7 +455,7 @@
+      * canonical_path buffer.
+      */
+     r->canonical_filename = "";
+-    vhost_alias_interpolate(r, name, map, uri);
++    vhost_alias_interpolate(r, conf, name, map, uri);
+ 
+     if (cgi) {
+         /* see is_scriptaliased() in mod_cgi */
