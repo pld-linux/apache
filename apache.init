@@ -50,25 +50,24 @@ configtest() {
 checkconfig() {
 	local details=${1:-0}
 
-	if [ $details = 1 ]; then
+	if [ $details -eq 1 ]; then
 		# run config test and display report (status action)
 		show "Checking %s configuration" "$SVC_NAME"; busy
 		local out
 		out=`configtest 2>&1`
 		RETVAL=$?
-		if [ $RETVAL = 0 ]; then
-			ok
-		else
-			fail
-		fi
+		[ $RETVAL -eq 0 ] && ok || fail
 		[ "$out" ] && echo >&2 "$out"
 	else
 		# run config test and abort with nice message if failed
 		# (for actions checking status before action).
+		show "Checking %s configuration" "$SVC_NAME"; busy
 		configtest >/dev/null 2>&1
 		RETVAL=$?
-		if [ $RETVAL != 0 ]; then
-			show "Checking %s configuration" "$SVC_NAME"; fail
+		if [ $RETVAL -eq 0 ]; then
+			ok
+		else
+			fail
 			nls 'Configuration test failed. See details with %s "checkconfig"' $0
 			exit $RETVAL
 		fi
@@ -146,7 +145,7 @@ case "$1" in
 	condrestart 0
 	;;
   reload|force-reload|graceful|flush-logs)
-  	reload
+	reload
 	;;
   checkconfig|configtest)
 	checkconfig 1
