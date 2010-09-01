@@ -1,8 +1,12 @@
---- httpd-2.2.0/docs/cgi-examples/printenv.save	2005-12-26 23:09:55.000000000 +0200
-+++ httpd-2.2.0/docs/cgi-examples/printenv	2005-12-26 23:09:55.000000000 +0200
-@@ -1,4 +1,4 @@
--#!/usr/local/bin/perl
+--- httpd-2.3.8/docs/cgi-examples/printenv~	2008-09-06 23:26:15.000000000 +0300
++++ httpd-2.3.8/docs/cgi-examples/printenv	2010-09-01 13:14:05.820581537 +0300
+@@ -1,8 +1,4 @@
+-#
+-
+-# To permit this cgi, replace # on the first line above with the
+-# appropriate #!/path/to/perl shebang, and set this script executable
+-# with chmod 755.
 +#!/usr/bin/perl
- ##
- ##  printenv -- demo CGI program which just prints its environment
- ##
+ #
+ # Note that it is subject to cross site scripting attacks on MS IE
+ # and any other browser which fails to honor RFC2616, so never use

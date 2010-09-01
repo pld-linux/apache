@@ -9,16 +9,16 @@ go upstream.
 
 Note this patch depends on the pie patch.
 
---- httpd-2.0.48/include/http_log.h.debuglog
-+++ httpd-2.0.48/include/http_log.h
-@@ -130,7 +130,11 @@
+--- httpd-2.3.8/include/http_log.h~	2010-06-14 22:59:05.000000000 +0300
++++ httpd-2.3.8/include/http_log.h	2010-09-01 13:18:19.608547664 +0300
+@@ -213,7 +213,11 @@
  
  extern int AP_DECLARE_DATA ap_default_loglevel;
  
 +#ifdef AP_FNAME
-+#define APLOG_MARK      AP_FNAME,__LINE__
++#define APLOG_MARK      AP_FNAME,__LINE__,APLOG_MODULE_INDEX
 +#else
- #define APLOG_MARK	__FILE__,__LINE__
+ #define APLOG_MARK     __FILE__,__LINE__,APLOG_MODULE_INDEX
 +#endif
  
  /**

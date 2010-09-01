@@ -1,14 +1,12 @@
-diff -urbB httpd-2.2.0.org/modules/ssl/ssl_engine_mutex.c httpd-2.2.0/modules/ssl/ssl_engine_mutex.c
---- httpd-2.2.0.org/modules/ssl/ssl_engine_mutex.c	2005-11-10 16:20:05.000000000 +0100
-+++ httpd-2.2.0/modules/ssl/ssl_engine_mutex.c	2005-12-02 23:11:09.183916500 +0100
-@@ -45,6 +45,10 @@
-     if (mc->pMutex) {
+--- httpd-2.3.8/modules/ssl/ssl_engine_mutex.c~	2010-05-04 20:40:43.000000000 +0300
++++ httpd-2.3.8/modules/ssl/ssl_engine_mutex.c	2010-09-01 13:15:13.397109981 +0300
+@@ -47,6 +47,9 @@
          return TRUE;
      }
-+
+ 
 +    if (mc->szMutexFile)
-+	    apr_file_remove(mc->szMutexFile, p);
++        apr_file_remove(mc->szMutexFile, p);
 +
-     if ((rv = apr_global_mutex_create(&mc->pMutex, mc->szMutexFile,
-                                       mc->nMutexMech, s->process->pool))
+     if ((rv = ap_global_mutex_create(&mc->pMutex, NULL, SSL_CACHE_MUTEX_TYPE,
+                                      NULL, s, s->process->pool, 0))
              != APR_SUCCESS) {
