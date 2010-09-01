@@ -1,0 +1,105 @@
+diff -urNp httpd-2.2.8.orig/support/suexec.c httpd-2.2.8/support/suexec.c
+--- httpd-2.2.8.orig/support/suexec.c	2006-07-12 05:38:44.000000000 +0200
++++ httpd-2.2.8/support/suexec.c	2008-05-13 21:04:25.000000000 +0200
+@@ -245,6 +245,21 @@ static void clean_env(void)
+     environ = cleanenv;
+ }
+ 
++/*
++ * Return the `basename' of the pathname in STRING (the stuff after
++ * the last '/').  If STRING is `/', just return it. Taken from bash.
++ */
++char *base_pathname(char *string)
++{
++    char *p;
++
++    if (string[0] == '/' && string[1] == 0)
++        return (string);
++
++    p = (char *)strrchr (string, '/');
++        return (p ? ++p : string);
++}
++
+ int main(int argc, char *argv[])
+ {
+     int userdir = 0;        /* ~userdir flag             */
+@@ -261,6 +276,7 @@ int main(int argc, char *argv[])
+     char dwd[AP_MAXPATH];   /* docroot working directory */
+     struct passwd *pw;      /* password entry holder     */
+     struct group *gr;       /* group entry holder        */
++    struct passwd tpw;      /* tmp password entry holder */
+     struct stat dir_info;   /* directory info holder     */
+     struct stat prg_info;   /* program info holder       */
+ 
+@@ -270,6 +286,7 @@ int main(int argc, char *argv[])
+     clean_env();
+ 
+     prog = argv[0];
++
+     /*
+      * Check existence/validity of the UID of the user
+      * running this program.  Error out if invalid.
+@@ -382,8 +399,23 @@ int main(int argc, char *argv[])
+     }
+     else {
+         if ((pw = getpwuid(atoi(target_uname))) == NULL) {
+-            log_err("invalid target user id: (%s)\n", target_uname);
+-            exit(121);
++            /*
++             * If called as suexec.fcgi ignore if there is no passwd
++             * entry for specified UID. Also bail out if UID = 0.
++             */
++            if(!strcmp(base_pathname(prog),"suexec.fcgi")) {
++                tpw.pw_name = strdup(target_uname);
++                tpw.pw_uid = atoi(target_uname);
++                tpw.pw_dir = (char *)"/tmp";
++                pw = &tpw;
++                if (tpw.pw_uid <= 0) {
++                    log_err("invalid target user id: (%s)\n", target_uname);
++                    exit(121);
++                }
++            } else {
++                log_err("invalid target user id: (%s)\n", target_uname);
++                exit(121);
++            }
+         }
+     }
+ 
+@@ -560,20 +592,24 @@ int main(int argc, char *argv[])
+     }
+ 
+     /*
+-     * Error out if the target name/group is different from
+-     * the name/group of the cwd or the program.
+-     */
+-    if ((uid != dir_info.st_uid) ||
+-        (gid != dir_info.st_gid) ||
+-        (uid != prg_info.st_uid) ||
+-        (gid != prg_info.st_gid)) {
+-        log_err("target uid/gid (%ld/%ld) mismatch "
+-                "with directory (%ld/%ld) or program (%ld/%ld)\n",
+-                uid, gid,
+-                dir_info.st_uid, dir_info.st_gid,
+-                prg_info.st_uid, prg_info.st_gid);
+-        exit(120);
++     * If not called as suexec.fcgi error out if the target
++     * name/group is different from the name/group of the cwd
++     * or the program.
++     */
++    if(strcmp(base_pathname(prog),"suexec.fcgi")) {
++        if ((uid != dir_info.st_uid) ||
++            (gid != dir_info.st_gid) ||
++            (uid != prg_info.st_uid) ||
++            (gid != prg_info.st_gid)) {
++            log_err("target uid/gid (%ld/%ld) mismatch "
++                    "with directory (%ld/%ld) or program (%ld/%ld)\n",
++                    uid, gid,
++                    dir_info.st_uid, dir_info.st_gid,
++                    prg_info.st_uid, prg_info.st_gid);
++            exit(120);
++        }
+     }
++
+     /*
+      * Error out if the program is not executable for the user.
+      * Otherwise, she won't find any error in the logs except for
