@@ -25,6 +25,30 @@
  		print STDERR "apxs:Error: no config variable $var\n";
  		&usage;
  	    }
+@@ -199,11 +201,10 @@
+     ($httpd = $0) =~ s:support/apxs$::;
+ }
+ 
+-unless (-x "$httpd") {
+-	error("$httpd not found or not executable");
+-	exit 1;
++if (not -x "$httpd") {
++	print STDERR "Note: $httpd not found or not executable.\n";
+ }
+-
++else {
+ unless (grep /mod_so/, `. $envvars && $httpd -l`) {
+     error("Sorry, no shared object support for Apache");
+     error("available under your platform. Make sure");
+@@ -211,7 +212,7 @@
+     error("your server binary `$httpd'.");
+     exit 1;
+ }
+-
++}
+ sub get_config_vars{
+     my ($file, $rh_config) = @_;
+ 
 @@ -479,8 +480,8 @@
          $t =~ s|\.[^./\\]+$|\.so|;
          if ($opt_i) {

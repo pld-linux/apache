@@ -1,15 +1,17 @@
---- httpd-2.3.8/modules/ssl/ssl_private.h~	2010-09-01 13:21:44.000000000 +0300
-+++ httpd-2.3.8/modules/ssl/ssl_private.h	2010-09-01 13:22:12.923733895 +0300
-@@ -394,6 +394,9 @@
+Index: httpd-2.2.x/modules/ssl/ssl_private.h
+===================================================================
+--- httpd-2.2.x/modules/ssl/ssl_private.h	(revision 833672)
++++ httpd-2.2.x/modules/ssl/ssl_private.h	(working copy)
+@@ -395,6 +395,9 @@ typedef struct {
  #if defined(HAVE_OPENSSL_ENGINE_H) && defined(HAVE_ENGINE_INIT)
      const char     *szCryptoDevice;
  #endif
 +#ifndef OPENSSL_NO_TLSEXT
 +    ssl_enabled_t  session_tickets_enabled;
 +#endif
- 
- #ifdef HAVE_OCSP_STAPLING
-     const ap_socache_provider_t *stapling_cache;
+     struct {
+         void *pV1, *pV2, *pV3, *pV4, *pV5, *pV6, *pV7, *pV8, *pV9, *pV10;
+     } rCtx;
 @@ -545,6 +548,7 @@ const char  *ssl_cmd_SSLRequire(cmd_parm
  const char  *ssl_cmd_SSLRenegBufferSize(cmd_parms *cmd, void *dcfg, const char *arg);
  const char  *ssl_cmd_SSLStrictSNIVHostCheck(cmd_parms *cmd, void *dcfg, int flag);
@@ -159,12 +161,14 @@ Index: httpd-2.2.x/modules/ssl/ssl_engine_kernel.c
  
          /*
           * Save the found server into our SSLConnRec for later
---- httpd-2.3.8/modules/ssl/mod_ssl.c~	2010-06-06 20:10:23.000000000 +0300
-+++ httpd-2.3.8/modules/ssl/mod_ssl.c	2010-09-01 13:22:58.820804816 +0300
-@@ -69,6 +69,8 @@
+Index: httpd-2.2.x/modules/ssl/mod_ssl.c
+===================================================================
+--- httpd-2.2.x/modules/ssl/mod_ssl.c	(revision 833672)
++++ httpd-2.2.x/modules/ssl/mod_ssl.c	(working copy)
+@@ -92,6 +92,8 @@ static const command_rec ssl_config_cmds
      SSL_CMD_SRV(RandomSeed, TAKE23,
                  "SSL Pseudo Random Number Generator (PRNG) seeding source "
-                 "('startup|connect builtin|file:/path|exec:/path [bytes]')")
+                 "(`startup|connect builtin|file:/path|exec:/path [bytes]')")
 +    SSL_CMD_SRV(SessionTicketExtension, FLAG,
 +                "TLS Session Ticket extension support")
  

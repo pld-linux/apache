@@ -1,3 +1,4 @@
+# # TODO:
 # - config examples for mod_*
 # - --with-suexec-uidmin=500 or =1000 ?
 # - subpackages for MPMs
@@ -20,16 +21,16 @@
 %bcond_without	event		# event MPM
 %bcond_with	distcache	# distcache support
 %bcond_with	bucketeer	# debug one
-
+#
+%include	/usr/lib/rpm/macros.perl
 # this is internal macro, don't change to %%apache_modules_api
-%define		_apache_modules_api 20100723
+%define		_apache_modules_api 20051115
 
 %if "%{pld_release}" != "ac"
 %define		openssl_ver	0.9.8i
 %else
 %define		openssl_ver	0.9.7d
 %endif
-%include	/usr/lib/rpm/macros.perl
 Summary:	The most widely used Web server on the Internet
 Summary(de.UTF-8):	Leading World Wide Web-Server
 Summary(es.UTF-8):	Servidor HTTPD para proveer servicios WWW
@@ -39,12 +40,12 @@ Summary(pt_BR.UTF-8):	Servidor HTTPD para prover serviços WWW
 Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
-Version:	2.3.8
-Release:	0.1
+Version:	2.2.16
+Release:	1
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
-# Source0-md5:	275b3dea795edb19f74470ff9b591ccd
+# Source0-md5:	7f33f2c8b213ad758c009ae46d2795ed
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}.sysconfig
@@ -81,7 +82,7 @@ Patch3:		%{name}-branding.patch
 Patch4:		%{name}-apr.patch
 # what about this? it isn't applied...
 Patch6:		httpd-2.0.40-xfsz.patch
-#Patch7:		%{name}-syslibs.patch
+Patch7:		%{name}-syslibs.patch
 Patch8:		httpd-2.0.45-encode.patch
 Patch9:		%{name}-paths.patch
 Patch10:	httpd-2.0.46-dav401dest.patch
@@ -1758,7 +1759,7 @@ Dwa programy testowe/przykładowe cgi: test-cgi and print-env.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
-#%patch7 -p1
+%patch7 -p1
 %patch8 -p1
 %patch9 -p1
 %patch10 -p1
@@ -1775,7 +1776,7 @@ Dwa programy testowe/przykładowe cgi: test-cgi and print-env.
 %patch26 -p1
 
 # using system apr, apr-util and pcre
-#rm -rf srclib/{apr,apr-util,pcre}
+rm -rf srclib/{apr,apr-util,pcre}
 
 # sanity check
 MODULES_API=`awk '/#define MODULE_MAGIC_NUMBER_MAJOR/ {print $3}' include/ap_mmn.h`
