@@ -8,6 +8,7 @@ SERVICE_RUN_NICE_LEVEL="+5"
 #HTTPD_CONF="/etc/httpd/apache.conf"
 
 # other command-line options
+# -T avoid doing many unneded DocumentRoot checks
 HTTPD_OPTS=""
 
 # choose MPM

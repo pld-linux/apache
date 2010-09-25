@@ -1,12 +1,87 @@
---- apache/server/core.c~	2008-06-06 11:05:04.956063837 +0200
-+++ apache/server/core.c	2008-06-06 11:11:35.201986198 +0200
-@@ -1176,8 +1176,7 @@
+Index: server/core.c
+===================================================================
+--- server/core.c	(wersja 984170)
++++ server/core.c	(wersja 984171)
+@@ -1183,13 +1183,19 @@
+         return err;
+     }
  
-     /* TODO: ap_configtestonly && ap_docrootcheck && */
++    /* When ap_document_root_check is false; skip all the stuff below */
++    if (!ap_document_root_check) {
++       conf->ap_document_root = arg;
++       return NULL;
++    }
++
+     /* Make it absolute, relative to ServerRoot */
+     arg = ap_server_root_relative(cmd->pool, arg);
+     if (arg == NULL) {
+         return "DocumentRoot must be a directory";
+     }
+ 
+-    /* TODO: ap_configtestonly && ap_docrootcheck && */
++    /* TODO: ap_configtestonly */
      if (apr_filepath_merge((char**)&conf->ap_document_root, NULL, arg,
--                           APR_FILEPATH_TRUENAME, cmd->pool) != APR_SUCCESS
--        || !ap_is_directory(cmd->pool, arg)) {
-+                           APR_FILEPATH_TRUENAME, cmd->pool) != APR_SUCCESS) {
-         if (cmd->server->is_virtual) {
-             ap_log_perror(APLOG_MARK, APLOG_STARTUP, 0,
-                           cmd->pool,
+                            APR_FILEPATH_TRUENAME, cmd->pool) != APR_SUCCESS
+         || !ap_is_directory(cmd->pool, arg)) {
+Index: server/main.c
+===================================================================
+--- server/main.c	(wersja 984170)
++++ server/main.c	(wersja 984171)
+@@ -361,7 +361,7 @@
+ #endif /* AP_MPM_WANT_SET_GRACEFUL_SHUTDOWN */
+ #endif
+     ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL,
+-                 "       %s [-v] [-V] [-h] [-l] [-L] [-t] [-S]", pad);
++                 "       %s [-v] [-V] [-h] [-l] [-L] [-t] [-T] [-S]", pad);
+     ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL,
+                  "Options:");
+ 
+@@ -440,10 +440,15 @@
+                  "  -M                 : a synonym for -t -D DUMP_MODULES");
+     ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL,
+                  "  -t                 : run syntax check for config files");
++    ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL,
++                "  -T                 : start without DocumentRoot(s) check");
+ 
+     destroy_and_exit_process(process, 1);
+ }
+ 
++/* Set ap_document_root_check to default value: true */
++AP_DECLARE_DATA int ap_document_root_check = 1;
++
+ int main(int argc, const char * const argv[])
+ {
+     char c;
+@@ -592,6 +597,10 @@
+             configtestonly = 1;
+             break;
+ 
++       case 'T':
++           ap_document_root_check = 0;
++           break;
++
+         case 'S':
+             configtestonly = 1;
+             new = (char **)apr_array_push(ap_server_config_defines);
+Index: include/http_main.h
+===================================================================
+--- include/http_main.h	(wersja 984170)
++++ include/http_main.h	(wersja 984171)
+@@ -32,7 +32,7 @@
+  * in apr_getopt() format.  Use this for default'ing args that the MPM
+  * can safely ignore and pass on from its rewrite_args() handler.
+  */
+-#define AP_SERVER_BASEARGS "C:c:D:d:E:e:f:vVlLtSMh?X"
++#define AP_SERVER_BASEARGS "C:c:D:d:E:e:f:vVlLtTSMh?X"
+ 
+ #ifdef __cplusplus
+ extern "C" {
+@@ -53,6 +53,8 @@
+ /** An array of all -D defines on the command line.  This allows people to
+  *  effect the server based on command line options */
+ AP_DECLARE_DATA extern apr_array_header_t *ap_server_config_defines;
++/** Available integer for using the -T switch */
++AP_DECLARE_DATA extern int ap_document_root_check;
+ 
+ /**
+  * An optional function to send signal to server on presence of '-k'

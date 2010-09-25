@@ -1763,7 +1763,7 @@ Dwa programy testowe/przykładowe cgi: test-cgi and print-env.
 %patch8 -p1
 %patch9 -p1
 %patch10 -p1
-%patch11 -p1
+%patch11 -p0
 %patch12 -p1
 %patch14 -p1
 %patch15 -p1
