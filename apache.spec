@@ -819,20 +819,33 @@ proxy. Dołączono dwa moduły pozwalające magazynować dane w pamięci
 dysku (używane do cache'owania proxy).
 
 %package mod_case_filter
-Summary:	TODO
+Summary:	Apache output filter that converts all output to upper case
+Summary(pl.UTF-8):	Filtr wyjściowy Apache'a zamieniający wszystkie litery na wielkie
 Group:		Networking/Daemons/HTTP
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_case_filter) = %{version}-%{release}
 
 %description mod_case_filter
+Apache output filter that converts all output to upper case.
+
+%description mod_case_filter -l pl.UTF-8
+Filtr wyjściowy Apache'a zamieniający wszystkie litery w wyjściu na
+wielkie.
 
 %package mod_case_filter_in
-Summary:	TODO
+Summary:	Apache input filter that converts all request body to upper case
+Summary(pl.UTF-8):	Filtr wejściowy Apache'a zamieniający wszystkie litery w żądaniu na wielkie
 Group:		Networking/Daemons/HTTP
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_case_filter_in) = %{version}-%{release}
 
 %description mod_case_filter_in
+Apache input filter that converts all request body (not headers) to
+upper case.
+
+%description mod_case_filter_in -l pl.UTF-8
+Filtr wejściowy Apache'a zamieniający wszystkie litery w ciele żądania
+(ale nie nagłówkach) na wielkie.
 
 %package mod_cern_meta
 Summary:	CERN httpd metafile semantics
