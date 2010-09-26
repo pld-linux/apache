@@ -1480,7 +1480,7 @@ HTTP/1.0 i HTTP/1.1.
 
 %package mod_reqtimeout
 Summary:	Apache module to set timeout and minimum data rate for receiving requests
-Summary(pl.UTF-8):	Moduł Apache'a pozwalający na ustawianie timeout oraz minimalnego transferu danych
+Summary(pl.UTF-8):	Moduł Apache'a pozwalający na ustawianie limitu czasu oraz minimalnego transferu danych
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_reqtimeout.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1492,7 +1492,7 @@ Apache module to set timeout and minimum data rate for receiving
 requests.
 
 %description mod_reqtimeout -l pl.UTF-8
-Moduł Apache'a pozwalający na ustawianie timeout oraz minimalnego
+Moduł Apache'a pozwalający na ustawianie limitu czasu oraz minimalnego
 transferu danych.
 
 %package mod_rewrite
