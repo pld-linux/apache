@@ -86,7 +86,7 @@ diff -urNp httpd-2.2.8.orig/support/suexec.c httpd-2.2.8/support/suexec.c
 +     * name/group is different from the name/group of the cwd
 +     * or the program.
 +     */
-+    if(!strcmp(base_pathname(prog),"suexec.fcgi")) {
++    if(strcmp(base_pathname(prog),"suexec.fcgi")) {
 +        if ((uid != dir_info.st_uid) ||
 +            (gid != dir_info.st_gid) ||
 +            (uid != prg_info.st_uid) ||
