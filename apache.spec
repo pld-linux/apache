@@ -21,8 +21,7 @@
 %bcond_without	event		# event MPM
 %bcond_with	distcache	# distcache support
 %bcond_with	bucketeer	# debug one
-#
-%include	/usr/lib/rpm/macros.perl
+
 # this is internal macro, don't change to %%apache_modules_api
 %define		_apache_modules_api 20051115
 
@@ -31,6 +30,7 @@
 %else
 %define		openssl_ver	0.9.7d
 %endif
+%include	/usr/lib/rpm/macros.perl
 Summary:	The most widely used Web server on the Internet
 Summary(de.UTF-8):	Leading World Wide Web-Server
 Summary(es.UTF-8):	Servidor HTTPD para proveer servicios WWW
@@ -108,8 +108,8 @@ BuildRequires:	expat-devel
 BuildRequires:	gdbm-devel >= 1.8.3
 BuildRequires:	libtool >= 2:1.5
 %{?with_ldap:BuildRequires:	openldap-devel >= 2.3.0}
-%{?with_ssl:BuildRequires:	openssl-devel >= %{openssl_version}}
-%{?with_ssl:BuildRequires:	openssl-tools >= %{openssl_version}}
+%{?with_ssl:BuildRequires:	openssl-devel >= %{openssl_ver}}
+%{?with_ssl:BuildRequires:	openssl-tools >= %{openssl_ver}}
 BuildRequires:	pcre-devel
 BuildRequires:	pkgconfig
 BuildRequires:	rpm >= 4.4.9-56
@@ -1569,7 +1569,7 @@ Epoch:		1
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_ssl.html
 Requires:	%{name}-base = %{version}-%{release}
-Requires:	openssl >= %{openssl_version}
+Requires:	openssl >= %{openssl_ver}
 %if "%{pld_release}" != "ac"
 Requires:	apr-util-dbm-db
 %endif
