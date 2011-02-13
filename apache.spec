@@ -41,7 +41,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.2.17
-Release:	7
+Release:	8
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -97,6 +97,7 @@ Patch24:	%{name}-bug-48094.patch
 # http://scripts.mit.edu/trac/browser/trunk/server/common/patches/httpd-2.2.x-mod_ssl-sessioncaching.patch?rev=1348
 Patch25:	httpd-2.2.x-mod_ssl-sessioncaching.patch
 Patch26:	apache-mod_vhost_alias_docroot.patch
+Patch27:	apache-bug-41743.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	apr-devel >= 1:1.2
 BuildRequires:	apr-util-devel >= 1:1.3
@@ -1786,6 +1787,7 @@ Dwa programy testowe/przykładowe cgi: test-cgi and print-env.
 %patch24 -p1
 %patch25 -p1
 %patch26 -p1
+%patch27 -p0
 
 # using system apr, apr-util and pcre
 rm -rf srclib/{apr,apr-util,pcre}
