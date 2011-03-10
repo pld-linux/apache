@@ -1825,7 +1825,7 @@ touch ssl_expr_scan.c
 cd ../..
 
 CPPFLAGS="-DMAX_SERVER_LIMIT=200000 -DBIG_SECURITY_HOLE=1"
-for mpm in prefork worker %{?with_event:event} %{with_itk:itk}; do
+for mpm in prefork worker %{?with_event:event} %{?with_itk:itk}; do
 install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
 ../%configure \
 	--enable-layout=PLD \
@@ -1909,7 +1909,7 @@ cd ..
 
 done
 
-for mpm in worker %{?with_event:event}; do
+for mpm in worker %{?with_event:event} %{?with_itk:itk}; do
 	if ! cmp -s buildmpm-prefork/modules-inside buildmpm-${mpm}/modules-inside; then
 		echo "List of compiled modules is different between prefork-MPM and ${mpm}-MPM!"
 		echo "Build failed."
@@ -1929,7 +1929,7 @@ install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig} \
 	DESTDIR=$RPM_BUILD_ROOT
 
 # install other mpm-s
-for mpm in worker %{?with_event:event}; do
+for mpm in worker %{?with_event:event} %{?with_itk:itk}; do
 	install buildmpm-${mpm}/httpd.${mpm} $RPM_BUILD_ROOT%{_sbindir}/httpd.${mpm}
 done
 
