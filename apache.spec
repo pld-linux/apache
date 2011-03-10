@@ -19,6 +19,7 @@
 %bcond_without	ldap		# build without LDAP support
 %bcond_without	peruser		# peruser MPM
 %bcond_without	event		# event MPM
+%bcond_without	itk		# ITK MPM
 %bcond_with	distcache	# distcache support
 %bcond_with	bucketeer	# debug one
 
@@ -41,7 +42,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.2.17
-Release:	8
+Release:	8.1
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -98,6 +99,8 @@ Patch24:	%{name}-bug-48094.patch
 Patch25:	httpd-2.2.x-mod_ssl-sessioncaching.patch
 Patch26:	apache-mod_vhost_alias_docroot.patch
 Patch27:	apache-bug-41743.patch
+# http://mpm-itk.sesse.net/
+Patch28:	apache-mpm-itk.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	apr-devel >= 1:1.2
 BuildRequires:	apr-util-devel >= 1:1.3
@@ -1788,6 +1791,7 @@ Dwa programy testowe/przykładowe cgi: test-cgi and print-env.
 %patch25 -p1
 %patch26 -p1
 %patch27 -p0
+%patch28 -p1
 
 # using system apr, apr-util and pcre
 rm -rf srclib/{apr,apr-util,pcre}
@@ -1821,12 +1825,12 @@ touch ssl_expr_scan.c
 cd ../..
 
 CPPFLAGS="-DMAX_SERVER_LIMIT=200000 -DBIG_SECURITY_HOLE=1"
-for mpm in prefork worker %{?with_event:event}; do
+for mpm in prefork worker %{?with_event:event} %{with_itk:itk}; do
 install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
 ../%configure \
 	--enable-layout=PLD \
 	--disable-v4-mapped \
-	$( [ "${mpm}" = "prefork" -o "${mpm}" = "worker" -o "${mpm}" = "event" ] && echo "--enable-exception-hook" ) \
+	$( [ "${mpm}" = "prefork" -o "${mpm}" = "worker" -o "${mpm}" = "event" -o "${mpm}" = "itk" ] && echo "--enable-exception-hook" ) \
 	--enable-modules=all \
 	--enable-mods-shared=all \
 	--enable-auth-anon \
