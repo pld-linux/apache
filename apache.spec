@@ -19,7 +19,7 @@
 %bcond_without	ldap		# build without LDAP support
 %bcond_without	peruser		# peruser MPM
 %bcond_without	event		# event MPM
-%bcond_without	itk		# ITK MPM
+%bcond_with	itk		# ITK MPM
 %bcond_with	distcache	# distcache support
 %bcond_with	bucketeer	# debug one
 
