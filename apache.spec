@@ -42,7 +42,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.2.17
-Release:	9
+Release:	10
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -104,7 +104,7 @@ Patch28:	apache-mpm-itk.patch
 Patch29:	libtool-tag.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	apr-devel >= 1:1.2
-BuildRequires:	apr-util-devel >= 1:1.3
+BuildRequires:	apr-util-devel >= 1:1.3.10-2
 BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	db-devel
