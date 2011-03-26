@@ -101,6 +101,7 @@ Patch26:	apache-mod_vhost_alias_docroot.patch
 Patch27:	apache-bug-41743.patch
 # http://mpm-itk.sesse.net/
 Patch28:	apache-mpm-itk.patch
+Patch29:	libtool-tag.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	apr-devel >= 1:1.2
 BuildRequires:	apr-util-devel >= 1:1.3
@@ -1792,6 +1793,7 @@ Dwa programy testowe/przykładowe cgi: test-cgi and print-env.
 %patch26 -p1
 %patch27 -p0
 %patch28 -p1
+%patch29 -p1
 
 # using system apr, apr-util and pcre
 rm -rf srclib/{apr,apr-util,pcre}
