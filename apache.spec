@@ -41,12 +41,12 @@ Summary(pt_BR.UTF-8):	Servidor HTTPD para prover serviços WWW
 Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
-Version:	2.2.18
+Version:	2.2.19
 Release:	1
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
-# Source0-md5:	f719de25956eeb52728beb6311e836b5
+# Source0-md5:	e9f5453e1e4d7aeb0e7ec7184c6784b5
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}.sysconfig
@@ -102,7 +102,7 @@ Patch26:	apache-mod_vhost_alias_docroot.patch
 Patch28:	apache-mpm-itk.patch
 Patch29:	libtool-tag.patch
 URL:		http://httpd.apache.org/
-BuildRequires:	apr-devel >= 1:1.4.4
+BuildRequires:	apr-devel >= 1:1.4.5
 BuildRequires:	apr-util-devel >= 1:1.3.10-2
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -197,7 +197,7 @@ Requires(pre):	/usr/bin/getgid
 Requires(pre):	/usr/sbin/groupadd
 Requires(pre):	/usr/sbin/useradd
 Requires:	/sbin/chkconfig
-Requires:	apr >= 1:1.4.4
+Requires:	apr >= 1:1.4.5
 Requires:	psmisc >= 20.1
 Requires:	rc-scripts >= 0.4.1.23
 Provides:	apache(modules-api) = %{_apache_modules_api}
