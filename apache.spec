@@ -1794,7 +1794,7 @@ Dwa programy testowe/przykładowe cgi: test-cgi and print-env.
 %patch29 -p1
 
 # using system apr, apr-util and pcre
-rm -rf srclib/{apr,apr-util,pcre}
+%{__rm} -r srclib/{apr,apr-util,pcre}
 
 # sanity check
 MODULES_API=`awk '/#define MODULE_MAGIC_NUMBER_MAJOR/ {print $3}' include/ap_mmn.h`
@@ -2030,7 +2030,7 @@ echo "LoadModule substitute_module	modules/mod_substitute.so" > $CFG/00_mod_subs
 echo "LoadModule reqtimeout_module	modules/mod_reqtimeout.so" >> $CFG/00_mod_reqtimeout.conf
 
 # anything in style dir not ending with .css is trash
-rm -rf $RPM_BUILD_ROOT%{_datadir}/manual/style/{lang,latex,xsl}
+%{__rm} -r $RPM_BUILD_ROOT%{_datadir}/manual/style/{lang,latex,xsl}
 find $RPM_BUILD_ROOT%{_datadir}/manual/style -type f ! -name '*.css' -print0 | xargs -0r rm -f
 
 # find manual files
@@ -2059,11 +2059,11 @@ EOF
 ln -sf suexec $RPM_BUILD_ROOT%{_sbindir}/suexec.fcgi
 
 # no value
-rm $RPM_BUILD_ROOT%{_libexecdir}/build/config.nice
-rm $RPM_BUILD_ROOT%{_libexecdir}/*.exp
-rm $RPM_BUILD_ROOT%{_sysconfdir}/mime.types
-rm $RPM_BUILD_ROOT%{_sysconfdir}/httpd.prefork.conf
-rm -rf $RPM_BUILD_ROOT%{_sysconfdir}/{extra,original}
+%{__rm} $RPM_BUILD_ROOT%{_libexecdir}/build/config.nice
+%{__rm} $RPM_BUILD_ROOT%{_libexecdir}/*.exp
+%{__rm} $RPM_BUILD_ROOT%{_sysconfdir}/mime.types
+%{__rm} $RPM_BUILD_ROOT%{_sysconfdir}/httpd.prefork.conf
+%{__rm} -r $RPM_BUILD_ROOT%{_sysconfdir}/{extra,original}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -2344,7 +2344,7 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/apache.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_common.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mpm.conf
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/vhosts.d/example.net.conf
+%attr(640,root,root) %config(noreplace,missingok) %verify(not md5 mtime size) %{_sysconfdir}/vhosts.d/example.net.conf
 %attr(640,root,root) %{_sysconfdir}/magic
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/httpd
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/*
