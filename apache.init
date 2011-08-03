@@ -81,7 +81,7 @@ start() {
 		return
 	fi
 
-	checkconfig
+	[ "$1" -eq 0 ] || checkconfig
 	msg_starting "$SVC_NAME"
 	daemon --pidfile /var/run/httpd.pid /usr/sbin/httpd.${HTTPD_MPM} $CFG $HTTPD_OPTS
 	RETVAL=$?
@@ -140,7 +140,7 @@ case "$1" in
   restart)
 	checkconfig
 	stop
-	start
+	start 0
 	;;
   try-restart)
 	condrestart 0
