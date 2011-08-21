@@ -83,6 +83,9 @@ start() {
 
 	[ "$1" -eq 0 ] || checkconfig
 	msg_starting "$SVC_NAME"
+	# remove ssl_scache on startup, otherwise httpd may go into
+	# infinite loop if there are db transaction logs laying around
+	rm -f /var/cache/httpd/*ssl_scache*
 	daemon --pidfile /var/run/httpd.pid /usr/sbin/httpd.${HTTPD_MPM} $CFG $HTTPD_OPTS
 	RETVAL=$?
 	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/httpd
