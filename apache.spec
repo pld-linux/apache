@@ -42,7 +42,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.2.19
-Release:	3
+Release:	4
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -101,6 +101,8 @@ Patch26:	apache-mod_vhost_alias_docroot.patch
 # http://mpm-itk.sesse.net/
 Patch28:	apache-mpm-itk.patch
 Patch29:	libtool-tag.patch
+# http://people.apache.org/~sf/byterange-no-merge.2.2.diff
+Patch30:	byterange-no-merge.2.2.diff
 URL:		http://httpd.apache.org/
 BuildRequires:	apr-devel >= 1:1.4.5
 BuildRequires:	apr-util-devel >= 1:1.3.10-2
@@ -1792,6 +1794,7 @@ Dwa programy testowe/przykładowe cgi: test-cgi and print-env.
 %patch26 -p1
 %patch28 -p1
 %patch29 -p1
+%patch30 -p0
 
 # using system apr, apr-util and pcre
 %{__rm} -r srclib/{apr,apr-util,pcre}
