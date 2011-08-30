@@ -26,10 +26,12 @@
 # this is internal macro, don't change to %%apache_modules_api
 %define		_apache_modules_api 20051115
 
-%if "%{pld_release}" != "ac"
-%define		openssl_ver	0.9.8i
-%else
+%if "%{pld_release}" == "ac"
 %define		openssl_ver	0.9.7d
+%define		apr_ver		1:1.2
+%else
+%define		openssl_ver	0.9.8i
+%define		apr_ver		1:1.4.5
 %endif
 %include	/usr/lib/rpm/macros.perl
 Summary:	The most widely used Web server on the Internet
@@ -103,7 +105,7 @@ Patch26:	apache-mod_vhost_alias_docroot.patch
 Patch28:	apache-mpm-itk.patch
 Patch29:	libtool-tag.patch
 URL:		http://httpd.apache.org/
-BuildRequires:	apr-devel >= 1:1.4.5
+BuildRequires:	apr-devel >= %{apr_ver}
 BuildRequires:	apr-util-devel >= 1:1.3.10-2
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -198,7 +200,7 @@ Requires(pre):	/usr/bin/getgid
 Requires(pre):	/usr/sbin/groupadd
 Requires(pre):	/usr/sbin/useradd
 Requires:	/sbin/chkconfig
-Requires:	apr >= 1:1.4.5
+Requires:	apr >= %{apr_ver}
 Requires:	psmisc >= 20.1
 Requires:	rc-scripts >= 0.4.1.23
 Provides:	apache(modules-api) = %{_apache_modules_api}
