@@ -47,8 +47,7 @@ Version:	2.2.20
 Release:	1
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
-#Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
-Source0:	http://httpd.apache.org/dev/dist/httpd-%{version}.tar.gz
+Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 # Source0-md5:	4504934464c5ee51018dbafa6d99810d
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
