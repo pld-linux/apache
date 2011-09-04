@@ -1,0 +1,11 @@
+--- httpd/httpd/trunk/modules/http/byterange_filter.c	2011/09/01 06:42:40	1163920
++++ httpd/httpd/trunk/modules/http/byterange_filter.c	2011/09/01 10:25:45	1163985
+@@ -544,7 +544,7 @@
+             return 0;
+         }
+ 
+-        if (dash == range) {
++        if (dash == cur) {
+             /* In the form "-5" */
+             if (apr_strtoff(&number, dash+1, &errp, 10) || *errp) {
+                 return 0;
