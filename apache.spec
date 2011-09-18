@@ -106,12 +106,9 @@ Patch29:	libtool-tag.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	apr-devel >= %{apr_ver}
 BuildRequires:	apr-util-devel >= 1:1.3.10-2
-BuildRequires:	autoconf
+BuildRequires:	autoconf >= 2.13
 BuildRequires:	automake
-BuildRequires:	db-devel
 %{?with_distcache:BuildRequires:	distcache-devel}
-BuildRequires:	expat-devel
-BuildRequires:	gdbm-devel >= 1.8.3
 BuildRequires:	libtool >= 2:1.5
 %{?with_ldap:BuildRequires:	openldap-devel >= 2.3.0}
 %{?with_ssl:BuildRequires:	openssl-devel >= %{openssl_ver}}
