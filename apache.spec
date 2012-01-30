@@ -44,7 +44,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.2.21
-Release:	3
+Release:	4
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -78,6 +78,7 @@ Source26:	%{name}-mod_log_config.conf
 Source27:	%{name}-mod_mime_magic.conf
 Source28:	%{name}-mod_cache.conf
 Source29:	%{name}-example.net.conf
+Source30:	%{name}.tmpfiles
 Patch0:		%{name}-configdir_skip_backups.patch
 Patch1:		%{name}-layout.patch
 Patch2:		%{name}-suexec.patch
@@ -1921,7 +1922,8 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig} \
 	$RPM_BUILD_ROOT%{_var}/{log/{httpd,archive/httpd},{run,cache}/httpd,lock/mod_dav} \
 	$RPM_BUILD_ROOT%{_sysconfdir}/{webapps.d,conf.d,vhosts.d} \
-	$RPM_BUILD_ROOT%{_datadir}/{cgi-bin,vhosts}
+	$RPM_BUILD_ROOT%{_datadir}/{cgi-bin,vhosts} \
+	$RPM_BUILD_ROOT/usr/lib/tmpfiles.d
 
 # prefork is default one
 %{__make} -C buildmpm-prefork install \
@@ -1977,6 +1979,8 @@ cp -a %{SOURCE20} $CFG/16_mod_userdir.conf
 cp -a %{SOURCE21} $CFG/10_mpm.conf
 cp -a %{SOURCE22} $CFG/20_languages.conf
 cp -a %{SOURCE29} $RPM_BUILD_ROOT%{_sysconfdir}/vhosts.d/example.net.conf
+
+install %{SOURCE30} $RPM_BUILD_ROOT/usr/lib/tmpfiles.d/%{name}.conf
 
 echo "LoadModule alias_module modules/mod_alias.so" > $CFG/00_mod_alias.conf
 echo "LoadModule authn_file_module	modules/mod_authn_file.so" > $CFG/00_mod_authn_file.conf
@@ -2356,6 +2360,8 @@ fi
 
 %dir %attr(770,root,http) /var/run/httpd
 %dir %attr(770,root,http) /var/cache/httpd
+
+/usr/lib/tmpfiles.d/%{name}.conf
 
 %{_mandir}/man8/httpd.8*
 
