@@ -2383,7 +2383,7 @@ fi
 %attr(640,root,root) %config(noreplace,missingok) %verify(not md5 mtime size) %{_sysconfdir}/vhosts.d/example.net.conf
 %attr(640,root,root) %{_sysconfdir}/magic
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/httpd
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/*
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/httpd
 
 %dir %{_libexecdir}
 
@@ -2395,7 +2395,7 @@ fi
 %dir %attr(770,root,http) /var/cache/httpd
 
 /usr/lib/tmpfiles.d/%{name}.conf
-%{systemdunitdir}/*.service
+%{systemdunitdir}/httpd-*.service
 %config(noreplace) %verify(not md5 mtime size) /etc/systemd/system/httpd.service
 
 %{_mandir}/man8/httpd.8*
