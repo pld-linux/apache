@@ -1,0 +1,18 @@
+[Unit]
+Description=The Apache HTTP Server (@NAME@ MPM)
+After=syslog.target network.target remote-fs.target nss-lookup.target
+
+[Service]
+Type=forking
+PIDFile=/var/run/httpd.pid
+EnvironmentFile=/etc/sysconfig/httpd
+ExecStartPre=/bin/sh -c '/usr/bin/test -f "${HTTPD_CONF}" -o -d "${HTTPD_CONF}" || (echo "${HTTPD_CONF} is not file or directory"; exit 1)'
+ExecStartPre=@EXEC@ -f ${HTTPD_CONF} $HTTPD_OPTS -t
+ExecStart=@EXEC@ -f ${HTTPD_CONF} $HTTPD_OPTS -k start
+ExecReload=@EXEC@ -f ${HTTPD_CONF} $HTTPD_OPTS -t
+ExecReload=@EXEC@ -f ${HTTPD_CONF} $HTTPD_OPTS -k graceful
+ExecStop=@EXEC@ -f ${HTTPD_CONF} $HTTPD_OPTS -k stop
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

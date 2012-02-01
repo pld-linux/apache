@@ -4,8 +4,8 @@
 # Nice level for apache
 SERVICE_RUN_NICE_LEVEL="+5"
 
-# config dir/file path. default is compiled in path
-#HTTPD_CONF="/etc/httpd/apache.conf"
+# config dir/file path.
+HTTPD_CONF="/etc/httpd/apache.conf"
 
 # other command-line options
 # -T avoid doing many unneded DocumentRoot checks

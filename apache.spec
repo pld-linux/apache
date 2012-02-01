@@ -44,7 +44,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.2.22
-Release:	1
+Release:	2
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -79,6 +79,7 @@ Source27:	%{name}-mod_mime_magic.conf
 Source28:	%{name}-mod_cache.conf
 Source29:	%{name}-example.net.conf
 Source30:	%{name}.tmpfiles
+Source31:	%{name}.service
 Patch0:		%{name}-configdir_skip_backups.patch
 Patch1:		%{name}-layout.patch
 Patch2:		%{name}-suexec.patch
@@ -119,7 +120,7 @@ BuildRequires:	pkgconfig
 BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpm-build >= 4.4.0
 BuildRequires:	rpm-perlprov >= 4.1-13
-BuildRequires:	rpmbuild(macros) >= 1.268
+BuildRequires:	rpmbuild(macros) >= 1.639
 BuildRequires:	sed >= 4.0
 BuildRequires:	zlib-devel
 Requires:	%{name}-errordocs = %{version}-%{release}
@@ -142,6 +143,19 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_datadir	/home/services/httpd
 %define		_libexecdir	%{_libdir}/apache
 %define		_cgibindir	%{_prefix}/lib/cgi-bin/%{name}
+
+%define		httpd_restart \
+	if /bin/systemd_booted; then \
+		/bin/systemctl restart httpd.service \
+	else \
+		%service -q httpd restart \
+	fi
+%define		httpd_reload \
+	if /bin/systemd_booted; then \
+		/bin/systemctl reload httpd.service \
+	else \
+		%service -q httpd reload \
+	fi
 
 %description
 Apache is a powerful, full-featured, efficient and freely-available
@@ -200,6 +214,8 @@ Requires:	/sbin/chkconfig
 Requires:	apr >= %{apr_ver}
 Requires:	psmisc >= 20.1
 Requires:	rc-scripts >= 0.4.1.23
+Requires:	sed >= 4.0
+Requires:	systemd-units
 Provides:	apache(modules-api) = %{_apache_modules_api}
 Provides:	group(http)
 Provides:	user(http)
@@ -1919,22 +1935,29 @@ done
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig} \
+install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig,systemd/system} \
 	$RPM_BUILD_ROOT%{_var}/{log/{httpd,archive/httpd},{run,cache}/httpd,lock/mod_dav} \
 	$RPM_BUILD_ROOT%{_sysconfdir}/{webapps.d,conf.d,vhosts.d} \
 	$RPM_BUILD_ROOT%{_datadir}/{cgi-bin,vhosts} \
-	$RPM_BUILD_ROOT/usr/lib/tmpfiles.d
+	$RPM_BUILD_ROOT/usr/lib/tmpfiles.d \
+	$RPM_BUILD_ROOT%{systemdunitdir}
 
 # prefork is default one
 %{__make} -C buildmpm-prefork install \
 	DESTDIR=$RPM_BUILD_ROOT
+mpm=prefork
+sed -e "s|@EXEC@|%{_sbindir}/httpd.${mpm}|g;s|@NAME@|${mpm}|g" < %{SOURCE31} \
+	> $RPM_BUILD_ROOT%{systemdunitdir}/httpd-${mpm}.service
 
 # install other mpm-s
 for mpm in worker %{?with_event:event} %{?with_itk:itk}; do
 	install buildmpm-${mpm}/httpd.${mpm} $RPM_BUILD_ROOT%{_sbindir}/httpd.${mpm}
+	sed -e "s|@EXEC@|%{_sbindir}/httpd.${mpm}|g;s|@NAME@|${mpm}|g" < %{SOURCE31} \
+		> $RPM_BUILD_ROOT%{systemdunitdir}/httpd-${mpm}.service
 done
 
 ln -s httpd.prefork $RPM_BUILD_ROOT%{_sbindir}/httpd
+ln -s %{systemdunitdir}/httpd-prefork.service $RPM_BUILD_ROOT/etc/systemd/system/httpd.service
 ln -s %{_libexecdir} $RPM_BUILD_ROOT%{_sysconfdir}/modules
 ln -s %{_localstatedir}/run/httpd $RPM_BUILD_ROOT%{_sysconfdir}/run
 ln -s %{_var}/log/httpd $RPM_BUILD_ROOT%{_sysconfdir}/logs
@@ -2100,18 +2123,21 @@ exit 0
 /sbin/chkconfig --add httpd
 umask 137
 touch /var/log/httpd/{access,error,agent,referer}_log
+%systemd_post httpd.service
 
 %preun base
 if [ "$1" = "0" ]; then
 	%service httpd stop
 	/sbin/chkconfig --del httpd
 fi
+%systemd_preun httpd.service
 
 %postun base
 if [ "$1" = "0" ]; then
 	%userremove http
 	%groupremove http
 fi
+%systemd_reload
 
 %triggerpostun base -- %{name} < 2.0.50-6.9
 %banner %{name}-2.0.50-6 << EOF
@@ -2199,6 +2225,13 @@ Please report bugs to <http://bugs.pld-linux.org/>.
 
 EOF
 
+%triggerpostun base -- %{name} < 2.2.22-2
+. /etc/sysconfig/httpd
+if [ -z "$HTTPD_CONF" ]; then
+	echo 'HTTPD_CONF="/etc/httpd/apache.conf"' >> /etc/sysconfig/httpd
+fi
+%systemd_trigger httpd.service
+
 %triggerpostun mod_ssl -- %{name}-mod_ssl < 1:2.2.0-3.1
 cp -f /etc/httpd/conf.d/40_mod_ssl.conf{,.rpmsave}
 sed -i -e '
@@ -2220,18 +2253,18 @@ mv -f /var/lock/subsys/httpd{.disabled,} 2>/dev/null
 # main package are very important for all this to work.
 
 # restart webserver at the end of transaction
-%service httpd restart
+%httpd_restart
 
 # macro called at module post scriptlet
 %define	module_post \
 if [ "$1" = "1" ]; then \
-	%service -q httpd restart \
+	%httpd_restart \
 fi
 
 # macro called at module postun scriptlet
 %define	module_postun \
 if [ "$1" = "0" ]; then \
-	%service -q httpd restart \
+	%httpd_restart \
 fi
 
 # it's sooo annoying to write them
@@ -2310,22 +2343,22 @@ fi
 
 %post cgi_test
 if [ "$1" = "1" ]; then
-	%service -q httpd reload
+	%httpd_reload
 fi
 
 %postun cgi_test
 if [ "$1" = "0" ]; then
-	%service -q httpd reload
+	%httpd_reload
 fi
 
 %post errordocs
 if [ "$1" = "1" ]; then
-	%service -q httpd reload
+	%httpd_reload
 fi
 
 %postun errordocs
 if [ "$1" = "0" ]; then
-	%service -q httpd reload
+	%httpd_reload
 fi
 
 %files
@@ -2362,6 +2395,8 @@ fi
 %dir %attr(770,root,http) /var/cache/httpd
 
 /usr/lib/tmpfiles.d/%{name}.conf
+%{systemdunitdir}/*.service
+%config(noreplace) %verify(not md5 mtime size) /etc/systemd/system/httpd.service
 
 %{_mandir}/man8/httpd.8*
 
