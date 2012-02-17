@@ -44,7 +44,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.2.22
-Release:	2
+Release:	3
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -120,7 +120,7 @@ BuildRequires:	pkgconfig
 BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpm-build >= 4.4.0
 BuildRequires:	rpm-perlprov >= 4.1-13
-BuildRequires:	rpmbuild(macros) >= 1.639
+BuildRequires:	rpmbuild(macros) >= 1.647
 BuildRequires:	sed >= 4.0
 BuildRequires:	zlib-devel
 Requires:	%{name}-errordocs = %{version}-%{release}
@@ -143,19 +143,6 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_datadir	/home/services/httpd
 %define		_libexecdir	%{_libdir}/apache
 %define		_cgibindir	%{_prefix}/lib/cgi-bin/%{name}
-
-%define		httpd_restart \
-	if /bin/systemd_booted; then \
-		/bin/systemctl restart httpd.service \
-	else \
-		%service -q httpd restart \
-	fi
-%define		httpd_reload \
-	if /bin/systemd_booted; then \
-		/bin/systemctl reload httpd.service \
-	else \
-		%service -q httpd reload \
-	fi
 
 %description
 Apache is a powerful, full-featured, efficient and freely-available
@@ -2253,18 +2240,21 @@ mv -f /var/lock/subsys/httpd{.disabled,} 2>/dev/null
 # main package are very important for all this to work.
 
 # restart webserver at the end of transaction
-%httpd_restart
+%service httpd restart
+%systemd_service_restart httpd.service
 
 # macro called at module post scriptlet
 %define	module_post \
 if [ "$1" = "1" ]; then \
-	%httpd_restart \
+	%service -q httpd restart \
+	%systemd_service_restart httpd.service
 fi
 
 # macro called at module postun scriptlet
 %define	module_postun \
 if [ "$1" = "0" ]; then \
-	%httpd_restart \
+	%service -q httpd restart \
+	%systemd_service_restart httpd.service
 fi
 
 # it's sooo annoying to write them
@@ -2343,22 +2333,26 @@ fi
 
 %post cgi_test
 if [ "$1" = "1" ]; then
-	%httpd_reload
+	%service -q httpd reload
+	%systemd_service_reload httpd.service
 fi
 
 %postun cgi_test
 if [ "$1" = "0" ]; then
-	%httpd_reload
+	%service -q httpd reload
+	%systemd_service_reload httpd.service
 fi
 
 %post errordocs
 if [ "$1" = "1" ]; then
-	%httpd_reload
+	%service -q httpd reload
+	%systemd_service_reload httpd.service
 fi
 
 %postun errordocs
 if [ "$1" = "0" ]; then
-	%httpd_reload
+	%service -q httpd reload
+	%systemd_service_reload httpd.service
 fi
 
 %files
