@@ -44,7 +44,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.2.22
-Release:	3
+Release:	4
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -2247,14 +2247,14 @@ mv -f /var/lock/subsys/httpd{.disabled,} 2>/dev/null
 %define	module_post \
 if [ "$1" = "1" ]; then \
 	%service -q httpd restart \
-	%systemd_service_restart httpd.service
+	%systemd_service_restart httpd.service \
 fi
 
 # macro called at module postun scriptlet
 %define	module_postun \
 if [ "$1" = "0" ]; then \
 	%service -q httpd restart \
-	%systemd_service_restart httpd.service
+	%systemd_service_restart httpd.service \
 fi
 
 # it's sooo annoying to write them
