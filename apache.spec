@@ -95,7 +95,6 @@ Patch18:	%{name}-v6only-ENOPROTOOPT.patch
 Patch19:	%{name}-conffile-path.patch
 Patch20:	%{name}-apxs.patch
 Patch23:	%{name}-suexec_fcgi.patch
-Patch24:	%{name}-bug-48094.patch
 # http://scripts.mit.edu/trac/browser/trunk/server/common/patches/httpd-2.2.x-mod_ssl-sessioncaching.patch?rev=1348
 Patch25:	httpd-2.2.x-mod_ssl-sessioncaching.patch
 Patch26:	apache-mod_vhost_alias_docroot.patch
@@ -1785,8 +1784,9 @@ Dwa programy testowe/przykładowe cgi: test-cgi and print-env.
 %patch18 -p1
 %patch19 -p1
 %patch20 -p1
-%patch23 -p1
-%patch24 -p1
+# ?
+#%patch23 -p1
+
 # ?
 #%patch25 -p1
 # ?
@@ -1824,12 +1824,11 @@ touch ssl_expr_scan.c
 cd ../..
 
 CPPFLAGS="-DMAX_SERVER_LIMIT=200000 -DBIG_SECURITY_HOLE=1"
-for mpm in prefork worker %{?with_event:event} %{?with_itk:itk}; do
-install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
+install -d build; cd build
 ../%configure \
 	--enable-layout=PLD \
 	--disable-v4-mapped \
-	$( [ "${mpm}" = "prefork" -o "${mpm}" = "worker" -o "${mpm}" = "event" -o "${mpm}" = "itk" ] && echo "--enable-exception-hook" ) \
+	--enable-exception-hook \
 	--enable-modules=all \
 	--enable-mods-shared=all \
 	--enable-auth-anon \
@@ -1884,11 +1883,11 @@ install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
 	--enable-speling \
 	--enable-rewrite \
 	--enable-so \
-	--with-program-name=httpd.${mpm} \
-	--with-mpm=${mpm} \
+	--with-program-name=httpd \
+	--enable-mpms-shared=all \
 %ifarch %{ix86}
 %ifnarch i386 i486
-	$( [ "${mpm}" = "leader" ] && echo "--enable-nonportable-atomics=yes" ) \
+	--enable-nonportable-atomics=yes \
 %endif
 %endif
 	--with-suexec-bin=%{_sbindir}/suexec \
@@ -1903,18 +1902,6 @@ install -d "buildmpm-${mpm}"; cd "buildmpm-${mpm}"
 	--with-pcre
 
 %{__make}
-./httpd.${mpm} -l | grep -v "${mpm}" > modules-inside
-cd ..
-
-done
-
-for mpm in worker %{?with_event:event} %{?with_itk:itk}; do
-	if ! cmp -s buildmpm-prefork/modules-inside buildmpm-${mpm}/modules-inside; then
-		echo "List of compiled modules is different between prefork-MPM and ${mpm}-MPM!"
-		echo "Build failed."
-		exit 1
-	fi
-done
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -1925,25 +1912,16 @@ install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig,systemd/system
 	$RPM_BUILD_ROOT/usr/lib/tmpfiles.d \
 	$RPM_BUILD_ROOT%{systemdunitdir}
 
-# prefork is default one
-%{__make} -C buildmpm-prefork install \
+%{__make} -C build install \
 	DESTDIR=$RPM_BUILD_ROOT
-mpm=prefork
-sed -e "s|@EXEC@|%{_sbindir}/httpd.${mpm}|g;s|@NAME@|${mpm}|g" < %{SOURCE31} \
-	> $RPM_BUILD_ROOT%{systemdunitdir}/httpd-${mpm}.service
 
-# install other mpm-s
-for mpm in worker %{?with_event:event} %{?with_itk:itk}; do
-	install buildmpm-${mpm}/httpd.${mpm} $RPM_BUILD_ROOT%{_sbindir}/httpd.${mpm}
-	sed -e "s|@EXEC@|%{_sbindir}/httpd.${mpm}|g;s|@NAME@|${mpm}|g" < %{SOURCE31} \
-		> $RPM_BUILD_ROOT%{systemdunitdir}/httpd-${mpm}.service
-done
-
-ln -s httpd.prefork $RPM_BUILD_ROOT%{_sbindir}/httpd
-ln -s %{systemdunitdir}/httpd-prefork.service $RPM_BUILD_ROOT/etc/systemd/system/httpd.service
+install %{SOURCE31} $RPM_BUILD_ROOT%{systemdunitdir}/httpd.service
+ln -s %{systemdunitdir}/httpd.service $RPM_BUILD_ROOT/etc/systemd/system/httpd.service
 ln -s %{_libexecdir} $RPM_BUILD_ROOT%{_sysconfdir}/modules
 ln -s %{_localstatedir}/run/httpd $RPM_BUILD_ROOT%{_sysconfdir}/run
 ln -s %{_var}/log/httpd $RPM_BUILD_ROOT%{_sysconfdir}/logs
+# we have own apache.conf
+rm $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
 ln -s conf.d $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
 
 install -p %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
@@ -2054,7 +2032,6 @@ s/^.*\.\(pt-br\)/%%lang(pt_BR) &/
 cd $cur
 
 # htpasswd goes to %{_bindir}
-mv $RPM_BUILD_ROOT%{_sbindir}/htpasswd $RPM_BUILD_ROOT%{_bindir}
 ln -sf %{_bindir}/htpasswd $RPM_BUILD_ROOT%{_sbindir}
 
 # cgi_test: create config file with ScriptAlias
@@ -2071,7 +2048,6 @@ ln -sf suexec $RPM_BUILD_ROOT%{_sbindir}/suexec.fcgi
 %{__rm} $RPM_BUILD_ROOT%{_libexecdir}/build/config.nice
 %{__rm} $RPM_BUILD_ROOT%{_libexecdir}/*.exp
 %{__rm} $RPM_BUILD_ROOT%{_sysconfdir}/mime.types
-%{__rm} $RPM_BUILD_ROOT%{_sysconfdir}/httpd.prefork.conf
 %{__rm} -r $RPM_BUILD_ROOT%{_sysconfdir}/{extra,original}
 
 %clean
@@ -2379,13 +2355,12 @@ fi
 
 %attr(755,root,root) %{_sbindir}/checkgid
 %attr(755,root,root) %{_sbindir}/httpd
-%attr(755,root,root) %{_sbindir}/httpd.*
 
 %dir %attr(770,root,http) /var/run/httpd
 %dir %attr(770,root,http) /var/cache/httpd
 
 /usr/lib/tmpfiles.d/%{name}.conf
-%{systemdunitdir}/httpd-*.service
+%{systemdunitdir}/httpd.service
 %config(noreplace) %verify(not md5 mtime size) /etc/systemd/system/httpd.service
 
 %{_mandir}/man8/httpd.8*
@@ -2425,10 +2400,10 @@ fi
 
 %files tools
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_sbindir}/ab
+%attr(755,root,root) %{_bindir}/ab
 %attr(755,root,root) %{_sbindir}/apachectl
-%attr(755,root,root) %{_sbindir}/htdigest
-%attr(755,root,root) %{_sbindir}/logresolve
+%attr(755,root,root) %{_bindir}/htdigest
+%attr(755,root,root) %{_bindir}/logresolve
 %attr(755,root,root) %{_sbindir}/rotatelogs
 %{_mandir}/man1/ab.1*
 %{_mandir}/man8/apachectl.8*
@@ -2438,7 +2413,7 @@ fi
 
 %files devel
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_sbindir}/apxs
+%attr(755,root,root) %{_bindir}/apxs
 %attr(755,root,root) %{_sbindir}/envvars*
 %dir %{_libexecdir}
 %dir %{_libexecdir}/build
@@ -2482,7 +2457,7 @@ fi
 %files mod_authn_alias
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_authn_alias.conf
-%attr(755,root,root) %{_libexecdir}/mod_authn_alias.so
+#%attr(755,root,root) %{_libexecdir}/mod_authn_alias.so
 
 %files mod_authn_anon
 %defattr(644,root,root,755)
@@ -2502,7 +2477,7 @@ fi
 %files mod_authn_default
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_authn_default.conf
-%attr(755,root,root) %{_libexecdir}/mod_authn_default.so
+#%attr(755,root,root) %{_libexecdir}/mod_authn_default.so
 
 %files mod_authn_file
 %defattr(644,root,root,755)
@@ -2524,7 +2499,7 @@ fi
 %files mod_authz_default
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_authz_default.conf
-%attr(755,root,root) %{_libexecdir}/mod_authz_default.so
+#%attr(755,root,root) %{_libexecdir}/mod_authz_default.so
 
 %files mod_authz_groupfile
 %defattr(644,root,root,755)
@@ -2563,8 +2538,8 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_cache.conf
 %attr(755,root,root) %{_sbindir}/htcacheclean
 %attr(755,root,root) %{_libexecdir}/mod_cache.so
-%attr(755,root,root) %{_libexecdir}/mod_disk_cache.so
-%attr(755,root,root) %{_libexecdir}/mod_mem_cache.so
+#%attr(755,root,root) %{_libexecdir}/mod_disk_cache.so
+#%attr(755,root,root) %{_libexecdir}/mod_mem_cache.so
 %{_mandir}/man8/htcacheclean.8*
 
 %files mod_case_filter
@@ -2728,7 +2703,7 @@ fi
 
 %files mod_rewrite
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_sbindir}/httxt2dbm
+%attr(755,root,root) %{_bindir}/httxt2dbm
 %attr(755,root,root) %{_libexecdir}/mod_rewrite.so
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_rewrite.conf
 %{_mandir}/man1/httxt2dbm.1*
@@ -2795,8 +2770,8 @@ fi
 
 %files dbmtools
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_sbindir}/dbmmanage
-%attr(755,root,root) %{_sbindir}/htdbm
+%attr(755,root,root) %{_bindir}/dbmmanage
+%attr(755,root,root) %{_bindir}/htdbm
 %{_mandir}/man1/dbmmanage.1*
 %{_mandir}/man1/htdbm.1*
 
