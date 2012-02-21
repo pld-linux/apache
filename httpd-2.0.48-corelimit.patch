@@ -4,10 +4,10 @@ is configured.
 
 --- httpd-2.0.48/server/core.c.corelimit
 +++ httpd-2.0.48/server/core.c
-@@ -4233,6 +4233,25 @@
- 
-     ap_set_version(pconf);
+@@ -4424,6 +4424,25 @@
+     set_banner(pconf);
      ap_setup_make_content_type(pconf);
+     ap_setup_auth_internal(ptemp);
 +
 +#ifdef RLIMIT_CORE
 +    if (ap_coredumpdir_configured) {
@@ -27,6 +27,7 @@ is configured.
 +    }
 +#endif
 +
-     return OK;
- }
- 
+     if (!sys_privileges) {
+         ap_log_error(APLOG_MARK, APLOG_CRIT, 0, NULL, APLOGNO(00136)
+                      "Server MUST relinquish startup privileges before "
+

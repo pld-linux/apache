@@ -1,11 +1,10 @@
 diff -urN httpd-2.0.45.org/config.layout httpd-2.0.45/config.layout
 --- httpd-2.0.45.org/config.layout	Thu Apr  3 09:27:42 2003
 +++ httpd-2.0.45/config.layout	Thu Apr  3 09:27:59 2003
-@@ -298,3 +298,28 @@
-     installbuilddir: ${prefix}/etc/apache2/build
-     errordir:      ${datadir}/error
+@@ -347,3 +347,27 @@
+     proxycachedir: ${localstatedir}/proxy
  </Layout>
-+
+ 
 +# PLD layout
 +<Layout PLD>
 +    prefix:        /usr
@@ -30,3 +29,4 @@ diff -urN httpd-2.0.45.org/config.layout httpd-2.0.45/config.layout
 +    proxycachedir: /var/cache/httpd
 +    installbuilddir: ${libexecdir}/build
 +</Layout>
+

@@ -24,7 +24,7 @@
 %bcond_with	bucketeer	# debug one
 
 # this is internal macro, don't change to %%apache_modules_api
-%define		_apache_modules_api 20051115
+%define		_apache_modules_api 20120211
 
 %if "%{pld_release}" == "ac"
 %define		openssl_ver	0.9.7d
@@ -43,12 +43,12 @@ Summary(pt_BR.UTF-8):	Servidor HTTPD para prover serviços WWW
 Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
-Version:	2.2.22
-Release:	4
+Version:	2.4.1
+Release:	0.1
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
-# Source0-md5:	d77fa5af23df96a8af68ea8114fa6ce1
+# Source0-md5:	4366afbea8149ca125af01fd59a2f8a2
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}.sysconfig
@@ -85,13 +85,10 @@ Patch1:		%{name}-layout.patch
 Patch2:		%{name}-suexec.patch
 Patch3:		%{name}-branding.patch
 Patch4:		%{name}-apr.patch
-# what about this? it isn't applied...
-Patch6:		httpd-2.0.40-xfsz.patch
+
 Patch7:		%{name}-syslibs.patch
-Patch8:		httpd-2.0.45-encode.patch
-Patch9:		%{name}-paths.patch
+
 Patch10:	httpd-2.0.46-dav401dest.patch
-Patch12:	httpd-2.0.46-sslmutex.patch
 Patch14:	httpd-2.0.48-corelimit.patch
 Patch15:	httpd-2.0.48-debuglog.patch
 Patch18:	%{name}-v6only-ENOPROTOOPT.patch
@@ -1780,10 +1777,9 @@ Dwa programy testowe/przykładowe cgi: test-cgi and print-env.
 %patch3 -p1
 %patch4 -p1
 %patch7 -p1
-%patch8 -p1
-%patch9 -p1
+
 %patch10 -p1
-%patch12 -p1
+
 %patch14 -p1
 %patch15 -p1
 %patch18 -p1
@@ -1791,13 +1787,13 @@ Dwa programy testowe/przykładowe cgi: test-cgi and print-env.
 %patch20 -p1
 %patch23 -p1
 %patch24 -p1
-%patch25 -p1
-%patch26 -p1
-%patch28 -p1
+# ?
+#%patch25 -p1
+# ?
+#%patch26 -p1
+# probably drop
+#%patch28 -p1
 %patch29 -p1
-
-# using system apr, apr-util and pcre
-%{__rm} -r srclib/{apr,apr-util,pcre}
 
 # sanity check
 MODULES_API=`awk '/#define MODULE_MAGIC_NUMBER_MAJOR/ {print $3}' include/ap_mmn.h`

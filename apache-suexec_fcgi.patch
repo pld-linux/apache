@@ -31,14 +31,6 @@ diff -urNp httpd-2.2.8.orig/support/suexec.c httpd-2.2.8/support/suexec.c
      struct stat dir_info;   /* directory info holder     */
      struct stat prg_info;   /* program info holder       */
  
-@@ -270,6 +286,7 @@ int main(int argc, char *argv[])
-     clean_env();
- 
-     prog = argv[0];
-+
-     /*
-      * Check existence/validity of the UID of the user
-      * running this program.  Error out if invalid.
 @@ -382,8 +399,23 @@ int main(int argc, char *argv[])
      }
      else {

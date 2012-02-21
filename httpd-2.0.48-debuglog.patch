@@ -11,15 +11,16 @@ Note this patch depends on the pie patch.
 
 --- httpd-2.0.48/include/http_log.h.debuglog
 +++ httpd-2.0.48/include/http_log.h
-@@ -130,7 +130,11 @@
- 
- extern int AP_DECLARE_DATA ap_default_loglevel;
- 
+@@ -280,7 +280,11 @@
+  * @see ap_log_rerror
+  * @see ap_log_cserror
+  */
 +#ifdef AP_FNAME
-+#define APLOG_MARK      AP_FNAME,__LINE__
++#define APLOG_MARK     AP_FNAME,__LINE__,APLOG_MODULE_INDEX
 +#else
- #define APLOG_MARK	__FILE__,__LINE__
+ #define APLOG_MARK     __FILE__,__LINE__,APLOG_MODULE_INDEX
 +#endif
  
  /**
   * Set up for logging to stderr.
+

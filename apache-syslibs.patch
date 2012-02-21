@@ -1,17 +1,14 @@
 --- httpd-2.2.0/configure.in~	2005-12-18 02:38:31.000000000 +0200
 +++ httpd-2.2.0/configure.in	2005-12-18 02:40:04.000000000 +0200
-@@ -584,9 +584,9 @@
-               [Listening sockets are non-blocking when there are more than 1])
+@@ -751,7 +751,7 @@
+               [Allow IPv4 connections on IPv6 listening sockets])
  fi
  
 -APACHE_FAST_OUTPUT(Makefile modules/Makefile srclib/Makefile) 
-+APACHE_FAST_OUTPUT(Makefile modules/Makefile)
++APACHE_FAST_OUTPUT(Makefile modules/Makefile) 
  APACHE_FAST_OUTPUT(os/Makefile server/Makefile)
--APACHE_FAST_OUTPUT(support/Makefile srclib/pcre/Makefile)
-+APACHE_FAST_OUTPUT(support/Makefile)
+ APACHE_FAST_OUTPUT(support/Makefile)
  
- if test -d ./test; then
-     APACHE_FAST_OUTPUT(test/Makefile)
 --- httpd-2.2.0/Makefile.in	2005-12-18 02:41:25.000000000 +0200
 +++ httpd-2.2.0/Makefile.in	2005-12-18 02:38:31.000000000 +0200
 @@ -1,5 +1,5 @@
