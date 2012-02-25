@@ -194,6 +194,7 @@ Requires(pre):	/usr/bin/getgid
 Requires(pre):	/usr/sbin/groupadd
 Requires(pre):	/usr/sbin/useradd
 Requires:	/sbin/chkconfig
+Requires:	%{name}-mod_unixd = %{version}-%{release}
 Requires:	apr >= %{apr_ver}
 Requires:	psmisc >= 20.1
 Requires:	rc-scripts >= 0.4.1.23
