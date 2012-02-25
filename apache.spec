@@ -344,7 +344,7 @@ desenvolver módulos adicionais para o Apache.
 %package mod_access_compat
 Summary:	Group authorizations based on host (name or IPaddress)
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/access_compat.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_access_compat.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_access_compat) = %{version}-%{release}
 
@@ -419,7 +419,7 @@ URL-ach. Bardziej skomplikowane zadania, takie jak modyfikowanie
 %package mod_allowmethods
 Summary:	Easily restrict what HTTP methods can be used on the server
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/allowmethods.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_allowmethods.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_allowmethods) = %{version}-%{release}
 
@@ -535,7 +535,7 @@ eksperymentalny.
 %package mod_auth_form
 Summary:	Form authentication
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/auth_form.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_auth_form.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_auth_form) = %{version}-%{release}
 
@@ -586,7 +586,7 @@ być logowane.
 %package mod_authn_core
 Summary:	Core Authentication
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/authn_core.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_authn_core.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_authn_core) = %{version}-%{release}
 
@@ -670,7 +670,7 @@ wyszukiwanie w plikach tekstowych z hasłami.
 %package mod_authn_socache
 Summary:	Manages a cache of authentication credentials to relievethe load on backends
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/authn_socache.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_authn_socache.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_authn_socache) = %{version}-%{release}
 
@@ -702,7 +702,7 @@ mod_auth_basic uwierzytelnianie użytkowników poprzez katalog LDAP.
 %package mod_authz_core
 Summary:	Core Authorization
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/authz_core.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_authz_core.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_authz_core) = %{version}-%{release}
 
@@ -712,7 +712,7 @@ Core Authorization
 %package mod_authz_dbd
 Summary:	Group Authorization and Login using SQL
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/authz_dbd.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_authz_dbd.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_authz_dbd) = %{version}-%{release}
 
@@ -871,7 +871,7 @@ Dzielenie kubełków po znalezieniu znaku sterującego.
 %package mod_buffer
 Summary:	Support for request buffering
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/buffer.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_buffer.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_buffer) = %{version}-%{release}
 
@@ -904,7 +904,7 @@ dysku (używane do cache'owania proxy).
 %package mod_cache_disk
 Summary:	Disk based storage module for the HTTP caching filter.
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/cache_disk.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_cache_disk.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_cache_disk) = %{version}-%{release}
 
@@ -1056,7 +1056,7 @@ Jest to moduł eksperymentalny i należy używać go z uwagą.
 %package mod_data
 Summary:	Convert response body into an RFC2397 data URL
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/data.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_data.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_data) = %{version}-%{release}
 
@@ -1125,7 +1125,7 @@ Moduł kompresujący dane przed przesłaniem ich do klienta.
 %package mod_dialup
 Summary:	Send static content at a bandwidth rate limit, defined by the various old modem standards
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/dialup.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_dialup.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_dialup) = %{version}-%{release}
 
@@ -1342,7 +1342,7 @@ wysyłanych do przeglądarki.
 %package mod_heartbeat
 Summary:	sends messages with server status to frontend proxy
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/heartbeat.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_heartbeat.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_heartbeat) = %{version}-%{release}
 
@@ -1352,7 +1352,7 @@ sends messages with server status to frontend proxy
 %package mod_heartmonitor
 Summary:	centralized monitor for mod_heartbeat origin servers
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/heartmonitor.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_heartmonitor.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_heartmonitor) = %{version}-%{release}
 
@@ -1440,7 +1440,7 @@ zainstalowanych modułach itp.
 %package mod_lbmethod_bybusyness
 Summary:	Pending Request Counting load balancer scheduler algorithm for mod_proxy_balancer
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/lbmethod_bybusyness.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_lbmethod_bybusyness.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_lbmethod_bybusyness) = %{version}-%{release}
 
@@ -1450,7 +1450,7 @@ Pending Request Counting load balancer scheduler algorithm for mod_proxy_balance
 %package mod_lbmethod_byrequests
 Summary:	Request Counting load balancer scheduler algorithm for mod_proxy_balancer
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/lbmethod_byrequests.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_lbmethod_byrequests.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_lbmethod_byrequests) = %{version}-%{release}
 
@@ -1460,7 +1460,7 @@ Request Counting load balancer scheduler algorithm for mod_proxy_balancer
 %package mod_lbmethod_bytraffic
 Summary:	Weighted Traffic Counting load balancer scheduler algorithm for mod_proxy_balancer
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/lbmethod_bytraffic.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_lbmethod_bytraffic.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_lbmethod_bytraffic) = %{version}-%{release}
 
@@ -1470,7 +1470,7 @@ Weighted Traffic Counting load balancer scheduler algorithm for mod_proxy_balanc
 %package mod_lbmethod_heartbeat
 Summary:	Heartbeat Traffic Counting load balancer scheduler algorithm for mod_proxy_balancer
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/lbmethod_heartbeat.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_lbmethod_heartbeat.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_lbmethod_heartbeat) = %{version}-%{release}
 
@@ -1524,7 +1524,7 @@ charakterystyki żądania.
 %package mod_log_debug
 Summary:	Additional configurable debug logging
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/log_debug.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_log_debug.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_log_debug) = %{version}-%{release}
 
@@ -1626,7 +1626,7 @@ rozwiązać mod_mime.
 %package mod_mpm_event
 Summary:	A variant of the worker MPM with the goalof consuming threads only for connections with active processing
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/mpm_event.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_mpm_event.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_mpm_event) = %{version}-%{release}
 
@@ -1636,7 +1636,7 @@ A variant of the worker MPM with the goalof consuming threads only for connectio
 %package mod_mpm_prefork
 Summary:	Implements a non-threaded, pre-forking web server
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/mpm_prefork.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_mpm_prefork.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_mpm_prefork) = %{version}-%{release}
 
@@ -1646,7 +1646,7 @@ Implements a non-threaded, pre-forking web server
 %package mod_mpm_worker
 Summary:	Multi-Processing Module implementing a hybrid    multi-threaded multi-process web server
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/mpm_worker.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_mpm_worker.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_mpm_worker) = %{version}-%{release}
 
@@ -1695,7 +1695,7 @@ HTTP/1.0 i HTTP/1.1.
 %package mod_ratelimit
 Summary:	Bandwidth Rate Limiting for Clients
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/ratelimit.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_ratelimit.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_ratelimit) = %{version}-%{release}
 
@@ -1705,7 +1705,7 @@ Bandwidth Rate Limiting for Clients
 %package mod_reflector
 Summary:	Reflect a request body as a response via the output filter stack.
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/reflector.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_reflector.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_reflector) = %{version}-%{release}
 
@@ -1715,7 +1715,7 @@ Reflect a request body as a response via the output filter stack.
 %package mod_remoteip
 Summary:	Replaces the original client IP address for the connectionwith the useragent IP address list presented by a proxies or a load balancervia the request headers.
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/remoteip.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_remoteip.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_remoteip) = %{version}-%{release}
 
@@ -1742,7 +1742,7 @@ transferu danych.
 %package mod_request
 Summary:	Filters to handle and make available HTTP request bodies
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/request.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_request.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_request) = %{version}-%{release}
 
@@ -1768,7 +1768,7 @@ Moduł oferujący możliwość "przepisywania" adresów URL w locie.
 %package mod_sed
 Summary:	Filter Input (request) and Output (response) content using sed syntax
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/sed.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_sed.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_sed) = %{version}-%{release}
 
@@ -1778,7 +1778,7 @@ Filter Input (request) and Output (response) content using sed syntax
 %package mod_session
 Summary:	Session support
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/session.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_session.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_session) = %{version}-%{release}
 
@@ -1788,7 +1788,7 @@ Session support
 %package mod_session_cookie
 Summary:	Cookie based session support
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/session_cookie.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_session_cookie.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_session_cookie) = %{version}-%{release}
 
@@ -1798,7 +1798,7 @@ Cookie based session support
 %package mod_session_crypto
 Summary:	Session encryption support
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/session_crypto.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_session_crypto.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_session_crypto) = %{version}-%{release}
 
@@ -1808,7 +1808,7 @@ Session encryption support
 %package mod_session_dbd
 Summary:	DBD/SQL based session support
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/session_dbd.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_session_dbd.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_session_dbd) = %{version}-%{release}
 
@@ -1838,7 +1838,7 @@ części serwera do podejmowania decyzji o podejmowanych akcjach.
 %package mod_slotmem_plain
 Summary:	Slot-based shared memory provider.
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/slotmem_plain.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_slotmem_plain.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_slotmem_plain) = %{version}-%{release}
 
@@ -1848,7 +1848,7 @@ Slot-based shared memory provider.
 %package mod_slotmem_shm
 Summary:	Slot-based shared memory provider.
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/slotmem_shm.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_slotmem_shm.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_slotmem_shm) = %{version}-%{release}
 
@@ -1858,7 +1858,7 @@ Slot-based shared memory provider.
 %package mod_socache_dbm
 Summary:	DBM based shared object cache provider.
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/socache_dbm.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_socache_dbm.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_socache_dbm) = %{version}-%{release}
 
@@ -1868,7 +1868,7 @@ DBM based shared object cache provider.
 %package mod_socache_memcache
 Summary:	Memcache based shared object cache provider.
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/socache_memcache.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_socache_memcache.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_socache_memcache) = %{version}-%{release}
 
@@ -1878,7 +1878,7 @@ Memcache based shared object cache provider.
 %package mod_socache_shmcb
 Summary:	shmcb based shared object cache provider.
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/socache_shmcb.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_socache_shmcb.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_socache_shmcb) = %{version}-%{release}
 
@@ -2005,7 +2005,7 @@ UNIQUE_ID.
 %package mod_unixd
 Summary:	Basic (required) security for Unix-family platforms.
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/unixd.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_unixd.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_unixd) = %{version}-%{release}
 
@@ -2087,7 +2087,7 @@ wirtualnych.
 %package mod_watchdog
 Summary:	provides infrastructure for other modules to periodically run     tasks
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/watchdog.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_watchdog.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_watchdog) = %{version}-%{release}
 
@@ -2097,7 +2097,7 @@ provides infrastructure for other modules to periodically run     tasks
 %package mod_xml2enc
 Summary:	Enhanced charset/internationalisation support for libxml2-basedfilter modules
 Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/xml2enc.html
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_xml2enc.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_xml2enc) = %{version}-%{release}
 
