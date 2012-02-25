@@ -340,6 +340,16 @@ utilitário apxs para a construção de objetos compartilhados dinâmicos
 (DSOs). Este pacote precisa ser instalado se você deseja compilar ou
 desenvolver módulos adicionais para o Apache.
 
+%package mod_access_compat
+Summary:	Group authorizations based on host (name or IPaddress)
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/access_compat.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_access_compat) = %{version}-%{release}
+
+%description mod_access_compat
+Group authorizations based on host (name or IPaddress)
+
 %package mod_actions
 Summary:	Apache module for executing CGI scripts based on media type or request method
 Summary(pl.UTF-8):	Moduł Apache'a do uruchamiania skryptów CGI w oparciu o rodzaj danych lub żądania
@@ -404,6 +414,16 @@ zostały przeniesione w inne miejsce.
 mod_alias został zaprojektowany do obsługi prostych manipulacji na
 URL-ach. Bardziej skomplikowane zadania, takie jak modyfikowanie
 łańcucha zapytania można wykonać przy użyciu mod_rewrite.
+
+%package mod_allowmethods
+Summary:	Easily restrict what HTTP methods can be used on the server
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/allowmethods.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_allowmethods) = %{version}-%{release}
+
+%description mod_allowmethods
+Easily restrict what HTTP methods can be used on the server
 
 %package mod_asis
 Summary:	Sends files that contain their own HTTP headers
@@ -511,6 +531,16 @@ Ten moduł implementuje uwierzytelnienie HTTP Digest. Nie został on
 jednak zbyt obszernie przetestowany, więc jest oznaczony jako
 eksperymentalny.
 
+%package mod_auth_form
+Summary:	Form authentication
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/auth_form.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_auth_form) = %{version}-%{release}
+
+%description mod_auth_form
+Form authentication
+
 %package mod_authn_alias
 Summary:	Apache module that provides the ability to create extended authentication
 Summary(pl.UTF-8):	Moduł Apache'a umożliwiający tworzenie rozszerzonego uwierzytelniania
@@ -551,6 +581,16 @@ mod_auth_basic uwierzytelnianie użytkowników podobnie do serwisów
 anonimowego ftp, tzn. przez udostępnianie "magicznego" identyfikatora
 "anonymous" i adresu pocztowego jako hasła. Te adresy pocztowe mogą
 być logowane.
+
+%package mod_authn_core
+Summary:	Core Authentication
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/authn_core.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_authn_core) = %{version}-%{release}
+
+%description mod_authn_core
+Core Authentication
 
 %package mod_authn_dbd
 Summary:	Apache module that allows user authentication using an SQL
@@ -626,6 +666,16 @@ Ten moduł udostępnia frontendom uwierzytelniającym takim jak
 mod_auth_digest i mod_auth_basic uwierzytelnianie użytkowników poprzez
 wyszukiwanie w plikach tekstowych z hasłami.
 
+%package mod_authn_socache
+Summary:	Manages a cache of authentication credentials to relievethe load on backends
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/authn_socache.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_authn_socache) = %{version}-%{release}
+
+%description mod_authn_socache
+Manages a cache of authentication credentials to relievethe load on backends
+
 %package mod_authnz_ldap
 Summary:	Apache module that allows an LDAP directory to be used to store the database for HTTP Basic authentication
 Summary(pl.UTF-8):	Moduł Apache'a umożliwiający przechowywanie danych dla uwierzytelnienia HTTP Basic w bazie LDAP
@@ -647,6 +697,26 @@ to authenticate users through an LDAP directory.
 %description mod_authnz_ldap -l pl.UTF-8
 Ten moduł udostępnia frontendom uwierzytelniającym takim jak
 mod_auth_basic uwierzytelnianie użytkowników poprzez katalog LDAP.
+
+%package mod_authz_core
+Summary:	Core Authorization
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/authz_core.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_authz_core) = %{version}-%{release}
+
+%description mod_authz_core
+Core Authorization
+
+%package mod_authz_dbd
+Summary:	Group Authorization and Login using SQL
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/authz_dbd.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_authz_dbd) = %{version}-%{release}
+
+%description mod_authz_dbd
+Group Authorization and Login using SQL
 
 %package mod_authz_dbm
 Summary:	Apache module that allows group authorization using DBM files
@@ -797,6 +867,16 @@ Split buckets whenever we find a control-char.
 %description mod_bucketeer -l pl.UTF-8
 Dzielenie kubełków po znalezieniu znaku sterującego.
 
+%package mod_buffer
+Summary:	Support for request buffering
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/buffer.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_buffer) = %{version}-%{release}
+
+%description mod_buffer
+Support for request buffering
+
 %package mod_cache
 Summary:	Content cache keyed to URIs
 Summary(pl.UTF-8):	Pamięć podręczna wg klucza URI
@@ -819,6 +899,16 @@ używana do zapamiętywania zawartości lokalnej lub dostępnej przez
 proxy. Dołączono dwa moduły pozwalające magazynować dane w pamięci
 (głównie użyteczne przy cache'owaniu lokalnej zawartości) oraz na
 dysku (używane do cache'owania proxy).
+
+%package mod_cache_disk
+Summary:	Disk based storage module for the HTTP caching filter.
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/cache_disk.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_cache_disk) = %{version}-%{release}
+
+%description mod_cache_disk
+Disk based storage module for the HTTP caching filter.
 
 %package mod_case_filter
 Summary:	Apache output filter that converts all output to upper case
@@ -962,6 +1052,16 @@ zaimplementowanych przez Russian Apache i powiązany z nim mod_charset.
 
 Jest to moduł eksperymentalny i należy używać go z uwagą.
 
+%package mod_data
+Summary:	Convert response body into an RFC2397 data URL
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/data.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_data) = %{version}-%{release}
+
+%description mod_data
+Convert response body into an RFC2397 data URL
+
 %package mod_dav
 Summary:	Apache module - Distributed Authoring and Versioning
 Summary(pl.UTF-8):	Moduł Apache'a - rozproszone autorstwo i wersjonowanie
@@ -1020,6 +1120,16 @@ Compress content before it is delivered to the client.
 
 %description mod_deflate -l pl.UTF-8
 Moduł kompresujący dane przed przesłaniem ich do klienta.
+
+%package mod_dialup
+Summary:	Send static content at a bandwidth rate limit, defined by the various old modem standards
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/dialup.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_dialup) = %{version}-%{release}
+
+%description mod_dialup
+Send static content at a bandwidth rate limit, defined by the various old modem standards
 
 %package mod_dir
 Summary:	Apache module for "trailing slash" redirects and serving directory index files
@@ -1228,6 +1338,26 @@ replaced or removed.
 Moduł pozwalający na łączenie, usuwanie oraz zamianę nagłówków HTTP
 wysyłanych do przeglądarki.
 
+%package mod_heartbeat
+Summary:	sends messages with server status to frontend proxy
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/heartbeat.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_heartbeat) = %{version}-%{release}
+
+%description mod_heartbeat
+sends messages with server status to frontend proxy
+
+%package mod_heartmonitor
+Summary:	centralized monitor for mod_heartbeat origin servers
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/heartmonitor.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_heartmonitor) = %{version}-%{release}
+
+%description mod_heartmonitor
+centralized monitor for mod_heartbeat origin servers
+
 %package mod_ident
 Summary:	RFC 1413 ident lookups
 Summary(pl.UTF-8):	Sprawdzanie identyfikacji RFC 1413
@@ -1306,6 +1436,46 @@ and directives in the configuration files.
 Moduł udostępniający informacje o konfiguracji serwera,
 zainstalowanych modułach itp.
 
+%package mod_lbmethod_bybusyness
+Summary:	Pending Request Counting load balancer scheduler algorithm for mod_proxy_balancer
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/lbmethod_bybusyness.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_lbmethod_bybusyness) = %{version}-%{release}
+
+%description mod_lbmethod_bybusyness
+Pending Request Counting load balancer scheduler algorithm for mod_proxy_balancer
+
+%package mod_lbmethod_byrequests
+Summary:	Request Counting load balancer scheduler algorithm for mod_proxy_balancer
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/lbmethod_byrequests.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_lbmethod_byrequests) = %{version}-%{release}
+
+%description mod_lbmethod_byrequests
+Request Counting load balancer scheduler algorithm for mod_proxy_balancer
+
+%package mod_lbmethod_bytraffic
+Summary:	Weighted Traffic Counting load balancer scheduler algorithm for mod_proxy_balancer
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/lbmethod_bytraffic.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_lbmethod_bytraffic) = %{version}-%{release}
+
+%description mod_lbmethod_bytraffic
+Weighted Traffic Counting load balancer scheduler algorithm for mod_proxy_balancer
+
+%package mod_lbmethod_heartbeat
+Summary:	Heartbeat Traffic Counting load balancer scheduler algorithm for mod_proxy_balancer
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/lbmethod_heartbeat.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_lbmethod_heartbeat) = %{version}-%{release}
+
+%description mod_lbmethod_heartbeat
+Heartbeat Traffic Counting load balancer scheduler algorithm for mod_proxy_balancer
+
 %package mod_ldap
 Summary:	Apache module for LDAP connection pooling and result caching services for other LDAP modules
 Summary(pl.UTF-8):	Moduł Apache'a zarządzający połączeniami z serwerami LDAP
@@ -1349,6 +1519,16 @@ bezpośrednio do pliku lub przekazywane do zewnętrznego programu.
 Dostępne jest logowanie warunkowe polegające na włączeniu lub
 wyłączeniu poszczególnych żądań z logowania na podstawie
 charakterystyki żądania.
+
+%package mod_log_debug
+Summary:	Additional configurable debug logging
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/log_debug.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_log_debug) = %{version}-%{release}
+
+%description mod_log_debug
+Additional configurable debug logging
 
 %package mod_log_forensic
 Summary:	Forensic Logging of the requests made to the server
@@ -1442,6 +1622,36 @@ polecenie file(1): patrzy na kilka początkowych bajtów pliku. Ma
 służyć jako "druga linia obrony" dla przypadków, których nie może
 rozwiązać mod_mime.
 
+%package mod_mpm_event
+Summary:	A variant of the worker MPM with the goalof consuming threads only for connections with active processing
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/mpm_event.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_mpm_event) = %{version}-%{release}
+
+%description mod_mpm_event
+A variant of the worker MPM with the goalof consuming threads only for connections with active processing
+
+%package mod_mpm_prefork
+Summary:	Implements a non-threaded, pre-forking web server
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/mpm_prefork.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_mpm_prefork) = %{version}-%{release}
+
+%description mod_mpm_prefork
+Implements a non-threaded, pre-forking web server
+
+%package mod_mpm_worker
+Summary:	Multi-Processing Module implementing a hybrid    multi-threaded multi-process web server
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/mpm_worker.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_mpm_worker) = %{version}-%{release}
+
+%description mod_mpm_worker
+Multi-Processing Module implementing a hybrid    multi-threaded multi-process web server
+
 %package mod_negotiation
 Summary:	Provides for content negotiation
 Summary(pl.UTF-8):	Moduł do negocjacji treści
@@ -1481,6 +1691,36 @@ Moduł zawiera implementację serwera proxy/cache dla Apache.
 Implementacja zawiera obsługę FTP, CONNECT (dla SSL), HTTP/0.9,
 HTTP/1.0 i HTTP/1.1.
 
+%package mod_ratelimit
+Summary:	Bandwidth Rate Limiting for Clients
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/ratelimit.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_ratelimit) = %{version}-%{release}
+
+%description mod_ratelimit
+Bandwidth Rate Limiting for Clients
+
+%package mod_reflector
+Summary:	Reflect a request body as a response via the output filter stack.
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/reflector.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_reflector) = %{version}-%{release}
+
+%description mod_reflector
+Reflect a request body as a response via the output filter stack.
+
+%package mod_remoteip
+Summary:	Replaces the original client IP address for the connectionwith the useragent IP address list presented by a proxies or a load balancervia the request headers.
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/remoteip.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_remoteip) = %{version}-%{release}
+
+%description mod_remoteip
+Replaces the original client IP address for the connectionwith the useragent IP address list presented by a proxies or a load balancervia the request headers.
+
 %package mod_reqtimeout
 Summary:	Apache module to set timeout and minimum data rate for receiving requests
 Summary(pl.UTF-8):	Moduł Apache'a pozwalający na ustawianie limitu czasu oraz minimalnego transferu danych
@@ -1498,6 +1738,16 @@ requests.
 Moduł Apache'a pozwalający na ustawianie limitu czasu oraz minimalnego
 transferu danych.
 
+%package mod_request
+Summary:	Filters to handle and make available HTTP request bodies
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/request.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_request) = %{version}-%{release}
+
+%description mod_request
+Filters to handle and make available HTTP request bodies
+
 %package mod_rewrite
 Summary:	Apache module with rule-based engine for rewrite requested URLs on the fly
 Summary(pl.UTF-8):	Moduł Apache'a do "przepisywania" adresów URL w locie
@@ -1513,6 +1763,56 @@ rewrite requested URLs on the fly.
 
 %description mod_rewrite -l pl.UTF-8
 Moduł oferujący możliwość "przepisywania" adresów URL w locie.
+
+%package mod_sed
+Summary:	Filter Input (request) and Output (response) content using sed syntax
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/sed.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_sed) = %{version}-%{release}
+
+%description mod_sed
+Filter Input (request) and Output (response) content using sed syntax
+
+%package mod_session
+Summary:	Session support
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/session.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_session) = %{version}-%{release}
+
+%description mod_session
+Session support
+
+%package mod_session_cookie
+Summary:	Cookie based session support
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/session_cookie.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_session_cookie) = %{version}-%{release}
+
+%description mod_session_cookie
+Cookie based session support
+
+%package mod_session_crypto
+Summary:	Session encryption support
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/session_crypto.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_session_crypto) = %{version}-%{release}
+
+%description mod_session_crypto
+Session encryption support
+
+%package mod_session_dbd
+Summary:	DBD/SQL based session support
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/session_dbd.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_session_dbd) = %{version}-%{release}
+
+%description mod_session_dbd
+DBD/SQL based session support
 
 %package mod_setenvif
 Summary:	Allows the setting of environment variables based on characteristics of the request
@@ -1533,6 +1833,56 @@ Moduł mod_setenvif pozwala na ustawianie zmiennych środowiskowych w
 zależności od różnych aspektów żądania pasujących do podanych wyrażeń
 regularnych. Te zmienne środowiskowe mogą być używane przez inne
 części serwera do podejmowania decyzji o podejmowanych akcjach.
+
+%package mod_slotmem_plain
+Summary:	Slot-based shared memory provider.
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/slotmem_plain.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_slotmem_plain) = %{version}-%{release}
+
+%description mod_slotmem_plain
+Slot-based shared memory provider.
+
+%package mod_slotmem_shm
+Summary:	Slot-based shared memory provider.
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/slotmem_shm.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_slotmem_shm) = %{version}-%{release}
+
+%description mod_slotmem_shm
+Slot-based shared memory provider.
+
+%package mod_socache_dbm
+Summary:	DBM based shared object cache provider.
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/socache_dbm.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_socache_dbm) = %{version}-%{release}
+
+%description mod_socache_dbm
+DBM based shared object cache provider.
+
+%package mod_socache_memcache
+Summary:	Memcache based shared object cache provider.
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/socache_memcache.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_socache_memcache) = %{version}-%{release}
+
+%description mod_socache_memcache
+Memcache based shared object cache provider.
+
+%package mod_socache_shmcb
+Summary:	shmcb based shared object cache provider.
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/socache_shmcb.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_socache_shmcb) = %{version}-%{release}
+
+%description mod_socache_shmcb
+shmcb based shared object cache provider.
 
 %package mod_speling
 Summary:	Attempts to correct mistaken URLs by ignoring capitalization and by allowing up to one misspelling
@@ -1651,6 +2001,16 @@ zapytań, nawet w ramach poprawnie skonfigurowanego klastra z wielu
 maszyn. Moduł ustawia przy każdym zapytaniu zmienną środowiskową
 UNIQUE_ID.
 
+%package mod_unixd
+Summary:	Basic (required) security for Unix-family platforms.
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/unixd.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_unixd) = %{version}-%{release}
+
+%description mod_unixd
+Basic (required) security for Unix-family platforms.
+
 %package mod_userdir
 Summary:	User-specific directories
 Summary(pl.UTF-8):	Katalogi specyficzne dla użytkowników
@@ -1722,6 +2082,26 @@ dynamically configured mass virtual hosting.
 %description mod_vhost_alias -l pl.UTF-8
 Moduł umożliwia na dynamiczne konfigurowanie masowej ilości serwerów
 wirtualnych.
+
+%package mod_watchdog
+Summary:	provides infrastructure for other modules to periodically run     tasks
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/watchdog.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_watchdog) = %{version}-%{release}
+
+%description mod_watchdog
+provides infrastructure for other modules to periodically run     tasks
+
+%package mod_xml2enc
+Summary:	Enhanced charset/internationalisation support for libxml2-basedfilter modules
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/xml2enc.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_xml2enc) = %{version}-%{release}
+
+%description mod_xml2enc
+Enhanced charset/internationalisation support for libxml2-basedfilter modules
 
 %package -n htpasswd-%{name}
 Summary:	Apache 2 htpasswd utility: manage user files for basic authentication
@@ -1966,32 +2346,43 @@ cp -a %{SOURCE29} $RPM_BUILD_ROOT%{_sysconfdir}/vhosts.d/example.net.conf
 
 install %{SOURCE30} $RPM_BUILD_ROOT/usr/lib/tmpfiles.d/%{name}.conf
 
+echo "LoadModule access_compat_module   modules/mod_access_compat.so" > $CFG/00_mod_access_compat.conf
 echo "LoadModule actions_module	modules/mod_actions.so" > $CFG/00_mod_actions.conf
 echo "LoadModule alias_module modules/mod_alias.so" > $CFG/00_mod_alias.conf
+echo "LoadModule allowmethods_module    modules/mod_allowmethods.so" > $CFG/00_mod_allowmethods.conf
 echo "LoadModule asis_module	modules/mod_asis.so" > $CFG/00_mod_asis.conf
 echo "LoadModule auth_basic_module	modules/mod_auth_basic.so" > $CFG/00_mod_auth_basic.conf
 echo "LoadModule auth_digest_module	modules/mod_auth_digest.so" > $CFG/00_mod_auth_digest.conf
+echo "LoadModule auth_form_module       modules/mod_auth_form.so" > $CFG/00_mod_auth_form.conf
 echo "LoadModule authn_alias_module	modules/mod_authn_alias.so" > $CFG/00_mod_authn_alias.conf
 echo "LoadModule authn_anon_module	modules/mod_authn_anon.so" > $CFG/00_mod_authn_anon.conf
+echo "LoadModule authn_core_module      modules/mod_authn_core.so" > $CFG/00_mod_authn_core.conf
 echo "LoadModule authn_dbd_module	modules/mod_authn_dbd.so" > $CFG/00_mod_authn_dbd.conf
 echo "LoadModule authn_dbm_module	modules/mod_authn_dbm.so" > $CFG/00_mod_authn_dbm.conf
 echo "LoadModule authn_default_module	modules/mod_authn_default.so" > $CFG/00_mod_authn_default.conf
 echo "LoadModule authn_file_module	modules/mod_authn_file.so" > $CFG/00_mod_authn_file.conf
+echo "LoadModule authn_socache_module      modules/mod_authn_socache.so" > $CFG/00_mod_authn_socache.conf
 echo "LoadModule authnz_ldap_module	modules/mod_authnz_ldap.so" > $CFG/00_mod_authnz_ldap.conf
+echo "LoadModule authz_core_module      modules/mod_authz_core.so" > $CFG/00_mod_authz_core.conf
+echo "LoadModule authz_dbd_module       modules/mod_authz_dbd.so" > $CFG/00_mod_authz_dbd.conf
 echo "LoadModule authz_dbm_module	modules/mod_authz_dbm.so" > $CFG/00_mod_authz_dbm.conf
 echo "LoadModule authz_default_module	modules/mod_authz_default.so" > $CFG/00_mod_authz_default.conf
 echo "LoadModule authz_groupfile_module	modules/mod_authz_groupfile.so" > $CFG/00_mod_authz_groupfile.conf
 echo "LoadModule authz_owner_module	modules/mod_authz_owner.so" > $CFG/00_mod_authz_owner.conf
 echo "LoadModule authz_user_module	modules/mod_authz_user.so" > $CFG/00_mod_authz_user.conf
+echo "LoadModule buffer_module  modules/mod_buffer.so" > $CFG/00_mod_buffer.conf
 %if %{with bucketeer}
 echo "LoadModule bucketeer_module	modules/mod_bucketeer.so" > $CFG/00_mod_bucketeer.conf
 %endif
+echo "LoadModule cache_disk_module      modules/mod_cache_disk.so" > $CFG/00_mod_cache_disk.conf
 echo "LoadModule case_filter_in_module	modules/mod_case_filter_in.so" > $CFG/00_mod_case_filter_in.conf
 echo "LoadModule case_filter_module	modules/mod_case_filter.so" > $CFG/00_mod_case_filter.conf
 echo "LoadModule cern_meta_module	modules/mod_cern_meta.so" > $CFG/00_mod_cern_meta.conf
 echo "LoadModule cgi_module	modules/mod_cgi.so" > $CFG/00_mod_cgi.conf
 echo "LoadModule charset_lite_module	modules/mod_charset_lite.so" > $CFG/00_mod_charset_lite.conf
+echo "LoadModule data_module    modules/mod_data.so" > $CFG/00_mod_data.conf
 echo "LoadModule dbd_module	modules/mod_dbd.so" > $CFG/00_mod_dbd.conf
+echo "LoadModule dialup_module  modules/mod_dialup.so" > $CFG/00_mod_dialup.conf
 echo "LoadModule dumpio_module	modules/mod_dumpio.so" > $CFG/00_mod_dumpio.conf
 echo "LoadModule echo_module	modules/mod_echo.so" > $CFG/00_mod_echo.conf
 echo "LoadModule env_module	modules/mod_env.so" > $CFG/00_mod_env.conf
@@ -2000,21 +2391,49 @@ echo "LoadModule ext_filter_module	modules/mod_ext_filter.so" > $CFG/00_mod_ext_
 echo "LoadModule file_cache_module	modules/mod_file_cache.so" > $CFG/00_mod_file_cache.conf
 echo "LoadModule filter_module	modules/mod_filter.so" > $CFG/00_mod_filter.conf
 echo "LoadModule headers_module	modules/mod_headers.so" > $CFG/00_mod_headers.conf
+echo "LoadModule heartbeat_module       modules/mod_heartbeat.so" > $CFG/00_mod_heartbeat.conf
+echo "LoadModule heartmonitor_module    modules/mod_heartmonitor.so" > $CFG/00_mod_heartmonitor.conf
 echo "LoadModule ident_module	modules/mod_ident.so" > $CFG/00_mod_ident.conf
 echo "LoadModule imagemap_module	modules/mod_imagemap.so" > $CFG/00_mod_imagemap.conf
 echo "LoadModule include_module	modules/mod_include.so" > $CFG/00_mod_include.conf
+echo "LoadModule lbmethod_bybusyness_module     modules/mod_lbmethod_bybusyness.so" > $CFG/00_mod_lbmethod_bybusyness.conf
+echo "LoadModule lbmethod_byrequests_module     modules/mod_lbmethod_byrequests.so" > $CFG/00_mod_lbmethod_byrequests.conf
+echo "LoadModule lbmethod_bytraffic_module      modules/mod_lbmethod_bytraffic.so" > $CFG/00_mod_lbmethod_bytraffic.conf
+echo "LoadModule lbmethod_heartbeat_module      modules/mod_lbmethod_heartbeat.so" > $CFG/00_mod_lbmethod_heartbeat.conf
 echo "LoadModule ldap_module	modules/mod_ldap.so" > $CFG/00_mod_ldap.conf
+echo "LoadModule log_debug_module       modules/mod_log_debug.so" > $CFG/00_mod_log_debug.conf
 echo "LoadModule log_forensic_module	modules/mod_log_forensic.so" > $CFG/00_mod_log_forensic.conf
 echo "LoadModule logio_module	modules/mod_logio.so" > $CFG/00_mod_logio.conf
+echo "LoadModule mpm_event_module       modules/mod_mpm_event.so" > $CFG/00_mod_mpm_event.conf
+echo "LoadModule mpm_prefork_module     modules/mod_mpm_prefork.so" > $CFG/00_mod_mpm_prefork.conf
+echo "LoadModule mpm_worker_module      modules/mod_mpm_worker.so" > $CFG/00_mod_mpm_worker.conf
 echo "LoadModule negotiation_module	modules/mod_negotiation.so" > $CFG/00_mod_negotiation.conf
+echo "LoadModule ratelimit_module       modules/mod_ratelimit.so" > $CFG/00_mod_ratelimit.conf
+echo "LoadModule reflector_module       modules/mod_reflector.so" > $CFG/00_mod_reflector.conf
+echo "LoadModule remoteip_module        modules/mod_remoteip.so" > $CFG/00_mod_remoteip.conf
 echo "LoadModule reqtimeout_module	modules/mod_reqtimeout.so" >> $CFG/00_mod_reqtimeout.conf
+echo "LoadModule request_module modules/mod_request.so" > $CFG/00_mod_request.conf
 echo "LoadModule rewrite_module	modules/mod_rewrite.so" > $CFG/00_mod_rewrite.conf
+echo "LoadModule sed_module     modules/mod_sed.so" > $CFG/00_mod_sed.conf
+echo "LoadModule session_cookie_module  modules/mod_session_cookie.so" > $CFG/00_mod_session_cookie.conf
+echo "LoadModule session_crypto_module  modules/mod_session_crypto.so" > $CFG/00_mod_session_crypto.conf
+echo "LoadModule session_dbd_module     modules/mod_session_dbd.so" > $CFG/00_mod_session_dbd.conf
+echo "LoadModule session_module modules/mod_session.so" > $CFG/00_mod_session.conf
 echo "LoadModule setenvif_module	modules/mod_setenvif.so" > $CFG/00_mod_setenvif.conf
+echo "LoadModule slotmem_plain_module   modules/mod_slotmem_plain.so" > $CFG/00_mod_slotmem_plain.conf
+echo "LoadModule slotmem_shm_module     modules/mod_slotmem_shm.so" > $CFG/00_mod_slotmem_shm.conf
+echo "LoadModule socache_dbm_module     modules/mod_socache_dbm.so" > $CFG/00_mod_socache_dbm.conf
+echo "LoadModule socache_memcache_module        modules/mod_socache_memcache.so" > $CFG/00_mod_socache_memcache.conf
+echo "LoadModule socache_shmcb_module   modules/mod_socache_shmcb.so" > $CFG/00_mod_socache_shmcb.conf
 echo "LoadModule speling_module	modules/mod_speling.so" > $CFG/00_mod_speling.conf
 echo "LoadModule substitute_module	modules/mod_substitute.so" > $CFG/00_mod_substitute.conf
 echo "LoadModule unique_id_module	modules/mod_unique_id.so" > $CFG/00_mod_unique_id.conf
+echo "LoadModule unixd_module   modules/mod_unixd.so" > $CFG/00_mod_unixd.conf
 echo "LoadModule usertrack_module	modules/mod_usertrack.so" > $CFG/00_mod_usertrack.conf
 echo "LoadModule version_module	modules/mod_version.so" > $CFG/00_mod_version.conf
+echo "LoadModule watchdog_module        modules/mod_watchdog.so" > $CFG/00_mod_watchdog.conf
+echo "LoadModule xml2enc_module modules/mod_xml2enc.so" > $CFG/00_mod_xml2enc.conf
+
 
 # anything in style dir not ending with .css is trash
 %{__rm} -r $RPM_BUILD_ROOT%{_datadir}/manual/style/{lang,latex,xsl}
@@ -2237,19 +2656,26 @@ fi
 %postun %1 \
 %module_postun
 
+%module_scripts mod_access_compat
 %module_scripts mod_actions
 %module_scripts mod_alias
+%module_scripts mod_allowmethods
 %module_scripts mod_asis
 %module_scripts mod_auth_basic
 %module_scripts mod_auth_dbm
 %module_scripts mod_auth_digest
+%module_scripts mod_auth_form
 %module_scripts mod_authn_alias
 %module_scripts mod_authn_anon
+%module_scripts mod_authn_core
 %module_scripts mod_authn_dbd
 %module_scripts mod_authn_dbm
 %module_scripts mod_authn_default
 %module_scripts mod_authn_file
+%module_scripts mod_authn_socache
 %module_scripts mod_authnz_ldap
+%module_scripts mod_authz_core
+%module_scripts mod_authz_dbd
 %module_scripts mod_authz_dbm
 %module_scripts mod_authz_default
 %module_scripts mod_authz_groupfile
@@ -2258,16 +2684,20 @@ fi
 %module_scripts mod_authz_user
 %module_scripts mod_autoindex
 %module_scripts mod_bucketeer
+%module_scripts mod_buffer
 %module_scripts mod_cache
+%module_scripts mod_cache_disk
 %module_scripts mod_case_filter
 %module_scripts mod_case_filter_in
 %module_scripts mod_cern_meta
 %module_scripts mod_cgi
 %module_scripts mod_cgid
 %module_scripts mod_charset_lite
+%module_scripts mod_data
 %module_scripts mod_dav
 %module_scripts mod_dbd
 %module_scripts mod_deflate
+%module_scripts mod_dialup
 %module_scripts mod_dir
 %module_scripts mod_dumpio
 %module_scripts mod_echo
@@ -2277,30 +2707,57 @@ fi
 %module_scripts mod_file_cache
 %module_scripts mod_filter
 %module_scripts mod_headers
+%module_scripts mod_heartbeat
+%module_scripts mod_heartmonitor
 %module_scripts mod_ident
 %module_scripts mod_imagemap
 %module_scripts mod_include
 %module_scripts mod_info
+%module_scripts mod_lbmethod_bybusyness
+%module_scripts mod_lbmethod_byrequests
+%module_scripts mod_lbmethod_bytraffic
+%module_scripts mod_lbmethod_heartbeat
 %module_scripts mod_ldap
 %module_scripts mod_log_config
+%module_scripts mod_log_debug
 %module_scripts mod_log_forensic
 %module_scripts mod_logio
 %module_scripts mod_mime
 %module_scripts mod_mime_magic
+%module_scripts mod_mpm_event
+%module_scripts mod_mpm_prefork
+%module_scripts mod_mpm_worker
 %module_scripts mod_negotiation
 %module_scripts mod_proxy
+%module_scripts mod_ratelimit
+%module_scripts mod_reflector
+%module_scripts mod_remoteip
 %module_scripts mod_reqtimeout
+%module_scripts mod_request
 %module_scripts mod_rewrite
+%module_scripts mod_sed
+%module_scripts mod_session
+%module_scripts mod_session_cookie
+%module_scripts mod_session_crypto
+%module_scripts mod_session_dbd
 %module_scripts mod_setenvif
+%module_scripts mod_slotmem_plain
+%module_scripts mod_slotmem_shm
+%module_scripts mod_socache_dbm
+%module_scripts mod_socache_memcache
+%module_scripts mod_socache_shmcb
 %module_scripts mod_speling
 %module_scripts mod_ssl
 %module_scripts mod_status
 %module_scripts mod_substitute
 %module_scripts mod_unique_id
+%module_scripts mod_unixd
 %module_scripts mod_userdir
 %module_scripts mod_usertrack
 %module_scripts mod_version
 %module_scripts mod_vhost_alias
+%module_scripts mod_watchdog
+%module_scripts mod_xml2enc
 %module_scripts suexec
 
 %post cgi_test
@@ -2423,6 +2880,11 @@ fi
 %{_includedir}
 %{_mandir}/man1/apxs.1*
 
+%files mod_access_compat
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_access_compat.conf
+%attr(755,root,root) %{_libexecdir}/mod_access_compat.so
+
 %files mod_actions
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_actions.conf
@@ -2432,6 +2894,11 @@ fi
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_alias.conf
 %attr(755,root,root) %{_libexecdir}/mod_alias.so
+
+%files mod_allowmethods
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_allowmethods.conf
+%attr(755,root,root) %{_libexecdir}/mod_allowmethods.so
 
 %files mod_asis
 %defattr(644,root,root,755)
@@ -2453,6 +2920,16 @@ fi
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_auth_digest.conf
 %attr(755,root,root) %{_libexecdir}/mod_auth_digest.so
+
+%files mod_auth_form
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_auth_form.conf
+%attr(755,root,root) %{_libexecdir}/mod_auth_form.so
+
+%files mod_authn_core
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_authn_core.conf
+%attr(755,root,root) %{_libexecdir}/mod_authn_core.so
 
 %files mod_authn_alias
 %defattr(644,root,root,755)
@@ -2484,12 +2961,27 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_authn_file.conf
 %attr(755,root,root) %{_libexecdir}/mod_authn_file.so
 
+%files mod_authn_socache
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_authn_socache.conf
+%attr(755,root,root) %{_libexecdir}/mod_authn_socache.so
+
 %if %{with ldap}
 %files mod_authnz_ldap
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_authnz_ldap.conf
 %attr(755,root,root) %{_libexecdir}/mod_authnz_ldap.so
 %endif
+
+%files mod_authz_core
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_authz_core.conf
+%attr(755,root,root) %{_libexecdir}/mod_authz_core.so
+
+%files mod_authz_dbd
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_authz_dbd.conf
+%attr(755,root,root) %{_libexecdir}/mod_authz_dbd.so
 
 %files mod_authz_dbm
 %defattr(644,root,root,755)
@@ -2533,6 +3025,11 @@ fi
 %attr(755,root,root) %{_libexecdir}/mod_bucketeer.so
 %endif
 
+%files mod_buffer
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_buffer.conf
+%attr(755,root,root) %{_libexecdir}/mod_buffer.so
+
 %files mod_cache
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_cache.conf
@@ -2541,6 +3038,11 @@ fi
 #%attr(755,root,root) %{_libexecdir}/mod_disk_cache.so
 #%attr(755,root,root) %{_libexecdir}/mod_mem_cache.so
 %{_mandir}/man8/htcacheclean.8*
+
+%files mod_cache_disk
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_cache_disk.conf
+%attr(755,root,root) %{_libexecdir}/mod_cache_disk.so
 
 %files mod_case_filter
 %defattr(644,root,root,755)
@@ -2572,6 +3074,11 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_charset_lite.conf
 %attr(755,root,root) %{_libexecdir}/mod_charset_lite.so
 
+%files mod_data
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_data.conf
+%attr(755,root,root) %{_libexecdir}/mod_data.so
+
 %files mod_dav
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_dav.conf
@@ -2587,6 +3094,11 @@ fi
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_deflate.conf
 %attr(755,root,root) %{_libexecdir}/mod_deflate.so
+
+%files mod_dialup
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_dialup.conf
+%attr(755,root,root) %{_libexecdir}/mod_dialup.so
 
 %files mod_dir
 %defattr(644,root,root,755)
@@ -2633,6 +3145,16 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_headers.conf
 %attr(755,root,root) %{_libexecdir}/mod_headers.so
 
+%files mod_heartbeat
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_heartbeat.conf
+%attr(755,root,root) %{_libexecdir}/mod_heartbeat.so
+
+%files mod_heartmonitor
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_heartmonitor.conf
+%attr(755,root,root) %{_libexecdir}/mod_heartmonitor.so
+
 %files mod_ident
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_ident.conf
@@ -2653,6 +3175,26 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_info.conf
 %attr(755,root,root) %{_libexecdir}/mod_info.so
 
+%files mod_lbmethod_bybusyness
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_lbmethod_bybusyness.conf
+%attr(755,root,root) %{_libexecdir}/mod_lbmethod_bybusyness.so
+
+%files mod_lbmethod_byrequests
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_lbmethod_byrequests.conf
+%attr(755,root,root) %{_libexecdir}/mod_lbmethod_byrequests.so
+
+%files mod_lbmethod_bytraffic
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_lbmethod_bytraffic.conf
+%attr(755,root,root) %{_libexecdir}/mod_lbmethod_bytraffic.so
+
+%files mod_lbmethod_heartbeat
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_lbmethod_heartbeat.conf
+%attr(755,root,root) %{_libexecdir}/mod_lbmethod_heartbeat.so
+
 %if %{with ldap}
 %files mod_ldap
 %defattr(644,root,root,755)
@@ -2664,6 +3206,11 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_log_config.so
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_log_config.conf
+
+%files mod_log_debug
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_log_debug.conf
+%attr(755,root,root) %{_libexecdir}/mod_log_debug.so
 
 %files mod_log_forensic
 %defattr(644,root,root,755)
@@ -2685,6 +3232,21 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_mime_magic.conf
 %attr(755,root,root) %{_libexecdir}/mod_mime_magic.so
 
+%files mod_mpm_event
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_mpm_event.conf
+%attr(755,root,root) %{_libexecdir}/mod_mpm_event.so
+
+%files mod_mpm_prefork
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_mpm_prefork.conf
+%attr(755,root,root) %{_libexecdir}/mod_mpm_prefork.so
+
+%files mod_mpm_worker
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_mpm_worker.conf
+%attr(755,root,root) %{_libexecdir}/mod_mpm_worker.so
+
 %files mod_negotiation
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_negotiation.conf
@@ -2696,10 +3258,30 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_proxy.conf
 %attr(755,root,root) %{_libexecdir}/mod_proxy*.so
 
+%files mod_ratelimit
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_ratelimit.conf
+%attr(755,root,root) %{_libexecdir}/mod_ratelimit.so
+
+%files mod_reflector
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_reflector.conf
+%attr(755,root,root) %{_libexecdir}/mod_reflector.so
+
+%files mod_remoteip
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_remoteip.conf
+%attr(755,root,root) %{_libexecdir}/mod_remoteip.so
+
 %files mod_reqtimeout
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_reqtimeout.so
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_reqtimeout.conf
+
+%files mod_request
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_request.conf
+%attr(755,root,root) %{_libexecdir}/mod_request.so
 
 %files mod_rewrite
 %defattr(644,root,root,755)
@@ -2708,10 +3290,60 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_rewrite.conf
 %{_mandir}/man1/httxt2dbm.1*
 
+%files mod_sed
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_sed.conf
+%attr(755,root,root) %{_libexecdir}/mod_sed.so
+
+%files mod_session
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_session.conf
+%attr(755,root,root) %{_libexecdir}/mod_session.so
+
+%files mod_session_cookie
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_session_cookie.conf
+%attr(755,root,root) %{_libexecdir}/mod_session_cookie.so
+
+%files mod_session_crypto
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_session_crypto.conf
+%attr(755,root,root) %{_libexecdir}/mod_session_crypto.so
+
+%files mod_session_dbd
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_session_dbd.conf
+%attr(755,root,root) %{_libexecdir}/mod_session_dbd.so
+
 %files mod_setenvif
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_setenvif.conf
 %attr(755,root,root) %{_libexecdir}/mod_setenvif.so
+
+%files mod_slotmem_plain
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_slotmem_plain.conf
+%attr(755,root,root) %{_libexecdir}/mod_slotmem_plain.so
+
+%files mod_slotmem_shm
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_slotmem_shm.conf
+%attr(755,root,root) %{_libexecdir}/mod_slotmem_shm.so
+
+%files mod_socache_dbm
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_socache_dbm.conf
+%attr(755,root,root) %{_libexecdir}/mod_socache_dbm.so
+
+%files mod_socache_memcache
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_socache_memcache.conf
+%attr(755,root,root) %{_libexecdir}/mod_socache_memcache.so
+
+%files mod_socache_shmcb
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_socache_shmcb.conf
+%attr(755,root,root) %{_libexecdir}/mod_socache_shmcb.so
 
 %files mod_speling
 %defattr(644,root,root,755)
@@ -2742,6 +3374,11 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_unique_id.conf
 %attr(755,root,root) %{_libexecdir}/mod_unique_id.so
 
+%files mod_unixd
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_unixd.conf
+%attr(755,root,root) %{_libexecdir}/mod_unixd.so
+
 %files mod_userdir
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_userdir.conf
@@ -2761,6 +3398,16 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_vhost_alias.so
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_vhost_alias.conf
+
+%files mod_watchdog
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_watchdog.conf
+%attr(755,root,root) %{_libexecdir}/mod_watchdog.so
+
+%files mod_xml2enc
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_xml2enc.conf
+%attr(755,root,root) %{_libexecdir}/mod_xml2enc.so
 
 %files -n htpasswd-%{name}
 %defattr(644,root,root,755)
