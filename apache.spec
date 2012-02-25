@@ -1623,36 +1623,6 @@ polecenie file(1): patrzy na kilka początkowych bajtów pliku. Ma
 służyć jako "druga linia obrony" dla przypadków, których nie może
 rozwiązać mod_mime.
 
-%package mod_mpm_event
-Summary:	A variant of the worker MPM with the goalof consuming threads only for connections with active processing
-Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/mod_mpm_event.html
-Requires:	%{name}-base = %{version}-%{release}
-Provides:	apache(mod_mpm_event) = %{version}-%{release}
-
-%description mod_mpm_event
-A variant of the worker MPM with the goalof consuming threads only for connections with active processing
-
-%package mod_mpm_prefork
-Summary:	Implements a non-threaded, pre-forking web server
-Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/mod_mpm_prefork.html
-Requires:	%{name}-base = %{version}-%{release}
-Provides:	apache(mod_mpm_prefork) = %{version}-%{release}
-
-%description mod_mpm_prefork
-Implements a non-threaded, pre-forking web server
-
-%package mod_mpm_worker
-Summary:	Multi-Processing Module implementing a hybrid    multi-threaded multi-process web server
-Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/mod_mpm_worker.html
-Requires:	%{name}-base = %{version}-%{release}
-Provides:	apache(mod_mpm_worker) = %{version}-%{release}
-
-%description mod_mpm_worker
-Multi-Processing Module implementing a hybrid    multi-threaded multi-process web server
-
 %package mod_negotiation
 Summary:	Provides for content negotiation
 Summary(pl.UTF-8):	Moduł do negocjacji treści
@@ -2405,9 +2375,6 @@ echo "LoadModule ldap_module	modules/mod_ldap.so" > $CFG/00_mod_ldap.conf
 echo "LoadModule log_debug_module       modules/mod_log_debug.so" > $CFG/00_mod_log_debug.conf
 echo "LoadModule log_forensic_module	modules/mod_log_forensic.so" > $CFG/00_mod_log_forensic.conf
 echo "LoadModule logio_module	modules/mod_logio.so" > $CFG/00_mod_logio.conf
-echo "LoadModule mpm_event_module       modules/mod_mpm_event.so" > $CFG/00_mod_mpm_event.conf
-echo "LoadModule mpm_prefork_module     modules/mod_mpm_prefork.so" > $CFG/00_mod_mpm_prefork.conf
-echo "LoadModule mpm_worker_module      modules/mod_mpm_worker.so" > $CFG/00_mod_mpm_worker.conf
 echo "LoadModule negotiation_module	modules/mod_negotiation.so" > $CFG/00_mod_negotiation.conf
 echo "LoadModule ratelimit_module       modules/mod_ratelimit.so" > $CFG/00_mod_ratelimit.conf
 echo "LoadModule reflector_module       modules/mod_reflector.so" > $CFG/00_mod_reflector.conf
@@ -2725,9 +2692,6 @@ fi
 %module_scripts mod_logio
 %module_scripts mod_mime
 %module_scripts mod_mime_magic
-%module_scripts mod_mpm_event
-%module_scripts mod_mpm_prefork
-%module_scripts mod_mpm_worker
 %module_scripts mod_negotiation
 %module_scripts mod_proxy
 %module_scripts mod_ratelimit
@@ -2834,6 +2798,9 @@ fi
 %dir %{_datadir}/vhosts
 # do not adapter here, %{_datadir} != /usr/share here
 %{_datadir}/icons
+%attr(755,root,root) %{_libexecdir}/mod_mpm_event.so
+%attr(755,root,root) %{_libexecdir}/mod_mpm_prefork.so
+%attr(755,root,root) %{_libexecdir}/mod_mpm_worker.so
 
 %files doc -f manual.files
 %defattr(644,root,root,755)
@@ -3232,21 +3199,6 @@ fi
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_mime_magic.conf
 %attr(755,root,root) %{_libexecdir}/mod_mime_magic.so
-
-%files mod_mpm_event
-%defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_mpm_event.conf
-%attr(755,root,root) %{_libexecdir}/mod_mpm_event.so
-
-%files mod_mpm_prefork
-%defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_mpm_prefork.conf
-%attr(755,root,root) %{_libexecdir}/mod_mpm_prefork.so
-
-%files mod_mpm_worker
-%defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_mpm_worker.conf
-%attr(755,root,root) %{_libexecdir}/mod_mpm_worker.so
 
 %files mod_negotiation
 %defattr(644,root,root,755)
