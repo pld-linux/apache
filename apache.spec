@@ -1966,55 +1966,55 @@ cp -a %{SOURCE29} $RPM_BUILD_ROOT%{_sysconfdir}/vhosts.d/example.net.conf
 
 install %{SOURCE30} $RPM_BUILD_ROOT/usr/lib/tmpfiles.d/%{name}.conf
 
+echo "LoadModule actions_module	modules/mod_actions.so" > $CFG/00_mod_actions.conf
 echo "LoadModule alias_module modules/mod_alias.so" > $CFG/00_mod_alias.conf
-echo "LoadModule authn_file_module	modules/mod_authn_file.so" > $CFG/00_mod_authn_file.conf
-echo "LoadModule authn_dbm_module	modules/mod_authn_dbm.so" > $CFG/00_mod_authn_dbm.conf
+echo "LoadModule asis_module	modules/mod_asis.so" > $CFG/00_mod_asis.conf
+echo "LoadModule auth_basic_module	modules/mod_auth_basic.so" > $CFG/00_mod_auth_basic.conf
+echo "LoadModule auth_digest_module	modules/mod_auth_digest.so" > $CFG/00_mod_auth_digest.conf
+echo "LoadModule authn_alias_module	modules/mod_authn_alias.so" > $CFG/00_mod_authn_alias.conf
 echo "LoadModule authn_anon_module	modules/mod_authn_anon.so" > $CFG/00_mod_authn_anon.conf
 echo "LoadModule authn_dbd_module	modules/mod_authn_dbd.so" > $CFG/00_mod_authn_dbd.conf
+echo "LoadModule authn_dbm_module	modules/mod_authn_dbm.so" > $CFG/00_mod_authn_dbm.conf
 echo "LoadModule authn_default_module	modules/mod_authn_default.so" > $CFG/00_mod_authn_default.conf
-echo "LoadModule authn_alias_module	modules/mod_authn_alias.so" > $CFG/00_mod_authn_alias.conf
-echo "LoadModule authz_groupfile_module	modules/mod_authz_groupfile.so" > $CFG/00_mod_authz_groupfile.conf
-echo "LoadModule authz_user_module	modules/mod_authz_user.so" > $CFG/00_mod_authz_user.conf
-echo "LoadModule authz_dbm_module	modules/mod_authz_dbm.so" > $CFG/00_mod_authz_dbm.conf
-echo "LoadModule authz_owner_module	modules/mod_authz_owner.so" > $CFG/00_mod_authz_owner.conf
+echo "LoadModule authn_file_module	modules/mod_authn_file.so" > $CFG/00_mod_authn_file.conf
 echo "LoadModule authnz_ldap_module	modules/mod_authnz_ldap.so" > $CFG/00_mod_authnz_ldap.conf
+echo "LoadModule authz_dbm_module	modules/mod_authz_dbm.so" > $CFG/00_mod_authz_dbm.conf
 echo "LoadModule authz_default_module	modules/mod_authz_default.so" > $CFG/00_mod_authz_default.conf
-echo "LoadModule auth_basic_module	modules/mod_auth_basic.so" > $CFG/00_mod_auth_basic.conf
-echo "LoadModule dbd_module	modules/mod_dbd.so" > $CFG/00_mod_dbd.conf
+echo "LoadModule authz_groupfile_module	modules/mod_authz_groupfile.so" > $CFG/00_mod_authz_groupfile.conf
+echo "LoadModule authz_owner_module	modules/mod_authz_owner.so" > $CFG/00_mod_authz_owner.conf
+echo "LoadModule authz_user_module	modules/mod_authz_user.so" > $CFG/00_mod_authz_user.conf
 %if %{with bucketeer}
 echo "LoadModule bucketeer_module	modules/mod_bucketeer.so" > $CFG/00_mod_bucketeer.conf
 %endif
+echo "LoadModule case_filter_in_module	modules/mod_case_filter_in.so" > $CFG/00_mod_case_filter_in.conf
+echo "LoadModule case_filter_module	modules/mod_case_filter.so" > $CFG/00_mod_case_filter.conf
+echo "LoadModule cern_meta_module	modules/mod_cern_meta.so" > $CFG/00_mod_cern_meta.conf
+echo "LoadModule cgi_module	modules/mod_cgi.so" > $CFG/00_mod_cgi.conf
+echo "LoadModule charset_lite_module	modules/mod_charset_lite.so" > $CFG/00_mod_charset_lite.conf
+echo "LoadModule dbd_module	modules/mod_dbd.so" > $CFG/00_mod_dbd.conf
 echo "LoadModule dumpio_module	modules/mod_dumpio.so" > $CFG/00_mod_dumpio.conf
 echo "LoadModule echo_module	modules/mod_echo.so" > $CFG/00_mod_echo.conf
-echo "LoadModule case_filter_module	modules/mod_case_filter.so" > $CFG/00_mod_case_filter.conf
-echo "LoadModule case_filter_in_module	modules/mod_case_filter_in.so" > $CFG/00_mod_case_filter_in.conf
+echo "LoadModule env_module	modules/mod_env.so" > $CFG/00_mod_env.conf
+echo "LoadModule expires_module	modules/mod_expires.so" > $CFG/00_mod_expires.conf
 echo "LoadModule ext_filter_module	modules/mod_ext_filter.so" > $CFG/00_mod_ext_filter.conf
-echo "LoadModule include_module	modules/mod_include.so" > $CFG/00_mod_include.conf
+echo "LoadModule file_cache_module	modules/mod_file_cache.so" > $CFG/00_mod_file_cache.conf
 echo "LoadModule filter_module	modules/mod_filter.so" > $CFG/00_mod_filter.conf
+echo "LoadModule headers_module	modules/mod_headers.so" > $CFG/00_mod_headers.conf
+echo "LoadModule ident_module	modules/mod_ident.so" > $CFG/00_mod_ident.conf
+echo "LoadModule imagemap_module	modules/mod_imagemap.so" > $CFG/00_mod_imagemap.conf
+echo "LoadModule include_module	modules/mod_include.so" > $CFG/00_mod_include.conf
+echo "LoadModule ldap_module	modules/mod_ldap.so" > $CFG/00_mod_ldap.conf
 echo "LoadModule log_forensic_module	modules/mod_log_forensic.so" > $CFG/00_mod_log_forensic.conf
 echo "LoadModule logio_module	modules/mod_logio.so" > $CFG/00_mod_logio.conf
-echo "LoadModule env_module	modules/mod_env.so" > $CFG/00_mod_env.conf
-echo "LoadModule cern_meta_module	modules/mod_cern_meta.so" > $CFG/00_mod_cern_meta.conf
-echo "LoadModule ident_module	modules/mod_ident.so" > $CFG/00_mod_ident.conf
-echo "LoadModule setenvif_module	modules/mod_setenvif.so" > $CFG/00_mod_setenvif.conf
-echo "LoadModule version_module	modules/mod_version.so" > $CFG/00_mod_version.conf
-echo "LoadModule asis_module	modules/mod_asis.so" > $CFG/00_mod_asis.conf
-echo "LoadModule cgi_module	modules/mod_cgi.so" > $CFG/00_mod_cgi.conf
 echo "LoadModule negotiation_module	modules/mod_negotiation.so" > $CFG/00_mod_negotiation.conf
-echo "LoadModule imagemap_module	modules/mod_imagemap.so" > $CFG/00_mod_imagemap.conf
-echo "LoadModule speling_module	modules/mod_speling.so" > $CFG/00_mod_speling.conf
-echo "LoadModule ldap_module	modules/mod_ldap.so" > $CFG/00_mod_ldap.conf
-echo "LoadModule actions_module	modules/mod_actions.so" > $CFG/00_mod_actions.conf
-echo "LoadModule auth_digest_module	modules/mod_auth_digest.so" > $CFG/00_mod_auth_digest.conf
-echo "LoadModule charset_lite_module	modules/mod_charset_lite.so" > $CFG/00_mod_charset_lite.conf
-echo "LoadModule expires_module	modules/mod_expires.so" > $CFG/00_mod_expires.conf
-echo "LoadModule file_cache_module	modules/mod_file_cache.so" > $CFG/00_mod_file_cache.conf
-echo "LoadModule headers_module	modules/mod_headers.so" > $CFG/00_mod_headers.conf
-echo "LoadModule rewrite_module	modules/mod_rewrite.so" > $CFG/00_mod_rewrite.conf
-echo "LoadModule usertrack_module	modules/mod_usertrack.so" > $CFG/00_mod_usertrack.conf
-echo "LoadModule unique_id_module	modules/mod_unique_id.so" > $CFG/00_mod_unique_id.conf
-echo "LoadModule substitute_module	modules/mod_substitute.so" > $CFG/00_mod_substitute.conf
 echo "LoadModule reqtimeout_module	modules/mod_reqtimeout.so" >> $CFG/00_mod_reqtimeout.conf
+echo "LoadModule rewrite_module	modules/mod_rewrite.so" > $CFG/00_mod_rewrite.conf
+echo "LoadModule setenvif_module	modules/mod_setenvif.so" > $CFG/00_mod_setenvif.conf
+echo "LoadModule speling_module	modules/mod_speling.so" > $CFG/00_mod_speling.conf
+echo "LoadModule substitute_module	modules/mod_substitute.so" > $CFG/00_mod_substitute.conf
+echo "LoadModule unique_id_module	modules/mod_unique_id.so" > $CFG/00_mod_unique_id.conf
+echo "LoadModule usertrack_module	modules/mod_usertrack.so" > $CFG/00_mod_usertrack.conf
+echo "LoadModule version_module	modules/mod_version.so" > $CFG/00_mod_version.conf
 
 # anything in style dir not ending with .css is trash
 %{__rm} -r $RPM_BUILD_ROOT%{_datadir}/manual/style/{lang,latex,xsl}
