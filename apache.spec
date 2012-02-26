@@ -191,7 +191,6 @@ Requires(pre):	/usr/bin/getgid
 Requires(pre):	/usr/sbin/groupadd
 Requires(pre):	/usr/sbin/useradd
 Requires:	/sbin/chkconfig
-Requires:	%{name}-mod_unixd = %{version}-%{release}
 Requires:	apr >= %{apr_ver}
 Requires:	psmisc >= 20.1
 Requires:	rc-scripts >= 0.4.1.23
@@ -1926,16 +1925,6 @@ zapytań, nawet w ramach poprawnie skonfigurowanego klastra z wielu
 maszyn. Moduł ustawia przy każdym zapytaniu zmienną środowiskową
 UNIQUE_ID.
 
-%package mod_unixd
-Summary:	Basic (required) security for Unix-family platforms.
-Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/mod_unixd.html
-Requires:	%{name}-base = %{version}-%{release}
-Provides:	apache(mod_unixd) = %{version}-%{release}
-
-%description mod_unixd
-Basic (required) security for Unix-family platforms.
-
 %package mod_userdir
 Summary:	User-specific directories
 Summary(pl.UTF-8):	Katalogi specyficzne dla użytkowników
@@ -2346,7 +2335,6 @@ echo "LoadModule socache_shmcb_module   modules/mod_socache_shmcb.so" > $CFG/00_
 echo "LoadModule speling_module	modules/mod_speling.so" > $CFG/00_mod_speling.conf
 echo "LoadModule substitute_module	modules/mod_substitute.so" > $CFG/00_mod_substitute.conf
 echo "LoadModule unique_id_module	modules/mod_unique_id.so" > $CFG/00_mod_unique_id.conf
-echo "LoadModule unixd_module   modules/mod_unixd.so" > $CFG/00_mod_unixd.conf
 echo "LoadModule usertrack_module	modules/mod_usertrack.so" > $CFG/00_mod_usertrack.conf
 echo "LoadModule version_module	modules/mod_version.so" > $CFG/00_mod_version.conf
 echo "LoadModule watchdog_module        modules/mod_watchdog.so" > $CFG/00_mod_watchdog.conf
@@ -2662,7 +2650,6 @@ fi
 %module_scripts mod_status
 %module_scripts mod_substitute
 %module_scripts mod_unique_id
-%module_scripts mod_unixd
 %module_scripts mod_userdir
 %module_scripts mod_usertrack
 %module_scripts mod_version
@@ -2747,6 +2734,7 @@ fi
 %attr(755,root,root) %{_libexecdir}/mod_mpm_event.so
 %attr(755,root,root) %{_libexecdir}/mod_mpm_prefork.so
 %attr(755,root,root) %{_libexecdir}/mod_mpm_worker.so
+%attr(755,root,root) %{_libexecdir}/mod_unixd.so
 
 %files doc -f manual.files
 %defattr(644,root,root,755)
@@ -3251,11 +3239,6 @@ fi
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_unique_id.conf
 %attr(755,root,root) %{_libexecdir}/mod_unique_id.so
-
-%files mod_unixd
-%defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_unixd.conf
-%attr(755,root,root) %{_libexecdir}/mod_unixd.so
 
 %files mod_userdir
 %defattr(644,root,root,755)
