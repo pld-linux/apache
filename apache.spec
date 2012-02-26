@@ -3344,7 +3344,7 @@ fi
 
 %files mod_proxy
 %defattr(644,root,root,755)
-%attr(4755,root,root) %{_sbindir}/fcgistarter
+%attr(755,root,root) %{_sbindir}/fcgistarter
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_proxy.conf
 %attr(755,root,root) %{_libexecdir}/mod_proxy*.so
 
