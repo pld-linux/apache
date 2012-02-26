@@ -780,6 +780,8 @@ Summary(pl.UTF-8):	Moduł Apache'a umożliwiający autoryzację grup w oparcu o 
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_authz_host.html
 Requires:	%{name}-base = %{version}-%{release}
+# provides compatibility directives for 2.2-style access control
+Requires:	apache(mod_access_compat) = %{version}-%{release}
 Provides:	apache(mod_authz_host) = %{version}-%{release}
 # for apache < 2.2.0
 Provides:	apache(mod_access) = %{version}-%{release}
