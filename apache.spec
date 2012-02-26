@@ -573,7 +573,7 @@ Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_authn_core) = %{version}-%{release}
 Provides:	apache(mod_authn_default) = %{version}-%{release}
 Obsoletes:	apache(mod_authn_alias)
-Obsoletes:	apache(mod_authn_default) = %{version}-%{release}
+Obsoletes:	apache-mod_authn_default < %{version}-%{release}
 
 %description mod_authn_core
 This module provides core authentication capabilities to allow or deny
@@ -679,7 +679,7 @@ URL:		http://httpd.apache.org/docs/2.4/mod/mod_authz_core.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_authz_core) = %{version}-%{release}
 Provides:	apache(mod_authz_default) = %{version}-%{release}
-Obsoletes:	apache(mod_authz_default) = %{version}-%{release}
+Obsoletes:	apache-mod_authz_default < %{version}-%{release}
 
 %description mod_authz_core
 This module provides core authentication capabilities to allow or deny
