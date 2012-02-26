@@ -1850,6 +1850,7 @@ Summary:	Cookie based session support
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_session_cookie.html
 Requires:	%{name}-base = %{version}-%{release}
+Requires:	%{name}-mod_session = %{version}-%{release}
 Provides:	apache(mod_session_cookie) = %{version}-%{release}
 
 %description mod_session_cookie
@@ -1866,6 +1867,7 @@ Summary:	Session encryption support
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_session_crypto.html
 Requires:	%{name}-base = %{version}-%{release}
+Requires:	%{name}-mod_session = %{version}-%{release}
 Provides:	apache(mod_session_crypto) = %{version}-%{release}
 
 %description mod_session_crypto
@@ -1882,6 +1884,7 @@ Summary:	DBD/SQL based session support
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_session_dbd.html
 Requires:	%{name}-base = %{version}-%{release}
+Requires:	%{name}-mod_session = %{version}-%{release}
 Provides:	apache(mod_session_dbd) = %{version}-%{release}
 
 %description mod_session_dbd
