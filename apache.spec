@@ -712,6 +712,7 @@ Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_authz_dbd.html
 Requires:	%{name}-base = %{version}-%{release}
 Requires:	%{name}-mod_authz_core = %{version}-%{release}
+Requires:	%{name}-mod_dbd = %{version}-%{release}
 Provides:	apache(mod_authz_dbd) = %{version}-%{release}
 
 %description mod_authz_dbd
