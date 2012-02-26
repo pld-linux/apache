@@ -539,22 +539,6 @@ Provides:	apache(mod_auth_form) = %{version}-%{release}
 %description mod_auth_form
 Form authentication
 
-%package mod_authn_alias
-Summary:	Apache module that provides the ability to create extended authentication
-Summary(pl.UTF-8):	Moduł Apache'a umożliwiający tworzenie rozszerzonego uwierzytelniania
-Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/mod_authn_alias.html
-Requires:	%{name}-base = %{version}-%{release}
-Provides:	apache(mod_authn_alias) = %{version}-%{release}
-
-%description mod_authn_alias
-This module allows extended authentication providers to be created
-within the configuration file and assigned an alias name.
-
-%description mod_authn_alias -l pl.UTF-8
-Ten moduł umożliwia tworzenie rozszerzonych sposobów uwierzytelniania
-w pliku konfiguracyjnym i nadawanie im aliasów.
-
 %package mod_authn_anon
 Summary:	Apache module that allows "anonymous" user access to authenticated areas
 Summary(pl.UTF-8):	Moduł Apache'a umożliwiający dostęp anonimowych użytkowników do stref uwierzytelnianych
@@ -588,6 +572,7 @@ URL:		http://httpd.apache.org/docs/2.4/mod/mod_authn_core.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_authn_core) = %{version}-%{release}
 Provides:	apache(mod_authn_default) = %{version}-%{release}
+Obsoletes:	apache(mod_authn_alias)
 Obsoletes:	apache(mod_authn_default) = %{version}-%{release}
 
 %description mod_authn_core
@@ -2294,7 +2279,6 @@ echo "LoadModule asis_module	modules/mod_asis.so" > $CFG/00_mod_asis.conf
 echo "LoadModule auth_basic_module	modules/mod_auth_basic.so" > $CFG/00_mod_auth_basic.conf
 echo "LoadModule auth_digest_module	modules/mod_auth_digest.so" > $CFG/00_mod_auth_digest.conf
 echo "LoadModule auth_form_module       modules/mod_auth_form.so" > $CFG/00_mod_auth_form.conf
-echo "LoadModule authn_alias_module	modules/mod_authn_alias.so" > $CFG/00_mod_authn_alias.conf
 echo "LoadModule authn_anon_module	modules/mod_authn_anon.so" > $CFG/00_mod_authn_anon.conf
 echo "LoadModule authn_core_module      modules/mod_authn_core.so" > $CFG/00_mod_authn_core.conf
 echo "LoadModule authn_dbd_module	modules/mod_authn_dbd.so" > $CFG/00_mod_authn_dbd.conf
@@ -2599,7 +2583,6 @@ fi
 %module_scripts mod_auth_dbm
 %module_scripts mod_auth_digest
 %module_scripts mod_auth_form
-%module_scripts mod_authn_alias
 %module_scripts mod_authn_anon
 %module_scripts mod_authn_core
 %module_scripts mod_authn_dbd
@@ -2861,11 +2844,6 @@ fi
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_authn_core.conf
 %attr(755,root,root) %{_libexecdir}/mod_authn_core.so
-
-%files mod_authn_alias
-%defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_authn_alias.conf
-#%attr(755,root,root) %{_libexecdir}/mod_authn_alias.so
 
 %files mod_authn_anon
 %defattr(644,root,root,755)
