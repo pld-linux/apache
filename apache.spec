@@ -544,6 +544,7 @@ Summary(pl.UTF-8):	Moduł Apache'a umożliwiający dostęp anonimowych użytkown
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_authn_anon.html
 Requires:	%{name}-base = %{version}-%{release}
+Requires:	%{name}-mod_authn_core = %{version}-%{release}
 Provides:	apache(mod_authn_anon) = %{version}-%{release}
 # compat
 Provides:	apache(mod_auth_anon) = %{version}-%{release}
@@ -589,6 +590,7 @@ Summary(pl.UTF-8):	Moduł Apache'a umożliwiający uwierzytelnianie użytkownik�
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_authn_dbd.html
 Requires:	%{name}-base = %{version}-%{release}
+Requires:	%{name}-mod_authn_core = %{version}-%{release}
 Requires:	%{name}-mod_dbd = %{version}-%{release}
 Provides:	apache(mod_authn_dbd) = %{version}-%{release}
 
@@ -608,6 +610,7 @@ Summary(pl.UTF-8):	Moduł Apache'a umożliwiający uwierzytelnianie użytkownik�
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_authn_dbm.html
 Requires:	%{name}-base = %{version}-%{release}
+Requires:	%{name}-mod_authn_core = %{version}-%{release}
 Provides:	apache(mod_authn_dbm) = %{version}-%{release}
 
 %description mod_authn_dbm
@@ -626,6 +629,7 @@ Summary(pl.UTF-8):	Moduł Apache'a umożliwiający uwierzytelnianie użytkownik�
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_authn_file.html
 Requires:	%{name}-base = %{version}-%{release}
+Requires:	%{name}-mod_authn_core = %{version}-%{release}
 Provides:	apache(mod_authn_file) = %{version}-%{release}
 
 %description mod_authn_file
@@ -643,6 +647,7 @@ Summary:	Manages a cache of authentication credentials to relievethe load on bac
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_authn_socache.html
 Requires:	%{name}-base = %{version}-%{release}
+Requires:	%{name}-mod_authn_core = %{version}-%{release}
 Provides:	apache(mod_authn_socache) = %{version}-%{release}
 
 %description mod_authn_socache
@@ -694,6 +699,7 @@ Summary:	Group Authorization and Login using SQL
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_authz_dbd.html
 Requires:	%{name}-base = %{version}-%{release}
+Requires:	%{name}-mod_authz_core = %{version}-%{release}
 Provides:	apache(mod_authz_dbd) = %{version}-%{release}
 
 %description mod_authz_dbd
@@ -705,6 +711,7 @@ Summary(pl.UTF-8):	Moduł Apache'a umożliwiający uwierzytelnianie grup z użyc
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_authz_dbm.html
 Requires:	%{name}-base = %{version}-%{release}
+Requires:	%{name}-mod_authz_core = %{version}-%{release}
 Provides:	apache(mod_authz_dbm) = %{version}-%{release}
 
 %description mod_authz_dbm
@@ -723,6 +730,7 @@ Summary(pl.UTF-8):	Moduł Apache'a umożliwiający autoryzację grup przy użyci
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_authz_groupfile.html
 Requires:	%{name}-base = %{version}-%{release}
+Requires:	%{name}-mod_authz_core = %{version}-%{release}
 Provides:	apache(mod_authz_groupfile) = %{version}-%{release}
 
 %description mod_authz_groupfile
@@ -741,6 +749,7 @@ Summary(pl.UTF-8):	Moduł Apache'a umożliwiający autoryzację grup w oparcu o 
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_authz_host.html
 Requires:	%{name}-base = %{version}-%{release}
+Requires:	%{name}-mod_authz_core = %{version}-%{release}
 # provides compatibility directives for 2.2-style access control
 Requires:	apache(mod_access_compat) = %{version}-%{release}
 Provides:	apache(mod_authz_host) = %{version}-%{release}
@@ -768,6 +777,7 @@ Summary(pl.UTF-8):	Moduł Apache'a umożliwiający autoryzacje w oparciu o włas
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/en/mod/mod_authz_owner.html
 Requires:	%{name}-base = %{version}-%{release}
+Requires:	%{name}-mod_authz_core = %{version}-%{release}
 #Requires:	any-auth-module
 Provides:	apache(mod_authz_owner) = %{version}-%{release}
 
@@ -792,6 +802,7 @@ Summary(pl.UTF-8):	Moduł Apache'a umożliwiający autoryzację użytkowników
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/en/mod/mod_authz_user.html
 Requires:	%{name}-base = %{version}-%{release}
+Requires:	%{name}-mod_authz_core = %{version}-%{release}
 Provides:	apache(mod_authz_user) = %{version}-%{release}
 
 %description mod_authz_user
