@@ -1884,6 +1884,7 @@ Summary:	DBD/SQL based session support
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_session_dbd.html
 Requires:	%{name}-base = %{version}-%{release}
+Requires:	%{name}-mod_dbd = %{version}-%{release}
 Requires:	%{name}-mod_session = %{version}-%{release}
 Provides:	apache(mod_session_dbd) = %{version}-%{release}
 
