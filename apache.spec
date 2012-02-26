@@ -2487,8 +2487,8 @@ echo "LoadModule ext_filter_module	modules/mod_ext_filter.so" > $CFG/00_mod_ext_
 echo "LoadModule file_cache_module	modules/mod_file_cache.so" > $CFG/00_mod_file_cache.conf
 echo "LoadModule filter_module	modules/mod_filter.so" > $CFG/00_mod_filter.conf
 echo "LoadModule headers_module	modules/mod_headers.so" > $CFG/00_mod_headers.conf
-echo "LoadModule heartbeat_module       modules/mod_heartbeat.so" > $CFG/00_mod_heartbeat.conf
-echo "LoadModule heartmonitor_module    modules/mod_heartmonitor.so" > $CFG/00_mod_heartmonitor.conf
+echo "LoadModule heartbeat_module       modules/mod_heartbeat.so" > $CFG/01_mod_heartbeat.conf
+echo "LoadModule heartmonitor_module    modules/mod_heartmonitor.so" > $CFG/01_mod_heartmonitor.conf
 echo "LoadModule ident_module	modules/mod_ident.so" > $CFG/00_mod_ident.conf
 echo "LoadModule imagemap_module	modules/mod_imagemap.so" > $CFG/00_mod_imagemap.conf
 echo "LoadModule include_module	modules/mod_include.so" > $CFG/00_mod_include.conf
