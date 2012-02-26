@@ -1356,6 +1356,8 @@ Summary:	sends messages with server status to frontend proxy
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_heartbeat.html
 Requires:	%{name}-base = %{version}-%{release}
+Requires:	%{name}-mod_status = %{version}-%{release}
+Requires:	%{name}-mod_watchdog = %{version}-%{release}
 Provides:	apache(mod_heartbeat) = %{version}-%{release}
 
 %description mod_heartbeat
@@ -1373,6 +1375,8 @@ Summary:	centralized monitor for mod_heartbeat origin servers
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_heartmonitor.html
 Requires:	%{name}-base = %{version}-%{release}
+Requires:	%{name}-mod_status = %{version}-%{release}
+Requires:	%{name}-mod_watchdog = %{version}-%{release}
 Provides:	apache(mod_heartmonitor) = %{version}-%{release}
 
 %description mod_heartmonitor
