@@ -2411,6 +2411,16 @@ if [ ! -L /etc/httpd/httpd.conf ]; then
 	install -d /etc/httpd
 	ln -s conf.d /etc/httpd/httpd.conf
 fi
+if [ -f /etc/sysconfig/httpd ]; then
+        MPM=$(grep HTTPD_MPM /etc/sysconfig/httpd |sed 's,HTTPD_MPM=,,;s,",,g')
+        if [ -n $MPM ]; then
+                echo "LoadModule mpm_${MPM}_module                modules/mod_mpm_${MPM}.so" > /etc/httpd/conf.d/10_mpm.conf.rpmnew
+                cat /etc/httpd/conf.d/10_mpm.conf >> /etc/httpd/conf.d/10_mpm.conf.rpmnew
+                mv /etc/httpd/conf.d/10_mpm.conf.rpmnew /etc/httpd/conf.d/10_mpm.conf
+                sed -i -e 's,HTTPD_MPM.*,,g' /etc/sysconfig/httpd
+        fi
+fi
+
 exit 0
 
 %post base
@@ -2526,11 +2536,30 @@ if [ -z "$HTTPD_CONF" ]; then
 fi
 %systemd_trigger httpd.service
 
+%triggerpostun base -- %{name} < 2.4.0
+cp -f /etc/httpd/apache.conf{,.rpmsave}
+sed -i -e '
+	/^DefaultType.*/s,.*,,
+	/^Include /s,^Include ,IncludeOptional ,
+	/^NameVirtualHost.*/s,.*,,
+	/^User/s,^,LoadModule unixd_module modules/mod_unixd.so\n,
+' /etc/httpd/apache.conf
+sed -i -e '
+	s,^LockFile /var/run/httpd/accept.lock,Mutex file:/var/run/httpd/,g
+' /etc/httpd/conf.d/10_mpm.conf
+
 %triggerpostun mod_ssl -- %{name}-mod_ssl < 1:2.2.0-3.1
 cp -f /etc/httpd/conf.d/40_mod_ssl.conf{,.rpmsave}
 sed -i -e '
 	s,/var/run/apache,/var/run/httpd,g
 	s,/var/cache/apache,/var/cache/httpd,g
+' /etc/httpd/conf.d/40_mod_ssl.conf
+
+%triggerpostun mod_ssl -- %{name}-mod_ssl < 1:2.4.0
+cp -f /etc/httpd/conf.d/40_mod_ssl.conf{,.rpmsave}
+sed -i -e '
+	/^SSLMutex/s,^,#,
+	/^NameVirtualHost.*/s,.*,,
 ' /etc/httpd/conf.d/40_mod_ssl.conf
 
 %posttrans base
