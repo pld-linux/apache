@@ -1857,6 +1857,7 @@ Epoch:		1
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_ssl.html
 Requires:	%{name}-base = %{version}-%{release}
+Requires:	%{name}-mod_socache_shmcb = %{version}-%{release}
 Requires:	openssl >= %{openssl_ver}
 %if "%{pld_release}" != "ac"
 Requires:	apr-util-dbm-db
