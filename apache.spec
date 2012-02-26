@@ -1472,6 +1472,7 @@ Summary:	Pending Request Counting load balancer scheduler algorithm for mod_prox
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_lbmethod_bybusyness.html
 Requires:	%{name}-base = %{version}-%{release}
+Requires:	%{name}-mod_proxy = %{version}-%{release}
 Provides:	apache(mod_lbmethod_bybusyness) = %{version}-%{release}
 
 %description mod_lbmethod_bybusyness
@@ -1483,6 +1484,7 @@ Summary:	Request Counting load balancer scheduler algorithm for mod_proxy_balanc
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_lbmethod_byrequests.html
 Requires:	%{name}-base = %{version}-%{release}
+Requires:	%{name}-mod_proxy = %{version}-%{release}
 Provides:	apache(mod_lbmethod_byrequests) = %{version}-%{release}
 
 %description mod_lbmethod_byrequests
@@ -1494,6 +1496,7 @@ Summary:	Weighted Traffic Counting load balancer scheduler algorithm for mod_pro
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_lbmethod_bytraffic.html
 Requires:	%{name}-base = %{version}-%{release}
+Requires:	%{name}-mod_proxy = %{version}-%{release}
 Provides:	apache(mod_lbmethod_bytraffic) = %{version}-%{release}
 
 %description mod_lbmethod_bytraffic
@@ -1505,6 +1508,7 @@ Summary:	Heartbeat Traffic Counting load balancer scheduler algorithm for mod_pr
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_lbmethod_heartbeat.html
 Requires:	%{name}-base = %{version}-%{release}
+Requires:	%{name}-mod_proxy = %{version}-%{release}
 Provides:	apache(mod_lbmethod_heartbeat) = %{version}-%{release}
 
 %description mod_lbmethod_heartbeat
