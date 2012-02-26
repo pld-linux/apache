@@ -901,16 +901,6 @@ proxy. Dołączono dwa moduły pozwalające magazynować dane w pamięci
 (głównie użyteczne przy cache'owaniu lokalnej zawartości) oraz na
 dysku (używane do cache'owania proxy).
 
-%package mod_cache_disk
-Summary:	Disk based storage module for the HTTP caching filter.
-Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/mod_cache_disk.html
-Requires:	%{name}-base = %{version}-%{release}
-Provides:	apache(mod_cache_disk) = %{version}-%{release}
-
-%description mod_cache_disk
-Disk based storage module for the HTTP caching filter.
-
 %package mod_case_filter
 Summary:	Apache output filter that converts all output to upper case
 Summary(pl.UTF-8):	Filtr wyjściowy Apache'a zamieniający wszystkie litery na wielkie
@@ -2345,7 +2335,6 @@ echo "LoadModule buffer_module  modules/mod_buffer.so" > $CFG/00_mod_buffer.conf
 %if %{with bucketeer}
 echo "LoadModule bucketeer_module	modules/mod_bucketeer.so" > $CFG/00_mod_bucketeer.conf
 %endif
-echo "LoadModule cache_disk_module      modules/mod_cache_disk.so" > $CFG/00_mod_cache_disk.conf
 echo "LoadModule case_filter_in_module	modules/mod_case_filter_in.so" > $CFG/00_mod_case_filter_in.conf
 echo "LoadModule case_filter_module	modules/mod_case_filter.so" > $CFG/00_mod_case_filter.conf
 echo "LoadModule cern_meta_module	modules/mod_cern_meta.so" > $CFG/00_mod_cern_meta.conf
@@ -2654,7 +2643,6 @@ fi
 %module_scripts mod_bucketeer
 %module_scripts mod_buffer
 %module_scripts mod_cache
-%module_scripts mod_cache_disk
 %module_scripts mod_case_filter
 %module_scripts mod_case_filter_in
 %module_scripts mod_cern_meta
@@ -3003,14 +2991,8 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_cache.conf
 %attr(755,root,root) %{_sbindir}/htcacheclean
 %attr(755,root,root) %{_libexecdir}/mod_cache.so
-#%attr(755,root,root) %{_libexecdir}/mod_disk_cache.so
-#%attr(755,root,root) %{_libexecdir}/mod_mem_cache.so
-%{_mandir}/man8/htcacheclean.8*
-
-%files mod_cache_disk
-%defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_cache_disk.conf
 %attr(755,root,root) %{_libexecdir}/mod_cache_disk.so
+%{_mandir}/man8/htcacheclean.8*
 
 %files mod_case_filter
 %defattr(644,root,root,755)
