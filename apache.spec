@@ -581,14 +581,25 @@ anonimowego ftp, tzn. przez udostępnianie "magicznego" identyfikatora
 być logowane.
 
 %package mod_authn_core
-Summary:	Core Authentication
+Summary:	Apache module that rejects any credentials supplied by the user
+Summary(pl.UTF-8):	Moduł Apache'a odrzucający wszystkie dane podane przez użytkownika
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_authn_core.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_authn_core) = %{version}-%{release}
+Provides:	apache(mod_authn_default) = %{version}-%{release}
+Obsoletes:	apache(mod_authn_default) = %{version}-%{release}
 
 %description mod_authn_core
-Core Authentication
+This module is designed to be the fallback module, if you don't have
+configured an authentication module like mod_auth_basic. It simply
+rejects any credentials supplied by the user.
+
+%description mod_authn_core -l pl.UTF-8
+Ten moduł został pomyślany jako domyślny moduł uwierzytelniający,
+jeśli nie skonfigurowano modułu uwierzytelniającego takiego jak
+mod_auth_basic. Moduł ten po prostu odrzuca wszelkie dane przekazane
+przez użytkownika.
 
 %package mod_authn_dbd
 Summary:	Apache module that allows user authentication using an SQL
@@ -626,25 +637,6 @@ password files.
 Ten moduł udostępnia frontendom uwierzytelniającym takim jak
 mod_auth_digest i mod_auth_basic uwierzytelnianie użytkowników poprzez
 wyszukiwanie w tabelach haseł DBM.
-
-%package mod_authn_default
-Summary:	Apache module that rejects any credentials supplied by the user
-Summary(pl.UTF-8):	Moduł Apache'a odrzucający wszystkie dane podane przez użytkownika
-Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/mod_authn_default.html
-Requires:	%{name}-base = %{version}-%{release}
-Provides:	apache(mod_authn_default) = %{version}-%{release}
-
-%description mod_authn_default
-This module is designed to be the fallback module, if you don't have
-configured an authentication module like mod_auth_basic. It simply
-rejects any credentials supplied by the user.
-
-%description mod_authn_default -l pl.UTF-8
-Ten moduł został pomyślany jako domyślny moduł uwierzytelniający,
-jeśli nie skonfigurowano modułu uwierzytelniającego takiego jak
-mod_auth_basic. Moduł ten po prostu odrzuca wszelkie dane przekazane
-przez użytkownika.
 
 %package mod_authn_file
 Summary:	Apache module that allows user authentication using text files
@@ -697,14 +689,25 @@ Ten moduł udostępnia frontendom uwierzytelniającym takim jak
 mod_auth_basic uwierzytelnianie użytkowników poprzez katalog LDAP.
 
 %package mod_authz_core
-Summary:	Core Authorization
+Summary:	Apache module that rejects any authorization request
+Summary(pl.UTF-8):	Moduł Apache'a odrzucający wszystkie żądania autoryzacji
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_authz_core.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_authz_core) = %{version}-%{release}
+Provides:	apache(mod_authz_default) = %{version}-%{release}
+Obsoletes:	apache(mod_authz_default) = %{version}-%{release}
 
 %description mod_authz_core
-Core Authorization
+This module is designed to be the fallback module, if you don't have
+configured an authorization module like mod_authz_user or
+mod_authz_groupfile. It simply rejects any authorization request.
+
+%description mod_authz_core -l pl.UTF-8
+Ten moduł został pomyślany jako domyślny moduł autoryzujący jeśli nie
+skonfigurowano modułu autoryzującego takiego jak mod_authz_user czy
+mod_authz_groupfile. Moduł ten po prostu odrzuca wszelkie żądania
+autoryzacji.
 
 %package mod_authz_dbd
 Summary:	Group Authorization and Login using SQL
@@ -733,25 +736,6 @@ group membership stored in DBM file.
 Ten moduł daje możliwość udostępniania bądź blokowania części serwisu
 WWW dla uwierzytelnionych użytkowników na podstawie ich przynależności
 do grupy zapisywanej w pliku DBM.
-
-%package mod_authz_default
-Summary:	Apache module that rejects any authorization request
-Summary(pl.UTF-8):	Moduł Apache'a odrzucający wszystkie żądania autoryzacji
-Group:		Networking/Daemons/HTTP
-URL:		http://httpd.apache.org/docs/2.4/mod/mod_authz_default.html
-Requires:	%{name}-base = %{version}-%{release}
-Provides:	apache(mod_authz_default) = %{version}-%{release}
-
-%description mod_authz_default
-This module is designed to be the fallback module, if you don't have
-configured an authorization module like mod_authz_user or
-mod_authz_groupfile. It simply rejects any authorization request.
-
-%description mod_authz_default -l pl.UTF-8
-Ten moduł został pomyślany jako domyślny moduł autoryzujący jeśli nie
-skonfigurowano modułu autoryzującego takiego jak mod_authz_user czy
-mod_authz_groupfile. Moduł ten po prostu odrzuca wszelkie żądania
-autoryzacji.
 
 %package mod_authz_groupfile
 Summary:	Apache module that allows group authorization using plaintext files
@@ -2319,14 +2303,12 @@ echo "LoadModule authn_anon_module	modules/mod_authn_anon.so" > $CFG/00_mod_auth
 echo "LoadModule authn_core_module      modules/mod_authn_core.so" > $CFG/00_mod_authn_core.conf
 echo "LoadModule authn_dbd_module	modules/mod_authn_dbd.so" > $CFG/00_mod_authn_dbd.conf
 echo "LoadModule authn_dbm_module	modules/mod_authn_dbm.so" > $CFG/00_mod_authn_dbm.conf
-echo "LoadModule authn_default_module	modules/mod_authn_default.so" > $CFG/00_mod_authn_default.conf
 echo "LoadModule authn_file_module	modules/mod_authn_file.so" > $CFG/00_mod_authn_file.conf
 echo "LoadModule authn_socache_module      modules/mod_authn_socache.so" > $CFG/00_mod_authn_socache.conf
 echo "LoadModule authnz_ldap_module	modules/mod_authnz_ldap.so" > $CFG/00_mod_authnz_ldap.conf
 echo "LoadModule authz_core_module      modules/mod_authz_core.so" > $CFG/00_mod_authz_core.conf
 echo "LoadModule authz_dbd_module       modules/mod_authz_dbd.so" > $CFG/00_mod_authz_dbd.conf
 echo "LoadModule authz_dbm_module	modules/mod_authz_dbm.so" > $CFG/00_mod_authz_dbm.conf
-echo "LoadModule authz_default_module	modules/mod_authz_default.so" > $CFG/00_mod_authz_default.conf
 echo "LoadModule authz_groupfile_module	modules/mod_authz_groupfile.so" > $CFG/00_mod_authz_groupfile.conf
 echo "LoadModule authz_owner_module	modules/mod_authz_owner.so" > $CFG/00_mod_authz_owner.conf
 echo "LoadModule authz_user_module	modules/mod_authz_user.so" > $CFG/00_mod_authz_user.conf
@@ -2626,14 +2608,12 @@ fi
 %module_scripts mod_authn_core
 %module_scripts mod_authn_dbd
 %module_scripts mod_authn_dbm
-%module_scripts mod_authn_default
 %module_scripts mod_authn_file
 %module_scripts mod_authn_socache
 %module_scripts mod_authnz_ldap
 %module_scripts mod_authz_core
 %module_scripts mod_authz_dbd
 %module_scripts mod_authz_dbm
-%module_scripts mod_authz_default
 %module_scripts mod_authz_groupfile
 %module_scripts mod_authz_host
 %module_scripts mod_authz_owner
@@ -2906,11 +2886,6 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_authn_dbm.conf
 %attr(755,root,root) %{_libexecdir}/mod_authn_dbm.so
 
-%files mod_authn_default
-%defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_authn_default.conf
-#%attr(755,root,root) %{_libexecdir}/mod_authn_default.so
-
 %files mod_authn_file
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_authn_file.conf
@@ -2942,11 +2917,6 @@ fi
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_authz_dbm.conf
 %attr(755,root,root) %{_libexecdir}/mod_authz_dbm.so
-
-%files mod_authz_default
-%defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_authz_default.conf
-#%attr(755,root,root) %{_libexecdir}/mod_authz_default.so
 
 %files mod_authz_groupfile
 %defattr(644,root,root,755)
