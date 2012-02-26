@@ -581,8 +581,8 @@ anonimowego ftp, tzn. przez udostępnianie "magicznego" identyfikatora
 być logowane.
 
 %package mod_authn_core
-Summary:	Apache module that rejects any credentials supplied by the user
-Summary(pl.UTF-8):	Moduł Apache'a odrzucający wszystkie dane podane przez użytkownika
+Summary:	Apache module that provides core authentication directives
+Summary(pl.UTF-8):	Moduł Apache'a udostępniający podstawowe dyrektywy dotyczące uwierzytelniania
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_authn_core.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -591,15 +591,13 @@ Provides:	apache(mod_authn_default) = %{version}-%{release}
 Obsoletes:	apache(mod_authn_default) = %{version}-%{release}
 
 %description mod_authn_core
-This module is designed to be the fallback module, if you don't have
-configured an authentication module like mod_auth_basic. It simply
-rejects any credentials supplied by the user.
+This module provides core authentication capabilities to allow or deny
+access to portions of the web site. mod_authn_core provides directives
+that are common to all authentication providers.
 
 %description mod_authn_core -l pl.UTF-8
-Ten moduł został pomyślany jako domyślny moduł uwierzytelniający,
-jeśli nie skonfigurowano modułu uwierzytelniającego takiego jak
-mod_auth_basic. Moduł ten po prostu odrzuca wszelkie dane przekazane
-przez użytkownika.
+Ten moduł dostarcza podstawowych funkcjonalności uwierzytelniania
+umożliwiając na kontrolę dostępu do części serwisu.
 
 %package mod_authn_dbd
 Summary:	Apache module that allows user authentication using an SQL
@@ -689,8 +687,8 @@ Ten moduł udostępnia frontendom uwierzytelniającym takim jak
 mod_auth_basic uwierzytelnianie użytkowników poprzez katalog LDAP.
 
 %package mod_authz_core
-Summary:	Apache module that rejects any authorization request
-Summary(pl.UTF-8):	Moduł Apache'a odrzucający wszystkie żądania autoryzacji
+Summary:	Apache module that provides core authentication directives
+Summary(pl.UTF-8):	Moduł Apache'a udostępniający podstawowe dyrektywy dotyczące uwierzytelniania
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_authz_core.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -699,15 +697,13 @@ Provides:	apache(mod_authz_default) = %{version}-%{release}
 Obsoletes:	apache(mod_authz_default) = %{version}-%{release}
 
 %description mod_authz_core
-This module is designed to be the fallback module, if you don't have
-configured an authorization module like mod_authz_user or
-mod_authz_groupfile. It simply rejects any authorization request.
+This module provides core authentication capabilities to allow or deny
+access to portions of the web site. mod_authz_core provides directives
+that are common to all authentication providers.
 
 %description mod_authz_core -l pl.UTF-8
-Ten moduł został pomyślany jako domyślny moduł autoryzujący jeśli nie
-skonfigurowano modułu autoryzującego takiego jak mod_authz_user czy
-mod_authz_groupfile. Moduł ten po prostu odrzuca wszelkie żądania
-autoryzacji.
+Ten moduł dostarcza podstawowych funkcjonalności uwierzytelniania
+umożliwiając na kontrolę dostępu do części serwisu.
 
 %package mod_authz_dbd
 Summary:	Group Authorization and Login using SQL
