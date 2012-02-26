@@ -25,15 +25,6 @@
  		print STDERR "apxs:Error: no config variable $var\n";
  		&usage;
  	    }
-@@ -211,7 +212,7 @@
-     error("your server binary `$httpd'.");
-     exit 1;
- }
--
-+}
- sub get_config_vars{
-     my ($file, $rh_config) = @_;
- 
 @@ -479,8 +480,8 @@
          $t =~ s|\.[^./\\]+$|\.so|;
          if ($opt_i) {
