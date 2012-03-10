@@ -1,4 +1,7 @@
 # # TODO:
+# - enable new modules: https://httpd.apache.org/docs/2.4/new_features_2_4.html
+#   - mod_lua
+#   - mod_proxy_fcgi, mod_proxy_scgi
 # - config examples for mod_*
 # - --with-suexec-uidmin=500 or =1000 ?
 # - check those autn modules inner deps
