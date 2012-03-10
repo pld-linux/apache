@@ -2723,10 +2723,10 @@ fi
 %triggerpostun base -- %{name} < 2.4.0
 cp -f /etc/httpd/apache.conf{,.rpmsave}
 sed -i -e '
-	/^DefaultType.*/s,.*,,
-	/^Include /s,^Include ,IncludeOptional ,
-	/^NameVirtualHost.*/s,.*,,
-	/^User/s,^,LoadModule unixd_module modules/mod_unixd.so\n,
+	/^DefaultType/d
+	/^Include / s,^Include ,IncludeOptional ,
+	/^NameVirtualHost/d
+	/^User/ s,^,LoadModule unixd_module modules/mod_unixd.so\n,
 ' /etc/httpd/apache.conf
 sed -i -e '
 	s,^LockFile /var/run/httpd/accept.lock,Mutex file:/var/run/httpd/,g
@@ -2742,8 +2742,8 @@ sed -i -e '
 %triggerpostun mod_ssl -- %{name}-mod_ssl < 1:2.4.0
 cp -f /etc/httpd/conf.d/40_mod_ssl.conf{,.rpmsave}
 sed -i -e '
-	/^SSLMutex/s,^,#,
-	/^NameVirtualHost.*/s,.*,,
+	/^SSLMutex/ s,^,#,
+	/^NameVirtualHost/d
 ' /etc/httpd/conf.d/40_mod_ssl.conf
 
 %posttrans base
