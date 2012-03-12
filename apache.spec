@@ -42,7 +42,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.4.1
-Release:	0.3
+Release:	0.4
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -2407,7 +2407,7 @@ install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig,systemd/system
 	DESTDIR=$RPM_BUILD_ROOT
 
 # clean "ccache" prefix. confuses other build systems (like php)
-%{__sed} -ire '/^(CC|CPP|CXX)/ s/ccache //' $RPM_BUILD_ROOT%{_libdir}/%{name}/build/config_vars.mk
+%{__sed} -i -re '/^(CC|CPP|CXX)/ s/ccache //' $RPM_BUILD_ROOT%{_libdir}/%{name}/build/config_vars.mk
 
 install %{SOURCE31} $RPM_BUILD_ROOT%{systemdunitdir}/httpd.service
 ln -s %{systemdunitdir}/httpd.service $RPM_BUILD_ROOT/etc/systemd/system/httpd.service
