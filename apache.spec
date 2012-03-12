@@ -42,7 +42,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.4.1
-Release:	0.1
+Release:	0.2
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -2556,6 +2556,8 @@ cd $cur
 # htpasswd goes to %{_bindir}
 ln -sf %{_bindir}/htpasswd $RPM_BUILD_ROOT%{_sbindir}
 
+mv $RPM_BUILD_ROOT{%{_bindir},%{_sbindir}}/apxs
+
 # cgi_test: create config file with ScriptAlias
 cat << 'EOF' > $CFG/09_cgi_test.conf
 ScriptAlias /cgi-bin/printenv %{_cgibindir}/printenv
@@ -2998,7 +3000,7 @@ fi
 
 %files devel
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_bindir}/apxs
+%attr(755,root,root) %{_sbindir}/apxs
 %attr(755,root,root) %{_sbindir}/envvars*
 %dir %{_libexecdir}
 %dir %{_libexecdir}/build
