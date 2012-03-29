@@ -1,0 +1,11 @@
+--- httpd-2.2.22/server/util_pcre.c.wiget	2012-03-29 08:50:30.426713350 +0200
++++ httpd-2.2.22/server/util_pcre.c	2012-03-29 08:52:34.946711295 +0200
+@@ -137,7 +137,7 @@ preg->re_erroffset = erroffset;
+ 
+ if (preg->re_pcre == NULL) return AP_REG_INVARG;
+ 
+-preg->re_nsub = pcre_info((const pcre *)preg->re_pcre, NULL, NULL);
++pcre_fullinfo((const pcre *)preg->re_pcre, NULL, PCRE_INFO_CAPTURECOUNT, &(preg->re_nsub));
+ return 0;
+ }
+ 
