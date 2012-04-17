@@ -41,12 +41,12 @@ Summary(pt_BR.UTF-8):	Servidor HTTPD para prover serviços WWW
 Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
-Version:	2.4.1
-Release:	0.4
+Version:	2.4.2
+Release:	0.1
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
-# Source0-md5:	4366afbea8149ca125af01fd59a2f8a2
+# Source0-md5:	02d674020d5eda33267861d4a09bf3d4
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}.sysconfig
@@ -3355,6 +3355,7 @@ fi
 %attr(755,root,root) %{_sbindir}/fcgistarter
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_proxy.conf
 %attr(755,root,root) %{_libexecdir}/mod_proxy*.so
+%{_mandir}/man8/fcgistarter.8*
 
 %files mod_ratelimit
 %defattr(644,root,root,755)
