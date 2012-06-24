@@ -1,6 +1,4 @@
 # # TODO:
-# - enable new modules: https://httpd.apache.org/docs/2.4/new_features_2_4.html
-#   - mod_lua
 # - config examples for mod_*
 # - --with-suexec-uidmin=500 or =1000 ?
 # - check those autn modules inner deps
@@ -98,6 +96,7 @@ Patch26:	%{name}-mod_vhost_alias_docroot.patch
 # http://mpm-itk.sesse.net/
 Patch28:	%{name}-mpm-itk.patch
 Patch29:	libtool-tag.patch
+Patch30:	lua-lib.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	apr-devel >= %{apr_ver}
 BuildRequires:	apr-util-devel >= 1:1.3.10-2
@@ -105,6 +104,7 @@ BuildRequires:	autoconf >= 2.13
 BuildRequires:	automake
 %{?with_distcache:BuildRequires:	distcache-devel}
 BuildRequires:	libtool >= 2:1.5
+BuildRequires:	lua51-devel
 %{?with_ldap:BuildRequires:	openldap-devel >= 2.3.0}
 %{?with_ssl:BuildRequires:	openssl-devel >= %{openssl_ver}}
 %{?with_ssl:BuildRequires:	openssl-tools >= %{openssl_ver}}
@@ -1615,6 +1615,21 @@ ciałami żądań i odpowiedzi. Zliczanie jest wykonywane przed SSL/TLS na
 wejściu i po SSL/TLS na wyjściu, więc liczby będą właściwie
 odzwierciedlały wszystkie zmiany dokonywane przez szyfrowanie.
 
+%package mod_lua
+Summary:	Provides Lua hooks into various portions of the httpd request processing
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_lua.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_lua) = %{version}-%{release}
+
+%description mod_lua
+This module allows the server to be extended with scripts written in
+the Lua programming language. The extension points (hooks) available
+with mod_lua include many of the hooks available to natively compiled
+Apache HTTP Server modules, such as mapping requests to files,
+generating dynamic responses, access control, authentication,
+and authorization
+
 %package mod_mime
 Summary:	Associates the requested filename's extensions with the file's behavior and content
 Summary(pl.UTF-8):	Wiązanie określonych rozszerzeń plików z zachowaniem i zawartością
@@ -2286,6 +2301,7 @@ Dwa programy testowe/przykładowe cgi: test-cgi and print-env.
 # probably drop
 #%patch28 -p1
 %patch29 -p1
+%patch30 -p1
 
 # sanity check
 MODULES_API=`awk '/#define MODULE_MAGIC_NUMBER_MAJOR/ {print $3}' include/ap_mmn.h`
@@ -2347,6 +2363,7 @@ install -d build; cd build
 	--enable-case-filter-in \
 	--enable-log-forensic \
 	--enable-logio \
+	--enable-lua \
 	--with-z=%{_prefix} \
 	--enable-mime-magic \
 	--enable-cern-meta \
@@ -2515,6 +2532,7 @@ echo "LoadModule ldap_module	modules/mod_ldap.so" > $CFG/00_mod_ldap.conf
 echo "LoadModule log_debug_module       modules/mod_log_debug.so" > $CFG/00_mod_log_debug.conf
 echo "LoadModule log_forensic_module	modules/mod_log_forensic.so" > $CFG/00_mod_log_forensic.conf
 echo "LoadModule logio_module	modules/mod_logio.so" > $CFG/00_mod_logio.conf
+echo "LoadModule lua_module	modules/mod_lua.so" > $CFG/00_mod_lua.conf
 echo "LoadModule negotiation_module	modules/mod_negotiation.so" > $CFG/00_mod_negotiation.conf
 echo "LoadModule ratelimit_module       modules/mod_ratelimit.so" > $CFG/00_mod_ratelimit.conf
 echo "LoadModule reflector_module       modules/mod_reflector.so" > $CFG/00_mod_reflector.conf
@@ -2856,6 +2874,7 @@ fi
 %module_scripts mod_log_debug
 %module_scripts mod_log_forensic
 %module_scripts mod_logio
+%module_scripts mod_lua
 %module_scripts mod_mime
 %module_scripts mod_mime_magic
 %module_scripts mod_negotiation
@@ -3334,6 +3353,11 @@ fi
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_logio.conf
 %attr(755,root,root) %{_libexecdir}/mod_logio.so
+
+%files mod_lua
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_lua.conf
+%attr(755,root,root) %{_libexecdir}/mod_lua.so
 
 %files mod_mime
 %defattr(644,root,root,755)

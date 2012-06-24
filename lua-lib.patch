@@ -1,0 +1,16 @@
+--- httpd-2.4.2/modules/lua/config.m4~	2011-07-24 21:14:25.000000000 +0200
++++ httpd-2.4.2/modules/lua/config.m4	2012-06-24 12:50:48.078264944 +0200
+@@ -76,11 +76,8 @@
+         save_LDFLAGS=$LDFLAGS
+         CFLAGS="$CFLAGS"
+         LDFLAGS="-L$x/lib/lua51 $LDFLAGS $lib_m"
+-        AC_CHECK_LIB(lua, luaL_newstate, [
+-            LUA_LIBS="-L$x/lib/lua51 -llua $lib_m"
+-            if test "x$ap_platform_runtime_link_flag" != "x"; then
+-               APR_ADDTO(LUA_LIBS, [$ap_platform_runtime_link_flag$x/lib/lua51])
+-            fi
++        AC_CHECK_LIB(lua51, luaL_newstate, [
++            LUA_LIBS="-llua51 $lib_m"
+             LUA_CFLAGS="-I$x/include/lua51"
+             ])
+         CFLAGS=$save_CFLAGS
