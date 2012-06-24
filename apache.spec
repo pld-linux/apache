@@ -1690,6 +1690,7 @@ Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_proxy.html
 Requires:	%{name}-base = %{version}-%{release}
 Requires:	%{name}-mod_authz_host = %{version}-%{release}
+Requires:	%{name}-mod_xml2enc = %{version}-%{release}
 Provides:	apache(mod_proxy) = %{version}-%{release}
 
 %description mod_proxy
