@@ -1,7 +1,6 @@
 # # TODO:
 # - enable new modules: https://httpd.apache.org/docs/2.4/new_features_2_4.html
 #   - mod_lua
-#   - mod_proxy_fcgi, mod_proxy_scgi
 # - config examples for mod_*
 # - --with-suexec-uidmin=500 or =1000 ?
 # - check those autn modules inner deps
@@ -3355,7 +3354,17 @@ fi
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_sbindir}/fcgistarter
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_proxy.conf
-%attr(755,root,root) %{_libexecdir}/mod_proxy*.so
+%attr(755,root,root) %{_libexecdir}/mod_proxy_ajp.so
+%attr(755,root,root) %{_libexecdir}/mod_proxy_balancer.so
+%attr(755,root,root) %{_libexecdir}/mod_proxy_connect.so
+%attr(755,root,root) %{_libexecdir}/mod_proxy_express.so
+%attr(755,root,root) %{_libexecdir}/mod_proxy_fcgi.so
+%attr(755,root,root) %{_libexecdir}/mod_proxy_fdpass.so
+%attr(755,root,root) %{_libexecdir}/mod_proxy_ftp.so
+%attr(755,root,root) %{_libexecdir}/mod_proxy_html.so
+%attr(755,root,root) %{_libexecdir}/mod_proxy_http.so
+%attr(755,root,root) %{_libexecdir}/mod_proxy_scgi.so
+%attr(755,root,root) %{_libexecdir}/mod_proxy.so
 %{_mandir}/man8/fcgistarter.8*
 
 %files mod_ratelimit
