@@ -1,10 +1,10 @@
-diff -urN httpd-2.0.45.org/config.layout httpd-2.0.45/config.layout
---- httpd-2.0.45.org/config.layout	Thu Apr  3 09:27:42 2003
-+++ httpd-2.0.45/config.layout	Thu Apr  3 09:27:59 2003
-@@ -347,3 +347,27 @@
-     proxycachedir: ${localstatedir}/proxy
+--- httpd-2.4.3/config.layout.orig	2012-04-17 16:01:41.000000000 +0200
++++ httpd-2.4.3/config.layout	2012-08-23 13:01:27.879147377 +0200
+@@ -370,3 +370,29 @@
+     logfiledir:      ${localstatedir}/log/httpd
+     proxycachedir:   ${localstatedir}/cache/httpd
  </Layout>
- 
++
 +# PLD layout
 +<Layout PLD>
 +    prefix:        /usr
@@ -29,4 +29,4 @@ diff -urN httpd-2.0.45.org/config.layout httpd-2.0.45/config.layout
 +    proxycachedir: /var/cache/httpd
 +    installbuilddir: ${libexecdir}/build
 +</Layout>
-
++
