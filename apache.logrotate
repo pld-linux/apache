@@ -9,7 +9,7 @@
     olddir /var/log/archive/httpd
     sharedscripts
     postrotate
-	if /bin/systemd_booted; then
+	if [ -x /bin/systemd_booted ] && /bin/systemd_booted; then
 		/bin/systemctl reload httpd.service
 	else
 		/sbin/service httpd flush-logs > /dev/null
