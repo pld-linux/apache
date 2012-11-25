@@ -43,12 +43,12 @@ Summary(pt_BR.UTF-8):	Servidor HTTPD para prover serviços WWW
 Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
-Version:	2.2.22
-Release:	7
+Version:	2.2.23
+Release:	1
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
-# Source0-md5:	d77fa5af23df96a8af68ea8114fa6ce1
+# Source0-md5:	77246eaa84a54bb7451f68216333750d
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}.sysconfig
@@ -105,7 +105,6 @@ Patch26:	apache-mod_vhost_alias_docroot.patch
 # http://mpm-itk.sesse.net/
 Patch28:	apache-mpm-itk.patch
 Patch29:	libtool-tag.patch
-Patch30:	pcre8.30.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	apr-devel >= %{apr_ver}
 BuildRequires:	apr-util-devel >= 1:1.3.10-2
@@ -1797,7 +1796,6 @@ Dwa programy testowe/przykładowe cgi: test-cgi and print-env.
 %patch26 -p1
 %patch28 -p1
 %patch29 -p1
-%patch30 -p1
 
 # using system apr, apr-util and pcre
 %{__rm} -r srclib/{apr,apr-util,pcre}
@@ -2437,10 +2435,10 @@ fi
 %attr(755,root,root) %{_sbindir}/htdigest
 %attr(755,root,root) %{_sbindir}/logresolve
 %attr(755,root,root) %{_sbindir}/rotatelogs
-%{_mandir}/man1/ab.1*
+%{_mandir}/man8/ab.8*
 %{_mandir}/man8/apachectl.8*
 %{_mandir}/man1/htdigest.1*
-%{_mandir}/man1/logresolve.1*
+%{_mandir}/man8/logresolve.8*
 %{_mandir}/man8/rotatelogs.8*
 
 %files devel
@@ -2453,7 +2451,7 @@ fi
 %{_libexecdir}/build/config_vars.mk
 %attr(755,root,root) %{_libexecdir}/build/*.sh
 %{_includedir}
-%{_mandir}/man1/apxs.1*
+%{_mandir}/man8/apxs.8*
 
 %files mod_actions
 %defattr(644,root,root,755)
