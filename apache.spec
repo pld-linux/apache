@@ -4,7 +4,7 @@
 # - check those autn modules inner deps
 # - for external packages: don't use any apache module name in dep as they
 #  differ for apache 1.3/2.0/2.2!? any better ideas? rpm Suggests: tags?
-# - for mod_auth_* modules require each auth module to require virtual authn so at least *_default
+# - for mod_auth_* modules require each auth module to require virtual authn so at least *_core
 #  is chosen?
 # - same for mod_authz
 # - mod_auth_digest and mod_auth_basic R: apache(authn) ?
@@ -21,13 +21,9 @@
 # this is internal macro, don't change to %%apache_modules_api
 %define		_apache_modules_api 20120211
 
-%if "%{pld_release}" == "ac"
-%define		openssl_ver	0.9.7d
-%define		apr_ver		1:1.2
-%else
 %define		openssl_ver	0.9.8i
-%define		apr_ver		1:1.4.5
-%endif
+%define		apr_ver		1:1.4.6
+
 %include	/usr/lib/rpm/macros.perl
 Summary:	The most widely used Web server on the Internet
 Summary(de.UTF-8):	Leading World Wide Web-Server
@@ -2047,9 +2043,7 @@ URL:		http://httpd.apache.org/docs/2.4/mod/mod_ssl.html
 Requires:	%{name}-base = %{version}-%{release}
 Requires:	%{name}-mod_socache_shmcb = %{version}-%{release}
 Requires:	openssl >= %{openssl_ver}
-%if "%{pld_release}" != "ac"
 Requires:	apr-util-dbm-db
-%endif
 Provides:	apache(mod_ssl) = 1:%{version}-%{release}
 
 %description mod_ssl
@@ -2690,6 +2684,18 @@ if [ -f /etc/httpd/httpd.conf/10_httpd.conf ]; then
 EOF
 	fi
 fi
+
+%triggerpostun base -- %{name} < 2.4.0
+cp -f /etc/httpd/apache.conf{,.rpmsave}
+sed -i -e '
+        /^DefaultType.*/s,.*,,
+        /^Include /s,^Include ,IncludeOptional ,
+        /^NameVirtualHost.*/s,.*,,
+        /^User/s,^,LoadModule unixd_module modules/mod_unixd.so\n,
+' /etc/httpd/apache.conf
+sed -i -e '
+        s,^LockFile /var/run/httpd/accept.lock,Mutex file:/var/run/httpd/,g
+' /etc/httpd/conf.d/10_mpm.conf
 
 %triggerpostun base -- %{name} < 2.2.0
 # change HTTPD_CONF to point to new location. *only* if it's the
