@@ -96,7 +96,7 @@ Patch30:	lua-lib.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	apr-devel >= %{apr_ver}
 BuildRequires:	apr-util-devel >= 1:1.3.10-2
-BuildRequires:	autoconf >= 2.13
+BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
 %{?with_distcache:BuildRequires:	distcache-devel}
 BuildRequires:	libtool >= 2:1.5
