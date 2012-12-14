@@ -336,6 +336,7 @@ desenvolver módulos adicionais para o Apache.
 
 %package mod_access_compat
 Summary:	Group authorizations based on host (name or IP address)
+Summary(pl.UTF-8):	Grupowe uwierzytelnianie w oparciu o hosta (nazwę lub adres IP)
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_access_compat.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -351,6 +352,17 @@ and Deny directives are used to specify which clients are or are not
 allowed access to the server, while the Order directive sets the
 default access state, and configures how the Allow and Deny directives
 interact with each other.
+
+%description mod_access_compat -l pl.UTF-8
+Dyrektywy udostępniane przez mod_access_compat są używane w sekcjach
+<Directory>, <Files> i <Location>, a także plikach .htaccess do
+sterowania odstępem do poszczególnych części serwera. Dostęp można
+kontrolować w oparciu o nazwę hosta klienta, adres IP lub inne cechy
+żądania klienta, przechwytywane w zmiennych środowiskowych. Dyrektywy
+Allow i Deny służą do określania, którzy klienci mają, a którzy nie
+mają dostępu do serwera, natomiast dyrektywa Order ustawia domyślny
+stan dostępu i konfiguruje sposób interakcji między dyrektywami Allow
+oraz Deny.
 
 %package mod_actions
 Summary:	Apache module for executing CGI scripts based on media type or request method
@@ -419,6 +431,7 @@ URL-ach. Bardziej skomplikowane zadania, takie jak modyfikowanie
 
 %package mod_allowmethods
 Summary:	Easily restrict what HTTP methods can be used on the server
+Summary(pl.UTF-8):	Łatwe ograniczanie metod HTTP dostępnych na serwerze
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_allowmethods.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -427,6 +440,9 @@ Provides:	apache(mod_allowmethods) = %{version}-%{release}
 %description mod_allowmethods
 This module makes it easy to restrict what HTTP methods can used on an
 server.
+
+%description mod_allowmethods -l pl.UTF-8
+Ten moduł ułatwia ograniczanie metod HTTP udostępnianych przez serwer.
 
 %package mod_asis
 Summary:	Sends files that contain their own HTTP headers
@@ -457,8 +473,8 @@ włącznie z przekierowaniami i innymi specjalnymi odpowiedziami HTTP
 bez wymagania skryptu CGI lub nph.
 
 %package mod_auth
-Summary:	Virtual package which provides backward compatibility with apache 2.0
-Summary(pl.UTF-8):	Pakiet wirtualny zapewniający kompatybilność wsteczną z apache 2.0
+Summary:	Virtual package which provides backward compatibility with Apache 2.0
+Summary(pl.UTF-8):	Pakiet wirtualny zapewniający kompatybilność wsteczną z Apachem 2.0
 Group:		Networking/Daemons/HTTP
 Requires:	%{name}-base = %{version}-%{release}
 Requires:	%{name}-mod_auth_basic = %{version}-%{release}
@@ -471,12 +487,12 @@ Provides:	webserver(auth)
 %description mod_auth
 Virtual package which requires apache-mod_authn_file,
 apache-mod_authz_user and apache-mod_authz_groupfile for backward
-compatibility with apache 2.0.
+compatibility with Apache 2.0.
 
 %description mod_auth -l pl.UTF-8
 Pakiet wirtualny wymagający apache-mod_authn_file,
 apache-mod_authz_user i apache-mod_authz_groupfile dla kompatybilności
-wstecznej z apache 2.0.
+wstecznej z Apachem 2.0.
 
 %package mod_auth_basic
 Summary:	Apache module that allows Basic authentication
@@ -497,11 +513,17 @@ mod_authz_user.
 
 %description mod_auth_basic -l pl.UTF-8
 Ten moduł pozwala używać uwierzytelnienia HTTP Basic do ograniczania
-dostępu poprzez wyszukiwanie użytkowników we wskazanych miejscach
+dostępu poprzez wyszukiwanie użytkowników we wskazanych miejscach.
+
+Uwierzytelnianie HTTP Digest jest udostępniane przez moduł
+mod_auth_digest. Niniejszy moduł jest zwykle używany w połączeniu z
+przynajmniej jednym modułem uwierzytelniającym, takim jak
+mod_authn_file oraz jednym modułem autoryzacyjnym, takim jak
+mod_authz_user.
 
 %package mod_auth_dbm
-Summary:	Virtual package which provides backward compatibility with apache 2.0
-Summary(pl.UTF-8):	Pakiet wirtualny zapewniający kompatybilność wsteczną z apache 2.0
+Summary:	Virtual package which provides backward compatibility with Apache 2.0
+Summary(pl.UTF-8):	Pakiet wirtualny zapewniający kompatybilność wsteczną z Apachem 2.0
 Group:		Networking/Daemons/HTTP
 Requires:	%{name}-base = %{version}-%{release}
 Requires:	%{name}-dbmtools = %{version}-%{release}
@@ -511,11 +533,11 @@ Provides:	apache(mod_auth_dbm) = %{version}-%{release}
 
 %description mod_auth_dbm
 Virtual package which requires apache-mod_authn_dbm and
-apache-mod_authz_dbm for backward compatibility with apache 2.0.
+apache-mod_authz_dbm for backward compatibility with Apache 2.0.
 
 %description mod_auth_dbm -l pl.UTF-8
 Pakiet wirtualny wymagający apache-mod_authn_dbm i
-apache-mod_authz_dbm dla kompatybilności wstecznej z apache 2.0.
+apache-mod_authz_dbm dla kompatybilności wstecznej z Apachem 2.0.
 
 %package mod_auth_digest
 Summary:	User authentication using MD5 Digest Authentication
@@ -536,6 +558,7 @@ eksperymentalny.
 
 %package mod_auth_form
 Summary:	Form authentication
+Summary(pl.UTF-8):	Uwierzytelnianie poprzez formularz
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_auth_form.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -547,6 +570,13 @@ looking up users in the given providers. HTML forms require
 significantly more configuration than the alternatives, however an
 HTML login form can provide a much friendlier experience for end
 users.
+
+%description mod_auth_form -l pl.UTF-8
+Ten moduł pozwala na wykorzystywanie HTML-owego formularza logowania
+do ograniczania dostępu poprzez wyszukiwanie użytkowników we
+wskazanych miejscach. Formularze HTML wymagają znacząco większych
+nakładów na konfigurację niż alternatywne sposoby, ale mogą być
+bardziej przyjazne dla użytkowników końcowych.
 
 %package mod_authn_anon
 Summary:	Apache module that allows "anonymous" user access to authenticated areas
@@ -575,8 +605,8 @@ anonimowego ftp, tzn. przez udostępnianie "magicznego" identyfikatora
 być logowane.
 
 %package mod_authn_core
-Summary:	Apache module that provides core authentication directives
-Summary(pl.UTF-8):	Moduł Apache'a udostępniający podstawowe dyrektywy dotyczące uwierzytelniania
+Summary:	Apache module that provides core authentication capabilieties
+Summary(pl.UTF-8):	Moduł Apache'a udostępniający podstawowe funkcje uwierzytelniające
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_authn_core.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -591,8 +621,10 @@ access to portions of the web site. mod_authn_core provides directives
 that are common to all authentication providers.
 
 %description mod_authn_core -l pl.UTF-8
-Ten moduł dostarcza podstawowych funkcjonalności uwierzytelniania
-umożliwiając na kontrolę dostępu do części serwisu.
+Ten moduł dostarcza podstawowe funkcje uwierzytelniania, umożliwiające
+lub blokujące dostęp do części serwisu WWW. mod_authn_core udostępnia
+dyrektywy wspólne dla wszystkich modułów obsługujących
+uwierzytelnianie.
 
 %package mod_authn_dbd
 Summary:	Apache module that allows user authentication using an SQL
@@ -653,7 +685,8 @@ mod_auth_digest i mod_auth_basic uwierzytelnianie użytkowników poprzez
 wyszukiwanie w plikach tekstowych z hasłami.
 
 %package mod_authn_socache
-Summary:	Manages a cache of authentication credentials to relievethe load on backends
+Summary:	Manages a cache of authentication credentials to relieve the load on backends
+Summary(pl.UTF-8):	Zarządzanie pamięcią podręczną uwierzytelniania w celu odciążenia backendów
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_authn_socache.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -663,6 +696,11 @@ Provides:	apache(mod_authn_socache) = %{version}-%{release}
 %description mod_authn_socache
 This module maintains a cache of authentication credentials, so that a
 new backend lookup is not required for every authenticated request.
+
+%description mod_authn_socache -l pl.UTF-8
+Ten moduł utrzymuje pamięć podręczną danych uwierzytelniających,
+dzięki czemu nie przy każdym żądaniu uwierzytelniania wymagane jest
+nowe wyszukiwanie po stronie backendu.
 
 %package mod_authnz_ldap
 Summary:	Apache module that allows an LDAP directory to be used to store the database for HTTP Basic authentication
@@ -687,8 +725,8 @@ Ten moduł udostępnia frontendom uwierzytelniającym takim jak
 mod_auth_basic uwierzytelnianie użytkowników poprzez katalog LDAP.
 
 %package mod_authz_core
-Summary:	Apache module that provides core authentication directives
-Summary(pl.UTF-8):	Moduł Apache'a udostępniający podstawowe dyrektywy dotyczące uwierzytelniania
+Summary:	Apache module that provides core authorization capabilities
+Summary(pl.UTF-8):	Moduł Apache'a udostępniający podstawowe funkcje autoryzujące
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_authz_core.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -697,16 +735,26 @@ Provides:	apache(mod_authz_default) = %{version}-%{release}
 Obsoletes:	apache-mod_authz_default < %{version}-%{release}
 
 %description mod_authz_core
-This module provides core authentication capabilities to allow or deny
-access to portions of the web site. mod_authz_core provides directives
-that are common to all authentication providers.
+This module provides core authorization capabilities so that
+authenticated users can be allowed or denied access to portions of the
+web site. mod_authz_core provides the functionality to register
+various authorization providers. It is usually used in conjunction
+with an authentication provider module such as mod_authn_file and an
+authorization module such as mod_authz_user. It also allows for
+advanced logic to be applied to the authorization processing.
 
 %description mod_authz_core -l pl.UTF-8
-Ten moduł dostarcza podstawowych funkcjonalności uwierzytelniania
-umożliwiając na kontrolę dostępu do części serwisu.
+Ten moduł dostarcza podstawowe funkcje autoryzacji, umożliwiające lub
+blokujące dostęp do części serwisu WWW uwierzytelnionym użytkownikom.
+mod_authz_core udostępnia funkcje do rejestrowania różnych modułów
+autoryzujących. Zwykle jest używany w połączeniu z modułem
+zapewniającym uwierzytelnianie, takim jak mod_authn_file oraz modułem
+autoryzującym, takim jak mod_authz_user. Umożliwia także użycie
+zaawansowanej logiki w czasie procesu autoryzacji.
 
 %package mod_authz_dbd
 Summary:	Group Authorization and Login using SQL
+Summary(pl.UTF-8):	Grupowa autoryzacja i logowanie przy użyciu SQL
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_authz_dbd.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -728,6 +776,21 @@ conjunction with mod_authn_dbd.
 
 This module relies on mod_dbd to specify the backend database driver
 and connection parameters, and manage the database connections.
+
+%description mod_authz_dbd -l pl.UTF-8
+Ten moduł udostępnia funkcje autoryzujące pozwalające lub blokujące
+dostęp do części serwisu WWW uwierzytelnionym użytkownikom na
+podstawie ich przynależności do grup. Podobne funkcje udostępniają
+moduły mod_authz_groupfile oraz mod_authz_dbm, z tą różnicą, że
+niniejszy moduł odpytuje bazę SQL w celu stwierdzenia przynależności
+do grupy.
+
+Ten moduł może także zapewniać funkcje do logowania/wylogowywania
+użytkowników w oparciu o bazę danych. Jest to przydatne najbardziej w
+połączeniu z mod_authn_dbd.
+
+Ten moduł polega na mod_dbd w celu określenia sterownika bazy danych i
+parametrów połączenia oraz zarządzania połączeniami z bazą.
 
 %package mod_authz_dbm
 Summary:	Apache module that allows group authorization using DBM files
@@ -868,6 +931,7 @@ Dzielenie kubełków po znalezieniu znaku sterującego.
 
 %package mod_buffer
 Summary:	Support for request buffering
+Summary(pl.UTF-8):	Obsługa buforowania żądań
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_buffer.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -889,6 +953,21 @@ When httpd is used in front of an expensive content generator,
 buffering the response may allow the backend to complete processing
 and release resources sooner, depending on how the backend is
 designed.
+
+%description mod_buffer -l pl.UTF-8
+Ten moduł daje możliwość buforowania wejścia i wyjścia stosów filtrów.
+
+W niektórych warunkach generatory treści mogą wytwarzać treść w
+niewielkich porcjach. W celu ułatwienia ponownego używania pamięci,
+porcje w pamięci mają zawsze 8k niezależnoe od rozmiaru samych porcji.
+Kiedy żądanie wygeneruje wiele małych porcji, może to spowodować duży
+narzut pamięciowy podczas przetwarzania żądania. Dodanie bufora łączy
+odpowiedzi w jak najmniejszą liczbę porcji.
+
+W przypadku używania httpd do prezentacji treści z kosztownego
+generatora, buforowanie odpowiedzi może pozwolić backendowi dokończyć
+przetwarzanie i wcześniej zwolnić zasoby (w zależności od sposobu
+zaprojektowania backendu).
 
 %package mod_cache
 Summary:	Content cache keyed to URIs
@@ -1057,6 +1136,7 @@ Jest to moduł eksperymentalny i należy używać go z uwagą.
 
 %package mod_data
 Summary:	Convert response body into an RFC2397 data URL
+Summary(pl.UTF-8):	Konwersja ciała odpowiedzi do URL-a danych RFC2397
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_data.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1071,6 +1151,15 @@ the mod_include module, to remove the need for clients to make
 separate connections to fetch what may potentially be many small
 images. Data URLs may also be included into pages generated by
 scripting languages such as PHP.
+
+%description mod_data -l pl.UTF-8
+Ten moduł daje możliwość konwersji odpowiedzi do URL-a danych RFC2397.
+
+URL-e danych można osadzać wewnątrz stron WWW środkami takimi jak
+moduł mod_include, dzięki czemu klienci nie muszą tworzyć osobnych
+połączeń w celu pobrania wielu małych obrazków. URL-e danych można
+włączać także do stron generowanych przez języki skryptowe, takie jak
+PHP.
 
 %package mod_dav
 Summary:	Apache module - Distributed Authoring and Versioning
@@ -1133,15 +1222,21 @@ Moduł kompresujący dane przed przesłaniem ich do klienta.
 
 %package mod_dialup
 Summary:	Send static content at a bandwidth rate limit, defined by the various old modem standards
+Summary(pl.UTF-8):	Wysyłanie statycznej treści z ograniczeniem przepustowości
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_dialup.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_dialup) = %{version}-%{release}
 
 %description mod_dialup
-t is a module that sends static content at a bandwidth rate limit,
+It is a module that sends static content at a bandwidth rate limit,
 defined by the various old modem standards. So, you can browse your
 site with a 56k V.92 modem.
+
+%description mod_dialup -l pl.UTF-8
+Ten moduł wysyła statyczną treść z ograniczoną przepustowością,
+zgodnie ze stardardami różnych starych modemów. Można więc przeglądać
+stronę tak, jakby robiło się to przez modem 56k V.92.
 
 %package mod_dir
 Summary:	Apache module for "trailing slash" redirects and serving directory index files
@@ -1351,7 +1446,8 @@ Moduł pozwalający na łączenie, usuwanie oraz zamianę nagłówków HTTP
 wysyłanych do przeglądarki.
 
 %package mod_heartbeat
-Summary:	sends messages with server status to frontend proxy
+Summary:	Sends messages with server status to frontend proxy
+Summary(pl.UTF-8):	Wysyłanie wiadomości o stanie serwera do proxy frontendowego
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_heartbeat.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1369,8 +1465,16 @@ mod_lbmethod_heartbeat loaded, which allows ProxyPass to use the
 mod_heartbeat itself is loaded on the origin server(s) that serve
 requests through the proxy server(s).
 
+%description mod_heartbeat -l pl.UTF-8
+mod_heartbeat wysyła wiadomości multicast do modułu nasłuchującego
+mod_heartmonitor, rozgłaszającego bieżącą liczbę połączeń z serwerami.
+Zwykle mod_heartmonitor działa na serwerze proxy z wczytanym modułem
+mod_lbmethod_hartbeat, co pozwala na wykorzystanie metody rozkładania
+ruchu "heartbeat" wewnątrz ProxyPass.
+
 %package mod_heartmonitor
-Summary:	centralized monitor for mod_heartbeat origin servers
+Summary:	Centralized monitor for mod_heartbeat origin servers
+Summary(pl.UTF-8):	Scentralizowany monitor dla serwerów z mod_heartbeat
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_heartmonitor.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1387,6 +1491,16 @@ to mod_lbmethod_heartbeat. This allows ProxyPass to use the
 This module uses the services of mod_slotmem_shm when available
 instead of flat-file storage. No configuration is required to use
 mod_slotmem_shm.
+
+%description mod_heartmonitor -l pl.UTF-8
+mod_heartmonitor nasłuchuje wiadomości o stanie serwera, generowanych
+przez serwery z mod_heartbeat i udostępnia ich stan dla modułu
+mod_lbmethod_heartbeat. Pozwala to na wykorzystywanie metody
+rozkładania ruchu "heartbeat" wewnątrz ProxyPass.
+
+Ten moduł wykorzystuje usługi modułu mod_slotmem_shm (jeśli jest
+dostępny) zamiast przechowywania danych w płaskich plikach. Do
+używania tego modułu nie jest wymagana żadna konfiguracja.
 
 %package mod_ident
 Summary:	RFC 1413 ident lookups
@@ -1468,6 +1582,7 @@ zainstalowanych modułach itp.
 
 %package mod_lbmethod_bybusyness
 Summary:	Pending Request Counting load balancer scheduler algorithm for mod_proxy_balancer
+Summary(pl.UTF-8):	Algorytm rozkładania ruchu mod_proxy_balancer w oparciu o liczbę żądań do przetworzenia
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_lbmethod_bybusyness.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1478,8 +1593,14 @@ Provides:	apache(mod_lbmethod_bybusyness) = %{version}-%{release}
 Pending Request Counting load balancer scheduler algorithm for
 mod_proxy_balancer.
 
+%description mod_lbmethod_bybusyness -l pl.UTF-8
+Moduł algorytmu szeregowania rozkładania ruchu dla modułu
+mod_proxy_balancer w oparciu o liczbę żądań pozostałych do
+przetworzenia (Pending Request Count).
+
 %package mod_lbmethod_byrequests
 Summary:	Request Counting load balancer scheduler algorithm for mod_proxy_balancer
+Summary(pl.UTF-8):	Algorytm rozkładania ruchu mod_proxy_balancer w oparciu o liczbę żądań
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_lbmethod_byrequests.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1490,8 +1611,13 @@ Provides:	apache(mod_lbmethod_byrequests) = %{version}-%{release}
 Request Counting load balancer scheduler algorithm for
 mod_proxy_balancer.
 
+%description mod_lbmethod_byrequests -l pl.UTF-8
+Moduł algorytmu szeregowania rozkładania ruchu dla modułu
+mod_proxy_balancer w oparciu o liczbę żądań (Request Counting).
+
 %package mod_lbmethod_bytraffic
 Summary:	Weighted Traffic Counting load balancer scheduler algorithm for mod_proxy_balancer
+Summary(pl.UTF-8):	Algorytm rozkładania ruchu mod_proxy_balancer w oparciu o ważony ruch
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_lbmethod_bytraffic.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1502,8 +1628,14 @@ Provides:	apache(mod_lbmethod_bytraffic) = %{version}-%{release}
 Weighted Traffic Counting load balancer scheduler algorithm for
 mod_proxy_balancer.
 
+%description mod_lbmethod_bytraffic -l pl.UTF-8
+Moduł algorytmu szeregowania rozkładania ruchu dla modułu
+mod_proxy_balancer w oparciu o ważone zliczanie ruchu (Weighted
+Traffic Counting).
+
 %package mod_lbmethod_heartbeat
 Summary:	Heartbeat Traffic Counting load balancer scheduler algorithm for mod_proxy_balancer
+Summary(pl.UTF-8):	Algorytm rozkładania ruchu mod_proxy_balancer w oparciu o ruch i stan serwera
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_lbmethod_heartbeat.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1513,6 +1645,11 @@ Provides:	apache(mod_lbmethod_heartbeat) = %{version}-%{release}
 %description mod_lbmethod_heartbeat
 Heartbeat Traffic Counting load balancer scheduler algorithm for
 mod_proxy_balancer.
+
+%description mod_lbmethod_heartbeat -l pl.UTF-8
+Moduł algorytmu szeregowania rozkładania ruchu dla modułu
+mod_proxy_balancer w oparciu o zliczanie ruchu i stan serwera
+(Heartbeat Traffic Counting).
 
 %package mod_ldap
 Summary:	Apache module for LDAP connection pooling and result caching services for other LDAP modules
@@ -1560,6 +1697,7 @@ charakterystyki żądania.
 
 %package mod_log_debug
 Summary:	Additional configurable debug logging
+Summary(pl.UTF-8):	Dodatkowe, konfigurowalne logowanie diagnostyczne
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_log_debug.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1567,6 +1705,9 @@ Provides:	apache(mod_log_debug) = %{version}-%{release}
 
 %description mod_log_debug
 Additional configurable debug logging.
+
+%description mod_log_debug -l pl.UTF-8
+Dodatkowe, konfigurowalne logowanie diagnostyczne.
 
 %package mod_log_forensic
 Summary:	Forensic Logging of the requests made to the server
@@ -1612,7 +1753,8 @@ wejściu i po SSL/TLS na wyjściu, więc liczby będą właściwie
 odzwierciedlały wszystkie zmiany dokonywane przez szyfrowanie.
 
 %package mod_lua
-Summary:	Provides Lua hooks into various portions of the httpd request processing
+Summary:	Provides Lua hooks into various portions of the HTTP request processing
+Summary(pl.UTF-8):	Zaczepienia Lua do różnych etapów przetwarzania żądań HTTP
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_lua.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1624,7 +1766,15 @@ the Lua programming language. The extension points (hooks) available
 with mod_lua include many of the hooks available to natively compiled
 Apache HTTP Server modules, such as mapping requests to files,
 generating dynamic responses, access control, authentication,
-and authorization
+and authorization.
+
+%description mod_lua -l pl.UTF-8
+Ten moduł pozwala na rozszerzanie serwera poprzez skrypty napisane w
+języku Lua. Punkty rozszerzania (zaczepienia) dostępne poprzez mod_lua
+obejmują wiele punktów zaczepienia dostępnych w natywnie kompilowanych
+modułach serwera HTTP Apache, takich jak odwzorowywanie żądań na
+pliki, generowanie dynamicznych odpowiedzi, kontrola dostępu,
+uwierzytelnianie i autoryzacja.
 
 %package mod_mime
 Summary:	Associates the requested filename's extensions with the file's behavior and content
@@ -1717,6 +1867,7 @@ HTTP/1.0 i HTTP/1.1.
 
 %package mod_ratelimit
 Summary:	Bandwidth Rate Limiting for Clients
+Summary(pl.UTF-8):	Ograniczanie pasma dla klientów
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_ratelimit.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1727,8 +1878,14 @@ Provides a filter named RATE_LIMIT to limit client bandwidth. The
 connection speed to be simulated is specified, in KiB/s, using the
 environment variable rate-limit.
 
+%description mod_ratelimit -l pl.UTF-8
+Ten moduł udostępnia filtr o nazwie RATE_LIMIT do ograniczania pasma
+klienta. Szybkość połączenia do symulacji jest podawana w KiB/s
+poprzez zmienną środowiskową rate-limit.
+
 %package mod_reflector
 Summary:	Reflect a request body as a response via the output filter stack
+Summary(pl.UTF-8):	Odbijanie ciała żądania jako odpowiedzi poprzez stos filtrów wyjściowych
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_reflector.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1741,8 +1898,16 @@ suitably configured chain of filters can be used to transform the
 request into a response. This module can be used to turn an output
 filter into an HTTP service.
 
+%description mod_reflector -l pl.UTF-8
+Ten moduł pozwala na odbijanie ciał żądań z powrotem do klienta w
+procesie przekazywania żądania poprzez stos filtrów wyjściowych.
+Odpowiednio skonfigurowany łańcuch filtrów może przekształcić żądanie
+w odpowiedź. Tego modułu można użyć do zamiany filtra wyjściowego w
+usługę HTTP.
+
 %package mod_remoteip
-Summary:	Replaces the original client IP address for the connectionwith the useragent IP address list presented by a proxies or a load balancervia the request headers
+Summary:	Replaces the original client IP address for the connection
+Summary(pl.UTF-8):	Podmiana oryginalnego adresu IP klienta dla połączenia
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_remoteip.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1760,9 +1925,24 @@ the RemoteIPHeader directive.
 
 Once replaced as instructed, this overridden useragent IP address is
 then used for the mod_authz_host <Require ip> feature, is reported by
-mod_status, and is recorded by mod_log_config %a and core %a format
+mod_status, and is recorded by mod_log_config %%a and core %%a format
 strings. The underlying client IP of the connection is available in
-the %{c}a format string.
+the %%{c}a format string.
+
+%description mod_remoteip -l pl.UTF-8
+Ten moduł pozwala traktować adres przeglądarki, który zapoczątkował
+żądanie, jako oryginalny adres identyfikowany przez httpd do celów
+autoryzacji i logowania, nawet jeśli przeglądarka jest za load
+balancerem, serwerem frontendowym lub proxy.
+
+Moduł nadpisuje adres IP klienta dla połączenia adresem IP zgłaszanym
+w nagłówku żądania konfigurowanym dyrektywą RemoteIPHeader.
+
+Po zastąpieniu zgodnie z instrukcją ten nadpisany adres IP jest
+używany w dyrektywie <Require ip> modułu mod_authz_host, jest
+raportowany przez mod_status oraz zapisywany poprzez łańcuchy
+formatujące %%a modułu mod_log_config. Bezpośrednie IP klienckie
+połączenia jest dostępne poprzez łańcuch formatujący %%{c}a.
 
 %package mod_reqtimeout
 Summary:	Apache module to set timeout and minimum data rate for receiving requests
@@ -1783,13 +1963,17 @@ transferu danych.
 
 %package mod_request
 Summary:	Filters to handle and make available HTTP request bodies
+Summary(pl.UTF-8):	Filtry do obsługi i udostępniania ciał żądań HTTP
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_request.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_request) = %{version}-%{release}
 
 %description mod_request
-Filters to handle and make available HTTP request bodies
+Filters to handle and make available HTTP request bodies.
+
+%description mod_request -l pl.UTF-8
+Filtry do obsługi i udostępniania ciał żądań HTTP.
 
 %package mod_rewrite
 Summary:	Apache module with rule-based engine for rewrite requested URLs on the fly
@@ -1809,6 +1993,7 @@ Moduł oferujący możliwość "przepisywania" adresów URL w locie.
 
 %package mod_sed
 Summary:	Filter Input (request) and Output (response) content using sed syntax
+Summary(pl.UTF-8):	Filtrowanie treści wejścia (żądań) i wyjścia (odpowiedzi) przy użyciu składni seda
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_sed.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1821,7 +2006,7 @@ described in the manual page. However, unlike sed, mod_sed doesn't
 take data from standard input. Instead, the filter acts on the entity
 data sent between client and server. mod_sed can be used as an input
 or output filter. mod_sed is a content filter, which means that it
-cannot be used to modify client or server http headers.
+cannot be used to modify client or server HTTP headers.
 
 The mod_sed output filter accepts a chunk of data, executes the sed
 scripts on the data, and generates the output which is passed to the
@@ -1831,12 +2016,27 @@ The mod_sed input filter reads the data from the next filter in the
 chain, executes the sed scripts, and returns the generated data to the
 caller filter in the filter chain.
 
-Both the input and output filters only process the data if newline
-characters are seen in the content. At the end of the data, the rest
-of the data is treated as the last line.
+%description mod_sed -l pl.UTF-8
+Moduł mod_sed to filtr treści wewnątrz procesu. Filtr mod_sed
+implementuje polecenia edycyjne programu sed zgodnie z implementacją z
+systemu Solaris 10, opisaną na stronie man. W odróżnieniu od seda nie
+przyjmuje danych ze standardowego wejścia, ale przetwarza dane
+przesyłane między klientem a serwerem. mod_sed może być używany jako
+filtr wejściowy lub wyjściowy. mod_sed to filtr treści, co oznacza, że
+nie może być używany do modyfikowania nagłówków HTTP klienta ani
+serwera.
+
+Filtr wyjściowy mod_sed pobiera porcję danych, wykonuje na nich
+skrypty seda, a wygenerowane dane przekazuje do następnego filtra w
+łańcuchu.
+
+Filtr wejściowy mod_sed odczytuje dane z następnego filtra w łańcuchu,
+wykonuje skrypty seda i zwraca wygenerowane dane do filtra
+wywołującego w łańcuchu.
 
 %package mod_session
 Summary:	Session support
+Summary(pl.UTF-8):	Obsługa sesji
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_session.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1850,18 +2050,34 @@ kept available across requests.
 
 Sessions may be stored on the server, or may be stored on the browser.
 Sessions may also be optionally encrypted for added security. These
-features are divided into several modules in addition to mod_session;
+features are divided into several modules in addition to mod_session:
 mod_session_crypto, mod_session_cookie and mod_session_dbd. Depending
 on the server requirements, load the appropriate modules into the
-server (either statically at compile time or dynamically via the
-LoadModule directive).
+server.
 
 Sessions may be manipulated from other modules that depend on the
 session, or the session may be read from and written to using
 environment variables and HTTP headers, as appropriate.
 
+%description mod_session -l pl.UTF-8
+Ten moduł zapewnia obsługę sesji użytkownika po stronie serwera. Sesje
+można wykorzystywać do śledzenia, czy użytkownik jest zalogowany, albo
+do przechowywania innych informacji związanych z użytkownikiem, które
+powinny być pamiętane między żądaniami.
+
+Sesje mogą być przechowywane na serwerze, albo przez przeglądarkę.
+Mogą być opcjonalnie szyfrowane dla poprawy bezpieczeństwa. Te funkcje
+są rozdzielone między kilka modułów poza mod_session:
+mod_session_crypto, mod_session_cookie oraz mod_session_dbd. W
+zależności od wymagań można poszczególne moduły załadować do serwera.
+
+Sesjami można manipulować z poziomu innych modułów zależnych od sesji,
+można je też odczytywać i zapisywać przy użyciu odpowiednich zmiennych
+środowiskowych oraz nagłówków HTTP.
+
 %package mod_session_cookie
 Summary:	Cookie based session support
+Summary(pl.UTF-8):	Obsługa sesji opartych na ciasteczkach (cookie)
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_session_cookie.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1877,8 +2093,19 @@ group of servers to store the session locally, or collaborate to share
 a session, and can be useful for high traffic environments where a
 server based session might be too resource intensive.
 
+%description mod_session_cookie -l pl.UTF-8
+Ten podmoduł mod_session zapewnia obsługę przechowywania sesji
+użytkownika w zdalnej przeglądarce wewnątrz ciasteczek (cookie) HTTP.
+
+Wykorzystanie ciasteczek do zapisywania sesji eliminuje potrzebę
+zapisywania tych informacji lokalnie przez serwer lub grupę serwerów
+oraz współdzielenia sesji; jest przydatne także w środowiskach z dużym
+ruchem, gdzie sesje trzymane po stronie serwera mogłyby zajmować zbyt
+dużo zasobów.
+
 %package mod_session_crypto
 Summary:	Session encryption support
+Summary(pl.UTF-8):	Obsługa szyfrowania sesji
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_session_crypto.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1894,8 +2121,19 @@ This can help provide privacy to user sessions where the contents of
 the session should be kept private from the user, or where protection
 is needed against the effects of cross site scripting attacks.
 
+%description mod_session_crypto -l pl.UTF-8
+Ten modmoduł mod_session zapewnia obsługę szyfrowania sesji
+użytkownika przed zapisaniem do lokalnej bazy danych lub w zdalnej
+przeglądarce wewnątrz ciasteczka (cookie) HTTP.
+
+Może to pomóc w zapewnieniu prywatności sesji użytkowników, gdzie
+zawartość sesji powinna być chroniona przed użytkownikiem lub
+niezbędna jest ochrona przed efektami ataków CSS (cross-site
+scripting).
+
 %package mod_session_dbd
 Summary:	DBD/SQL based session support
+Summary(pl.UTF-8):	Obsługa sesji opartych na DBD/SQL
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_session_dbd.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1916,6 +2154,16 @@ of privacy without the need for encryption.
 
 Different webservers within a server farm may choose to share a
 database, and so share sessions with one another.
+
+%description mod_session_dbd -l pl.UTF-8
+Ten podmoduł mod_session zapewnia obsługę przechowywania sesji
+użytkownika w bazie SQL poprzez moduł mod_dbd.
+
+Sesje oparte na SQL-u są ukryte dla przeglądarki, więc dają pewien
+stopień prywatności bez potrzeby szyfrowania.
+
+Różne serwery WWW z farmy mogą dzielić współdzielić bazę danych, tym
+samym współdzieląc sesje.
 
 %package mod_setenvif
 Summary:	Allows the setting of environment variables based on characteristics of the request
@@ -1939,6 +2187,7 @@ części serwera do podejmowania decyzji o podejmowanych akcjach.
 
 %package mod_slotmem_plain
 Summary:	Slot-based shared memory provider
+Summary(pl.UTF-8):	Moduł zapewniający pamięć dzieloną w oparciu o sloty
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_slotmem_plain.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1952,8 +2201,17 @@ in "slots."
 If the memory needs to be shared between threads and processes, a
 better provider would be mod_slotmem_shm.
 
+%description mod_slotmem_plain -l pl.UTF-8
+mod_slotmem_plain to moduł dostarczający pamięć, pozwalający na
+tworzenie i dostęp do segmentu zwykłej pamięci, w której zbiory danych
+są zorganizowane w "sloty".
+
+Jeśli pamięć musi być dzielona między wątki i procesy, lepszym
+rozwiązaniem będzie mod_slotmem_shm.
+
 %package mod_slotmem_shm
 Summary:	Slot-based shared memory provider
+Summary(pl.UTF-8):	Moduł zapewniający pamięć dzieloną w oparciu o sloty
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_slotmem_shm.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1968,8 +2226,18 @@ All shared memory is cleared and cleaned with each restart, whether
 graceful or not. The data itself is stored and restored within a file
 noted by the name parameter in the create and attach calls.
 
+%description mod_slotmem_shm -l pl.UTF-8
+mod_slotmem_plain to moduł dostarczający pamięć, pozwalający na
+tworzenie i dostęp do segmentu pamięci dzielonej, w której zbiory
+danych są zorganizowane w "sloty".
+
+Cała pamięć współdzielona jest czyszczona przy każdym restarcie. Same
+dane są zapisywane i odtwarzane z pliku o nazwie podawanej jako
+parametr przy wywołaniach tworzenia i podłączania.
+
 %package mod_socache_dbm
 Summary:	DBM based shared object cache provider
+Summary(pl.UTF-8):	Moduł zapewniający współdzieloną pamięć podręczną obiektów w oparciu o DBM
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_socache_dbm.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1979,8 +2247,14 @@ Provides:	apache(mod_socache_dbm) = %{version}-%{release}
 mod_socache_dbm is a shared object cache provider which provides for
 creation and access to a cache backed by a DBM database.
 
+%description mod_socache_dbm -l pl.UTF-8
+mod_socache_dbm to moduł dostarczający współdzieloną pamięć podręczną
+obiektów, zapewniający tworzenie i dostęp do cache'a zapisywanego w
+bazie DBM.
+
 %package mod_socache_memcache
 Summary:	Memcache based shared object cache provider
+Summary(pl.UTF-8):	Moduł zapewniający współdzieloną pamięć podręczną obiektów w oparciu o memcache
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_socache_memcache.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1991,8 +2265,15 @@ mod_socache_memcache is a shared object cache provider which provides
 for creation and access to a cache backed by the memcached
 high-performance, distributed memory object caching system.
 
+%description mod_socache_memcache -l pl.UTF-8
+mod_socache_dbm to moduł dostarczający współdzieloną pamięć podręczną
+obiektów, zapewniający tworzenie i dostęp do cache'a zapisywanego w
+systemie memcached - wysoko wydajnym, ozproszonym systemie pamięci
+podręcznej obiektów.
+
 %package mod_socache_shmcb
 Summary:	shmcb based shared object cache provider
+Summary(pl.UTF-8):	Moduł zapewniający współdzieloną pamięć podręczną obiektów w oparciu o shmcb
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_socache_shmcb.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -2002,6 +2283,12 @@ Provides:	apache(mod_socache_shmcb) = %{version}-%{release}
 mod_socache_shmcb is a shared object cache provider which provides for
 creation and access to a cache backed by a high-performance cyclic
 buffer inside a shared memory segment.
+
+%description mod_socache_shmcb -l pl.UTF-8
+mod_socache_dbm to moduł dostarczający współdzieloną pamięć podręczną
+obiektów, zapewniający tworzenie i dostęp do cache'a zapisywanego w
+wysoko wydajnym buforze cyklicznym wewnątrz segmentu pamięci
+dzielonej.
 
 %package mod_speling
 Summary:	Attempts to correct mistaken URLs by ignoring capitalization and by allowing up to one misspelling
@@ -2192,7 +2479,8 @@ Moduł umożliwia na dynamiczne konfigurowanie masowej ilości serwerów
 wirtualnych.
 
 %package mod_watchdog
-Summary:	provides infrastructure for other modules to periodically run     tasks
+Summary:	Infrastructure for other modules to periodically run tasks
+Summary(pl.UTF-8):	Infrastruktura do cyklicznego uruchamiania zadań przez inne moduły
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_watchdog.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -2208,8 +2496,19 @@ functionality:
 - mod_heartbeat
 - mod_heartmonitor
 
+%description mod_watchdog -l pl.UTF-8
+mod_watchdog definiuje zaczepienia programowe dla innych modułów,
+pozwalające na cykliczne uruchamianie zadań. Moduły te mogą
+rejestrować procedury obsługi zaczepień mod_watchdog.
+
+Obecnie następujące moduły w dystrybucji Apache'a wykorzystują tę
+funkcjonalność:
+- mod_heartbeat
+- mod_heartmonitor
+
 %package mod_xml2enc
-Summary:	Enhanced charset/internationalisation support for libxml2-basedfilter modules
+Summary:	Enhanced charset/internationalisation support for libxml2-based filter modules
+Summary(pl.UTF-8):	Rozszerzona obsługa zestawów znaków/umiędzynarodowienia dla modułów filtrów opartych na libxml2
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_xml2enc.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -2223,6 +2522,16 @@ correctly processed by the libxml2 parser, including converting to
 Unicode (UTF-8) where necessary. It can also convert data to an
 encoding of choice after markup processing, and will ensure the
 correct charset value is set in the HTTP Content-Type header.
+
+%description mod_xml2enc -l pl.UTF-8
+Ten moduł zapewnia rozszerzoną obsługę umiędzynarodowienia dla modułów
+filtrów uwzględniających znaczniki, takich jak mod_proxy_html. Potrafi
+automatycznie wykryć kodowanie danych wejściowych i zapewnić, że będą
+właściwie przetworzone przez analizator libxml2, włącznie z konwersją
+do Unicode (UTF-8) w razie potrzeby. Potrafi także przekonwertować
+dane po przetworzeniu znaczników do wybranego kodowania i zapewnić
+ustawienie właściwej wartości zestawu znaków w nagłówku HTTP
+Content-Type.
 
 %package -n htpasswd-%{name}
 Summary:	Apache 2 htpasswd utility: manage user files for basic authentication
