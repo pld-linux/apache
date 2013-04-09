@@ -1,0 +1,18 @@
+--- httpd-2.2.24/os/unix/unixd.c~	2011-02-14 21:18:20.000000000 +0100
++++ httpd-2.2.24/os/unix/unixd.c	2013-04-09 15:56:56.967132150 +0200
+@@ -650,6 +650,15 @@
+             return APR_EGENERAL;
+ #else
+         default:
++           /* If the socket has been closed in ap_close_listeners()
++             * by the restart/stop action, we may get EBADF.
++             * Do not print an error in this case.
++             */
++            if (!lr->active) {
++                ap_log_error(APLOG_MARK, APLOG_DEBUG, status, ap_server_conf,
++                             "apr_socket_accept failed for inactive listener");
++                return status;
++            } 
+             ap_log_error(APLOG_MARK, APLOG_ERR, status, ap_server_conf,
+                          "apr_socket_accept: (client socket)");
+             return APR_EGENERAL;

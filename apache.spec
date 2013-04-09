@@ -85,6 +85,7 @@ Patch1:		%{name}-layout.patch
 Patch2:		%{name}-suexec.patch
 Patch3:		%{name}-branding.patch
 Patch4:		%{name}-apr.patch
+Patch5:		apache-bug-49058.patch
 # what about this? it isn't applied...
 Patch6:		httpd-2.0.40-xfsz.patch
 Patch7:		%{name}-syslibs.patch
@@ -1780,6 +1781,8 @@ Dwa programy testowe/przykładowe cgi: test-cgi and print-env.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
+%patch5 -p1
+
 %patch7 -p1
 %patch8 -p1
 %patch9 -p1
