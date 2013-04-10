@@ -64,3 +64,12 @@ index f5941f5..72b0e66 100644
          return rv;
      }
 
+@@ -709,7 +709,7 @@ static apr_status_t dummy_connection(ap_
+         return rv;
+     }
+ 
+-    if (ap_listeners->protocol && strcasecmp(ap_listeners->protocol, "https") == 0) {
++    if (lp->protocol && strcasecmp(lp->protocol, "https") == 0) {
+         /* Send a TLS 1.0 close_notify alert.  This is perhaps the
+          * "least wrong" way to open and cleanly terminate an SSL
+          * connection.  It should "work" without noisy error logs if
