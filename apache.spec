@@ -1212,6 +1212,7 @@ Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_deflate.html
 Requires:	%{name}-base = %{version}-%{release}
 Requires:	%{name}-mod_headers = %{version}-%{release}
+Requires:	%{name}-mod_filter = %{version}-%{release}
 Provides:	apache(mod_deflate) = %{version}-%{release}
 
 %description mod_deflate
