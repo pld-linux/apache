@@ -2927,7 +2927,7 @@ if [ ! -L /etc/httpd/httpd.conf ]; then
 	ln -s conf.d /etc/httpd/httpd.conf
 fi
 if [ -f /etc/sysconfig/httpd ]; then
-        MPM=$(grep HTTPD_MPM /etc/sysconfig/httpd |sed 's,HTTPD_MPM=,,;s,",,g')
+        MPM=$(grep ^HTTPD_MPM /etc/sysconfig/httpd |sed 's,HTTPD_MPM=,,;s,",,g')
         if [ -n $MPM ]; then
                 echo "LoadModule mpm_${MPM}_module                modules/mod_mpm_${MPM}.so" > /etc/httpd/conf.d/10_mpm.conf.rpmnew
                 cat /etc/httpd/conf.d/10_mpm.conf >> /etc/httpd/conf.d/10_mpm.conf.rpmnew
