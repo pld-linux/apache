@@ -1800,7 +1800,7 @@ Dwa programy testowe/przykładowe cgi: test-cgi and print-env.
 %patch24 -p1
 %patch25 -p1
 %patch26 -p1
-%patch28 -p1
+%{?with_itk:%patch28 -p1}
 %patch29 -p1
 %patch30 -p1
 
