@@ -1,0 +1,79 @@
+commit 813fdb4c8e2fc02cf4c5738e46b204f28d0763a3
+Author: sf <sf@13f79535-47bb-0310-9956-ffa450edef68>
+Date:   Sat Oct 2 14:44:20 2010 +0000
+
+    core: Speed up config parsing if using a very large number of config
+    files
+    
+    PR: 50002
+    Submitted by: andrew cloudaccess net
+    
+    
+    git-svn-id: http://svn.apache.org/repos/asf/httpd/httpd/trunk@1003808 13f79535-47bb-0310-9956-ffa450edef68
+
+diff --git a/include/ap_mmn.h b/include/ap_mmn.h
+index f44a22b..5207637 100644
+--- a/include/ap_mmn.h
++++ b/include/ap_mmn.h
+@@ -156,7 +156,7 @@
+ #ifndef MODULE_MAGIC_NUMBER_MAJOR
+ #define MODULE_MAGIC_NUMBER_MAJOR 20051115
+ #endif
+-#define MODULE_MAGIC_NUMBER_MINOR 31                    /* 0...n */
++#define MODULE_MAGIC_NUMBER_MINOR 32                    /* 0...n */
+ 
+ /**
+  * Determine if the server's current MODULE_MAGIC_NUMBER is at least a
+diff --git a/include/util_cfgtree.h b/include/util_cfgtree.h
+index 4da4c7d..791a5cc 100644
+--- a/include/util_cfgtree.h
++++ b/include/util_cfgtree.h
+@@ -64,6 +64,13 @@ struct ap_directive_t {
+     const char *filename;
+     /** The line number the directive was on */
+     int line_num;
++
++    /** A short-cut towards the last directive node in the tree.
++     *  The value may not always be up-to-date but it always points to
++     *  somewhere in the tree, nearer to the tail.
++     *  This value is only set in the first node
++     */
++    struct ap_directive_t *last;
+ };
+ 
+ /**
+diff --git a/server/config.c b/server/config.c
+index dc9b3b6..a3d67f0 100644
+--- a/server/config.c
++++ b/server/config.c
+@@ -1284,11 +1284,30 @@ AP_DECLARE(const char *) ap_build_config(cmd_parms *parms,
+     ap_directive_t *curr_parent = NULL;
+     char *l = apr_palloc (temp_pool, MAX_STRING_LEN);
+     const char *errmsg;
++    ap_directive_t **last_ptr = NULL;
++
++    if(current) {
++        /* If we have to traverse the whole tree again for every included
++         * config file, the required time grows as O(n^2) with the number of
++         * files. This can be a significant delay for large configurations.
++         * Therefore we cache a pointer to the last node.
++         */
++        last_ptr = &(current->last);
++
++        if(last_ptr && *last_ptr) {
++            current = *last_ptr;
++        }
++    }
+ 
+     if (current != NULL) {
+         while (current->next) {
+             current = current->next;
+         }
++
++        if(last_ptr) {
++            /* update cached pointer to last node */
++            *last_ptr = current;
++        }
+     }
+ 
+     while (!(ap_cfg_getline(l, MAX_STRING_LEN, parms->config_file))) {
