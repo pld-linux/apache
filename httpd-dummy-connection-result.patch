@@ -1,14 +1,14 @@
 ; http://www.mail-archive.com/dev%40httpd.apache.org/msg56690.html
-diff -ur a/server/mpm_common.c b/server/mpm_common.c
---- a/server/mpm_common.c	2012-07-03 21:38:58.000000000 +0200
-+++ b/server/mpm.common.c	2013-04-12 09:14:58.282929959 +0200
-@@ -604,7 +604,17 @@
+diff -ur httpd-2.2.24.org/server/mpm_common.c httpd-2.2.24/server/mpm_common.c
+--- httpd-2.2.24.org/server/mpm_common.c	2013-04-14 18:02:48.785876471 +0200
++++ httpd-2.2.24/server/mpm_common.c	2013-04-14 18:03:39.900458831 +0200
+@@ -739,7 +739,17 @@
          len = strlen(data);
      }
  
 -    apr_socket_send(sock, data, &len);
 +    rv = apr_socket_send(sock, data, &len);
-+    if (rv == APR_SUCCESS) {
++    if (rv == APR_SUCCESS && lp->protocol && strcasecmp(lp->protocol, "http") == 0) {
 +        char *buffer[10]; // dummy buffer to see if child is alive
 +
 +        len = sizeof(buffer);
