@@ -1,0 +1,21 @@
+--- httpd-2.4.4.org/server/mpm_unix.c	2012-07-03 21:38:58.000000000 +0200
++++ httpd-2.4.4/server/mpm_unix.c	2013-04-15 14:27:54.197655418 +0200
+@@ -604,7 +604,17 @@
+         len = strlen(data);
+     }
+ 
+-    apr_socket_send(sock, data, &len);
++    rv = apr_socket_send(sock, data, &len);
++    if (rv == APR_SUCCESS && lp->protocol && strcasecmp(lp->protocol, "http") == 0) {
++        char *buffer[10]; // dummy buffer to see if child is alive
++
++        len = sizeof(buffer);
++        rv = apr_socket_recv(sock, buffer, &len);
++        if (rv != APR_SUCCESS) {
++            ap_log_error(APLOG_MARK, APLOG_DEBUG, rv, ap_server_conf,
++                         "receiving response to dummy data to listener on %pI", lp->bind_addr);
++        }
++    }
+     apr_socket_close(sock);
+     apr_pool_destroy(p);
+ 
