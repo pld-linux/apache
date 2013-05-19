@@ -35,7 +35,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.4.4
-Release:	3
+Release:	4
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -2929,7 +2929,7 @@ if [ ! -L /etc/httpd/httpd.conf ]; then
 fi
 if [ -f /etc/sysconfig/httpd ]; then
         MPM=$(grep ^HTTPD_MPM /etc/sysconfig/httpd |sed 's,HTTPD_MPM=,,;s,",,g')
-        if [ -n $MPM ]; then
+        if [ -n "$MPM" ]; then
                 echo "LoadModule mpm_${MPM}_module                modules/mod_mpm_${MPM}.so" > /etc/httpd/conf.d/10_mpm.conf.rpmnew
                 cat /etc/httpd/conf.d/10_mpm.conf >> /etc/httpd/conf.d/10_mpm.conf.rpmnew
                 mv /etc/httpd/conf.d/10_mpm.conf.rpmnew /etc/httpd/conf.d/10_mpm.conf
