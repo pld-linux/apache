@@ -35,7 +35,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.4.4
-Release:	2
+Release:	3
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -838,8 +838,6 @@ Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_authz_host.html
 Requires:	%{name}-base = %{version}-%{release}
 Requires:	%{name}-mod_authz_core = %{version}-%{release}
-# provides compatibility directives for 2.2-style access control
-Requires:	apache(mod_access_compat) = %{version}-%{release}
 Provides:	apache(mod_authz_host) = %{version}-%{release}
 # for apache < 2.2.0
 Provides:	apache(mod_access) = %{version}-%{release}
