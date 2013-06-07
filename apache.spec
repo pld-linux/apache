@@ -21,7 +21,7 @@
 # this is internal macro, don't change to %%apache_modules_api
 %define		_apache_modules_api 20120211
 
-%define		openssl_ver	0.9.8i
+%define		openssl_ver	1.0.1e
 %define		apr_ver		1:1.4.6
 
 %include	/usr/lib/rpm/macros.perl
