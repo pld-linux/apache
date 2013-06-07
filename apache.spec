@@ -30,7 +30,7 @@
 %define		openssl_ver	0.9.7d
 %define		apr_ver		1:1.2
 %else
-%define		openssl_ver	0.9.8i
+%define		openssl_ver	1.0.1e
 %define		apr_ver		1:1.4.5
 %endif
 %include	/usr/lib/rpm/macros.perl
