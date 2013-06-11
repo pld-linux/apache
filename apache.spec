@@ -35,7 +35,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.4.4
-Release:	4
+Release:	5
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -206,6 +206,8 @@ Obsoletes:	apache-mod_optional_fn_import
 Obsoletes:	apache-mod_optional_fn_import
 Obsoletes:	apache-mod_optional_hook_import
 Conflicts:	apache < 2.2.0
+# mod_wsgi >= 3.4 is required for apache 2.4
+Conflicts:	apache-mod_wsgi < 3.4
 Conflicts:	logrotate < 3.7-4
 # for the posttrans scriptlet, conflicts because in vserver environment rpm package is not installed.
 Conflicts:	rpm < 4.4.2-0.2
