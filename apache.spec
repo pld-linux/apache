@@ -86,6 +86,8 @@ Patch15:	httpd-2.0.48-debuglog.patch
 Patch18:	%{name}-v6only-ENOPROTOOPT.patch
 Patch19:	%{name}-conffile-path.patch
 Patch20:	%{name}-apxs.patch
+# Relaxed version of suexec. If called as suexec.fcgi don't check uid/gid against file owner.
+# Required by our patched mod_fcgid to run php as fcgi via suexec.
 Patch23:	%{name}-suexec_fcgi.patch
 # http://scripts.mit.edu/trac/browser/trunk/server/common/patches/httpd-2.2.x-mod_ssl-sessioncaching.patch?rev=1348
 Patch25:	httpd-2.2.x-mod_ssl-sessioncaching.patch
@@ -2598,8 +2600,7 @@ Dwa programy testowe/przykładowe cgi: test-cgi and print-env.
 %patch18 -p1
 %patch19 -p1
 %patch20 -p1
-# ?
-#%patch23 -p1
+%patch23 -p1
 
 # ?
 #%patch25 -p1
