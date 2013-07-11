@@ -1,7 +1,7 @@
-diff -urNp httpd-2.2.8.orig/support/suexec.c httpd-2.2.8/support/suexec.c
---- httpd-2.2.8.orig/support/suexec.c	2006-07-12 05:38:44.000000000 +0200
-+++ httpd-2.2.8/support/suexec.c	2008-05-13 21:04:25.000000000 +0200
-@@ -245,6 +245,21 @@ static void clean_env(void)
+diff -urNp httpd-2.4.4.orig/support/suexec.c httpd-2.4.4/support/suexec.c
+--- httpd-2.4.4.orig/support/suexec.c	2012-12-03 16:33:42.000000000 +0000
++++ httpd-2.4.4/support/suexec.c	2013-07-11 11:49:54.250178570 +0000
+@@ -240,6 +240,21 @@ static void clean_env(void)
      environ = cleanenv;
  }
  
@@ -23,7 +23,7 @@ diff -urNp httpd-2.2.8.orig/support/suexec.c httpd-2.2.8/support/suexec.c
  int main(int argc, char *argv[])
  {
      int userdir = 0;        /* ~userdir flag             */
-@@ -261,6 +276,7 @@ int main(int argc, char *argv[])
+@@ -255,6 +270,7 @@ int main(int argc, char *argv[])
      char dwd[AP_MAXPATH];   /* docroot working directory */
      struct passwd *pw;      /* password entry holder     */
      struct group *gr;       /* group entry holder        */
@@ -31,7 +31,7 @@ diff -urNp httpd-2.2.8.orig/support/suexec.c httpd-2.2.8/support/suexec.c
      struct stat dir_info;   /* directory info holder     */
      struct stat prg_info;   /* program info holder       */
  
-@@ -382,8 +399,23 @@ int main(int argc, char *argv[])
+@@ -375,8 +391,23 @@ int main(int argc, char *argv[])
      }
      else {
          if ((pw = getpwuid(atoi(target_uname))) == NULL) {
@@ -41,7 +41,7 @@ diff -urNp httpd-2.2.8.orig/support/suexec.c httpd-2.2.8/support/suexec.c
 +             * If called as suexec.fcgi ignore if there is no passwd
 +             * entry for specified UID. Also bail out if UID = 0.
 +             */
-+            if(!strcmp(base_pathname(prog),"suexec.fcgi")) {
++            if(!strcmp(base_pathname(argv[0]),"suexec.fcgi")) {
 +                tpw.pw_name = strdup(target_uname);
 +                tpw.pw_uid = atoi(target_uname);
 +                tpw.pw_dir = (char *)"/tmp";
@@ -57,7 +57,7 @@ diff -urNp httpd-2.2.8.orig/support/suexec.c httpd-2.2.8/support/suexec.c
          }
      }
  
-@@ -560,20 +592,24 @@ int main(int argc, char *argv[])
+@@ -555,20 +586,24 @@ int main(int argc, char *argv[])
      }
  
      /*
@@ -68,26 +68,26 @@ diff -urNp httpd-2.2.8.orig/support/suexec.c httpd-2.2.8/support/suexec.c
 -        (gid != dir_info.st_gid) ||
 -        (uid != prg_info.st_uid) ||
 -        (gid != prg_info.st_gid)) {
--        log_err("target uid/gid (%ld/%ld) mismatch "
--                "with directory (%ld/%ld) or program (%ld/%ld)\n",
--                uid, gid,
--                dir_info.st_uid, dir_info.st_gid,
--                prg_info.st_uid, prg_info.st_gid);
+-        log_err("target uid/gid (%lu/%lu) mismatch "
+-                "with directory (%lu/%lu) or program (%lu/%lu)\n",
+-                (unsigned long)uid, (unsigned long)gid,
+-                (unsigned long)dir_info.st_uid, (unsigned long)dir_info.st_gid,
+-                (unsigned long)prg_info.st_uid, (unsigned long)prg_info.st_gid);
 -        exit(120);
 +     * If not called as suexec.fcgi error out if the target
 +     * name/group is different from the name/group of the cwd
 +     * or the program.
 +     */
-+    if(strcmp(base_pathname(prog),"suexec.fcgi")) {
++    if(strcmp(base_pathname(argv[0]),"suexec.fcgi")) {
 +        if ((uid != dir_info.st_uid) ||
 +            (gid != dir_info.st_gid) ||
 +            (uid != prg_info.st_uid) ||
 +            (gid != prg_info.st_gid)) {
-+            log_err("target uid/gid (%ld/%ld) mismatch "
-+                    "with directory (%ld/%ld) or program (%ld/%ld)\n",
-+                    uid, gid,
-+                    dir_info.st_uid, dir_info.st_gid,
-+                    prg_info.st_uid, prg_info.st_gid);
++            log_err("target uid/gid (%lu/%lu) mismatch "
++                    "with directory (%lu/%lu) or program (%lu/%lu)\n",
++                    (unsigned long)uid, (unsigned long)gid,
++                    (unsigned long)dir_info.st_uid, (unsigned long)dir_info.st_gid,
++                    (unsigned long)prg_info.st_uid, (unsigned long)prg_info.st_gid);
 +            exit(120);
 +        }
      }
