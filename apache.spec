@@ -34,12 +34,12 @@ Summary(pt_BR.UTF-8):	Servidor HTTPD para prover serviços WWW
 Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
-Version:	2.4.4
-Release:	5
+Version:	2.4.6
+Release:	1
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
-Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
-# Source0-md5:	a2fed766e67c9681e0d9b86768f08286
+Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
+# Source0-md5:	ea5e361ca37b8d7853404419dd502efe
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}.sysconfig
@@ -1780,6 +1780,26 @@ modułach serwera HTTP Apache, takich jak odwzorowywanie żądań na
 pliki, generowanie dynamicznych odpowiedzi, kontrola dostępu,
 uwierzytelnianie i autoryzacja.
 
+%package mod_macro
+Summary:	Provides macros within apache runtime configuration files
+Summary(pl.UTF-8):	Makra wewnątrz klików konfiguracyjnych apache
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_macro.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_macro) = %{version}-%{release}
+
+%description mod_macro
+This module provides macros within apache runtime configuration files.
+These macros have parameters. They are expanded when used (parameters
+are substituted by their values given as an argument), and the result
+is processed normally.
+
+%description mod_macro -l pl.UTF-8
+Ten moduł umożliwia tworzenie makr wewnątrz plików konfiguracyjnych
+apache. Makra mogą mieć parametry. Makra są rozwijane w momencie
+użycia (argumenty makra są podstawiane za wartości parametrów) a wynik
+jest parsowany jak normalna konfiguracja.
+
 %package mod_mime
 Summary:	Associates the requested filename's extensions with the file's behavior and content
 Summary(pl.UTF-8):	Wiązanie określonych rozszerzeń plików z zachowaniem i zawartością
@@ -2841,6 +2861,7 @@ echo "LoadModule log_debug_module       modules/mod_log_debug.so" > $CFG/00_mod_
 echo "LoadModule log_forensic_module	modules/mod_log_forensic.so" > $CFG/00_mod_log_forensic.conf
 echo "LoadModule logio_module	modules/mod_logio.so" > $CFG/00_mod_logio.conf
 echo "LoadModule lua_module	modules/mod_lua.so" > $CFG/00_mod_lua.conf
+echo "LoadModule macro_module	modules/mod_macro.so" > $CFG/00_mod_macro.conf
 echo "LoadModule negotiation_module	modules/mod_negotiation.so" > $CFG/00_mod_negotiation.conf
 echo "LoadModule ratelimit_module       modules/mod_ratelimit.so" > $CFG/00_mod_ratelimit.conf
 echo "LoadModule reflector_module       modules/mod_reflector.so" > $CFG/00_mod_reflector.conf
@@ -3195,6 +3216,7 @@ fi
 %module_scripts mod_log_forensic
 %module_scripts mod_logio
 %module_scripts mod_lua
+%module_scripts mod_macro
 %module_scripts mod_mime
 %module_scripts mod_mime_magic
 %module_scripts mod_negotiation
@@ -3494,6 +3516,7 @@ fi
 %attr(755,root,root) %{_sbindir}/htcacheclean
 %attr(755,root,root) %{_libexecdir}/mod_cache.so
 %attr(755,root,root) %{_libexecdir}/mod_cache_disk.so
+%attr(755,root,root) %{_libexecdir}/mod_cache_socache.so
 %{_mandir}/man8/htcacheclean.8*
 
 %files mod_case_filter
@@ -3679,6 +3702,11 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_lua.conf
 %attr(755,root,root) %{_libexecdir}/mod_lua.so
 
+%files mod_macro
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_macro.conf
+%attr(755,root,root) %{_libexecdir}/mod_macro.so
+
 %files mod_mime
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_mime.so
@@ -3709,6 +3737,7 @@ fi
 %attr(755,root,root) %{_libexecdir}/mod_proxy_html.so
 %attr(755,root,root) %{_libexecdir}/mod_proxy_http.so
 %attr(755,root,root) %{_libexecdir}/mod_proxy_scgi.so
+%attr(755,root,root) %{_libexecdir}/mod_proxy_wstunnel.so
 %attr(755,root,root) %{_libexecdir}/mod_proxy.so
 %{_mandir}/man8/fcgistarter.8*
 
