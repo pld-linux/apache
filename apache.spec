@@ -1781,24 +1781,24 @@ pliki, generowanie dynamicznych odpowiedzi, kontrola dostępu,
 uwierzytelnianie i autoryzacja.
 
 %package mod_macro
-Summary:	Provides macros within apache runtime configuration files
-Summary(pl.UTF-8):	Makra wewnątrz klików konfiguracyjnych apache
+Summary:	Provides macros within Apache runtime configuration files
+Summary(pl.UTF-8):	Makra wewnątrz klików konfiguracyjnych Apache'a
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_macro.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_macro) = %{version}-%{release}
 
 %description mod_macro
-This module provides macros within apache runtime configuration files.
+This module provides macros within Apache runtime configuration files.
 These macros have parameters. They are expanded when used (parameters
 are substituted by their values given as an argument), and the result
 is processed normally.
 
 %description mod_macro -l pl.UTF-8
 Ten moduł umożliwia tworzenie makr wewnątrz plików konfiguracyjnych
-apache. Makra mogą mieć parametry. Makra są rozwijane w momencie
-użycia (argumenty makra są podstawiane za wartości parametrów) a wynik
-jest parsowany jak normalna konfiguracja.
+Apache'a. Makra mogą mieć parametry. Makra są rozwijane w momencie
+użycia (argumenty makra są podstawiane za wartości parametrów), a
+wynik jest przetwarzany jak normalna konfiguracja.
 
 %package mod_mime
 Summary:	Associates the requested filename's extensions with the file's behavior and content
