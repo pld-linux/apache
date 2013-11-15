@@ -1,21 +1,17 @@
---- httpd-2.4.4.org/server/mpm_unix.c	2012-07-03 21:38:58.000000000 +0200
-+++ httpd-2.4.4/server/mpm_unix.c	2013-04-15 14:27:54.197655418 +0200
-@@ -604,7 +604,17 @@
-         len = strlen(data);
-     }
- 
--    apr_socket_send(sock, data, &len);
-+    rv = apr_socket_send(sock, data, &len);
-+    if (rv == APR_SUCCESS && lp->protocol && strcasecmp(lp->protocol, "http") == 0) {
-+        char *buffer[10]; // dummy buffer to see if child is alive
-+
-+        len = sizeof(buffer);
-+        rv = apr_socket_recv(sock, buffer, &len);
-+        if (rv != APR_SUCCESS) {
-+            ap_log_error(APLOG_MARK, APLOG_DEBUG, rv, ap_server_conf,
-+                         "receiving response to dummy data to listener on %pI", lp->bind_addr);
+diff --git a/server/mpm_unix.c b/server/mpm_unix.c
+index a70c271..ca880e5 100644
+--- a/server/mpm_unix.c
++++ b/server/mpm_unix.c
+@@ -742,7 +742,12 @@ void ap_mpm_pod_killpg(ap_pod_t *pod, int num)
+      * readers stranded (a number of them could be tied up for
+      * a while serving time-consuming requests)
+      */
++    /* Recall: we only worry about IDLE child processes here */
+     for (i = 0; i < num && rv == APR_SUCCESS; i++) {
++        if (ap_scoreboard_image->servers[i][0].status != SERVER_READY ||
++            ap_scoreboard_image->servers[i][0].pid == 0) {
++            continue;
 +        }
-+    }
-     apr_socket_close(sock);
-     apr_pool_destroy(p);
- 
+         rv = dummy_connection(pod);
+     }
+ }
