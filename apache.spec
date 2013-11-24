@@ -14,7 +14,6 @@
 # Conditional build:
 %bcond_without	ssl		# build without SSL support
 %bcond_without	ldap		# build without LDAP support
-%bcond_with	itk		# ITK MPM
 %bcond_with	distcache	# distcache support
 %bcond_with	bucketeer	# debug one
 
@@ -92,8 +91,6 @@ Patch23:	%{name}-suexec_fcgi.patch
 # http://scripts.mit.edu/trac/browser/trunk/server/common/patches/httpd-2.2.x-mod_ssl-sessioncaching.patch?rev=1348
 Patch25:	httpd-2.2.x-mod_ssl-sessioncaching.patch
 Patch26:	%{name}-mod_vhost_alias_docroot.patch
-# http://mpm-itk.sesse.net/
-Patch28:	%{name}-mpm-itk.patch
 Patch29:	libtool-tag.patch
 Patch30:	lua-lib.patch
 URL:		http://httpd.apache.org/
@@ -2626,8 +2623,6 @@ Dwa programy testowe/przykładowe cgi: test-cgi and print-env.
 #%patch25 -p1
 # ?
 #%patch26 -p1
-# probably drop
-#%patch28 -p1
 %patch29 -p1
 %patch30 -p1
 
