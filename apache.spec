@@ -22,7 +22,7 @@
 %define		_apache_modules_api 20120211
 
 %define		openssl_ver	1.0.1e
-%define		apr_ver		1:1.4.6
+%define		apr_ver		1:1.5.0
 
 %include	/usr/lib/rpm/macros.perl
 Summary:	The most widely used Web server on the Internet
@@ -34,12 +34,12 @@ Summary(pt_BR.UTF-8):	Servidor HTTPD para prover serviços WWW
 Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
-Version:	2.4.6
-Release:	2
+Version:	2.4.7
+Release:	1
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
-# Source0-md5:	ea5e361ca37b8d7853404419dd502efe
+# Source0-md5:	170d7fb6fe5f28b87d1878020a9ab94e
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}.sysconfig
