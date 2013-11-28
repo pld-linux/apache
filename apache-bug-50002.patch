@@ -11,19 +11,6 @@ Date:   Sat Oct 2 14:44:20 2010 +0000
     
     git-svn-id: http://svn.apache.org/repos/asf/httpd/httpd/trunk@1003808 13f79535-47bb-0310-9956-ffa450edef68
 
-diff --git a/include/ap_mmn.h b/include/ap_mmn.h
-index f44a22b..5207637 100644
---- a/include/ap_mmn.h
-+++ b/include/ap_mmn.h
-@@ -156,7 +156,7 @@
- #ifndef MODULE_MAGIC_NUMBER_MAJOR
- #define MODULE_MAGIC_NUMBER_MAJOR 20051115
- #endif
--#define MODULE_MAGIC_NUMBER_MINOR 31                    /* 0...n */
-+#define MODULE_MAGIC_NUMBER_MINOR 32                    /* 0...n */
- 
- /**
-  * Determine if the server's current MODULE_MAGIC_NUMBER is at least a
 diff --git a/include/util_cfgtree.h b/include/util_cfgtree.h
 index 4da4c7d..791a5cc 100644
 --- a/include/util_cfgtree.h
