@@ -1211,8 +1211,8 @@ Summary(pl.UTF-8):	Moduł Apache'a kompresujący dane przed przesłaniem ich do 
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_deflate.html
 Requires:	%{name}-base = %{version}-%{release}
-Requires:	%{name}-mod_headers = %{version}-%{release}
 Requires:	%{name}-mod_filter = %{version}-%{release}
+Requires:	%{name}-mod_headers = %{version}-%{release}
 Provides:	apache(mod_deflate) = %{version}-%{release}
 
 %description mod_deflate
@@ -1766,8 +1766,8 @@ This module allows the server to be extended with scripts written in
 the Lua programming language. The extension points (hooks) available
 with mod_lua include many of the hooks available to natively compiled
 Apache HTTP Server modules, such as mapping requests to files,
-generating dynamic responses, access control, authentication,
-and authorization.
+generating dynamic responses, access control, authentication, and
+authorization.
 
 %description mod_lua -l pl.UTF-8
 Ten moduł pozwala na rozszerzanie serwera poprzez skrypty napisane w
@@ -2350,8 +2350,8 @@ Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_ssl.html
 Requires:	%{name}-base = %{version}-%{release}
 Requires:	%{name}-mod_socache_shmcb = %{version}-%{release}
-Requires:	openssl >= %{openssl_ver}
 Requires:	apr-util-dbm-db
+Requires:	openssl >= %{openssl_ver}
 Provides:	apache(mod_ssl) = 1:%{version}-%{release}
 
 %description mod_ssl
