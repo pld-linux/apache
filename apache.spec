@@ -711,6 +711,7 @@ Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_authnz_ldap.html
 Requires:	%{name}-base = %{version}-%{release}
 Requires:	%{name}-mod_ldap = %{version}-%{release}
+Requires:	%{name}-mod_authn_core = %{version}-%{release}
 Requires:	apr-util-ldap
 Provides:	apache(mod_authnz_ldap) = %{version}-%{release}
 # compat
