@@ -34,7 +34,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.4.7
-Release:	1
+Release:	2
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -3022,18 +3022,6 @@ if [ -f /etc/httpd/httpd.conf/10_httpd.conf ]; then
 EOF
 	fi
 fi
-
-%triggerpostun base -- %{name} < 2.4.0
-cp -f /etc/httpd/apache.conf{,.rpmsave}
-sed -i -e '
-        /^DefaultType.*/s,.*,,
-        /^Include /s,^Include ,IncludeOptional ,
-        /^NameVirtualHost.*/s,.*,,
-        /^User/s,^,LoadModule unixd_module modules/mod_unixd.so\n,
-' /etc/httpd/apache.conf
-sed -i -e '
-        s,^LockFile /var/run/httpd/accept.lock,Mutex file:/var/run/httpd/,g
-' /etc/httpd/conf.d/10_mpm.conf
 
 %triggerpostun base -- %{name} < 2.2.0
 # change HTTPD_CONF to point to new location. *only* if it's the
