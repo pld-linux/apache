@@ -2952,14 +2952,16 @@ if [ ! -L /etc/httpd/httpd.conf ]; then
 	install -d /etc/httpd
 	ln -s conf.d /etc/httpd/httpd.conf
 fi
+
+# handle $HTTPD_MPM from sysconfig
 if [ -f /etc/sysconfig/httpd ]; then
-        MPM=$(grep ^HTTPD_MPM /etc/sysconfig/httpd |sed 's,HTTPD_MPM=,,;s,",,g')
-        if [ -n "$MPM" ]; then
-                echo "LoadModule mpm_${MPM}_module                modules/mod_mpm_${MPM}.so" > /etc/httpd/conf.d/10_mpm.conf.rpmnew
-                cat /etc/httpd/conf.d/10_mpm.conf >> /etc/httpd/conf.d/10_mpm.conf.rpmnew
-                mv /etc/httpd/conf.d/10_mpm.conf.rpmnew /etc/httpd/conf.d/10_mpm.conf
-                sed -i -e 's,HTTPD_MPM.*,,g' /etc/sysconfig/httpd
-        fi
+	MPM=$(grep ^HTTPD_MPM /etc/sysconfig/httpd | sed 's,HTTPD_MPM=,,;s,",,g')
+	if [ -n "$MPM" ]; then
+		echo "LoadModule mpm_${MPM}_module	modules/mod_mpm_${MPM}.so" > /etc/httpd/conf.d/10_mpm.conf.rpmnew
+		cat /etc/httpd/conf.d/10_mpm.conf >> /etc/httpd/conf.d/10_mpm.conf.rpmnew
+		mv -f /etc/httpd/conf.d/10_mpm.conf.rpmnew /etc/httpd/conf.d/10_mpm.conf
+		sed -i -e 's,HTTPD_MPM.*,,g' /etc/sysconfig/httpd
+	fi
 fi
 
 exit 0
