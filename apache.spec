@@ -34,7 +34,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.4.9
-Release:	1
+Release:	2
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -2984,100 +2984,14 @@ if [ "$1" = "0" ]; then
 fi
 %systemd_reload
 
-%triggerpostun base -- %{name} < 2.0.50-6.9
-%banner %{name}-2.0.50-6 << EOF
-WARNING!!!
-Since apache-2.0.50-6 autoindex module has been separated to package
-%{name}-mod_autoindex If you want to have the same functionality do:
-poldek -Uv %{name}-mod_autoindex
-EOF
-
-%triggerpostun base -- %{name} < 2.0.54-4
-%banner %{name}-2.0.54-2 << EOF
-WARNING!!!
-CGI demo/test programs - printenv and test-cgi, have been released
-from package apache into separate subpackage apache-cgi_test. If you
-need printenv and/or test-cgi, please install apache-cgi_test package,
-e.g. by running poldek -Uv apache-cgi_test
-EOF
-
-# update /etc/sysconfig/apache -> httpd rename
-if [ -f /etc/sysconfig/apache.rpmsave ]; then
-	cp -f /etc/sysconfig/httpd{,.rpmnew}
-	mv -f /etc/sysconfig/{apache.rpmsave,httpd}
-fi
-
-%triggerpostun base -- %{name} < 2.0.55-3.1
-# check for config first as in 2.2 it's .rpmsave
-if [ -f /etc/httpd/httpd.conf/10_httpd.conf ]; then
-	if ! grep -q 'Include webapps.d/' /etc/httpd/httpd.conf/10_httpd.conf; then
-		# make sure webapps.d is included
-		cp -f /etc/httpd/httpd.conf/10_httpd.conf{,.rpmsave}
-		# this file is ugly, so just append new lines
-		cat <<-EOF >> /etc/httpd/httpd.conf/10_httpd.conf
-		# Include webapps config
-		Include webapps.d/*.conf
-EOF
-	fi
-fi
-
-%triggerpostun base -- %{name} < 2.2.0
-# change HTTPD_CONF to point to new location. *only* if it's the
-# default config setting
-cp -f /etc/sysconfig/httpd{,.rpmorig}
-sed -i -e '/^HTTPD_CONF="\/etc\/httpd\/httpd.conf"/s,.*,HTTPD_CONF="/etc/httpd/apache.conf",' /etc/sysconfig/httpd
-
-if [ -f /etc/httpd/conf.d/10_httpd.conf.rpmsave ]; then
-	sed -e '
-	# as separate modules
-	/^LoadModule access_module/s,^,#,
-	/^LoadModule alias_module/s,^,#,
-	/^LoadModule asis_module/s,^,#,
-	/^LoadModule cern_meta_module/s,^,#,
-	/^LoadModule cgi_module/s,^,#,
-	/^LoadModule env_module/s,^,#,
-	/^LoadModule include_module/s,^,#,
-	/^LoadModule log_config_module/s,^,#,
-	/^LoadModule mime_magic_module/s,^,#,
-	/^LoadModule mime_module/s,^,#,
-	/^LoadModule negotiation_module/s,^,#,
-	/^LoadModule setenvif_module/s,^,#,
-	/^LoadModule speling_module/s,^,#,
-	/^LoadModule userdir_module/s,^,#,
-
-	# in 30_errordocs.conf
-	/<IfModule mod_include.c>/,/<\/IfModule>/s,^,#,
-
-	# in 57_mod_autoindex.conf
-	/^Alias \/icons\//s,^,#,
-
-	# in apache.conf
-	/^ScriptAlias \/cgi-bin\//s,^,#,
-	/^Listen 80/s,^,#,
-
-	# avoid loops
-	/Include conf.d\/\*.conf/s,^,#,
-	/Include webapps.d\/\*.conf/s,^,#,
-
-	' < /etc/httpd/conf.d/10_httpd.conf.rpmsave > /etc/httpd/conf.d/10_httpd.conf
-fi
-
-%banner -e %{name} <<'EOF'
-NB! Apache main config has been changed to /etc/httpd/apache.conf
-
-There has been changed a lot, so many things could be broken.
-Please report bugs to <http://bugs.pld-linux.org/>.
-
-EOF
-
-%triggerpostun base -- %{name} < 2.2.22-2
+%triggerpostun base -- %{name}-base < 2.2.22-2
 . /etc/sysconfig/httpd
 if [ -z "$HTTPD_CONF" ]; then
 	echo 'HTTPD_CONF="/etc/httpd/apache.conf"' >> /etc/sysconfig/httpd
 fi
 %systemd_trigger httpd.service
 
-%triggerpostun base -- %{name} < 2.4.0
+%triggerpostun base -- %{name}-base < 2.4.0
 cp -f /etc/httpd/apache.conf{,.rpmsave}
 sed -i -e '
 	/^DefaultType/d
