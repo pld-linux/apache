@@ -21,7 +21,7 @@
 %define		_apache_modules_api 20120211
 
 %define		openssl_ver	1.0.1e
-%define		apr_ver		1:1.5.0
+%define		apr_ver		1:1.4.6
 
 %include	/usr/lib/rpm/macros.perl
 Summary:	The most widely used Web server on the Internet
@@ -34,7 +34,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.4.9
-Release:	3
+Release:	4
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
