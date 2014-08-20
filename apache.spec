@@ -54,7 +54,6 @@ Source11:	%{name}-mod_info.conf
 Source12:	%{name}-mod_ssl.conf
 Source13:	%{name}-mod_dav.conf
 Source14:	%{name}-mod_dir.conf
-Source15:	%{name}-mod_suexec.conf
 Source16:	%{name}-mod_deflate.conf
 Source17:	%{name}-mod_autoindex.conf
 Source18:	%{name}-multilang-errordoc.conf
@@ -73,6 +72,7 @@ Source30:	%{name}.tmpfiles
 Source31:	%{name}.service
 Source32:	%{name}-mod_http2.conf
 Source33:	%{name}-mod_md.conf
+Source34:	loadmodule-mpm.conf
 Patch0:		%{name}-configdir_skip_backups.patch
 Patch1:		%{name}-layout.patch
 Patch2:		%{name}-suexec.patch
@@ -2838,7 +2838,7 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig,systemd/system} \
 	$RPM_BUILD_ROOT%{_var}/{log/{httpd,archive/httpd},{run,cache}/httpd,lock/mod_dav} \
 	$RPM_BUILD_ROOT%{_var}/lib/httpd/md \
-	$RPM_BUILD_ROOT%{_sysconfdir}/{webapps.d,conf.d,vhosts.d} \
+	$RPM_BUILD_ROOT%{_sysconfdir}/{webapps.d,conf.d,conf.modules.d,vhosts.d} \
 	$RPM_BUILD_ROOT%{_datadir}/{cgi-bin,vhosts} \
 	$RPM_BUILD_ROOT%{systemdtmpfilesdir} \
 	$RPM_BUILD_ROOT%{systemdunitdir}
@@ -2860,47 +2860,51 @@ ln -s %{_var}/lib/httpd/md $RPM_BUILD_ROOT%{_sysconfdir}/md
 rm $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
 
 install -p %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
-cp -a %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/httpd
-cp -a %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/httpd
+cp -p %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/httpd
+cp -p %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/httpd
 
 touch $RPM_BUILD_ROOT/var/log/httpd/{access,error,agent,referer,suexec}_log
 
 %if %{with ssl}
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/ssl
-cp -a %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/ssl/server.crt
-cp -a %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/ssl/server.key
+cp -p %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/ssl/server.crt
+cp -p %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}/ssl/server.key
 %endif
 
 cp -a %{SOURCE6} $RPM_BUILD_ROOT%{_sysconfdir}/apache.conf
 
-CFG="$RPM_BUILD_ROOT%{_sysconfdir}/conf.d"
+# There are two dirs loading configuration for modules:
+# - /etc/httpd/conf.modules.d - configs with LoadModule directive
+# - /etc/httpd/conf.d - actual configuration for the modules
+# Files are processed in alphabetical order in both dirs.
 
-cp -a %{SOURCE7} $CFG/10_common.conf
-cp -a %{SOURCE23} $CFG/01_mod_mime.conf
-cp -a %{SOURCE24} $CFG/01_mod_authz_host.conf
-cp -a %{SOURCE25} $CFG/01_mod_cgid.conf
-cp -a %{SOURCE26} $CFG/01_mod_log_config.conf
-cp -a %{SOURCE27} $CFG/01_mod_mime_magic.conf
-cp -a %{SOURCE28} $CFG/01_mod_cache.conf
-cp -a %{SOURCE32} $CFG/01_mod_http2.conf
-cp -a %{SOURCE8} $CFG/20_mod_vhost_alias.conf
-cp -a %{SOURCE9} $CFG/25_mod_status.conf
-cp -a %{SOURCE10} $CFG/30_mod_proxy.conf
-cp -a %{SOURCE11} $CFG/35_mod_info.conf
-cp -a %{SOURCE12} $CFG/40_mod_ssl.conf
-cp -a %{SOURCE13} $CFG/45_mod_dav.conf
-cp -a %{SOURCE14} $CFG/59_mod_dir.conf
-cp -a %{SOURCE15} $CFG/13_mod_suexec.conf
-cp -a %{SOURCE16} $CFG/58_mod_deflate.conf
-cp -a %{SOURCE17} $CFG/57_mod_autoindex.conf
-cp -a %{SOURCE18} $CFG/30_errordocs.conf
-cp -a %{SOURCE19} $CFG/30_manual.conf
-cp -a %{SOURCE20} $CFG/16_mod_userdir.conf
-cp -a %{SOURCE21} $CFG/10_mpm.conf
-cp -a %{SOURCE22} $CFG/20_languages.conf
-cp -a %{SOURCE33} $CFG/60_mod_md.conf
+CONFD=$RPM_BUILD_ROOT%{_sysconfdir}/conf.d
+CONFD_MODULES=$RPM_BUILD_ROOT%{_sysconfdir}/conf.modules.d
 
-cp -a %{SOURCE29} $RPM_BUILD_ROOT%{_sysconfdir}/vhosts.d/example.net.conf
+cp -p %{SOURCE7}  $CONFD/common.conf
+cp -p %{SOURCE23} $CONFD/mod_mime.conf
+cp -p %{SOURCE24} $CONFD/mod_authz_host.conf
+cp -p %{SOURCE25} $CONFD/mod_cgid.conf
+cp -p %{SOURCE26} $CONFD/mod_log_config.conf
+cp -p %{SOURCE27} $CONFD/mod_mime_magic.conf
+cp -p %{SOURCE28} $CONFD/mod_cache.conf
+cp -p %{SOURCE32} $CONFD/mod_http2.conf
+cp -p %{SOURCE8}  $CONFD/mod_vhost_alias.conf
+cp -p %{SOURCE9}  $CONFD/mod_status.conf
+cp -p %{SOURCE10} $CONFD/mod_proxy.conf
+cp -p %{SOURCE11} $CONFD/mod_info.conf
+cp -p %{SOURCE12} $CONFD/mod_ssl.conf
+cp -p %{SOURCE13} $CONFD/mod_dav.conf
+cp -p %{SOURCE14} $CONFD/mod_dir.conf
+cp -p %{SOURCE16} $CONFD/mod_deflate.conf
+cp -p %{SOURCE17} $CONFD/mod_autoindex.conf
+cp -p %{SOURCE18} $CONFD/errordocs.conf
+cp -p %{SOURCE19} $CONFD/manual.conf
+cp -p %{SOURCE20} $CONFD/mod_userdir.conf
+cp -p %{SOURCE21} $CONFD/mpm.conf
+cp -p %{SOURCE22} $CONFD/languages.conf
+cp -p %{SOURCE33} $CONFD/mod_md.conf
+cp -p %{SOURCE29} $RPM_BUILD_ROOT%{_sysconfdir}/vhosts.d/example.net.conf
 
 cp -p %{SOURCE30} $RPM_BUILD_ROOT%{systemdtmpfilesdir}/%{name}.conf
 
@@ -2929,12 +2933,14 @@ modules="
 	authz_user
 	brotli
 	buffer
+	cache
 	case_filter
 	case_filter_in
 	cern_meta
 	cgi
 	charset_lite
 	data
+	dav
 	dbd
 	dialup
 	dumpio
@@ -2947,6 +2953,7 @@ modules="
 	headers
 	heartbeat
 	heartmonitor
+	http2
 	ident
 	imagemap
 	include
@@ -2981,6 +2988,7 @@ modules="
 	socache_redis
 	socache_shmcb
 	speling
+	ssl
 	substitute
 	unique_id
 	usertrack
@@ -2992,12 +3000,22 @@ modules="
 LoadModule() {
 	local index=$1 module=$2 conffile
 	conffile=${3:-$module}
-	echo "LoadModule ${module}_module modules/mod_$module.so" > $CFG/${index}_mod_${conffile}.conf
+	echo "LoadModule ${module}_module modules/mod_$module.so" >> $CONFD_MODULES/$index-mod_$conffile.conf
 }
 
+# Setup mpm. Keep this first
+cp -p %{SOURCE34} $CONFD_MODULES/00-mpm.conf
+
 for module in $modules; do
-	LoadModule 00 $module
+	LoadModule 01 $module
 done
+
+# append these to dav config
+LoadModule 01 dav_fs dav
+LoadModule 01 dav_lock dav
+
+# heartbeat requires watchdog
+LoadModule 02 heartbeat
 
 # anything in style dir not ending with .css is trash
 %{__rm} -r $RPM_BUILD_ROOT%{_datadir}/manual/style/{lang,latex,xsl}
@@ -3020,7 +3038,7 @@ ln -sf %{_bindir}/htpasswd $RPM_BUILD_ROOT%{_sbindir}
 mv $RPM_BUILD_ROOT{%{_bindir},%{_sbindir}}/apxs
 
 # cgi_test: create config file with ScriptAlias
-cat << 'EOF' > $CFG/09_cgi_test.conf
+cat << 'EOF' > $CONFD/cgi_test.conf
 ScriptAlias /cgi-bin/printenv %{_cgibindir}/printenv
 ScriptAlias /cgi-bin/test-cgi %{_cgibindir}/test-cgi
 EOF
@@ -3280,11 +3298,13 @@ fi
 %{_sysconfdir}/run
 %{_sysconfdir}/logs
 %attr(750,root,root) %dir %{_sysconfdir}/conf.d
+%attr(750,root,root) %dir %{_sysconfdir}/conf.modules.d
 %attr(750,root,root) %dir %{_sysconfdir}/vhosts.d
 %attr(750,root,root) %dir %{_sysconfdir}/webapps.d
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/apache.conf
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_common.conf
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mpm.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mpm.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/common.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mpm.conf
 %attr(640,root,root) %config(noreplace,missingok) %verify(not md5 mtime size) %{_sysconfdir}/vhosts.d/example.net.conf
 %attr(640,root,root) %{_sysconfdir}/magic
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/httpd
@@ -3323,11 +3343,11 @@ fi
 
 %files doc -f manual.files
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_manual.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/manual.conf
 
 %files errordocs
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_errordocs.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/errordocs.conf
 %{_datadir}/error
 
 %files suexec
@@ -3335,7 +3355,7 @@ fi
 %attr(4755,root,root) %{_sbindir}/suexec
 %attr(755,root,root) %{_sbindir}/suexec.fcgi
 %attr(755,root,root) %{_libexecdir}/mod_suexec.so
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_suexec.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_suexec.conf
 %{_mandir}/man8/suexec.8*
 
 %files index
@@ -3369,27 +3389,27 @@ fi
 
 %files mod_access_compat
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_access_compat.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_access_compat.conf
 %attr(755,root,root) %{_libexecdir}/mod_access_compat.so
 
 %files mod_actions
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_actions.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_actions.conf
 %attr(755,root,root) %{_libexecdir}/mod_actions.so
 
 %files mod_alias
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_alias.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_alias.conf
 %attr(755,root,root) %{_libexecdir}/mod_alias.so
 
 %files mod_allowmethods
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_allowmethods.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_allowmethods.conf
 %attr(755,root,root) %{_libexecdir}/mod_allowmethods.so
 
 %files mod_asis
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_asis.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_asis.conf
 %attr(755,root,root) %{_libexecdir}/mod_asis.so
 
 %files mod_auth
@@ -3397,7 +3417,7 @@ fi
 
 %files mod_auth_basic
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_auth_basic.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_auth_basic.conf
 %attr(755,root,root) %{_libexecdir}/mod_auth_basic.so
 
 %files mod_auth_dbm
@@ -3405,89 +3425,91 @@ fi
 
 %files mod_auth_digest
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_auth_digest.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_auth_digest.conf
 %attr(755,root,root) %{_libexecdir}/mod_auth_digest.so
 
 %files mod_auth_form
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_auth_form.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_auth_form.conf
 %attr(755,root,root) %{_libexecdir}/mod_auth_form.so
 
 %files mod_authn_core
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_authn_core.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_authn_core.conf
 %attr(755,root,root) %{_libexecdir}/mod_authn_core.so
 
 %files mod_authn_anon
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_authn_anon.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_authn_anon.conf
 %attr(755,root,root) %{_libexecdir}/mod_authn_anon.so
 
 %files mod_authn_dbd
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_authn_dbd.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_authn_dbd.conf
 %attr(755,root,root) %{_libexecdir}/mod_authn_dbd.so
 
 %files mod_authn_dbm
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_authn_dbm.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_authn_dbm.conf
 %attr(755,root,root) %{_libexecdir}/mod_authn_dbm.so
 
 %files mod_authn_file
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_authn_file.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_authn_file.conf
 %attr(755,root,root) %{_libexecdir}/mod_authn_file.so
 
 %files mod_authn_socache
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_authn_socache.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_authn_socache.conf
 %attr(755,root,root) %{_libexecdir}/mod_authn_socache.so
 
 %if %{with ldap}
 %files mod_authnz_ldap
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_authnz_ldap.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_authnz_ldap.conf
 %attr(755,root,root) %{_libexecdir}/mod_authnz_ldap.so
 %endif
 
 %files mod_authz_core
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_authz_core.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_authz_core.conf
 %attr(755,root,root) %{_libexecdir}/mod_authz_core.so
 
 %files mod_authz_dbd
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_authz_dbd.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_authz_dbd.conf
 %attr(755,root,root) %{_libexecdir}/mod_authz_dbd.so
 
 %files mod_authz_dbm
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_authz_dbm.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_authz_dbm.conf
 %attr(755,root,root) %{_libexecdir}/mod_authz_dbm.so
 
 %files mod_authz_groupfile
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_authz_groupfile.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_authz_groupfile.conf
 %attr(755,root,root) %{_libexecdir}/mod_authz_groupfile.so
 
 %files mod_authz_host
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_authz_host.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_authz_host.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mod_authz_host.conf
 %attr(755,root,root) %{_libexecdir}/mod_authz_host.so
 
 %files mod_authz_owner
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_authz_owner.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_authz_owner.conf
 %attr(755,root,root) %{_libexecdir}/mod_authz_owner.so
 
 %files mod_authz_user
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_authz_user.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_authz_user.conf
 %attr(755,root,root) %{_libexecdir}/mod_authz_user.so
 
 %files mod_autoindex
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_autoindex.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_autoindex.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mod_autoindex.conf
 %attr(755,root,root) %{_libexecdir}/mod_autoindex.so
 
 %files mod_brotli
@@ -3498,18 +3520,18 @@ fi
 %if %{with bucketeer}
 %files mod_bucketeer
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_bucketeer.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_bucketeer.conf
 %attr(755,root,root) %{_libexecdir}/mod_bucketeer.so
 %endif
 
 %files mod_buffer
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_buffer.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_buffer.conf
 %attr(755,root,root) %{_libexecdir}/mod_buffer.so
 
 %files mod_cache
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_cache.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mod_cache.conf
 %attr(755,root,root) %{_sbindir}/htcacheclean
 %attr(755,root,root) %{_libexecdir}/mod_cache.so
 %attr(755,root,root) %{_libexecdir}/mod_cache_disk.so
@@ -3518,113 +3540,117 @@ fi
 
 %files mod_case_filter
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_case_filter.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_case_filter.conf
 %attr(755,root,root) %{_libexecdir}/mod_case_filter.so
 
 %files mod_case_filter_in
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_case_filter_in.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_case_filter_in.conf
 %attr(755,root,root) %{_libexecdir}/mod_case_filter_in.so
 
 %files mod_cern_meta
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_cern_meta.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_cern_meta.conf
 %attr(755,root,root) %{_libexecdir}/mod_cern_meta.so
 
 %files mod_cgi
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_cgi.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_cgi.conf
 %attr(755,root,root) %{_libexecdir}/mod_cgi.so
 
 %files mod_cgid
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_cgid.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_cgid.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mod_cgid.conf
 %attr(755,root,root) %{_libexecdir}/mod_cgid.so
 
 %files mod_charset_lite
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_charset_lite.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_charset_lite.conf
 %attr(755,root,root) %{_libexecdir}/mod_charset_lite.so
 
 %files mod_data
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_data.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_data.conf
 %attr(755,root,root) %{_libexecdir}/mod_data.so
 
 %files mod_dav
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_dav.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_dav.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mod_dav.conf
 %attr(755,root,root) %{_libexecdir}/mod_dav*.so
 %dir %attr(770,root,http) /var/lock/mod_dav
 
 %files mod_dbd
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_dbd.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_dbd.conf
 %attr(755,root,root) %{_libexecdir}/mod_dbd.so
 
 %files mod_deflate
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_deflate.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_deflate.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mod_deflate.conf
 %attr(755,root,root) %{_libexecdir}/mod_deflate.so
 
 %files mod_dialup
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_dialup.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_dialup.conf
 %attr(755,root,root) %{_libexecdir}/mod_dialup.so
 
 %files mod_dir
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_dir.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_dir.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mod_dir.conf
 %attr(755,root,root) %{_libexecdir}/mod_dir.so
 
 %files mod_dumpio
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_dumpio.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_dumpio.conf
 %attr(755,root,root) %{_libexecdir}/mod_dumpio.so
 
 %files mod_echo
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_echo.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_echo.conf
 %attr(755,root,root) %{_libexecdir}/mod_echo.so
 
 %files mod_env
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_env.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_env.conf
 %attr(755,root,root) %{_libexecdir}/mod_env.so
 
 %files mod_expires
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_expires.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_expires.conf
 %attr(755,root,root) %{_libexecdir}/mod_expires.so
 
 %files mod_ext_filter
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_ext_filter.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_ext_filter.conf
 %attr(755,root,root) %{_libexecdir}/mod_ext_filter.so
 
 %files mod_file_cache
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_file_cache.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_file_cache.conf
 %attr(755,root,root) %{_libexecdir}/mod_file_cache.so
 
 %files mod_filter
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_filter.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_filter.conf
 %attr(755,root,root) %{_libexecdir}/mod_filter.so
 
 %files mod_headers
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_headers.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_headers.conf
 %attr(755,root,root) %{_libexecdir}/mod_headers.so
 
 %files mod_heartbeat
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_heartbeat.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_heartbeat.conf
 %attr(755,root,root) %{_libexecdir}/mod_heartbeat.so
 
 %files mod_heartmonitor
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_heartmonitor.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_heartmonitor.conf
 %attr(755,root,root) %{_libexecdir}/mod_heartmonitor.so
 
 %if %{with http2}
@@ -3636,79 +3662,81 @@ fi
 
 %files mod_ident
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_ident.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_ident.conf
 %attr(755,root,root) %{_libexecdir}/mod_ident.so
 
 %files mod_imagemap
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_imagemap.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_imagemap.conf
 %attr(755,root,root) %{_libexecdir}/mod_imagemap.so
 
 %files mod_include
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_include.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_include.conf
 %attr(755,root,root) %{_libexecdir}/mod_include.so
 
 %files mod_info
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_info.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_info.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mod_info.conf
 %attr(755,root,root) %{_libexecdir}/mod_info.so
 
 %files mod_lbmethod_bybusyness
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_lbmethod_bybusyness.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_lbmethod_bybusyness.conf
 %attr(755,root,root) %{_libexecdir}/mod_lbmethod_bybusyness.so
 
 %files mod_lbmethod_byrequests
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_lbmethod_byrequests.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_lbmethod_byrequests.conf
 %attr(755,root,root) %{_libexecdir}/mod_lbmethod_byrequests.so
 
 %files mod_lbmethod_bytraffic
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_lbmethod_bytraffic.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_lbmethod_bytraffic.conf
 %attr(755,root,root) %{_libexecdir}/mod_lbmethod_bytraffic.so
 
 %files mod_lbmethod_heartbeat
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_lbmethod_heartbeat.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_lbmethod_heartbeat.conf
 %attr(755,root,root) %{_libexecdir}/mod_lbmethod_heartbeat.so
 
 %if %{with ldap}
 %files mod_ldap
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_ldap.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_ldap.conf
 %attr(755,root,root) %{_libexecdir}/mod_ldap.so
 %endif
 
 %files mod_log_config
 %defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_log_config.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mod_log_config.conf
 %attr(755,root,root) %{_libexecdir}/mod_log_config.so
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_log_config.conf
 
 %files mod_log_debug
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_log_debug.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_log_debug.conf
 %attr(755,root,root) %{_libexecdir}/mod_log_debug.so
 
 %files mod_log_forensic
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_log_forensic.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_log_forensic.conf
 %attr(755,root,root) %{_libexecdir}/mod_log_forensic.so
 
 %files mod_logio
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_logio.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_logio.conf
 %attr(755,root,root) %{_libexecdir}/mod_logio.so
 
 %files mod_lua
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_lua.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_lua.conf
 %attr(755,root,root) %{_libexecdir}/mod_lua.so
 
 %files mod_macro
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_macro.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_macro.conf
 %attr(755,root,root) %{_libexecdir}/mod_macro.so
 
 %files mod_md
@@ -3720,24 +3748,26 @@ fi
 
 %files mod_mime
 %defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_mime.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mod_mime.conf
 %attr(755,root,root) %{_libexecdir}/mod_mime.so
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_mime.conf
 
 %files mod_mime_magic
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_mime_magic.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_mime_magic.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mod_mime_magic.conf
 %attr(755,root,root) %{_libexecdir}/mod_mime_magic.so
 
 %files mod_negotiation
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_negotiation.conf
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_languages.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_negotiation.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/languages.conf
 %attr(755,root,root) %{_libexecdir}/mod_negotiation.so
 
 %files mod_proxy
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_sbindir}/fcgistarter
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_proxy.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mod_proxy.conf
 %attr(755,root,root) %{_libexecdir}/mod_proxy_ajp.so
 %attr(755,root,root) %{_libexecdir}/mod_proxy_balancer.so
 %attr(755,root,root) %{_libexecdir}/mod_proxy_connect.so
@@ -3757,84 +3787,84 @@ fi
 
 %files mod_ratelimit
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_ratelimit.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_ratelimit.conf
 %attr(755,root,root) %{_libexecdir}/mod_ratelimit.so
 
 %files mod_reflector
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_reflector.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_reflector.conf
 %attr(755,root,root) %{_libexecdir}/mod_reflector.so
 
 %files mod_remoteip
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_remoteip.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_remoteip.conf
 %attr(755,root,root) %{_libexecdir}/mod_remoteip.so
 
 %files mod_reqtimeout
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_reqtimeout.so
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_reqtimeout.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_reqtimeout.conf
 
 %files mod_request
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_request.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_request.conf
 %attr(755,root,root) %{_libexecdir}/mod_request.so
 
 %files mod_rewrite
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/httxt2dbm
 %attr(755,root,root) %{_libexecdir}/mod_rewrite.so
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_rewrite.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_rewrite.conf
 %{_mandir}/man1/httxt2dbm.1*
 
 %files mod_sed
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_sed.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_sed.conf
 %attr(755,root,root) %{_libexecdir}/mod_sed.so
 
 %files mod_session
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_session.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_session.conf
 %attr(755,root,root) %{_libexecdir}/mod_session.so
 
 %files mod_session_cookie
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_session_cookie.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_session_cookie.conf
 %attr(755,root,root) %{_libexecdir}/mod_session_cookie.so
 
 %files mod_session_crypto
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_session_crypto.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_session_crypto.conf
 %attr(755,root,root) %{_libexecdir}/mod_session_crypto.so
 
 %files mod_session_dbd
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_session_dbd.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_session_dbd.conf
 %attr(755,root,root) %{_libexecdir}/mod_session_dbd.so
 
 %files mod_setenvif
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_setenvif.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_setenvif.conf
 %attr(755,root,root) %{_libexecdir}/mod_setenvif.so
 
 %files mod_slotmem_plain
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_slotmem_plain.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_slotmem_plain.conf
 %attr(755,root,root) %{_libexecdir}/mod_slotmem_plain.so
 
 %files mod_slotmem_shm
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_slotmem_shm.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_slotmem_shm.conf
 %attr(755,root,root) %{_libexecdir}/mod_slotmem_shm.so
 
 %files mod_socache_dbm
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_socache_dbm.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_socache_dbm.conf
 %attr(755,root,root) %{_libexecdir}/mod_socache_dbm.so
 
 %files mod_socache_memcache
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_socache_memcache.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_socache_memcache.conf
 %attr(755,root,root) %{_libexecdir}/mod_socache_memcache.so
 
 %files mod_socache_redis
@@ -3844,12 +3874,12 @@ fi
 
 %files mod_socache_shmcb
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_socache_shmcb.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_socache_shmcb.conf
 %attr(755,root,root) %{_libexecdir}/mod_socache_shmcb.so
 
 %files mod_speling
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_speling.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_speling.conf
 %attr(755,root,root) %{_libexecdir}/mod_speling.so
 
 %if %{with ssl}
@@ -3857,53 +3887,57 @@ fi
 %defattr(644,root,root,755)
 %attr(750,root,root) %dir %{_sysconfdir}/ssl
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/ssl/server.*
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_ssl.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_ssl.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mod_ssl.conf
 %attr(755,root,root) %{_libexecdir}/mod_ssl.so
 %endif
 
 %files mod_status
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_status.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_status.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mod_status.conf
 %attr(755,root,root) %{_libexecdir}/mod_status.so
 
 %files mod_substitute
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_substitute.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_substitute.conf
 %attr(755,root,root) %{_libexecdir}/mod_substitute.so
 
 %files mod_unique_id
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_unique_id.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_unique_id.conf
 %attr(755,root,root) %{_libexecdir}/mod_unique_id.so
 
 %files mod_userdir
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_userdir.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_userdir.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mod_userdir.conf
 %attr(755,root,root) %{_libexecdir}/mod_userdir.so
 
 %files mod_usertrack
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_usertrack.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_usertrack.conf
 %attr(755,root,root) %{_libexecdir}/mod_usertrack.so
 
 %files mod_version
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_version.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_version.conf
 %attr(755,root,root) %{_libexecdir}/mod_version.so
 
 %files mod_vhost_alias
 %defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_vhost_alias.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mod_vhost_alias.conf
 %attr(755,root,root) %{_libexecdir}/mod_vhost_alias.so
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_vhost_alias.conf
 
 %files mod_watchdog
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_watchdog.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_watchdog.conf
 %attr(755,root,root) %{_libexecdir}/mod_watchdog.so
 
 %files mod_xml2enc
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_xml2enc.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_xml2enc.conf
 %attr(755,root,root) %{_libexecdir}/mod_xml2enc.so
 
 %files -n htpasswd-%{name}
@@ -3923,4 +3957,4 @@ fi
 %defattr(644,root,root,755)
 %dir %{_cgibindir}
 %attr(755,root,root) %{_cgibindir}/*
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_cgi_test.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/cgi_test.conf
