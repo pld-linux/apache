@@ -128,6 +128,7 @@ condrestart() {
 
 	checkconfig
 	stop
+	[ "$RESTART_DELAY" ] && usleep $RESTART_DELAY
 	start
 }
 
@@ -143,6 +144,7 @@ case "$1" in
   restart)
 	checkconfig
 	stop
+	[ "$RESTART_DELAY" ] && usleep $RESTART_DELAY
 	start 0
 	;;
   try-restart)
