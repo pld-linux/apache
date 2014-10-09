@@ -1,5 +1,4 @@
 # Customized settings for Apache
-# $Id$
 
 # Nice level for apache
 SERVICE_RUN_NICE_LEVEL="+5"
@@ -16,3 +15,6 @@ HTTPD_OPTS=""
 
 # Skip apache restarts invoked from rpm installs.
 #RPM_SKIP_AUTO_RESTART=yes
+
+# Delay in microseconds between stop and start to mitigate problems of third party Apache modules (PHP session ext
+#RESTART_DELAY=50000
