@@ -2759,7 +2759,6 @@ ln -s %{_localstatedir}/run/httpd $RPM_BUILD_ROOT%{_sysconfdir}/run
 ln -s %{_var}/log/httpd $RPM_BUILD_ROOT%{_sysconfdir}/logs
 # we have own apache.conf
 rm $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
-ln -s conf.d $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
 
 install -p %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
 cp -a %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/httpd
@@ -3132,7 +3131,6 @@ fi
 %{_sysconfdir}/modules
 %{_sysconfdir}/run
 %{_sysconfdir}/logs
-%ghost %{_sysconfdir}/httpd.conf
 %attr(750,root,root) %dir %{_sysconfdir}/conf.d
 %attr(750,root,root) %dir %{_sysconfdir}/vhosts.d
 %attr(750,root,root) %dir %{_sysconfdir}/webapps.d
