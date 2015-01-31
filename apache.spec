@@ -2805,88 +2805,32 @@ cp -a %{SOURCE29} $RPM_BUILD_ROOT%{_sysconfdir}/vhosts.d/example.net.conf
 
 install %{SOURCE30} $RPM_BUILD_ROOT%{systemdtmpfilesdir}/%{name}.conf
 
-echo "LoadModule access_compat_module	modules/mod_access_compat.so" > $CFG/00_mod_access_compat.conf
-echo "LoadModule actions_module	modules/mod_actions.so" > $CFG/00_mod_actions.conf
-echo "LoadModule alias_module	modules/mod_alias.so" > $CFG/00_mod_alias.conf
-echo "LoadModule allowmethods_module	modules/mod_allowmethods.so" > $CFG/00_mod_allowmethods.conf
-echo "LoadModule asis_module	modules/mod_asis.so" > $CFG/00_mod_asis.conf
-echo "LoadModule auth_basic_module	modules/mod_auth_basic.so" > $CFG/00_mod_auth_basic.conf
-echo "LoadModule auth_digest_module	modules/mod_auth_digest.so" > $CFG/00_mod_auth_digest.conf
-echo "LoadModule auth_form_module	modules/mod_auth_form.so" > $CFG/00_mod_auth_form.conf
-echo "LoadModule authn_anon_module	modules/mod_authn_anon.so" > $CFG/00_mod_authn_anon.conf
-echo "LoadModule authn_core_module	modules/mod_authn_core.so" > $CFG/00_mod_authn_core.conf
-echo "LoadModule authn_dbd_module	modules/mod_authn_dbd.so" > $CFG/00_mod_authn_dbd.conf
-echo "LoadModule authn_dbm_module	modules/mod_authn_dbm.so" > $CFG/00_mod_authn_dbm.conf
-echo "LoadModule authn_file_module	modules/mod_authn_file.so" > $CFG/00_mod_authn_file.conf
-echo "LoadModule authn_socache_module	modules/mod_authn_socache.so" > $CFG/00_mod_authn_socache.conf
-echo "LoadModule authnz_ldap_module	modules/mod_authnz_ldap.so" > $CFG/00_mod_authnz_ldap.conf
-echo "LoadModule authz_core_module	modules/mod_authz_core.so" > $CFG/00_mod_authz_core.conf
-echo "LoadModule authz_dbd_module	modules/mod_authz_dbd.so" > $CFG/00_mod_authz_dbd.conf
-echo "LoadModule authz_dbm_module	modules/mod_authz_dbm.so" > $CFG/00_mod_authz_dbm.conf
-echo "LoadModule authz_groupfile_module	modules/mod_authz_groupfile.so" > $CFG/00_mod_authz_groupfile.conf
-echo "LoadModule authz_owner_module	modules/mod_authz_owner.so" > $CFG/00_mod_authz_owner.conf
-echo "LoadModule authz_user_module	modules/mod_authz_user.so" > $CFG/00_mod_authz_user.conf
-echo "LoadModule buffer_module	modules/mod_buffer.so" > $CFG/00_mod_buffer.conf
+for module in access_compat actions alias allowmethods asis auth_basic \
+	auth_digest auth_form authn_anon authn_core authn_dbd authn_dbm \
+	authn_file authn_socache authnz_ldap authz_core authz_dbd \
+	authz_dbm authz_groupfile authz_owner authz_user buffer \
+	case_filter_in case_filter cern_meta cgi charset_lite \
+	data dbd dialup dumpio \
+	echo env expires ext_filter \
+	file_cache filter \
+	headers heartbeat heartmonitor \
+	ident imagemap include \
+	lbmethod_bybusyness lbmethod_byrequests lbmethod_bytraffic \
+	lbmethod_heartbeat ldap log_debug log_forensic logio lua \
+	macro negotiation \
+	ratelimit reflector remoteip reqtimeout request rewrite \
+	sed session_cookie session_crypto session_dbd session setenvif \
+	slotmem_plain slotmem_shm socache_dbm socache_memcache \
+	socache_shmcb speling substitute \
+	unique_id usertrack version watchdog xml2enc; do
+
+echo "LoadModule ${module}_module	modules/mod_$module.so" > $CFG/00_mod_$module.conf
+
+done
+
 %if %{with bucketeer}
 echo "LoadModule bucketeer_module	modules/mod_bucketeer.so" > $CFG/00_mod_bucketeer.conf
 %endif
-echo "LoadModule case_filter_in_module	modules/mod_case_filter_in.so" > $CFG/00_mod_case_filter_in.conf
-echo "LoadModule case_filter_module	modules/mod_case_filter.so" > $CFG/00_mod_case_filter.conf
-echo "LoadModule cern_meta_module	modules/mod_cern_meta.so" > $CFG/00_mod_cern_meta.conf
-echo "LoadModule cgi_module	modules/mod_cgi.so" > $CFG/00_mod_cgi.conf
-echo "LoadModule charset_lite_module	modules/mod_charset_lite.so" > $CFG/00_mod_charset_lite.conf
-echo "LoadModule data_module	modules/mod_data.so" > $CFG/00_mod_data.conf
-echo "LoadModule dbd_module	modules/mod_dbd.so" > $CFG/00_mod_dbd.conf
-echo "LoadModule dialup_module	modules/mod_dialup.so" > $CFG/00_mod_dialup.conf
-echo "LoadModule dumpio_module	modules/mod_dumpio.so" > $CFG/00_mod_dumpio.conf
-echo "LoadModule echo_module	modules/mod_echo.so" > $CFG/00_mod_echo.conf
-echo "LoadModule env_module	modules/mod_env.so" > $CFG/00_mod_env.conf
-echo "LoadModule expires_module	modules/mod_expires.so" > $CFG/00_mod_expires.conf
-echo "LoadModule ext_filter_module	modules/mod_ext_filter.so" > $CFG/00_mod_ext_filter.conf
-echo "LoadModule file_cache_module	modules/mod_file_cache.so" > $CFG/00_mod_file_cache.conf
-echo "LoadModule filter_module	modules/mod_filter.so" > $CFG/00_mod_filter.conf
-echo "LoadModule headers_module	modules/mod_headers.so" > $CFG/00_mod_headers.conf
-echo "LoadModule heartbeat_module	modules/mod_heartbeat.so" > $CFG/01_mod_heartbeat.conf
-echo "LoadModule heartmonitor_module	modules/mod_heartmonitor.so" > $CFG/01_mod_heartmonitor.conf
-echo "LoadModule ident_module	modules/mod_ident.so" > $CFG/00_mod_ident.conf
-echo "LoadModule imagemap_module	modules/mod_imagemap.so" > $CFG/00_mod_imagemap.conf
-echo "LoadModule include_module	modules/mod_include.so" > $CFG/00_mod_include.conf
-echo "LoadModule lbmethod_bybusyness_module	modules/mod_lbmethod_bybusyness.so" > $CFG/00_mod_lbmethod_bybusyness.conf
-echo "LoadModule lbmethod_byrequests_module	modules/mod_lbmethod_byrequests.so" > $CFG/00_mod_lbmethod_byrequests.conf
-echo "LoadModule lbmethod_bytraffic_module	modules/mod_lbmethod_bytraffic.so" > $CFG/00_mod_lbmethod_bytraffic.conf
-echo "LoadModule lbmethod_heartbeat_module	modules/mod_lbmethod_heartbeat.so" > $CFG/00_mod_lbmethod_heartbeat.conf
-echo "LoadModule ldap_module	modules/mod_ldap.so" > $CFG/00_mod_ldap.conf
-echo "LoadModule log_debug_module	modules/mod_log_debug.so" > $CFG/00_mod_log_debug.conf
-echo "LoadModule log_forensic_module	modules/mod_log_forensic.so" > $CFG/00_mod_log_forensic.conf
-echo "LoadModule logio_module	modules/mod_logio.so" > $CFG/00_mod_logio.conf
-echo "LoadModule lua_module	modules/mod_lua.so" > $CFG/00_mod_lua.conf
-echo "LoadModule macro_module	modules/mod_macro.so" > $CFG/00_mod_macro.conf
-echo "LoadModule negotiation_module	modules/mod_negotiation.so" > $CFG/00_mod_negotiation.conf
-echo "LoadModule ratelimit_module	modules/mod_ratelimit.so" > $CFG/00_mod_ratelimit.conf
-echo "LoadModule reflector_module	modules/mod_reflector.so" > $CFG/00_mod_reflector.conf
-echo "LoadModule remoteip_module	modules/mod_remoteip.so" > $CFG/00_mod_remoteip.conf
-echo "LoadModule reqtimeout_module	modules/mod_reqtimeout.so" >> $CFG/00_mod_reqtimeout.conf
-echo "LoadModule request_module	modules/mod_request.so" > $CFG/00_mod_request.conf
-echo "LoadModule rewrite_module	modules/mod_rewrite.so" > $CFG/00_mod_rewrite.conf
-echo "LoadModule sed_module	modules/mod_sed.so" > $CFG/00_mod_sed.conf
-echo "LoadModule session_cookie_module	modules/mod_session_cookie.so" > $CFG/00_mod_session_cookie.conf
-echo "LoadModule session_crypto_module	modules/mod_session_crypto.so" > $CFG/00_mod_session_crypto.conf
-echo "LoadModule session_dbd_module	modules/mod_session_dbd.so" > $CFG/00_mod_session_dbd.conf
-echo "LoadModule session_module	modules/mod_session.so" > $CFG/00_mod_session.conf
-echo "LoadModule setenvif_module	modules/mod_setenvif.so" > $CFG/00_mod_setenvif.conf
-echo "LoadModule slotmem_plain_module	modules/mod_slotmem_plain.so" > $CFG/00_mod_slotmem_plain.conf
-echo "LoadModule slotmem_shm_module	modules/mod_slotmem_shm.so" > $CFG/00_mod_slotmem_shm.conf
-echo "LoadModule socache_dbm_module	modules/mod_socache_dbm.so" > $CFG/00_mod_socache_dbm.conf
-echo "LoadModule socache_memcache_module	modules/mod_socache_memcache.so" > $CFG/00_mod_socache_memcache.conf
-echo "LoadModule socache_shmcb_module	modules/mod_socache_shmcb.so" > $CFG/00_mod_socache_shmcb.conf
-echo "LoadModule speling_module	modules/mod_speling.so" > $CFG/00_mod_speling.conf
-echo "LoadModule substitute_module	modules/mod_substitute.so" > $CFG/00_mod_substitute.conf
-echo "LoadModule unique_id_module	modules/mod_unique_id.so" > $CFG/00_mod_unique_id.conf
-echo "LoadModule usertrack_module	modules/mod_usertrack.so" > $CFG/00_mod_usertrack.conf
-echo "LoadModule version_module	modules/mod_version.so" > $CFG/00_mod_version.conf
-echo "LoadModule watchdog_module	modules/mod_watchdog.so" > $CFG/00_mod_watchdog.conf
-echo "LoadModule xml2enc_module	modules/mod_xml2enc.so" > $CFG/00_mod_xml2enc.conf
-
 
 # anything in style dir not ending with .css is trash
 %{__rm} -r $RPM_BUILD_ROOT%{_datadir}/manual/style/{lang,latex,xsl}
