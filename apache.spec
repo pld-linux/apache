@@ -1172,8 +1172,6 @@ Summary(pl.UTF-8):	Moduł Apache'a - rozproszone autorstwo i wersjonowanie
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/en/mod/mod_dav.html
 Requires:	%{name}-base = %{version}-%{release}
-Requires:	apache-mod_authn_file
-Requires:	apache-mod_setenvif
 Requires:	apr-util-dbm-db
 Provides:	apache(mod_dav) = %{version}-%{release}
 
