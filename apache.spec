@@ -1229,6 +1229,7 @@ Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_headers.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_headers) = %{version}-%{release}
+Provides:	webserver(headers)
 
 %description mod_headers
 This package contains mod_headers module. The module allows for the
