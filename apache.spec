@@ -34,7 +34,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.4.12
-Release:	1
+Release:	2
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -714,8 +714,8 @@ Summary(pl.UTF-8):	Moduł Apache'a umożliwiający przechowywanie danych dla uwi
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_authnz_ldap.html
 Requires:	%{name}-base = %{version}-%{release}
-Requires:	%{name}-mod_ldap = %{version}-%{release}
 Requires:	%{name}-mod_authn_core = %{version}-%{release}
+Requires:	%{name}-mod_ldap = %{version}-%{release}
 Requires:	apr-util-ldap
 Provides:	apache(mod_authnz_ldap) = %{version}-%{release}
 # compat
@@ -1439,6 +1439,7 @@ Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_headers.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_headers) = %{version}-%{release}
+Provides:	webserver(headers)
 
 %description mod_headers
 This package contains mod_headers module. The module allows for the
