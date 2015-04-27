@@ -17,4 +17,4 @@ HTTPD_OPTS=""
 #RPM_SKIP_AUTO_RESTART=yes
 
 # Delay in microseconds between stop and start to mitigate problems of third party Apache modules (PHP session ext
-#RESTART_DELAY=50000
+RESTART_DELAY=100000
