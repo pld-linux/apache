@@ -2927,13 +2927,6 @@ sed -i -e '
 	s,^LockFile /var/run/httpd/accept.lock,Mutex file:/var/run/httpd/,g
 ' /etc/httpd/conf.d/10_mpm.conf
 
-%triggerpostun mod_ssl -- %{name}-mod_ssl < 1:2.2.0-3.1
-cp -f /etc/httpd/conf.d/40_mod_ssl.conf{,.rpmsave}
-sed -i -e '
-	s,/var/run/apache,/var/run/httpd,g
-	s,/var/cache/apache,/var/cache/httpd,g
-' /etc/httpd/conf.d/40_mod_ssl.conf
-
 %triggerpostun mod_ssl -- %{name}-mod_ssl < 1:2.4.0
 cp -f /etc/httpd/conf.d/40_mod_ssl.conf{,.rpmsave}
 sed -i -e '
