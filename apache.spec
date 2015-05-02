@@ -2135,6 +2135,7 @@ Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_session_crypto.html
 Requires:	%{name}-base = %{version}-%{release}
 Requires:	%{name}-mod_session = %{version}-%{release}
+Requires:	apr-util-crypto-openssl
 Provides:	apache(mod_session_crypto) = %{version}-%{release}
 
 %description mod_session_crypto
@@ -2753,7 +2754,7 @@ install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig,systemd/system
 # clean "ccache" prefix. confuses other build systems (like php)
 %{__sed} -i -re '/^(CC|CPP|CXX)/ s/ccache //' $RPM_BUILD_ROOT%{_libdir}/%{name}/build/config_vars.mk
 
-install %{SOURCE31} $RPM_BUILD_ROOT%{systemdunitdir}/httpd.service
+cp -p %{SOURCE31} $RPM_BUILD_ROOT%{systemdunitdir}/httpd.service
 ln -s %{systemdunitdir}/httpd.service $RPM_BUILD_ROOT/etc/systemd/system/httpd.service
 ln -s %{_libexecdir} $RPM_BUILD_ROOT%{_sysconfdir}/modules
 ln -s %{_localstatedir}/run/httpd $RPM_BUILD_ROOT%{_sysconfdir}/run
@@ -2801,7 +2802,7 @@ cp -a %{SOURCE21} $CFG/10_mpm.conf
 cp -a %{SOURCE22} $CFG/20_languages.conf
 cp -a %{SOURCE29} $RPM_BUILD_ROOT%{_sysconfdir}/vhosts.d/example.net.conf
 
-install %{SOURCE30} $RPM_BUILD_ROOT%{systemdtmpfilesdir}/%{name}.conf
+cp -p %{SOURCE30} $RPM_BUILD_ROOT%{systemdtmpfilesdir}/%{name}.conf
 
 for module in access_compat actions alias allowmethods asis auth_basic \
 	auth_digest auth_form authn_anon authn_core authn_dbd authn_dbm \
