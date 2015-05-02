@@ -3065,9 +3065,9 @@ rm -rf $RPM_BUILD_ROOT
 if [ -f /etc/sysconfig/httpd ]; then
 	MPM=$(grep ^HTTPD_MPM /etc/sysconfig/httpd | sed 's,HTTPD_MPM=,,;s,",,g')
 	if [ -n "$MPM" ]; then
-		echo "LoadModule mpm_${MPM}_module	modules/mod_mpm_${MPM}.so" > /etc/httpd/conf.d/10_mpm.conf.rpmnew
-		cat /etc/httpd/conf.d/10_mpm.conf >> /etc/httpd/conf.d/10_mpm.conf.rpmnew
-		mv -f /etc/httpd/conf.d/10_mpm.conf.rpmnew /etc/httpd/conf.d/10_mpm.conf
+		echo "LoadModule mpm_${MPM}_module	modules/mod_mpm_${MPM}.so" > /etc/httpd/conf.modules.d/00-mpm.conf.rpmnew
+		cat /etc/httpd/conf.modules.d/00-mpm.conf >> /etc/httpd/conf.modules.d/00-mpm.conf.rpmnew
+		mv -bf /etc/httpd/conf.modules.d/00-mpm.conf{.rpmnew,}
 		sed -i -e 's,HTTPD_MPM.*,,g' /etc/sysconfig/httpd
 	fi
 fi
@@ -3112,6 +3112,48 @@ sed -i -e '
 sed -i -e '
 	s,^LockFile /var/run/httpd/accept.lock,Mutex file:/var/run/httpd/,g
 ' /etc/httpd/conf.d/10_mpm.conf
+
+%triggerpostun base -- %{name}-base < 2.4.39-2
+# skip *this* trigger on downgrade
+if [ $1 -le 1 ]; then
+	exit 0
+fi
+
+if ! grep -qi '^Include conf.modules.d/' %{_sysconfdir}/apache.conf; then
+	%{__sed} -i -e '/[Ii]nclude.*conf\.d/ i IncludeOptional conf.modules.d/*.conf' %{_sysconfdir}/apache.conf
+fi
+
+od=%{_sysconfdir}/conf.d
+nd=%{_sysconfdir}/conf.modules.d
+for of in $od/??_*.conf.rpmsave; do
+	# skip if glob did not expand
+	test -f "$of" || continue
+
+	# first check matching conf.d file
+	bn=${of##*/??_}
+	bn=${bn%.rpmsave}
+	nf=$od/$bn
+	if [ -f $nf ]; then
+		cp -f $nf{,.rpmnew}
+		mv -vf $of $nf
+		continue
+	fi
+
+	# then check matching conf.modules.d file
+	nf=$(echo $nd/??-$bn)
+	if [ -f $nf ]; then
+		cp -f $nf{,.rpmnew}
+		mv -vf $of $nf
+		continue
+	fi
+done
+
+%triggerpostun mod_ssl -- %{name}-mod_ssl < 1:2.2.0-3.1
+cp -f /etc/httpd/conf.d/40_mod_ssl.conf{,.rpmsave}
+sed -i -e '
+	s,/var/run/apache,/var/run/httpd,g
+	s,/var/cache/apache,/var/cache/httpd,g
+' /etc/httpd/conf.d/40_mod_ssl.conf
 
 %triggerpostun mod_ssl -- %{name}-mod_ssl < 1:2.4.0
 cp -f /etc/httpd/conf.d/40_mod_ssl.conf{,.rpmsave}
