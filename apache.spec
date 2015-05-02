@@ -2875,25 +2875,6 @@ rm -rf $RPM_BUILD_ROOT
 %useradd -u 51 -r -d /home/services/httpd -s /bin/false -c "HTTP User" -g http http
 
 %pretrans base
-# change httpd.conf from dir to symlink
-if [ ! -L /etc/httpd/httpd.conf ]; then
-	if [ -d /etc/httpd/httpd.conf ]; then
-		if [ -d /etc/httpd/conf.d ]; then
-			mv /etc/httpd/httpd.conf/* /etc/httpd/conf.d
-			rmdir /etc/httpd/httpd.conf 2>/dev/null || mv -v /etc/httpd/httpd.conf{,.rpmsave}
-		else
-			mv /etc/httpd/httpd.conf /etc/httpd/conf.d
-		fi
-
-		# new module packages issue error as first installed over 2.0 installation
-		mv -f /var/lock/subsys/httpd{,.disabled} 2>/dev/null
-	fi
-
-	# always have httpd.conf symlink (until all packages from Ac use new dir)
-	install -d /etc/httpd
-	ln -s conf.d /etc/httpd/httpd.conf
-fi
-
 # handle $HTTPD_MPM from sysconfig
 if [ -f /etc/sysconfig/httpd ]; then
 	MPM=$(grep ^HTTPD_MPM /etc/sysconfig/httpd | sed 's,HTTPD_MPM=,,;s,",,g')
