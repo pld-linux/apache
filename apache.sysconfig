@@ -16,5 +16,5 @@ HTTPD_OPTS=""
 # Skip apache restarts invoked from rpm installs.
 #RPM_SKIP_AUTO_RESTART=yes
 
-# Delay in microseconds between stop and start to mitigate problems of third party Apache modules (PHP session ext
+# Delay in microseconds between stop and start to mitigate problems of third party Apache modules (PHP session ext)
 RESTART_DELAY=100000
