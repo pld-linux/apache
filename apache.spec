@@ -16,11 +16,12 @@
 %bcond_without	ldap		# build without LDAP support
 %bcond_with	distcache	# distcache support
 %bcond_with	bucketeer	# debug one
+%bcond_without	http2	# support for HTTP/2
 
 # this is internal macro, don't change to %%apache_modules_api
 %define		_apache_modules_api 20120211
 
-%define		openssl_ver	1.0.1e
+%define		openssl_ver	1.0.2
 %define		apr_ver		1:1.4.6
 
 %include	/usr/lib/rpm/macros.perl
@@ -33,12 +34,12 @@ Summary(pt_BR.UTF-8):	Servidor HTTPD para prover serviços WWW
 Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
-Version:	2.4.16
-Release:	3
+Version:	2.4.17
+Release:	1
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
-# Source0-md5:	2b19cd338fd526dd5a63c57b1e9bfee2
+# Source0-md5:	cf4dfee11132cde836022f196611a8b7
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}.sysconfig
@@ -70,6 +71,7 @@ Source28:	%{name}-mod_cache.conf
 Source29:	%{name}-example.net.conf
 Source30:	%{name}.tmpfiles
 Source31:	%{name}.service
+Source32:	%{name}-mod_http2.conf
 Patch0:		%{name}-configdir_skip_backups.patch
 Patch1:		%{name}-layout.patch
 Patch2:		%{name}-suexec.patch
@@ -100,6 +102,7 @@ BuildRequires:	automake
 %{?with_distcache:BuildRequires:	distcache-devel}
 BuildRequires:	libtool >= 2:1.5
 BuildRequires:	lua51-devel
+%{?with_http2:BuildRequires:	nghttp2-devel}
 %{?with_ldap:BuildRequires:	openldap-devel >= 2.3.0}
 %{?with_ssl:BuildRequires:	openssl-devel >= %{openssl_ver}}
 %{?with_ssl:BuildRequires:	openssl-tools >= %{openssl_ver}}
@@ -1516,6 +1519,17 @@ Ten moduł wykorzystuje usługi modułu mod_slotmem_shm (jeśli jest
 dostępny) zamiast przechowywania danych w płaskich plikach. Do
 używania tego modułu nie jest wymagana żadna konfiguracja.
 
+%package mod_http2
+Summary:	Provide HTTP/2 support for the Apache HTTP Server
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_http2.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_http2) = %{version}-%{release}
+
+%description mod_http2
+This module provides HTTP/2 (RFC 7540) support for the Apache HTTP
+Server.
+
 %package mod_ident
 Summary:	RFC 1413 ident lookups
 Summary(pl.UTF-8):	Sprawdzanie identyfikacji RFC 1413
@@ -2708,6 +2722,7 @@ install -d build; cd build
 	--enable-cern-meta \
 	--enable-expires \
 	--enable-headers \
+	%{__enable_disable http2} \
 	--enable-ident \
 	--enable-usertrack \
 	--enable-unique-id \
@@ -2797,6 +2812,7 @@ cp -a %{SOURCE25} $CFG/01_mod_cgid.conf
 cp -a %{SOURCE26} $CFG/01_mod_log_config.conf
 cp -a %{SOURCE27} $CFG/01_mod_mime_magic.conf
 cp -a %{SOURCE28} $CFG/01_mod_cache.conf
+cp -a %{SOURCE32} $CFG/01_mod_http2.conf
 cp -a %{SOURCE8} $CFG/20_mod_vhost_alias.conf
 cp -a %{SOURCE9} $CFG/25_mod_status.conf
 cp -a %{SOURCE10} $CFG/30_mod_proxy.conf
@@ -3034,6 +3050,7 @@ fi
 %module_scripts mod_headers
 %module_scripts mod_heartbeat
 %module_scripts mod_heartmonitor
+%module_scripts mod_http2
 %module_scripts mod_ident
 %module_scripts mod_imagemap
 %module_scripts mod_include
@@ -3460,6 +3477,13 @@ fi
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_heartmonitor.conf
 %attr(755,root,root) %{_libexecdir}/mod_heartmonitor.so
+
+%if %{with http2}
+%files mod_http2
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_http2.conf
+%attr(755,root,root) %{_libexecdir}/mod_http2.so
+%endif
 
 %files mod_ident
 %defattr(644,root,root,755)
