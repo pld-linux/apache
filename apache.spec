@@ -16,7 +16,7 @@
 %bcond_without	ldap		# build without LDAP support
 %bcond_with	distcache	# distcache support
 %bcond_with	bucketeer	# debug one
-%bcond_without	http2	# support for HTTP/2
+%bcond_without	http2		# HTTP/2 support
 
 # this is internal macro, don't change to %%apache_modules_api
 %define		_apache_modules_api 20120211
@@ -1521,6 +1521,7 @@ używania tego modułu nie jest wymagana żadna konfiguracja.
 
 %package mod_http2
 Summary:	Provide HTTP/2 support for the Apache HTTP Server
+Summary(pl.UTF-8):	Obsługa HTTP/2 dla serwera HTTP Apache
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_http2.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -1529,6 +1530,9 @@ Provides:	apache(mod_http2) = %{version}-%{release}
 %description mod_http2
 This module provides HTTP/2 (RFC 7540) support for the Apache HTTP
 Server.
+
+%description mod_http2 -l pl.UTF-8
+Ten moduł zapewnia obsługę HTTP/2 (RFC 7540) dla serwera HTTP Apache.
 
 %package mod_ident
 Summary:	RFC 1413 ident lookups
