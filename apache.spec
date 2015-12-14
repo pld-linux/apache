@@ -34,12 +34,12 @@ Summary(pt_BR.UTF-8):	Servidor HTTPD para prover serviços WWW
 Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
-Version:	2.4.17
-Release:	3
+Version:	2.4.18
+Release:	1
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
-# Source0-md5:	cf4dfee11132cde836022f196611a8b7
+# Source0-md5:	3690b3cc991b7dfd22aea9e1264a11b9
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}.sysconfig
@@ -102,7 +102,7 @@ BuildRequires:	automake
 %{?with_distcache:BuildRequires:	distcache-devel}
 BuildRequires:	libtool >= 2:1.5
 BuildRequires:	lua51-devel
-%{?with_http2:BuildRequires:	nghttp2-devel}
+%{?with_http2:BuildRequires:	nghttp2-devel >= 1.2.1}
 %{?with_ldap:BuildRequires:	openldap-devel >= 2.3.0}
 %{?with_ssl:BuildRequires:	openssl-devel >= %{openssl_ver}}
 %{?with_ssl:BuildRequires:	openssl-tools >= %{openssl_ver}}
