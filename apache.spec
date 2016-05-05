@@ -44,7 +44,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.2.31
-Release:	4
+Release:	5
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -1584,7 +1584,7 @@ Epoch:		1
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.2/mod/mod_ssl.html
 Requires:	%{name}-base = %{version}-%{release}
-%requires_eq_to openssl openssl-devel
+%requires_ge_to openssl openssl-devel
 %if "%{pld_release}" != "ac"
 Requires:	apr-util-dbm-db
 %endif
