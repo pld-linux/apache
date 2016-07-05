@@ -34,12 +34,12 @@ Summary(pt_BR.UTF-8):	Servidor HTTPD para prover serviços WWW
 Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
-Version:	2.4.20
+Version:	2.4.23
 Release:	1
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
-# Source0-md5:	3ff4f00ee051cf5d5304b47b1bc418b8
+# Source0-md5:	04f19c60e810c028f5240a062668a688
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}.sysconfig
@@ -2736,6 +2736,7 @@ install -d build; cd build
 	--enable-proxy-http \
 	--enable-proxy-ajp \
 	--enable-proxy-balancer \
+	--enable-proxy-fdpass \
 	%{?with_ssl:--enable-ssl %{?with_distcache:--enable-distcache}} \
 	--enable-http \
 	--enable-dav \
@@ -3593,6 +3594,7 @@ fi
 %attr(755,root,root) %{_libexecdir}/mod_proxy_fcgi.so
 %attr(755,root,root) %{_libexecdir}/mod_proxy_fdpass.so
 %attr(755,root,root) %{_libexecdir}/mod_proxy_ftp.so
+%attr(755,root,root) %{_libexecdir}/mod_proxy_hcheck.so
 %attr(755,root,root) %{_libexecdir}/mod_proxy_html.so
 %attr(755,root,root) %{_libexecdir}/mod_proxy_http.so
 %attr(755,root,root) %{_libexecdir}/mod_proxy_scgi.so
