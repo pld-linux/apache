@@ -2004,7 +2004,6 @@ Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_reqtimeout.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_reqtimeout) = %{version}-%{release}
-Provides:	webserver(reqtimeout)
 
 %description mod_reqtimeout
 Apache module to set timeout and minimum data rate for receiving
