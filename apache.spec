@@ -77,7 +77,7 @@ Patch1:		%{name}-layout.patch
 Patch2:		%{name}-suexec.patch
 Patch3:		%{name}-branding.patch
 Patch4:		%{name}-apr.patch
-Patch5:		apache-CVE-2016-5387.patch
+Patch5:		%{name}-CVE-2016-5387.patch
 
 Patch7:		%{name}-syslibs.patch
 
@@ -122,11 +122,15 @@ Requires:	%{name}-mod_autoindex = %{version}-%{release}
 Requires:	%{name}-mod_deflate = %{version}-%{release}
 Requires:	%{name}-mod_dir = %{version}-%{release}
 Requires:	%{name}-mod_env = %{version}-%{release}
+Requires:	%{name}-mod_filter = %{version}-%{release}
+Requires:	%{name}-mod_headers = %{version}-%{release}
 Requires:	%{name}-mod_log_config = %{version}-%{release}
 Requires:	%{name}-mod_logio = %{version}-%{release}
 Requires:	%{name}-mod_mime = %{version}-%{release}
 Requires:	%{name}-mod_mime_magic = %{version}-%{release}
 Requires:	%{name}-mod_negotiation = %{version}-%{release}
+Requires:	%{name}-mod_reqtimeout = %{version}-%{release}
+Requires:	%{name}-mod_rewrite = %{version}-%{release}
 Requires:	%{name}-mod_setenvif = %{version}-%{release}
 Requires:	%{name}-mod_speling = %{version}-%{release}
 Requires:	%{name}-mod_status = %{version}-%{release}
