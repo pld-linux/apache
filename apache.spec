@@ -2840,10 +2840,17 @@ cp -a %{SOURCE29} $RPM_BUILD_ROOT%{_sysconfdir}/vhosts.d/example.net.conf
 
 cp -p %{SOURCE30} $RPM_BUILD_ROOT%{systemdtmpfilesdir}/%{name}.conf
 
+LoadModule() {
+	local index=$1 module=$2 conffile
+	conffile=${3:-$module}
+	echo "LoadModule ${module}_module modules/mod_$module.so" > $CFG/$index-mod_$conffile.conf
+}
+
 for module in access_compat actions alias allowmethods asis auth_basic \
 	auth_digest auth_form authn_anon authn_core authn_dbd authn_dbm \
 	authn_file authn_socache authnz_ldap authz_core authz_dbd \
 	authz_dbm authz_groupfile authz_owner authz_user buffer \
+	%{?with_bucketeer:bucketeer} \
 	case_filter_in case_filter cern_meta cgi charset_lite \
 	data dbd dialup dumpio \
 	echo env expires ext_filter \
@@ -2859,13 +2866,8 @@ for module in access_compat actions alias allowmethods asis auth_basic \
 	socache_shmcb speling substitute \
 	unique_id usertrack version watchdog xml2enc; do
 
-echo "LoadModule ${module}_module	modules/mod_$module.so" > $CFG/00_mod_$module.conf
-
+	LoadModule 00 $module
 done
-
-%if %{with bucketeer}
-echo "LoadModule bucketeer_module	modules/mod_bucketeer.so" > $CFG/00_mod_bucketeer.conf
-%endif
 
 # anything in style dir not ending with .css is trash
 %{__rm} -r $RPM_BUILD_ROOT%{_datadir}/manual/style/{lang,latex,xsl}
