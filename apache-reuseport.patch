@@ -1,0 +1,30 @@
+commit 20270f8b9d72c39ac8ddd9386c5126fe6cfe3f31
+Author: jorton <jorton@13f79535-47bb-0310-9956-ffa450edef68>
+Date:   Fri Mar 17 08:30:16 2017 +0000
+
+    Merge r1777923 from trunk:
+    
+    avoid SO_REUSEPORT w/o ListenCoresBucketsRatio
+    
+    Can lead to unintended/confusing sharing between
+    multiple servers started by the same ID.
+    
+    Submitted by: covener
+    Reviewed by: jorton, covener, wrowe
+    
+    
+    git-svn-id: http://svn.apache.org/repos/asf/httpd/httpd/branches/2.4.x@1787301 13f79535-47bb-0310-9956-ffa450edef68
+
+diff --git a/server/listen.c b/server/listen.c
+index 98cd117c..d44c7c9f 100644
+--- a/server/listen.c
++++ b/server/listen.c
+@@ -153,7 +153,7 @@ static apr_status_t make_sock(apr_pool_t *p, ap_listen_rec *server)
+ #endif
+ 
+ #if defined(SO_REUSEPORT)
+-    if (ap_have_so_reuseport) {
++    if (ap_have_so_reuseport && ap_listencbratio > 0) {
+         int thesock;
+         apr_os_sock_get(&thesock, s);
+         if (setsockopt(thesock, SOL_SOCKET, SO_REUSEPORT,
