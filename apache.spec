@@ -34,12 +34,12 @@ Summary(pt_BR.UTF-8):	Servidor HTTPD para prover serviços WWW
 Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
-Version:	2.4.25
-Release:	2
+Version:	2.4.26
+Release:	1
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
-# Source0-md5:	2826f49619112ad5813c0be5afcc7ddb
+# Source0-md5:	d4d47749a44461cb2e6c9d78a22b522b
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}.sysconfig
@@ -77,8 +77,6 @@ Patch1:		%{name}-layout.patch
 Patch2:		%{name}-suexec.patch
 Patch3:		%{name}-branding.patch
 Patch4:		%{name}-apr.patch
-Patch5:		apache-reuseport.patch
-
 Patch7:		%{name}-syslibs.patch
 
 Patch10:	httpd-2.0.46-dav401dest.patch
@@ -94,7 +92,6 @@ Patch23:	%{name}-suexec_fcgi.patch
 Patch25:	httpd-2.2.x-mod_ssl-sessioncaching.patch
 Patch26:	%{name}-mod_vhost_alias_docroot.patch
 Patch29:	libtool-tag.patch
-Patch30:	lua-lib.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	apr-devel >= %{apr_ver}
 BuildRequires:	apr-util-devel >= 1:1.3.10-2
@@ -571,13 +568,10 @@ Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_auth_digest) = %{version}-%{release}
 
 %description mod_auth_digest
-This module implements HTTP Digest Authentication. However, it has not
-been extensively tested and is therefore marked experimental.
+This module implements HTTP Digest Authentication.
 
 %description mod_auth_digest -l pl.UTF-8
-Ten moduł implementuje uwierzytelnienie HTTP Digest. Nie został on
-jednak zbyt obszernie przetestowany, więc jest oznaczony jako
-eksperymentalny.
+Ten moduł implementuje uwierzytelnienie HTTP Digest.
 
 %package mod_auth_form
 Summary:	Form authentication
@@ -1146,15 +1140,11 @@ Specify character set translation or recoding.
 This module provides a small subset of configuration mechanisms
 implemented by Russian Apache and its associated mod_charset.
 
-This is an experimental module and should be used with care.
-
 %description mod_charset_lite -l pl.UTF-8
 Translacja lub przekodowywanie znaków.
 
 Ten moduł udostępnia niewielki podzbiór mechanizmów konfiguracyjnych
 zaimplementowanych przez Russian Apache i powiązany z nim mod_charset.
-
-Jest to moduł eksperymentalny i należy używać go z uwagą.
 
 %package mod_data
 Summary:	Convert response body into an RFC2397 data URL
@@ -2645,7 +2635,6 @@ Dwa programy testowe/przykładowe cgi: test-cgi and print-env.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
-%patch5 -p1
 
 %patch7 -p1
 
@@ -2663,7 +2652,6 @@ Dwa programy testowe/przykładowe cgi: test-cgi and print-env.
 # ?
 #%patch26 -p1
 %patch29 -p1
-%patch30 -p1
 
 # sanity check
 MODULES_API=`awk '/#define MODULE_MAGIC_NUMBER_MAJOR/ {print $3}' include/ap_mmn.h`
@@ -2739,6 +2727,7 @@ install -d build; cd build
 	--enable-proxy-connect \
 	--enable-proxy-ftp \
 	--enable-proxy-http \
+	--enable-proxy-http2 \
 	--enable-proxy-ajp \
 	--enable-proxy-balancer \
 	--enable-proxy-fdpass \
@@ -3604,6 +3593,7 @@ fi
 %attr(755,root,root) %{_libexecdir}/mod_proxy_hcheck.so
 %attr(755,root,root) %{_libexecdir}/mod_proxy_html.so
 %attr(755,root,root) %{_libexecdir}/mod_proxy_http.so
+%attr(755,root,root) %{_libexecdir}/mod_proxy_http2.so
 %attr(755,root,root) %{_libexecdir}/mod_proxy_scgi.so
 %attr(755,root,root) %{_libexecdir}/mod_proxy_wstunnel.so
 %attr(755,root,root) %{_libexecdir}/mod_proxy.so
