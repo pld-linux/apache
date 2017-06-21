@@ -100,7 +100,7 @@ BuildRequires:	automake
 %{?with_distcache:BuildRequires:	distcache-devel}
 BuildRequires:	libtool >= 2:1.5
 BuildRequires:	lua51-devel
-%{?with_http2:BuildRequires:	nghttp2-devel >= 1.2.1}
+%{?with_http2:BuildRequires:	nghttp2-devel >= 1.15.0}
 %{?with_ldap:BuildRequires:	openldap-devel >= 2.3.0}
 %{?with_ssl:BuildRequires:	openssl-devel >= %{openssl_ver}}
 %{?with_ssl:BuildRequires:	openssl-tools >= %{openssl_ver}}
@@ -1520,6 +1520,7 @@ Summary(pl.UTF-8):	Obsługa HTTP/2 dla serwera HTTP Apache
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_http2.html
 Requires:	%{name}-base = %{version}-%{release}
+Requires:	nghttp2 >= 1.15.0
 Provides:	apache(mod_http2) = %{version}-%{release}
 
 %description mod_http2
