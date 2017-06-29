@@ -23,6 +23,7 @@
 
 %define		openssl_ver	1.0.2
 %define		apr_ver		1:1.6.0
+%define		apr_util_ver	1:1.6.0
 
 %include	/usr/lib/rpm/macros.perl
 Summary:	The most widely used Web server on the Internet
@@ -35,7 +36,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.4.26
-Release:	2
+Release:	3
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -94,7 +95,7 @@ Patch26:	%{name}-mod_vhost_alias_docroot.patch
 Patch29:	libtool-tag.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	apr-devel >= %{apr_ver}
-BuildRequires:	apr-util-devel >= 1:1.3.10-2
+BuildRequires:	apr-util-devel >= %{apr_util_ver}
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
 %{?with_distcache:BuildRequires:	distcache-devel}
@@ -322,7 +323,7 @@ Summary(pl.UTF-8):	Pliki nagłówkowe do tworzenia modułów rozszerzeń do serw
 Summary(pt_BR.UTF-8):	Arquivos de inclusão do Apache para desenvolvimento de módulos
 Summary(ru.UTF-8):	Средства разработки модулей для веб-сервера Apache
 Group:		Networking/Utilities
-Requires:	apr-util-devel >= 1:1.2
+Requires:	apr-util-devel >= %{apr_util_ver}
 Requires:	libtool
 Obsoletes:	apache-apxs
 Obsoletes:	apache-static
@@ -727,7 +728,7 @@ URL:		http://httpd.apache.org/docs/2.4/mod/mod_authnz_ldap.html
 Requires:	%{name}-base = %{version}-%{release}
 Requires:	%{name}-mod_authn_core = %{version}-%{release}
 Requires:	%{name}-mod_ldap = %{version}-%{release}
-Requires:	apr-util-ldap
+Requires:	apr-util-ldap >= %{apr_util_ver}
 Provides:	apache(mod_authnz_ldap) = %{version}-%{release}
 # compat
 Provides:	apache(mod_auth_ldap) = %{version}-%{release}
@@ -1179,7 +1180,7 @@ Summary(pl.UTF-8):	Moduł Apache'a - rozproszone autorstwo i wersjonowanie
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/en/mod/mod_dav.html
 Requires:	%{name}-base = %{version}-%{release}
-Requires:	apr-util-dbm-db
+Requires:	apr-util-dbm-db >= %{apr_util_ver}
 Provides:	apache(mod_dav) = %{version}-%{release}
 
 %description mod_dav
@@ -2157,7 +2158,7 @@ Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_session_crypto.html
 Requires:	%{name}-base = %{version}-%{release}
 Requires:	%{name}-mod_session = %{version}-%{release}
-Requires:	apr-util-crypto-openssl
+Requires:	apr-util-crypto-openssl >= %{apr_util_ver}
 Provides:	apache(mod_session_crypto) = %{version}-%{release}
 
 %description mod_session_crypto
@@ -2377,7 +2378,7 @@ Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_ssl.html
 Requires:	%{name}-base = %{version}-%{release}
 Requires:	%{name}-mod_socache_shmcb = %{version}-%{release}
-Requires:	apr-util-dbm-db
+Requires:	apr-util-dbm-db >= %{apr_util_ver}
 Requires:	openssl >= %{openssl_ver}
 Provides:	apache(mod_ssl) = 1:%{version}-%{release}
 
