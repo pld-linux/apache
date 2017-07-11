@@ -44,7 +44,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.2.32
-Release:	1
+Release:	2
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -85,16 +85,16 @@ Patch1:		%{name}-layout.patch
 Patch2:		%{name}-suexec.patch
 Patch3:		%{name}-branding.patch
 Patch4:		%{name}-apr.patch
-Patch5:		apache-bug-49058.patch
+Patch5:		%{name}-bug-49058.patch
 # what about this? it isn't applied...
 Patch6:		httpd-2.0.40-xfsz.patch
 Patch7:		%{name}-syslibs.patch
 Patch8:		httpd-2.0.45-encode.patch
 Patch9:		%{name}-paths.patch
 Patch10:	httpd-2.0.46-dav401dest.patch
-Patch11:	apache-bug-39311-preforkonly.patch
+Patch11:	%{name}-bug-39311-preforkonly.patch
 Patch12:	httpd-2.0.46-sslmutex.patch
-Patch13:	apache-bug-50002.patch
+Patch13:	%{name}-bug-50002.patch
 Patch14:	httpd-2.0.48-corelimit.patch
 Patch15:	httpd-2.0.48-debuglog.patch
 Patch18:	%{name}-v6only-ENOPROTOOPT.patch
@@ -104,12 +104,17 @@ Patch23:	%{name}-suexec_fcgi.patch
 Patch24:	%{name}-bug-48094.patch
 # http://scripts.mit.edu/trac/browser/trunk/server/common/patches/httpd-2.2.x-mod_ssl-sessioncaching.patch?rev=1348
 Patch25:	httpd-2.2.x-mod_ssl-sessioncaching.patch
-Patch26:	apache-mod_vhost_alias_docroot.patch
+Patch26:	%{name}-mod_vhost_alias_docroot.patch
 # http://mpm-itk.sesse.net/
-Patch28:	apache-mpm-itk.patch
+Patch28:	%{name}-mpm-itk.patch
 Patch29:	libtool-tag.patch
-Patch30:	apache-bug-39653.patch
+Patch30:	%{name}-bug-39653.patch
 Patch31:	httpd-dummy-connection-result.patch
+# https://www.apache.org/dist/httpd/patches/apply_to_2.2.32/
+Patch32:	CVE-2017-3167.patch
+Patch33:	CVE-2017-3169.patch
+Patch34:	CVE-2017-7668.patch
+Patch35:	CVE-2017-7679.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	apr-devel >= %{apr_ver}
 BuildRequires:	apr-util-devel >= 1:1.3.10-2
@@ -1808,6 +1813,10 @@ Dwa programy testowe/przykładowe cgi: test-cgi and print-env.
 %patch29 -p1
 %patch30 -p1
 %patch31 -p1
+%patch32 -p0
+%patch33 -p0
+%patch34 -p0
+%patch35 -p0
 
 # using system apr, apr-util and pcre
 %{__rm} -r srclib/{apr,apr-util,pcre}
@@ -1939,7 +1948,7 @@ install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig,systemd/system
 	$RPM_BUILD_ROOT%{_var}/{log/{httpd,archive/httpd},{run,cache}/httpd,lock/mod_dav} \
 	$RPM_BUILD_ROOT%{_sysconfdir}/{webapps.d,conf.d,vhosts.d} \
 	$RPM_BUILD_ROOT%{_datadir}/{cgi-bin,vhosts} \
-	$RPM_BUILD_ROOT/usr/lib/tmpfiles.d \
+	$RPM_BUILD_ROOT%{systemdtmpfilesdir} \
 	$RPM_BUILD_ROOT%{systemdunitdir}
 
 # prefork is default one
@@ -2003,7 +2012,7 @@ cp -a %{SOURCE21} $CFG/10_mpm.conf
 cp -a %{SOURCE22} $CFG/20_languages.conf
 cp -a %{SOURCE29} $RPM_BUILD_ROOT%{_sysconfdir}/vhosts.d/example.net.conf
 
-install %{SOURCE30} $RPM_BUILD_ROOT/usr/lib/tmpfiles.d/%{name}.conf
+cp -p %{SOURCE30} $RPM_BUILD_ROOT%{systemdtmpfilesdir}/%{name}.conf
 
 echo "LoadModule alias_module modules/mod_alias.so" > $CFG/00_mod_alias.conf
 echo "LoadModule authn_file_module	modules/mod_authn_file.so" > $CFG/00_mod_authn_file.conf
@@ -2401,7 +2410,7 @@ fi
 %dir %attr(770,root,http) /var/run/httpd
 %dir %attr(770,root,http) /var/cache/httpd
 
-/usr/lib/tmpfiles.d/%{name}.conf
+%{systemdtmpfilesdir}/%{name}.conf
 %{systemdunitdir}/httpd-*.service
 %config(noreplace) %verify(not md5 mtime size) /etc/systemd/system/httpd.service
 
