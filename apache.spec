@@ -36,7 +36,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.4.26
-Release:	3
+Release:	4
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -199,6 +199,7 @@ Requires(pre):	/usr/sbin/useradd
 Requires(post,preun,postun):	systemd-units >= 38
 Requires:	/sbin/chkconfig
 Requires:	apr >= %{apr_ver}
+Requires:	apr-util >= %{apr_util_ver}
 Requires:	psmisc >= 20.1
 Requires:	rc-scripts >= 0.4.1.23
 Requires:	sed >= 4.0
