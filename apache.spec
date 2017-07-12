@@ -1,4 +1,4 @@
-# # TODO:
+# TODO:
 # - config examples for mod_*
 # - --with-suexec-uidmin=500 or =1000 ?
 # - check those autn modules inner deps
@@ -99,8 +99,10 @@ BuildRequires:	apr-util-devel >= %{apr_util_ver}
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
 %{?with_distcache:BuildRequires:	distcache-devel}
+BuildRequires:	libbrotli-devel >= 0.6.0
 BuildRequires:	libtool >= 2:1.5
-BuildRequires:	lua51-devel
+BuildRequires:	libxml2-devel >= 2
+BuildRequires:	lua53-devel >= 5.3
 %{?with_http2:BuildRequires:	nghttp2-devel >= 1.15.0}
 %{?with_ldap:BuildRequires:	openldap-devel >= 2.3.0}
 %{?with_ssl:BuildRequires:	openssl-devel >= %{openssl_ver}}
@@ -920,7 +922,7 @@ WWW dla uwierzytelnionych użytkowników.
 
 %package mod_autoindex
 Summary:	Apache module - display index of files
-Summary(pl.UTF-8):	Moduł apache do wyświetlania indeksu plików
+Summary(pl.UTF-8):	Moduł Apache'a do wyświetlania indeksu plików
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/en/mod/mod_autoindex.html
 Requires:	%{name}-base = %{version}-%{release}
@@ -934,8 +936,27 @@ index of files.
 %description mod_autoindex -l pl.UTF-8
 Ten pakiet dostarcza moduł autoindex, który generuje indeks plików.
 
+%package mod_brotli
+Summary:	Apache module: compress content via Brotli before it is delivered to the client
+Summary(pl.UTF-8):	Moduł Apache'a kompresujący treść przy użyciu formatu Brotli przed wysłaniem do klienta
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_brotli.html
+Requires:	%{name}-base = %{version}-%{release}
+Requires:	libbrotli >= 0.6.0
+Provides:	apache(mod_brotli) = %{version}-%{release}
+
+%description mod_brotli
+The mod_brotli module provides the BROTLI_COMPRESS output filter that
+allows output from your server to be compressed using the brotli
+compression format before being sent to the client over the network.
+
+%description mod_brotli -l pl.UTF-8
+Moduł mod_brotli udostępnia filtr wyjściowy BROTLI_COMPRESS,
+pozwalający na kompresowanie wyjścia z serwera przy użyciu formatu
+kompresji brotli przed wysłaniem przez sieć do klienta.
+
 %package mod_bucketeer
-Summary:	buckets manipulation filter
+Summary:	Buckets manipulation filter
 Summary(pl.UTF-8):	Dzielenie kubełków po znalezieniu znaku sterującego
 Group:		Networking/Daemons/HTTP
 Requires:	%{name}-base = %{version}-%{release}
@@ -2696,36 +2717,47 @@ install -d build; cd build
 	--enable-auth-dbm \
 	--enable-authn-dbd \
 	--enable-authn-alias \
+	%{?with_ldap:--enable-authnz-ldap} \
 	--enable-authz-dbm \
 	--enable-authz-owner \
-	%{?with_ldap:--enable-authnz-ldap} \
 	--enable-auth-digest \
-	--enable-file-cache \
+	%{?with_bucketeer:--enable-bucketeer} \
 	--enable-cache \
 	--enable-disk-cache \
+	--enable-file-cache \
 	--enable-mem-cache \
-	--enable-dbd \
-	%{?with_bucketeer:--enable-bucketeer} \
-	--enable-dumpio \
-	--enable-echo \
+	--enable-cern-meta \
+	--enable-cgi \
+	--enable-cgid \
 	--enable-charset-lite \
+	--enable-dbd \
 	--enable-deflate \
-	%{?with_ldap:--enable-ldap} \
-	--enable-ext-filter \
+	--enable-dumpio \
 	--enable-case-filter \
 	--enable-case-filter-in \
+	--enable-dav \
+	--enable-dav-fs \
+	--enable-dav-lock \
+	--enable-echo \
+	--enable-ext-filter \
+	--enable-expires \
+	--enable-headers \
+	--enable-http \
+	%{__enable_disable http2} \
+	--enable-ident \
+	--enable-imagemap \
+	--enable-info \
+	%{?with_ldap:--enable-ldap} \
 	--enable-log-forensic \
 	--enable-logio \
 	--enable-lua \
-	--with-z=%{_prefix} \
 	--enable-mime-magic \
-	--enable-cern-meta \
-	--enable-expires \
-	--enable-headers \
-	%{__enable_disable http2} \
-	--enable-ident \
-	--enable-usertrack \
-	--enable-unique-id \
+	--enable-mpms-shared=all \
+%ifarch %{ix86}
+%ifnarch i386 i486
+	--enable-nonportable-atomics=yes \
+%endif
+%endif
 	--enable-proxy \
 	--enable-proxy-connect \
 	--enable-proxy-ftp \
@@ -2734,27 +2766,19 @@ install -d build; cd build
 	--enable-proxy-ajp \
 	--enable-proxy-balancer \
 	--enable-proxy-fdpass \
-	%{?with_ssl:--enable-ssl %{?with_distcache:--enable-distcache}} \
-	--enable-http \
-	--enable-dav \
-	--enable-info \
-	--enable-suexec \
-	--enable-cgi \
-	--enable-cgid \
-	--enable-dav-fs \
-	--enable-dav-lock \
-	--enable-vhost-alias \
-	--enable-imagemap \
-	--enable-speling \
 	--enable-rewrite \
 	--enable-so \
+	--enable-speling \
+	%{?with_ssl:--enable-ssl %{?with_distcache:--enable-distcache}} \
+	--enable-suexec \
+	--enable-unique-id \
+	--enable-usertrack \
+	--enable-vhost-alias \
+	--with-apr=%{_bindir}/apr-1-config \
+	--with-apr-util=%{_bindir}/apu-1-config \
+	--with-lua=/usr \
+	--with-pcre \
 	--with-program-name=httpd \
-	--enable-mpms-shared=all \
-%ifarch %{ix86}
-%ifnarch i386 i486
-	--enable-nonportable-atomics=yes \
-%endif
-%endif
 	--with-suexec-bin=%{_sbindir}/suexec \
 	--with-suexec-caller=http \
 	--with-suexec-docroot=%{_datadir} \
@@ -2762,9 +2786,7 @@ install -d build; cd build
 	--with-suexec-uidmin=500 \
 	--with-suexec-gidmin=500 \
 	--with-suexec-umask=077 \
-	--with-apr=%{_bindir}/apr-1-config \
-	--with-apr-util=%{_bindir}/apu-1-config \
-	--with-pcre
+	--with-z=%{_prefix}
 
 %{__make}
 
@@ -2843,8 +2865,8 @@ LoadModule() {
 for module in access_compat actions alias allowmethods asis auth_basic \
 	auth_digest auth_form authn_anon authn_core authn_dbd authn_dbm \
 	authn_file authn_socache authnz_ldap authz_core authz_dbd \
-	authz_dbm authz_groupfile authz_owner authz_user buffer \
-	%{?with_bucketeer:bucketeer} \
+	authz_dbm authz_groupfile authz_owner authz_user brotli \
+	%{?with_bucketeer:bucketeer} buffer \
 	case_filter_in case_filter cern_meta cgi charset_lite \
 	data dbd dialup dumpio \
 	echo env expires ext_filter \
@@ -3029,6 +3051,7 @@ fi
 %module_scripts mod_authz_owner
 %module_scripts mod_authz_user
 %module_scripts mod_autoindex
+%module_scripts mod_brotli
 %module_scripts mod_bucketeer
 %module_scripts mod_buffer
 %module_scripts mod_cache
@@ -3349,6 +3372,11 @@ fi
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_autoindex.conf
 %attr(755,root,root) %{_libexecdir}/mod_autoindex.so
+
+%files mod_brotli
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_brotli.conf
+%attr(755,root,root) %{_libexecdir}/mod_brotli.so
 
 %if %{with bucketeer}
 %files mod_bucketeer
