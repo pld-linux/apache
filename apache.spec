@@ -43,12 +43,12 @@ Summary(pt_BR.UTF-8):	Servidor HTTPD para prover serviços WWW
 Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
-Version:	2.2.32
-Release:	2
+Version:	2.2.34
+Release:	1
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
-Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
-# Source0-md5:	8141657cf0c58f14de2a5ce9426df2bc
+Source0:	https://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
+# Source0-md5:	fc33e64a9d4bca2f7ef7023189cb5ee6
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}.sysconfig
@@ -110,11 +110,6 @@ Patch28:	%{name}-mpm-itk.patch
 Patch29:	libtool-tag.patch
 Patch30:	%{name}-bug-39653.patch
 Patch31:	httpd-dummy-connection-result.patch
-# https://www.apache.org/dist/httpd/patches/apply_to_2.2.32/
-Patch32:	CVE-2017-3167.patch
-Patch33:	CVE-2017-3169.patch
-Patch34:	CVE-2017-7668.patch
-Patch35:	CVE-2017-7679.patch
 URL:		http://httpd.apache.org/
 BuildRequires:	apr-devel >= %{apr_ver}
 BuildRequires:	apr-util-devel >= 1:1.3.10-2
@@ -1813,10 +1808,6 @@ Dwa programy testowe/przykładowe cgi: test-cgi and print-env.
 %patch29 -p1
 %patch30 -p1
 %patch31 -p1
-%patch32 -p0
-%patch33 -p0
-%patch34 -p0
-%patch35 -p0
 
 # using system apr, apr-util and pcre
 %{__rm} -r srclib/{apr,apr-util,pcre}
