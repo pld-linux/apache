@@ -35,8 +35,8 @@ Summary(pt_BR.UTF-8):	Servidor HTTPD para prover serviços WWW
 Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
-Version:	2.4.29
-Release:	2
+Version:	2.4.32
+Release:	1
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -73,6 +73,7 @@ Source29:	%{name}-example.net.conf
 Source30:	%{name}.tmpfiles
 Source31:	%{name}.service
 Source32:	%{name}-mod_http2.conf
+Source33:	%{name}-mod_md.conf
 Patch0:		%{name}-configdir_skip_backups.patch
 Patch1:		%{name}-layout.patch
 Patch2:		%{name}-suexec.patch
@@ -1847,6 +1848,29 @@ Apache'a. Makra mogą mieć parametry. Makra są rozwijane w momencie
 użycia (argumenty makra są podstawiane za wartości parametrów), a
 wynik jest przetwarzany jak normalna konfiguracja.
 
+%package mod_md
+Summary:	Managing certificate provisioning via the ACME protocol
+Summary(pl.UTF-8):	Zarządzanie certyfikatami przez protokół ACME
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_macro.html
+Requires:	%{name}-base = %{version}-%{release}
+Requires:	apache(mod_watchdog) = %{version}-%{release}
+Provides:	apache(mod_md) = %{version}-%{release}
+
+%description mod_md
+This module manages common properties of domains for one or more
+virtual hosts. Specifically it can use the ACME protocol to automate
+certificate provisioning. These will be configured for managed domains
+and their virtual hosts automatically. This includes renewal of
+certificates before they expire.
+
+%description mod_md -l pl.UTF-8
+Moduł zarządzający właściwościami domen dla jednego lub więcej hostów
+wirtualnych. Konkretnie może używać protokołu ACME do automatyzacji
+instalacji certyfikatów. Certyfikaty będą automatycznie aktywowane dla
+zarządzanych domen i hostów wirtualnych w tych domenach. Instalacji
+oraz odnowień certyfikatów przed wygaśnięciem.
+
 %package mod_mime
 Summary:	Associates the requested filename's extensions with the file's behavior and content
 Summary(pl.UTF-8):	Wiązanie określonych rozszerzeń plików z zachowaniem i zawartością
@@ -2794,6 +2818,7 @@ install -d build; cd build
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig,systemd/system} \
 	$RPM_BUILD_ROOT%{_var}/{log/{httpd,archive/httpd},{run,cache}/httpd,lock/mod_dav} \
+	$RPM_BUILD_ROOT%{_var}/lib/httpd/md \
 	$RPM_BUILD_ROOT%{_sysconfdir}/{webapps.d,conf.d,vhosts.d} \
 	$RPM_BUILD_ROOT%{_datadir}/{cgi-bin,vhosts} \
 	$RPM_BUILD_ROOT%{systemdtmpfilesdir} \
@@ -2810,6 +2835,8 @@ ln -s %{systemdunitdir}/httpd.service $RPM_BUILD_ROOT/etc/systemd/system/httpd.s
 ln -s %{_libexecdir} $RPM_BUILD_ROOT%{_sysconfdir}/modules
 ln -s %{_localstatedir}/run/httpd $RPM_BUILD_ROOT%{_sysconfdir}/run
 ln -s %{_var}/log/httpd $RPM_BUILD_ROOT%{_sysconfdir}/logs
+ln -s %{_var}/lib/httpd/md $RPM_BUILD_ROOT%{_sysconfdir}/md
+
 # we have own apache.conf
 rm $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
 
@@ -2852,6 +2879,8 @@ cp -a %{SOURCE19} $CFG/30_manual.conf
 cp -a %{SOURCE20} $CFG/16_mod_userdir.conf
 cp -a %{SOURCE21} $CFG/10_mpm.conf
 cp -a %{SOURCE22} $CFG/20_languages.conf
+cp -a %{SOURCE33} $CFG/60_mod_md.conf
+
 cp -a %{SOURCE29} $RPM_BUILD_ROOT%{_sysconfdir}/vhosts.d/example.net.conf
 
 cp -p %{SOURCE30} $RPM_BUILD_ROOT%{systemdtmpfilesdir}/%{name}.conf
@@ -2875,7 +2904,7 @@ for module in access_compat actions alias allowmethods asis auth_basic \
 	ident imagemap include \
 	lbmethod_bybusyness lbmethod_byrequests lbmethod_bytraffic \
 	lbmethod_heartbeat ldap log_debug log_forensic logio lua \
-	macro negotiation \
+	macro md negotiation \
 	ratelimit reflector remoteip reqtimeout request rewrite \
 	sed session_cookie session_crypto session_dbd session setenvif \
 	slotmem_plain slotmem_shm socache_dbm socache_memcache \
@@ -3093,6 +3122,7 @@ fi
 %module_scripts mod_logio
 %module_scripts mod_lua
 %module_scripts mod_macro
+%module_scripts mod_md
 %module_scripts mod_mime
 %module_scripts mod_mime_magic
 %module_scripts mod_negotiation
@@ -3179,6 +3209,7 @@ fi
 %attr(755,root,root) %{_sbindir}/checkgid
 %attr(755,root,root) %{_sbindir}/httpd
 
+%dir %attr(750,root,http) /var/lib/httpd
 %dir %attr(770,root,http) /var/run/httpd
 %dir %attr(770,root,http) /var/cache/httpd
 
@@ -3594,6 +3625,13 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_macro.conf
 %attr(755,root,root) %{_libexecdir}/mod_macro.so
 
+%files mod_md
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_md.conf
+%attr(755,root,root) %{_libexecdir}/mod_md.so
+%attr(710,root,http) %dir /var/lib/httpd/md
+%{_sysconfdir}/md
+
 %files mod_mime
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libexecdir}/mod_mime.so
@@ -3626,6 +3664,7 @@ fi
 %attr(755,root,root) %{_libexecdir}/mod_proxy_http.so
 %attr(755,root,root) %{_libexecdir}/mod_proxy_http2.so
 %attr(755,root,root) %{_libexecdir}/mod_proxy_scgi.so
+%attr(755,root,root) %{_libexecdir}/mod_proxy_uwsgi.so
 %attr(755,root,root) %{_libexecdir}/mod_proxy_wstunnel.so
 %attr(755,root,root) %{_libexecdir}/mod_proxy.so
 %{_mandir}/man8/fcgistarter.8*
