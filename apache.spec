@@ -40,7 +40,7 @@ Release:	1
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
-# Source0-md5:	0c599404ef6b69eee95bcd9fcd094407
+# Source0-md5:	9ef4914905a90faee64a0955b621d7f8
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}.sysconfig
@@ -3209,7 +3209,7 @@ fi
 %attr(755,root,root) %{_sbindir}/checkgid
 %attr(755,root,root) %{_sbindir}/httpd
 
-%dir %attr(750,root,http) /var/lib/httpd
+%dir %attr(710,root,http) /var/lib/httpd
 %dir %attr(770,root,http) /var/run/httpd
 %dir %attr(770,root,http) /var/cache/httpd
 
