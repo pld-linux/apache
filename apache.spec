@@ -36,7 +36,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.4.34
-Release:	2
+Release:	3
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -100,6 +100,7 @@ BuildRequires:	apr-util-devel >= %{apr_util_ver}
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
 %{?with_distcache:BuildRequires:	distcache-devel}
+BuildRequires:	jansson-devel
 BuildRequires:	libbrotli-devel >= 0.6.0
 BuildRequires:	libtool >= 2:1.5
 BuildRequires:	libxml2-devel >= 2
@@ -1544,7 +1545,7 @@ Summary(pl.UTF-8):	Obsługa HTTP/2 dla serwera HTTP Apache
 Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_http2.html
 Requires:	%{name}-base = %{version}-%{release}
-Requires:	nghttp2 >= 1.15.0
+Requires:	nghttp2-libs >= 1.15.0
 Provides:	apache(mod_http2) = %{version}-%{release}
 
 %description mod_http2
