@@ -10,20 +10,3 @@
  
  install-suexec-caps:
 
---- httpd-2.4.34/Makefile.in~	2018-07-16 18:45:42.000000000 +0200
-+++ httpd-2.4.34/Makefile.in	2018-07-16 19:33:00.579273405 +0200
-@@ -277,12 +277,12 @@ install-suexec-binary:
-             $(INSTALL_PROGRAM) $(top_builddir)/support/suexec $(DESTDIR)$(sbindir); \
- 	fi
- 
--install-suexec-setuid:
-+install-suexec-setuid: install-suexec-binary
- 	@if test -f $(builddir)/support/suexec; then \
- 	    chmod 0755 $(DESTDIR)$(sbindir)/suexec; \
- 	fi
- 
--install-suexec-caps:
-+install-suexec-caps: install-suexec-binary
- 	@if test -f $(builddir)/support/suexec; then \
-             setcap 'cap_setuid,cap_setgid+pe' $(DESTDIR)$(sbindir)/suexec; \
- 	fi

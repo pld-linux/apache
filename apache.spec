@@ -35,12 +35,12 @@ Summary(pt_BR.UTF-8):	Servidor HTTPD para prover serviços WWW
 Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
-Version:	2.4.34
-Release:	3
+Version:	2.4.35
+Release:	1
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
-# Source0-md5:	818adca52f3be187fe45d6822755be95
+# Source0-md5:	30c1cde80ffe814a8d16b4fdffda330a
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}.sysconfig
