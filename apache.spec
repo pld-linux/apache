@@ -2367,6 +2367,25 @@ obiektów, zapewniający tworzenie i dostęp do cache'a zapisywanego w
 systemie memcached - wysoko wydajnym, ozproszonym systemie pamięci
 podręcznej obiektów.
 
+%package mod_socache_redis
+Summary:	Redis based shared object cache provider
+Summary(pl.UTF-8):	Moduł zapewniający współdzieloną pamięć podręczną obiektów w oparciu o Redis
+Group:		Networking/Daemons/HTTP
+URL:		http://httpd.apache.org/docs/2.4/mod/mod_socache_redis.html
+Requires:	%{name}-base = %{version}-%{release}
+Provides:	apache(mod_socache_redis) = %{version}-%{release}
+
+%description mod_socache_redis
+mod_socache_redis is a shared object cache provider which provides
+for creation and access to a cache backed by the redis
+high-performance, distributed memory object caching system.
+
+%description mod_socache_redis -l pl.UTF-8
+mod_socache_dbm to moduł dostarczający współdzieloną pamięć podręczną
+obiektów, zapewniający tworzenie i dostęp do cache'a zapisywanego w
+systemie redis - wysoko wydajnym, ozproszonym systemie pamięci
+podręcznej obiektów.
+
 %package mod_socache_shmcb
 Summary:	shmcb based shared object cache provider
 Summary(pl.UTF-8):	Moduł zapewniający współdzieloną pamięć podręczną obiektów w oparciu o shmcb
@@ -2909,7 +2928,7 @@ for module in access_compat actions alias allowmethods asis auth_basic \
 	ratelimit reflector remoteip reqtimeout request rewrite \
 	sed session_cookie session_crypto session_dbd session setenvif \
 	slotmem_plain slotmem_shm socache_dbm socache_memcache \
-	socache_shmcb speling substitute \
+	socache_redis socache_shmcb speling substitute \
 	unique_id usertrack version watchdog xml2enc; do
 
 	LoadModule 00 $module
@@ -3144,6 +3163,7 @@ fi
 %module_scripts mod_slotmem_shm
 %module_scripts mod_socache_dbm
 %module_scripts mod_socache_memcache
+%module_scripts mod_socache_redis
 %module_scripts mod_socache_shmcb
 %module_scripts mod_speling
 %module_scripts mod_ssl
@@ -3751,6 +3771,11 @@ fi
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_socache_memcache.conf
 %attr(755,root,root) %{_libexecdir}/mod_socache_memcache.so
+
+%files mod_socache_redis
+%defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_socache_redis.conf
+%attr(755,root,root) %{_libexecdir}/mod_socache_redis.so
 
 %files mod_socache_shmcb
 %defattr(644,root,root,755)
