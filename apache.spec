@@ -2383,7 +2383,7 @@ high-performance, distributed memory object caching system.
 %description mod_socache_redis -l pl.UTF-8
 mod_socache_dbm to moduł dostarczający współdzieloną pamięć podręczną
 obiektów, zapewniający tworzenie i dostęp do cache'a zapisywanego w
-systemie redis - wysoko wydajnym, ozproszonym systemie pamięci
+systemie redis - wysoko wydajnym, rozproszonym systemie pamięci
 podręcznej obiektów.
 
 %package mod_socache_shmcb
