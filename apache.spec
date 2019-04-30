@@ -2904,32 +2904,98 @@ cp -a %{SOURCE29} $RPM_BUILD_ROOT%{_sysconfdir}/vhosts.d/example.net.conf
 
 cp -p %{SOURCE30} $RPM_BUILD_ROOT%{systemdtmpfilesdir}/%{name}.conf
 
+modules="
+	%{?with_bucketeer:bucketeer}
+	access_compat
+	actions
+	alias
+	allowmethods
+	asis
+	auth_basic
+	auth_digest
+	auth_form
+	authn_anon
+	authn_core
+	authn_dbd
+	authn_dbm
+	authn_file
+	authn_socache
+	authnz_ldap
+	authz_core
+	authz_dbd
+	authz_dbm
+	authz_groupfile
+	authz_owner
+	authz_user
+	brotli
+	buffer
+	case_filter
+	case_filter_in
+	cern_meta
+	cgi
+	charset_lite
+	data
+	dbd
+	dialup
+	dumpio
+	echo
+	env
+	expires
+	ext_filter
+	file_cache
+	filter
+	headers
+	heartbeat
+	heartmonitor
+	ident
+	imagemap
+	include
+	lbmethod_bybusyness
+	lbmethod_byrequests
+	lbmethod_bytraffic
+	lbmethod_heartbeat
+	ldap
+	log_debug
+	log_forensic
+	logio
+	lua
+	macro
+	md
+	negotiation
+	ratelimit
+	reflector
+	remoteip
+	reqtimeout
+	request
+	rewrite
+	sed
+	session
+	session_cookie
+	session_crypto
+	session_dbd
+	setenvif
+	slotmem_plain
+	slotmem_shm
+	socache_dbm
+	socache_memcache
+	socache_redis
+	socache_shmcb
+	speling
+	substitute
+	unique_id
+	usertrack
+	version
+	watchdog
+	xml2enc
+"
+
 LoadModule() {
 	local index=$1 module=$2 conffile
 	conffile=${3:-$module}
 	echo "LoadModule ${module}_module modules/mod_$module.so" > $CFG/${index}_mod_${conffile}.conf
 }
 
-for module in access_compat actions alias allowmethods asis auth_basic \
-	auth_digest auth_form authn_anon authn_core authn_dbd authn_dbm \
-	authn_file authn_socache authnz_ldap authz_core authz_dbd \
-	authz_dbm authz_groupfile authz_owner authz_user brotli \
-	%{?with_bucketeer:bucketeer} buffer \
-	case_filter_in case_filter cern_meta cgi charset_lite \
-	data dbd dialup dumpio \
-	echo env expires ext_filter \
-	file_cache filter \
-	headers heartbeat heartmonitor \
-	ident imagemap include \
-	lbmethod_bybusyness lbmethod_byrequests lbmethod_bytraffic \
-	lbmethod_heartbeat ldap log_debug log_forensic logio lua \
-	macro md negotiation \
-	ratelimit reflector remoteip reqtimeout request rewrite \
-	sed session_cookie session_crypto session_dbd session setenvif \
-	slotmem_plain slotmem_shm socache_dbm socache_memcache \
-	socache_redis socache_shmcb speling substitute \
-	unique_id usertrack version watchdog xml2enc; do
-
+for module in $modules; do
 	LoadModule 00 $module
 done
 
