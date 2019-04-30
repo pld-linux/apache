@@ -1,11 +1,10 @@
 # TODO:
 # - config examples for mod_*
 # - --with-suexec-uidmin=500 or =1000 ?
-# - check those autn modules inner deps
+# - check those authn modules inner deps
 # - for external packages: don't use any apache module name in dep as they
-#  differ for apache 1.3/2.0/2.2!? any better ideas? rpm Suggests: tags?
-# - for mod_auth_* modules require each auth module to require virtual authn so at least *_core
-#  is chosen?
+#   differ for apache 1.3/2.0/2.2!? any better ideas? rpm Suggests: tags?
+# - for mod_auth_* modules require each auth module to require virtual authn so at least *_core is chosen?
 # - same for mod_authz
 # - mod_auth_digest and mod_auth_basic R: apache(authn) ?
 # - drop mod_case_filter* or find summary and description for them
@@ -2978,7 +2977,7 @@ rm -rf $RPM_BUILD_ROOT
 %useradd -u 51 -r -d /home/services/httpd -s /bin/false -c "HTTP User" -g http http
 
 %pretrans base
-# handle $HTTPD_MPM from sysconfig
+# upgrade to 2.4: handle $HTTPD_MPM from sysconfig
 if [ -f /etc/sysconfig/httpd ]; then
 	MPM=$(grep ^HTTPD_MPM /etc/sysconfig/httpd | sed 's,HTTPD_MPM=,,;s,",,g')
 	if [ -n "$MPM" ]; then
