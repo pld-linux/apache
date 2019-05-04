@@ -3133,7 +3133,7 @@ if [ $1 -le 1 ]; then
 fi
 
 if ! grep -qi '^Include conf.modules.d/' %{_sysconfdir}/apache.conf; then
-	%{__sed} -i -e '/[Ii]nclude.*conf\.d/ i IncludeOptional conf.modules.d/*.conf' %{_sysconfdir}/apache.conf
+	%{__sed} -i -e '/[Ii]nclude.*conf\.d/ i Include conf.modules.d/*.conf' %{_sysconfdir}/apache.conf
 fi
 
 od=%{_sysconfdir}/conf.d
