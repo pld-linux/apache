@@ -2929,8 +2929,10 @@ modules="
 	authz_dbd
 	authz_dbm
 	authz_groupfile
+	authz_host
 	authz_owner
 	authz_user
+	autoindex
 	brotli
 	buffer
 	cache
@@ -2938,11 +2940,14 @@ modules="
 	case_filter_in
 	cern_meta
 	cgi
+	cgid
 	charset_lite
 	data
 	dav
 	dbd
+	deflate
 	dialup
+	dir
 	dumpio
 	echo
 	env
@@ -2957,17 +2962,21 @@ modules="
 	ident
 	imagemap
 	include
+	info
 	lbmethod_bybusyness
 	lbmethod_byrequests
 	lbmethod_bytraffic
 	lbmethod_heartbeat
 	ldap
+	log_config
 	log_debug
 	log_forensic
 	logio
 	lua
 	macro
 	md
+	mime
+	mime_magic
 	negotiation
 	ratelimit
 	reflector
@@ -2989,10 +2998,14 @@ modules="
 	socache_shmcb
 	speling
 	ssl
+	status
 	substitute
+	suexec
 	unique_id
+	userdir
 	usertrack
 	version
+	vhost_alias
 	watchdog
 	xml2enc
 "
@@ -3556,7 +3569,7 @@ fi
 
 %files mod_brotli
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_brotli.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_brotli.conf
 %attr(755,root,root) %{_libexecdir}/mod_brotli.so
 
 %if %{with bucketeer}
@@ -3573,6 +3586,7 @@ fi
 
 %files mod_cache
 %defattr(644,root,root,755)
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_cache.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mod_cache.conf
 %attr(755,root,root) %{_sbindir}/htcacheclean
 %attr(755,root,root) %{_libexecdir}/mod_cache.so
@@ -3698,7 +3712,8 @@ fi
 %if %{with http2}
 %files mod_http2
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_http2.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_http2.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mod_http2.conf
 %attr(755,root,root) %{_libexecdir}/mod_http2.so
 %endif
 
@@ -3783,7 +3798,8 @@ fi
 
 %files mod_md
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_md.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_md.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mod_md.conf
 %attr(755,root,root) %{_libexecdir}/mod_md.so
 %attr(710,root,http) %dir /var/lib/httpd/md
 %{_sysconfdir}/md
@@ -3911,7 +3927,7 @@ fi
 
 %files mod_socache_redis
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_socache_redis.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_socache_redis.conf
 %attr(755,root,root) %{_libexecdir}/mod_socache_redis.so
 
 %files mod_socache_shmcb
