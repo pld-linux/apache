@@ -62,7 +62,7 @@ Source20:	%{name}-mod_userdir.conf
 Source21:	%{name}-mpm.conf
 Source22:	%{name}-languages.conf
 Source23:	%{name}-mod_mime.conf
-Source24:	%{name}-mod_authz_host.conf
+
 Source25:	%{name}-mod_cgid.conf
 Source26:	%{name}-mod_log_config.conf
 Source27:	%{name}-mod_mime_magic.conf
@@ -2883,7 +2883,6 @@ CONFD_MODULES=$RPM_BUILD_ROOT%{_sysconfdir}/conf.modules.d
 
 cp -p %{SOURCE7}  $CONFD/common.conf
 cp -p %{SOURCE23} $CONFD/mod_mime.conf
-cp -p %{SOURCE24} $CONFD/mod_authz_host.conf
 cp -p %{SOURCE25} $CONFD/mod_cgid.conf
 cp -p %{SOURCE26} $CONFD/mod_log_config.conf
 cp -p %{SOURCE27} $CONFD/mod_mime_magic.conf
@@ -3548,7 +3547,6 @@ fi
 %files mod_authz_host
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.modules.d/*mod_authz_host.conf
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/mod_authz_host.conf
 %attr(755,root,root) %{_libexecdir}/mod_authz_host.so
 
 %files mod_authz_owner
