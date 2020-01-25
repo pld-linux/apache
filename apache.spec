@@ -24,7 +24,6 @@
 %define		apr_ver		1:1.6.0
 %define		apr_util_ver	1:1.6.0
 
-%include	/usr/lib/rpm/macros.perl
 Summary:	The most widely used Web server on the Internet
 Summary(de.UTF-8):	Leading World Wide Web-Server
 Summary(es.UTF-8):	Servidor HTTPD para proveer servicios WWW
