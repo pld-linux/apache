@@ -33,12 +33,12 @@ Summary(pt_BR.UTF-8):	Servidor HTTPD para prover serviços WWW
 Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
-Version:	2.4.41
+Version:	2.4.43
 Release:	1
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
-# Source0-md5:	dfc674f8f454e3bc2d4ccd73ad3b5f1e
+# Source0-md5:	791c986b1e70fe61eb44060aacc89a64
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}.sysconfig
@@ -114,6 +114,7 @@ BuildRequires:	rpm-build >= 4.4.0
 BuildRequires:	rpm-perlprov >= 4.1-13
 BuildRequires:	rpmbuild(macros) >= 1.647
 BuildRequires:	sed >= 4.0
+BuildRequires:	systemd-devel
 BuildRequires:	zlib-devel
 Requires:	%{name}-errordocs = %{version}-%{release}
 Requires:	%{name}-mod_alias = %{version}-%{release}
@@ -2813,6 +2814,7 @@ install -d build; cd build
 	--enable-speling \
 	%{?with_ssl:--enable-ssl %{?with_distcache:--enable-distcache}} \
 	--enable-suexec \
+	--enable-systemd \
 	--enable-unique-id \
 	--enable-usertrack \
 	--enable-vhost-alias \
@@ -2981,6 +2983,7 @@ modules="
 	socache_shmcb
 	speling
 	substitute
+	systemd
 	unique_id
 	usertrack
 	version
@@ -3284,6 +3287,7 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/apache.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_common.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mpm.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_systemd.conf
 %attr(640,root,root) %config(noreplace,missingok) %verify(not md5 mtime size) %{_sysconfdir}/vhosts.d/example.net.conf
 %attr(640,root,root) %{_sysconfdir}/magic
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/httpd
@@ -3318,6 +3322,7 @@ fi
 %attr(755,root,root) %{_libexecdir}/mod_mpm_event.so
 %attr(755,root,root) %{_libexecdir}/mod_mpm_prefork.so
 %attr(755,root,root) %{_libexecdir}/mod_mpm_worker.so
+%attr(755,root,root) %{_libexecdir}/mod_systemd.so
 %attr(755,root,root) %{_libexecdir}/mod_unixd.so
 
 %files doc -f manual.files

@@ -1,10 +1,9 @@
---- httpd-2.4.3/config.layout.orig	2012-04-17 16:01:41.000000000 +0200
-+++ httpd-2.4.3/config.layout	2012-08-23 13:01:27.879147377 +0200
-@@ -370,3 +370,29 @@
-     logfiledir:      ${localstatedir}/log/httpd
-     proxycachedir:   ${localstatedir}/cache/httpd
+--- httpd-2.4.43/config.layout~	2020-02-21 01:39:22.000000000 +0100
++++ httpd-2.4.43/config.layout	2020-04-02 08:27:25.901641779 +0200
+@@ -106,6 +106,31 @@
+     proxycachedir: ${runtimedir}/proxy
  </Layout>
-+
+ 
 +# PLD layout
 +<Layout PLD>
 +    prefix:        /usr
@@ -30,3 +29,6 @@
 +    installbuilddir: ${libexecdir}/build
 +</Layout>
 +
+ #   Red Hat Linux 7.x layout
+ <Layout RedHat>
+     prefix:        /usr
