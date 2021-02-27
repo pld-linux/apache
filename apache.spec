@@ -270,9 +270,7 @@ Summary(pl.UTF-8):	Pliki Apache index.html*
 Group:		Documentation
 Requires:	%{name}-base = %{version}-%{release}
 Obsoletes:	indexhtml
-%if "%{_rpmversion}" >= "5"
 BuildArch:	noarch
-%endif
 
 %description index
 Apache index.html* files.
@@ -289,9 +287,7 @@ Requires:	%{name}-mod_alias = %{version}-%{release}
 Requires:	%{name}-mod_dir = %{version}-%{release}
 Requires:	%{name}-mod_negotiation = %{version}-%{release}
 Requires:	%{name}-mod_setenvif = %{version}-%{release}
-%if "%{_rpmversion}" >= "5"
 BuildArch:	noarch
-%endif
 
 %description doc
 Apache manual.
@@ -309,9 +305,7 @@ Requires:	%{name}-mod_alias = %{version}-%{release}
 Requires:	%{name}-mod_authz_host = %{version}-%{release}
 Requires:	%{name}-mod_include = %{version}-%{release}
 Requires:	%{name}-mod_negotiation = %{version}-%{release}
-%if "%{_rpmversion}" >= "5"
 BuildArch:	noarch
-%endif
 
 %description errordocs
 Multi-language error messages.
@@ -2685,9 +2679,7 @@ Summary(pl.UTF-8):	Programy testowe/przykładowe cgi
 Group:		Networking/Utilities
 Requires:	%{name}-base = %{version}-%{release}
 Requires:	filesystem >= 2.0-1
-%if "%{_rpmversion}" >= "5"
 BuildArch:	noarch
-%endif
 
 %description cgi_test
 Two cgi test/demo programs: test-cgi and print-env.
