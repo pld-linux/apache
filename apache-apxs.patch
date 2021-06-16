@@ -1,6 +1,7 @@
---- httpd-2.2.3/support/apxs.in-orig	2006-11-01 00:59:27.000000000 +0100
-+++ httpd-2.2.3/support/apxs.in	2006-11-01 00:59:54.000000000 +0100
-@@ -35,6 +35,7 @@
+diff -urNp -x '*.orig' httpd-2.4.46.org/support/apxs.in httpd-2.4.46/support/apxs.in
+--- httpd-2.4.46.org/support/apxs.in	2020-03-20 14:00:44.000000000 +0100
++++ httpd-2.4.46/support/apxs.in	2021-06-16 09:20:17.513003551 +0200
+@@ -45,6 +45,7 @@ my $CFG_PREFIX     = $prefix;
  my $exec_prefix    = get_vars("exec_prefix");
  my $datadir        = get_vars("datadir");
  my $localstatedir  = get_vars("localstatedir");
@@ -8,15 +9,15 @@
  my $CFG_TARGET     = get_vars("progname");
  my $CFG_SYSCONFDIR = get_vars("sysconfdir");
  my $CFG_CFLAGS     = join ' ', map { get_vars($_) }
-@@ -44,6 +45,7 @@
+@@ -56,6 +57,7 @@ my $CFG_INCLUDEDIR = eval qq("$includedi
  my $CFG_CC         = get_vars("CC");
- my $libexecdir     = get_vars("libexecdir");
+ my $libexecdir     = $destdir . get_vars("libexecdir");
  my $CFG_LIBEXECDIR = eval qq("$libexecdir");
 +my $CFG_DESTDIR    = '';
  my $sbindir        = get_vars("sbindir");
  my $CFG_SBINDIR    = eval qq("$sbindir");
  my $ltflags        = $ENV{'LTFLAGS'};
-@@ -171,7 +173,7 @@
+@@ -183,7 +185,7 @@ if (@opt_S) {
  	    my ($val) = $2;
  	    my $oldval = eval "\$CFG_$var";
  
@@ -25,7 +26,7 @@
  		print STDERR "apxs:Error: no config variable $var\n";
  		&usage;
  	    }
-@@ -479,8 +480,8 @@
+@@ -512,8 +514,8 @@ if ($opt_i or $opt_e) {
          $t =~ s|\.[^./\\]+$|\.so|;
          if ($opt_i) {
  	    push(@cmds, $destdir . "$installbuilddir/instdso.sh SH_LIBTOOL='" .

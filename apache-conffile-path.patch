@@ -1,7 +1,7 @@
-diff -ur httpd-2.0.49-orig/configure.in httpd-2.0.49/configure.in
---- httpd-2.0.49-orig/configure.in	2004-04-02 15:04:49.000000000 -0700
-+++ httpd-2.0.49/configure.in	2004-04-02 15:07:26.319486516 -0700
-@@ -541,9 +541,9 @@
+diff -urNp -x '*.orig' httpd-2.4.46.org/configure.in httpd-2.4.46/configure.in
+--- httpd-2.4.46.org/configure.in	2021-06-16 09:19:52.228364279 +0200
++++ httpd-2.4.46/configure.in	2021-06-16 09:19:53.851781461 +0200
+@@ -873,9 +873,9 @@ echo $MODLIST | $AWK -f $srcdir/build/bu
  APR_EXPAND_VAR(ap_prefix, $prefix)
  AC_DEFINE_UNQUOTED(HTTPD_ROOT, "${ap_prefix}",
  	[Root directory of the Apache install area])
@@ -11,5 +11,5 @@ diff -ur httpd-2.0.49-orig/configure.in httpd-2.0.49/configure.in
 -AC_DEFINE_UNQUOTED(AP_TYPES_CONFIG_FILE, "${rel_sysconfdir}/mime.types",
 +AC_DEFINE_UNQUOTED(AP_TYPES_CONFIG_FILE, "${exp_sysconfdir}/mime.types",
  	[Location of the MIME types config file, relative to the Apache root directory])
- AC_DEFINE_UNQUOTED(APACHE_MPM_DIR, "$MPM_DIR",
- 	[Location of the source for the current MPM])
+ 
+ perlbin=`$ac_aux_dir/PrintPath perl`

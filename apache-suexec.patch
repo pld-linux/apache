@@ -1,12 +1,12 @@
---- httpd-2.0.43/Makefile.in.wiget	Fri Oct  4 15:20:09 2002
-+++ httpd-2.0.43/Makefile.in	Fri Oct  4 15:20:32 2002
+diff -urNp -x '*.orig' httpd-2.4.46.org/Makefile.in httpd-2.4.46/Makefile.in
+--- httpd-2.4.46.org/Makefile.in	2018-08-08 13:48:15.000000000 +0200
++++ httpd-2.4.46/Makefile.in	2021-06-16 09:18:53.088643073 +0200
 @@ -279,7 +279,7 @@ install-suexec-binary:
  
- install-suexec-setuid:
+ install-suexec-setuid: install-suexec-binary
  	@if test -f $(builddir)/support/suexec; then \
 -	    chmod 4755 $(DESTDIR)$(sbindir)/suexec; \
 +	    chmod 0755 $(DESTDIR)$(sbindir)/suexec; \
  	fi
  
- install-suexec-caps:
-
+ install-suexec-caps: install-suexec-binary

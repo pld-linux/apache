@@ -1,12 +1,12 @@
-diff -urN httpd-2.0.47.org/configure.in httpd-2.0.47/configure.in
---- httpd-2.0.47.org/configure.in	2003-09-13 14:18:35.000000000 +0200
-+++ httpd-2.0.47/configure.in	2003-09-13 14:18:50.000000000 +0200
-@@ -76,8 +76,6 @@
-   AP_CLEAN_SRCLIB_DIRS="$AP_CLEAN_SRCLIB_DIRS apr"
+diff -urNp -x '*.orig' httpd-2.4.46.org/configure.in httpd-2.4.46/configure.in
+--- httpd-2.4.46.org/configure.in	2020-02-03 08:56:05.000000000 +0100
++++ httpd-2.4.46/configure.in	2021-06-16 09:19:28.107118428 +0200
+@@ -126,8 +126,6 @@ if test "$apr_found" = "reconfig"; then
+   done
  fi
  
 -APR_SETIFNULL(CC, `$apr_config --cc`)
 -APR_SETIFNULL(CPP, `$apr_config --cpp`)
  APR_ADDTO(CFLAGS, `$apr_config --cflags`)
  APR_ADDTO(CPPFLAGS, `$apr_config --cppflags`)
- APR_ADDTO(LDFLAGS, `$apr_config --ldflags`)
+ dnl internal-only CPPFLAGS (shouldn't affect third-party module builds)

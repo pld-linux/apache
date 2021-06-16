@@ -628,7 +628,6 @@ URL:		http://httpd.apache.org/docs/2.4/mod/mod_authn_core.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_authn_core) = %{version}-%{release}
 Provides:	apache(mod_authn_default) = %{version}-%{release}
-Obsoletes:	apache(mod_authn_alias)
 Obsoletes:	apache-mod_authn_default < %{version}-%{release}
 
 %description mod_authn_core
@@ -3070,14 +3069,15 @@ if [ "$1" = "0" ]; then
 fi
 %systemd_reload
 
-%triggerpostun base -- %{name}-base < 2.2.22-2
+%triggerpostun base -- %{name}-base < 2.4.0
+#  < 2.2.22-2
 . /etc/sysconfig/httpd
 if [ -z "$HTTPD_CONF" ]; then
 	echo 'HTTPD_CONF="/etc/httpd/apache.conf"' >> /etc/sysconfig/httpd
 fi
 %systemd_trigger httpd.service
 
-%triggerpostun base -- %{name}-base < 2.4.0
+# < 2.4.0
 cp -f /etc/httpd/apache.conf{,.rpmsave}
 sed -i -e '
 	/^DefaultType/d
@@ -3309,7 +3309,7 @@ fi
 %dir %{_datadir}/cgi-bin
 %dir %{_datadir}/html
 %dir %{_datadir}/vhosts
-# do not adapter here, %{_datadir} != /usr/share here
+# do not adapter here, %%{_datadir} != /usr/share here
 %{_datadir}/icons
 %attr(755,root,root) %{_libexecdir}/mod_mpm_event.so
 %attr(755,root,root) %{_libexecdir}/mod_mpm_prefork.so
