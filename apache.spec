@@ -9,6 +9,7 @@
 # - mod_auth_digest and mod_auth_basic R: apache(authn) ?
 # - drop mod_case_filter* or find summary and description for them
 # - FYI: http://wiki.apache.org/httpd/InternalDummyConnection
+# - consider modules: mod_authnz_fcgi, mod_socache_dc (distcache bcond)
 
 # Conditional build:
 %bcond_without	ssl		# build without SSL support
