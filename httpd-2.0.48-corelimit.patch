@@ -5,9 +5,9 @@ is configured.
 --- httpd-2.0.48/server/core.c.corelimit
 +++ httpd-2.0.48/server/core.c
 @@ -4424,6 +4424,25 @@
-     set_banner(pconf);
      ap_setup_make_content_type(pconf);
      ap_setup_auth_internal(ptemp);
+     ap_setup_ssl_optional_fns(pconf);
 +
 +#ifdef RLIMIT_CORE
 +    if (ap_coredumpdir_configured) {
