@@ -2843,11 +2843,11 @@ install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig,systemd/system
 %{__sed} -i -re '/^(CC|CPP|CXX)/ s/ccache //' $RPM_BUILD_ROOT%{_libdir}/%{name}/build/config_vars.mk
 
 cp -p %{SOURCE31} $RPM_BUILD_ROOT%{systemdunitdir}/httpd.service
-ln -s %{systemdunitdir}/httpd.service $RPM_BUILD_ROOT/etc/systemd/system/httpd.service
-ln -s %{_libexecdir} $RPM_BUILD_ROOT%{_sysconfdir}/modules
-ln -s %{_localstatedir}/run/httpd $RPM_BUILD_ROOT%{_sysconfdir}/run
-ln -s %{_var}/log/httpd $RPM_BUILD_ROOT%{_sysconfdir}/logs
-ln -s %{_var}/lib/httpd/md $RPM_BUILD_ROOT%{_sysconfdir}/md
+ln -sr $RPM_BUILD_ROOT%{systemdunitdir}/httpd.service $RPM_BUILD_ROOT/etc/systemd/system/httpd.service
+ln -sr $RPM_BUILD_ROOT%{_libexecdir} $RPM_BUILD_ROOT%{_sysconfdir}/modules
+ln -sr $RPM_BUILD_ROOT%{_localstatedir}/run/httpd $RPM_BUILD_ROOT%{_sysconfdir}/run
+ln -sr $RPM_BUILD_ROOT%{_var}/log/httpd $RPM_BUILD_ROOT%{_sysconfdir}/logs
+ln -sr $RPM_BUILD_ROOT%{_var}/lib/httpd/md $RPM_BUILD_ROOT%{_sysconfdir}/md
 
 # we have own apache.conf
 rm $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
@@ -3009,7 +3009,7 @@ s/^.*\.\(pt-br\)/%%lang(pt_BR) &/
 cd $cur
 
 # htpasswd goes to %{_bindir}
-ln -sf %{_bindir}/htpasswd $RPM_BUILD_ROOT%{_sbindir}
+ln -sfr $RPM_BUILD_ROOT%{_bindir}/htpasswd $RPM_BUILD_ROOT%{_sbindir}
 
 mv $RPM_BUILD_ROOT{%{_bindir},%{_sbindir}}/apxs
 
