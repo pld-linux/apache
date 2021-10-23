@@ -35,7 +35,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.4.51
-Release:	2
+Release:	3
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -2698,7 +2698,7 @@ Dwa programy testowe/przykładowe cgi: test-cgi and print-env.
 
 %patch7 -p1
 %patch8 -p1
-%patch9 -p3
+%patch9 -p1
 %patch10 -p1
 
 %patch14 -p1
