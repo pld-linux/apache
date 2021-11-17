@@ -99,6 +99,7 @@ BuildRequires:	apr-devel >= %{apr_ver}
 BuildRequires:	apr-util-devel >= %{apr_util_ver}
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
+BuildRequires:	curl-devel
 %{?with_distcache:BuildRequires:	distcache-devel}
 BuildRequires:	jansson-devel
 BuildRequires:	libbrotli-devel >= 0.6.0
