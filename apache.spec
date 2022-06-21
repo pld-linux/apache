@@ -213,13 +213,8 @@ Provides:	apache(modules-api) = %{_apache_modules_api}
 Provides:	group(http)
 Provides:	user(http)
 Provides:	webserver = apache
-Obsoletes:	apache-extra
-Obsoletes:	apache6
-# packaged by mistake. really sample code
-Obsoletes:	apache-mod_optional_fn_export
-Obsoletes:	apache-mod_optional_fn_import
-Obsoletes:	apache-mod_optional_fn_import
-Obsoletes:	apache-mod_optional_hook_import
+Obsoletes:	apache-extra < 1.3.1
+Obsoletes:	apache6 < 1.3.4
 Conflicts:	apache < 2.2.0
 # mod_wsgi >= 3.4 is required for apache 2.4
 Conflicts:	apache-mod_wsgi < 3.4
@@ -325,8 +320,8 @@ Summary(ru.UTF-8):	Средства разработки модулей для �
 Group:		Networking/Utilities
 Requires:	apr-util-devel >= %{apr_util_ver}
 Requires:	libtool
-Obsoletes:	apache-apxs
-Obsoletes:	apache-static
+Obsoletes:	apache-apxs < 2.2.6-3
+Obsoletes:	apache-static < 2.0.47-1
 
 %description devel
 The apache-devel package contains header files for Apache.
@@ -1427,7 +1422,7 @@ Group:		Networking/Daemons/HTTP
 URL:		http://httpd.apache.org/docs/2.4/mod/mod_file_cache.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_file_cache) = %{version}-%{release}
-Obsoletes:	apache-mmap_static
+Obsoletes:	apache-mod_mmap_static < 2
 
 %description mod_file_cache
 Caches a static list of files in memory.
@@ -1573,7 +1568,7 @@ URL:		http://httpd.apache.org/docs/2.4/mod/mod_imagemap.html
 Requires:	%{name}-base = %{version}-%{release}
 Provides:	apache(mod_imagemap) = %{version}-%{release}
 Provides:	apache-mod_imap
-Obsoletes:	apache-mod_imap
+Obsoletes:	apache-mod_imap < 2.2.0-1
 
 %description mod_imagemap
 This module processes .map files, thereby replacing the functionality
