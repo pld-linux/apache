@@ -34,12 +34,12 @@ Summary(pt_BR.UTF-8):	Servidor HTTPD para prover serviços WWW
 Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
-Version:	2.4.54
+Version:	2.4.55
 Release:	1
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
-# Source0-md5:	861b43073ab416d689f1fc4dfa087711
+# Source0-md5:	b6a8b9d8741db43cf5b4dd8e9bdb0ce7
 Source1:	%{name}.init
 Source2:	%{name}.logrotate
 Source3:	%{name}.sysconfig
@@ -79,6 +79,7 @@ Patch2:		%{name}-suexec.patch
 Patch3:		%{name}-branding.patch
 Patch4:		%{name}-apr.patch
 Patch7:		%{name}-syslibs.patch
+Patch8:         http2-500.patch
 
 Patch10:	httpd-2.0.46-dav401dest.patch
 Patch14:	httpd-2.0.48-corelimit.patch
@@ -2692,6 +2693,7 @@ Dwa programy testowe/przykładowe cgi: test-cgi and print-env.
 %patch4 -p1
 
 %patch7 -p1
+%patch8 -p1
 
 %patch10 -p1
 
