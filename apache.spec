@@ -35,7 +35,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.4.62
-Release:	1
+Release:	2
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -3024,6 +3024,7 @@ ln -sf suexec $RPM_BUILD_ROOT%{_sbindir}/suexec.fcgi
 %{__rm} $RPM_BUILD_ROOT%{_libexecdir}/*.exp
 %{__rm} $RPM_BUILD_ROOT%{_sysconfdir}/mime.types
 %{__rm} -r $RPM_BUILD_ROOT%{_sysconfdir}/{extra,original}
+%{__rm} $RPM_BUILD_ROOT%{_datadir}/icons/README*
 
 %clean
 rm -rf $RPM_BUILD_ROOT
