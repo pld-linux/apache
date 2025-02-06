@@ -35,7 +35,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.4.63
-Release:	1
+Release:	2
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -2685,28 +2685,28 @@ Dwa programy testowe/przykładowe cgi: test-cgi and print-env.
 
 %prep
 %setup -q -n httpd-%{version}
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
+%patch -P0 -p1
+%patch -P1 -p1
+%patch -P2 -p1
+%patch -P3 -p1
+%patch -P4 -p1
 
-%patch7 -p1
+%patch -P7 -p1
 
-%patch10 -p1
+%patch -P10 -p1
 
-%patch14 -p1
-%patch15 -p1
-%patch18 -p1
-%patch19 -p1
-%patch20 -p1
-%patch23 -p1
+%patch -P14 -p1
+%patch -P15 -p1
+%patch -P18 -p1
+%patch -P19 -p1
+%patch -P20 -p1
+%patch -P23 -p1
 
 # ?
-#%patch25 -p1
+#%patch -P25 -p1
 # ?
-#%patch26 -p1
-%patch29 -p1
+#%patch -P26 -p1
+%patch -P29 -p1
 
 # sanity check
 MODULES_API=`awk '/#define MODULE_MAGIC_NUMBER_MAJOR/ {print $3}' include/ap_mmn.h`
