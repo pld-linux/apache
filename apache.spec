@@ -2703,9 +2703,9 @@ Dwa programy testowe/przykładowe cgi: test-cgi and print-env.
 %patch -P23 -p1
 
 # ?
-#%patch -P25 -p1
+#patch -P25 -p1
 # ?
-#%patch -P26 -p1
+#patch -P26 -p1
 %patch -P29 -p1
 
 # sanity check
