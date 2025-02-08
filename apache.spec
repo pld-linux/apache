@@ -114,7 +114,7 @@ BuildRequires:	pkgconfig
 BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpm-build >= 4.4.0
 BuildRequires:	rpm-perlprov >= 4.1-13
-BuildRequires:	rpmbuild(macros) >= 1.647
+BuildRequires:	rpmbuild(macros) >= 2.043
 BuildRequires:	sed >= 4.0
 BuildRequires:	systemd-devel
 BuildRequires:	zlib-devel
@@ -2738,7 +2738,8 @@ cd ../..
 
 CPPFLAGS="-DMAX_SERVER_LIMIT=200000 -DBIG_SECURITY_HOLE=1"
 install -d build; cd build
-../%configure \
+%define configuredir ..
+%configure \
 	--enable-layout=PLD \
 	--disable-v4-mapped \
 	--enable-exception-hook \
