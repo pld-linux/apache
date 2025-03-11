@@ -73,6 +73,7 @@ Source30:	%{name}.tmpfiles
 Source31:	%{name}.service
 Source32:	%{name}-mod_http2.conf
 Source33:	%{name}-mod_md.conf
+Source34:	%{name}-mod_dav.tmpfiles
 Patch0:		%{name}-configdir_skip_backups.patch
 Patch1:		%{name}-layout.patch
 Patch2:		%{name}-suexec.patch
@@ -2840,7 +2841,6 @@ install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig,systemd/system
 %{__sed} -i -re '/^(CC|CPP|CXX)/ s/ccache //' $RPM_BUILD_ROOT%{_libdir}/%{name}/build/config_vars.mk
 
 cp -p %{SOURCE31} $RPM_BUILD_ROOT%{systemdunitdir}/httpd.service
-ln -sr $RPM_BUILD_ROOT%{systemdunitdir}/httpd.service $RPM_BUILD_ROOT/etc/systemd/system/httpd.service
 ln -sr $RPM_BUILD_ROOT%{_libexecdir} $RPM_BUILD_ROOT%{_sysconfdir}/modules
 ln -sr $RPM_BUILD_ROOT%{_localstatedir}/run/httpd $RPM_BUILD_ROOT%{_sysconfdir}/run
 ln -sr $RPM_BUILD_ROOT%{_var}/log/httpd $RPM_BUILD_ROOT%{_sysconfdir}/logs
@@ -2893,6 +2893,7 @@ cp -a %{SOURCE33} $CFG/60_mod_md.conf
 cp -a %{SOURCE29} $RPM_BUILD_ROOT%{_sysconfdir}/vhosts.d/example.net.conf
 
 cp -p %{SOURCE30} $RPM_BUILD_ROOT%{systemdtmpfilesdir}/%{name}.conf
+cp -p %{SOURCE34} $RPM_BUILD_ROOT%{systemdtmpfilesdir}/%{name}-mod_dav.conf
 
 modules="
 	%{?with_bucketeer:bucketeer}
@@ -3295,7 +3296,6 @@ fi
 
 %{systemdtmpfilesdir}/%{name}.conf
 %{systemdunitdir}/httpd.service
-%config(noreplace) %verify(not md5 mtime size) /etc/systemd/system/httpd.service
 
 %{_mandir}/man8/httpd.8*
 
@@ -3551,6 +3551,7 @@ fi
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_mod_dav.conf
 %attr(755,root,root) %{_libexecdir}/mod_dav*.so
 %dir %attr(770,root,http) /var/lock/mod_dav
+%{systemdtmpfilesdir}/%{name}-mod_dav.conf
 
 %files mod_dbd
 %defattr(644,root,root,755)
