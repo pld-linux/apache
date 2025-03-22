@@ -35,7 +35,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.4.63
-Release:	3
+Release:	4
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -145,9 +145,9 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_sysconfdir	/etc/httpd
 %define		_includedir	%{_prefix}/include/apache
-%define		_datadir	/home/services/httpd
 %define		_libexecdir	%{_libdir}/apache
 %define		_cgibindir	%{_prefix}/lib/cgi-bin/%{name}
+%define		docroot		/home/services/httpd
 
 %description
 Apache is a powerful, full-featured, efficient and freely-available
@@ -2741,6 +2741,7 @@ CPPFLAGS="-DMAX_SERVER_LIMIT=200000 -DBIG_SECURITY_HOLE=1"
 install -d build; cd build
 %define configuredir ..
 %configure \
+	--datadir=%{docroot} \
 	--enable-layout=PLD \
 	--disable-v4-mapped \
 	--enable-exception-hook \
@@ -2815,7 +2816,7 @@ install -d build; cd build
 	--with-program-name=httpd \
 	--with-suexec-bin=%{_sbindir}/suexec \
 	--with-suexec-caller=http \
-	--with-suexec-docroot=%{_datadir} \
+	--with-suexec-docroot=%{docroot} \
 	--with-suexec-logfile=/var/log/httpd/suexec_log \
 	--with-suexec-uidmin=500 \
 	--with-suexec-gidmin=500 \
@@ -2830,7 +2831,7 @@ install -d $RPM_BUILD_ROOT/etc/{logrotate.d,rc.d/init.d,sysconfig,systemd/system
 	$RPM_BUILD_ROOT%{_var}/{log/{httpd,archive/httpd},{run,cache}/httpd,lock/mod_dav} \
 	$RPM_BUILD_ROOT%{_var}/lib/httpd/md \
 	$RPM_BUILD_ROOT%{_sysconfdir}/{webapps.d,conf.d,vhosts.d} \
-	$RPM_BUILD_ROOT%{_datadir}/{cgi-bin,vhosts} \
+	$RPM_BUILD_ROOT%{docroot}/{cgi-bin,vhosts} \
 	$RPM_BUILD_ROOT%{systemdtmpfilesdir} \
 	$RPM_BUILD_ROOT%{systemdunitdir}
 
@@ -2992,15 +2993,15 @@ for module in $modules; do
 done
 
 # anything in style dir not ending with .css is trash
-%{__rm} -r $RPM_BUILD_ROOT%{_datadir}/manual/style/{lang,latex,xsl}
-find $RPM_BUILD_ROOT%{_datadir}/manual/style -type f ! -name '*.css' -print0 | xargs -0r rm -f
+%{__rm} -r $RPM_BUILD_ROOT%{docroot}/manual/style/{lang,latex,xsl}
+find $RPM_BUILD_ROOT%{docroot}/manual/style -type f ! -name '*.css' -print0 | xargs -0r rm -f
 
 # find manual files
 > manual.files
 cur=$(pwd)
 cd $RPM_BUILD_ROOT
-find ./%{_datadir}/manual -type d -printf "%%%%dir %{_datadir}/manual/%%P\n" >> "$cur/manual.files"
-find ./%{_datadir}/manual -type f -printf "%{_datadir}/manual/%%P\n" | sed -e '
+find ./%{docroot}/manual -type d -printf "%%%%dir %{docroot}/manual/%%P\n" >> "$cur/manual.files"
+find ./%{docroot}/manual -type f -printf "%{docroot}/manual/%%P\n" | sed -e '
 s/^.*\.\(de\|es\|fr\|ja\|ko\|ru\)\(\..*\)\?/%%lang(\1) &/
 s/^.*\.\(pt-br\)/%%lang(pt_BR) &/
 ' >> "$cur/manual.files"
@@ -3026,7 +3027,7 @@ ln -sf suexec $RPM_BUILD_ROOT%{_sbindir}/suexec.fcgi
 %{__rm} $RPM_BUILD_ROOT%{_libexecdir}/*.exp
 %{__rm} $RPM_BUILD_ROOT%{_sysconfdir}/mime.types
 %{__rm} -r $RPM_BUILD_ROOT%{_sysconfdir}/{extra,original}
-%{__rm} $RPM_BUILD_ROOT%{_datadir}/icons/README*
+%{__rm} $RPM_BUILD_ROOT%{docroot}/icons/README*
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -3303,13 +3304,12 @@ fi
 %attr(2750,root,logs) %dir /var/log/archive/httpd
 %attr(640,root,logs) %ghost /var/log/httpd/*
 
-%dir %{_datadir}
+%dir %{docroot}
 
-%dir %{_datadir}/cgi-bin
-%dir %{_datadir}/html
-%dir %{_datadir}/vhosts
-# do not adapter here, %%{_datadir} != /usr/share here
-%{_datadir}/icons
+%dir %{docroot}/cgi-bin
+%dir %{docroot}/html
+%dir %{docroot}/vhosts
+%{docroot}/icons
 %attr(755,root,root) %{_libexecdir}/mod_mpm_event.so
 %attr(755,root,root) %{_libexecdir}/mod_mpm_prefork.so
 %attr(755,root,root) %{_libexecdir}/mod_mpm_worker.so
@@ -3323,7 +3323,7 @@ fi
 %files errordocs
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/conf.d/*_errordocs.conf
-%{_datadir}/error
+%{docroot}/error
 
 %files suexec
 %defattr(644,root,root,755)
@@ -3335,7 +3335,7 @@ fi
 
 %files index
 %defattr(644,root,root,755)
-%config(noreplace,missingok) %{_datadir}/html/index.html*
+%config(noreplace,missingok) %{docroot}/html/index.html*
 
 %files tools
 %defattr(644,root,root,755)
