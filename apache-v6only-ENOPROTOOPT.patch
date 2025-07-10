@@ -1,12 +1,12 @@
---- httpd-2.0.48/server/listen.c.orig	Mon Mar 31 06:30:52 2003
-+++ httpd-2.0.48/server/listen.c	Wed Mar  3 12:05:09 2004
-@@ -76,7 +76,7 @@
+diff -ruNp httpd-2.4.64.orig/server/listen.c httpd-2.4.64/server/listen.c
+--- httpd-2.4.64.orig/server/listen.c	2025-06-04 11:41:25.000000000 +0200
++++ httpd-2.4.64/server/listen.c	2025-07-10 20:14:55.139703494 +0200
+@@ -163,7 +163,7 @@ static apr_status_t make_sock(apr_pool_t
  #if APR_HAVE_IPV6
-     if (server->bind_addr->family == APR_INET6) {
-         stat = apr_socket_opt_set(s, APR_IPV6_V6ONLY, v6only_setting);
--        if (stat != APR_SUCCESS && stat != APR_ENOTIMPL) {
-+        if (stat != APR_SUCCESS && stat != APR_ENOTIMPL && stat != ENOPROTOOPT) {
-             ap_log_perror(APLOG_MARK, APLOG_CRIT, stat, p, APLOGNO(00069)
-                           "make_sock: for address %pI, apr_socket_opt_set: "
-                           "(IPV6_V6ONLY)",
-
+         if (server->bind_addr->family == APR_INET6) {
+             stat = apr_socket_opt_set(s, APR_IPV6_V6ONLY, v6only_setting);
+-            if (stat != APR_SUCCESS && stat != APR_ENOTIMPL) {
++            if (stat != APR_SUCCESS && stat != APR_ENOTIMPL && stat != ENOPROTOOPT) {
+                 ap_log_perror(APLOG_MARK, APLOG_CRIT, stat, p, APLOGNO(00069)
+                               "make_sock: for address %pI, apr_socket_opt_set: "
+                               "(IPV6_V6ONLY)",
