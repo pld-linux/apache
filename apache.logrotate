@@ -14,5 +14,8 @@
 	else
 		/sbin/service httpd flush-logs > /dev/null
 	fi
+	# let old children drain and release the moved logs before compression
+	# (async graceful reload; else gzip races the still-open fd)
+	sleep 180
     endscript
 }
