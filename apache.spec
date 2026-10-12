@@ -35,7 +35,7 @@ Summary(ru.UTF-8):	Самый популярный веб-сервер
 Summary(tr.UTF-8):	Lider WWW tarayıcı
 Name:		apache
 Version:	2.4.69
-Release:	1
+Release:	2
 License:	Apache v2.0
 Group:		Networking/Daemons/HTTP
 Source0:	http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -3035,20 +3035,6 @@ rm -rf $RPM_BUILD_ROOT
 %pre base
 %groupadd -g 51 http
 %useradd -u 51 -r -d /home/services/httpd -s /bin/false -c "HTTP User" -g http http
-
-%pretrans base
-# upgrade to 2.4: handle $HTTPD_MPM from sysconfig
-if [ -f /etc/sysconfig/httpd ]; then
-	MPM=$(grep ^HTTPD_MPM /etc/sysconfig/httpd | sed 's,HTTPD_MPM=,,;s,",,g')
-	if [ -n "$MPM" ]; then
-		echo "LoadModule mpm_${MPM}_module	modules/mod_mpm_${MPM}.so" > /etc/httpd/conf.d/10_mpm.conf.rpmnew
-		cat /etc/httpd/conf.d/10_mpm.conf >> /etc/httpd/conf.d/10_mpm.conf.rpmnew
-		mv -f /etc/httpd/conf.d/10_mpm.conf.rpmnew /etc/httpd/conf.d/10_mpm.conf
-		sed -i -e 's,HTTPD_MPM.*,,g' /etc/sysconfig/httpd
-	fi
-fi
-
-exit 0
 
 %post base
 /sbin/chkconfig --add httpd
